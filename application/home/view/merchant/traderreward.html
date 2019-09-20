@@ -1,0 +1,108 @@
+{include file="Public:header_new"}
+    <div class="content-wrapper" id="pjax-container" style="min-height: 706px;">
+            <section class="content-header"><h1>
+            订单奖励
+            <small>列表</small>
+        </h1>
+
+        <!-- breadcrumb start -->
+                <!-- breadcrumb end -->
+
+    </section><section class="content"><div class="row"><div class="col-md-12">
+<div class="box">
+    <div class="box-header">
+
+        <h3 class="box-title"></h3>
+
+        <div class="pull-right">
+            <div class="btn-group pull-right" style="margin-right: 10px">
+    <a href="/merchant/traderreward" class="btn btn-sm btn-facebook"><i class="fa fa-undo"></i>&nbsp;&nbsp;重置</a>
+</div>
+&nbsp;&nbsp;
+
+            
+        </div>
+
+        <span>
+            <a class="btn btn-sm btn-primary grid-refresh"><i class="fa fa-refresh"></i> 刷新</a>
+        </span>
+
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body table-responsive no-padding">
+        <table class="table table-hover"><tbody><tr>
+<th>ID<a class="fa fa-fw fa-sort" href="/merchant/traderreward?order=asc"></a>
+</th>
+                                <th>订单编号</th>
+                                <th>总金额</th>
+                                <th>奖励</th>
+                                <th>类型</th>
+                                <th>时间</th>
+                            </tr>
+                            {volist name="list" id="vo"}
+                            <tr>
+                            	<td>{$vo.id}</td>
+                            	<td>{$vo.order_no}</td>
+                            	<td>{$vo.deal_amount}</td>
+                            	<td>{$vo.amount}</td>
+                            	<td>
+									{if	condition="$vo.type eq 0"}
+                            		出售订单完成奖励
+                            		{elseif condition="$vo.type eq 1"/}
+                            		{elseif condition="$vo.type eq 2"/}
+                            		{/if}
+                            	</td>
+                            	<td>{:date("Y-m-d H:i:s", $vo['create_time'])}</td>
+                            </tr>
+                            {/volist}
+                            </tbody></table>
+</div>
+    <div class="box-footer clearfix">
+		{$list->render()}
+    </div>
+    <!-- /.box-body -->
+</div>
+</div></div>
+
+    </section><script data-exec-on-popstate="">
+
+    $(function () {
+                    
+$("#filter-modal .submit").click(function () {
+    $("#filter-modal").modal('toggle');
+    $('body').removeClass('modal-open');
+    $('.modal-backdrop').remove();
+});
+
+                    $(".status").select2({
+  placeholder: "选择"
+});
+
+                    
+$('.export-selected').click(function (e) {
+    e.preventDefault();
+    
+    var rows = selectedRows().join(',');
+    if (!rows) {
+        return false;
+    }
+    
+    var href = $(this).attr('href').replace('__rows__', rows);
+    location.href = href;
+});
+
+                    
+$('.grid-refresh').on('click', function() {
+    //$.pjax.reload('#pjax-container');
+    //toastr.success('刷新成功 !');
+    window.location.reload();
+});
+
+                    
+$('.grid-per-pager').on("change", function(e) {
+    //$.pjax({url: this.value, container: '#pjax-container'});
+});
+
+            });
+</script></div>
+{include file="Public:footer_new"/}

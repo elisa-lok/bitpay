@@ -1,0 +1,292 @@
+{include file="public/header"/}
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+
+    <!-- 上方tab -->
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label pull-right" data-show="{$rechargeToday}">日</span>
+                    <span class="label pull-right" data-show="{$rechargeWeek}">周</span>
+                    <span class="label label-success pull-right" data-show="{$rechargeMonth}">月</span>
+                    <h5>充值数量</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins">{$rechargeMonth}</h1>
+                    <small>总充值数量</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label pull-right" data-show="{$tiToday}">日</span>
+                    <span class="label pull-right" data-show="{$tiWeek}">周</span>
+                    <span class="label label-success pull-right" data-show="{$tiMonth}">月</span>
+                    <h5>提币数量</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins">{$tiMonth}</h1>
+                    <small>总提币数量</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label pull-right" data-show="{$feeToday}">日</span>
+                    <span class="label pull-right" data-show="{$feeWeek}">周</span>
+                    <span class="label label-success pull-right" data-show="{$feeMonth}">月</span>
+                    <h5>手续费数量</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins">{$feeMonth}</h1>
+                    <small>总手续费数量</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label pull-right" data-show="{$addressToday}">日</span>
+                    <span class="label pull-right" data-show="{$addressWeek}">周</span>
+                    <span class="label label-success pull-right" data-show="{$addressMonth}">月</span>
+                    <h5>地址分配数量</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins">{$addressMonth}</h1>
+                    <small>分配地址数量</small>
+                </div>
+            </div>
+        </div>
+        {if condition="config('wallettype') eq 'omni'"}
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>USDT余额</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins" id="usdtbalance">{$usdt}</h1>
+                    <small onclick="getUsdt();" style="cursor:pointer;color:#1ab394">点击获取</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>BTC余额</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins" id="btcbalance">{$btc}</h1>
+                    <small onclick="getBtc();" style="cursor:pointer;color:#1ab394">点击获取</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>OMNI_USDT可用地址</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins" id="alladdress1">{$alladdress1}</h1>
+                    <small onclick="addaddress1();" style="cursor:pointer;color:#1ab394">点击生成10个新地址</small>
+                </div>
+            </div>
+        </div>
+    {else/}
+     <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>ERC20_USDT可用地址</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins" id="alladdress2">{$alladdress2}</h1>
+                    <small onclick="addaddress2();" style="cursor:pointer;color:#1ab394">点击生成10个新地址</small>
+                </div>
+            </div>
+        </div>
+{/if}
+       <!--  <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>USDT余额</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins" id="usdtbalance">{$usdt}</h1>
+                    <small onclick="getUsdt();" style="cursor:pointer;color:#1ab394">点击获取</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>BTC余额</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins" id="btcbalance">{$btc}</h1>
+                    <small onclick="getBtc();" style="cursor:pointer;color:#1ab394">点击获取</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>OMNI_USDT可用地址</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins" id="alladdress1">{$alladdress1}</h1>
+                    <small onclick="addaddress1();" style="cursor:pointer;color:#1ab394">点击生成10个新地址</small>
+                </div>
+            </div>
+        </div> -->
+
+        <!-- <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>ERC20_USDT可用地址</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins" id="alladdress2">{$alladdress2}</h1>
+                    <small onclick="addaddress2();" style="cursor:pointer;color:#1ab394">点击生成10个新地址</small>
+                </div>
+            </div>
+        </div> -->
+    </div>
+
+    <!-- 中间折线 -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="col-sm-6">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <i class="fa fa-cogs"></i> 系统信息
+                    </div>
+                    <div class="panel-body">
+                        <p><i class="fa fa-sitemap"></i> 框架版本：ThinkPHP{$info.think_v}
+                        </p>
+                        <p><i class="fa fa-windows"></i> 服务环境：{$info.web_server}
+                        </p>
+                        <p><i class="fa fa-warning"></i> 上传附件限制：{$info.onload}
+                        </p>
+                        <p><i class="fa fa-credit-card"></i> PHP 版本：{$info.phpversion}
+                        </p>
+                    </div>
+                </div>
+            </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{include file="public/footer" /}
+<script src="__JS__/ethers-v4.min.js"></script>
+<script>
+		$('.ibox-title span').click(function(){
+			var num = $(this).attr('data-show');
+			$(this).siblings('span').removeClass('label-success');
+			$(this).addClass('label-success');
+			$(this).parent().siblings('.ibox-content').children('h1').html(num);
+		})
+        function addaddress1(){
+            var load;
+            $.ajax({
+                url:'/admin/index/addaddress',
+                type:'post',
+                data:{},
+                beforeSend:function(){
+                    load = layer.load();
+                },
+                success:function(data){
+                    layer.close(load);
+                    console.log(data);
+                    if(data.code==1){
+                        layer.msg(data.msg, {
+                              icon: 1,
+                              time: 2000 //2秒关闭（如果不配置，默认是3秒）
+                            }, function(){
+                              window.location.reload()
+                            });
+                    }else{
+                         layer.msg(data.msg, {
+                              icon: 2,
+                              time: 2000 //2秒关闭（如果不配置，默认是3秒）
+                            });
+                    }
+                    // $('#usdtbalance').html(data.msg);
+                    // window.location.reload()
+                }
+            })
+        }
+        function addaddress2(){
+           var load = layer.load();
+            // load = layer.load();
+            var provider = ethers.getDefaultProvider();//线上默认网络
+            for (var i = 0; i < 10; i++) {
+                const wallet = new ethers.Wallet.createRandom();
+                // wallet.provider = provider;
+                const addr=wallet.address;
+                const prive=wallet.privateKey;
+                // console.log('钱包地址:' + wallet.address);
+                // console.log('导出私钥:'+ wallet.privateKey);
+                $.ajax({
+                url:'/admin/index/addaddresseth',
+                type:'post',
+                data:{addr:addr,prive:prive},
+
+             })
+            }
+
+            // console.log(provider);
+             layer.close(load);
+                 layer.msg('生成成功!', {
+                              icon: 1,
+                              time: 2000 //2秒关闭（如果不配置，默认是3秒）
+                            }, function(){
+                              window.location.reload()
+                            });
+        }
+		function getUsdt(){
+			var load;
+			$.ajax({
+				url:'/admin/index/getUsdt',
+				type:'post',
+				data:{},
+				beforeSend:function(){
+					load = layer.load();
+				},
+				success:function(data){
+					layer.close(load);
+					$('#usdtbalance').html(data.msg);
+				}
+			})
+		}
+		function getBtc(){
+			var load;
+			$.ajax({
+				url:'/admin/index/getBtc',
+				type:'post',
+				data:{},
+				beforeSend:function(){
+					load = layer.load();
+				},
+				success:function(data){
+					layer.close(load);
+					$('#btcbalance').html(data.msg);
+				}
+			})
+		}
+
+        $(function(){
+             contractaddr='{php} echo config('usdtaddr');{/php}';
+             abi='{php} echo config('usdtabi');{/php}';
+            localStorage.setItem('tokenaddress',contractaddr);//获取合约地址
+            localStorage.setItem('tokenabi',abi);//获取合约地址
+            });
+	</script>
+</body>
+</html>

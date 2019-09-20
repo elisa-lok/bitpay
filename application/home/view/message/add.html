@@ -1,0 +1,80 @@
+{include file="Public:header_new"}
+<style>
+                            .cards-item{ border:1px dashed #ccc; padding:10px; margin-bottom:5px; background:#fbfbfb; }
+                            .cards-item .form-group{ width:80%; margin-bottom:5px; }
+                            .cards-item .btn-remove{ float:right; border:1px solid #ccc; padding:5px; border-radius:2px;}
+                        </style>
+    <div class="content-wrapper" id="pjax-container" style="min-height: 706px;">
+            <section class="content-header"><h1>
+            反馈问题
+            <small>新增</small>
+        </h1>
+
+        <!-- breadcrumb start -->
+                <!-- breadcrumb end -->
+
+    </section><section class="content"><div class="row"><div class="col-md-12">
+<div class="box box-info">
+    <div class="box-header with-border">
+        <h3 class="box-title">新增</h3>
+
+        <div class="box-tools">
+            <div class="btn-group pull-right" style="margin-right: 10px">
+                <a href="/message/index" class="btn btn-sm btn-default"><i class="fa fa-list"></i>&nbsp;列表</a>
+            </div>
+        </div>
+    </div>
+    <!-- /.box-header -->
+
+    <!-- form start -->
+    <form action="/message/add" method="post" accept-charset="UTF-8" class="form-horizontal" pjax-container="">
+        <div class="box-body">
+<div class="fields-group">
+                <div class="form-group 1">
+                    <label for="currency" class="col-sm-3 control-label"><em class="text-danger">*</em> 问题类型</label>
+                    <div class="col-sm-2">
+                        <input type="hidden" name="currency"><select class="form-control" style="width: 100%;" name="type" onchange=""><!-- <option value="CNY">CNY</option> -->
+<option value="1">充值</option><option value="2">提币</option><option value="3">其它</option></select>
+</div>
+                </div>
+
+                <div class="form-group form-group-USDT" style="display:block">
+                    <label class="col-sm-3 control-label"><em class="text-danger">*</em> 问题内容</label>
+                    <div class="col-sm-9">
+                    	<textarea rows="" cols="" class="form-control" name="content"></textarea>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+
+            <div class="col-sm-2">
+
+            </div>
+            <div class="col-sm-8">
+                <div class="btn-group pull-right">
+                    <button type="submit" class="btn btn-info pull-right" data-loading-text="&lt;i class=&#39;fa fa-spinner fa-spin &#39;&gt;&lt;/i&gt; 提交">提交</button>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- /.box-footer -->
+    </form>
+</div>
+
+<script>
+</script>
+</div></div>
+
+    </section><script data-exec-on-popstate="">
+
+    $(function () {
+            });
+</script></div>
+{include file="Public:footer_new"/}

@@ -1,0 +1,43 @@
+{include file="Public:header_new"}
+<style>
+.news-title{
+    line-height: 1.2;
+    font-size: 28px;
+    font-weight: bold;
+}
+.new-info .label{
+    opacity: 0.6;
+    /*设置不透明度*/
+}
+.news-content{
+    margin-top: 10px;
+    font-size: 15px;
+}
+.news-content img{
+    width: 450px;
+    height: 250px;
+   margin: 10px auto;
+}
+.clear-image-padding{
+    padding-left: 0px;
+    padding-right: 0px;
+    /*这里添加的图片，继承了父元素的padding属性，重复了*/
+}
+</style>
+    <div class="content-wrapper" id="pjax-container" style="min-height: 706px;">
+    	 <div class="col-md-8">
+            <h1 class="news-title">{$detail.title}</h1>
+            <!--搜索引擎，h1爬取权重较高-->
+            <div class="new-info">{:date("Y-m-d H:i:s", $detail['update_time'])}
+                <div class="label label-default">{$detail.keyword}</div>
+            </div>
+            <div class="news-content">
+                {$detail.content}
+            </div>
+        </div>
+     <script data-exec-on-popstate="">
+
+    $(function () {
+            });
+</script></div>
+{include file="Public:footer_new"/}

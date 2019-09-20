@@ -1,0 +1,48 @@
+*{margin:0;padding:0;font-size:13px;font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;}
+em{font-style:normal}
+.usdt a,a{color:#b2def3}
+.clear{clear:both;}
+li{list-style:none;}
+h3{font-size:14px;}
+img{vertical-align:middle}
+.main{background:#e9e9e9;width:100%;}
+.content{width:1200px;margin:0 auto}
+.header{background:#778696;padding:10px;}
+.header img{height:35px;}
+.header span{margin-left:60px;color:#fff;font-size:14px;}
+.paycontent{background:#fff;border-radius:20px;margin-top:20px;padding:20px;}
+.confirminfo .infodetail{position:relative;margin-left:20px;background:#f0fff0;margin-top:20px;}
+.infodetail span{padding-left:100px;}
+.red{color:red;}
+.f14{font-size:14px;font-weight:bold;}
+.hide{display:none;}
+.usdt{position:absolute;top:0;right:0;}
+.p1050{padding:10px 50px;}
+.p10{padding:10px;}
+.mt20{margin-top:20px;}
+.mt10{margin-top:10px;}
+.descusdt{position:absolute;right:0;top:22px;}
+.descusdt p{width:500px;line-height:19px;}
+.usdt img{width:30px;}
+.paydesk{position:relative;}
+.paydesk h3{color:#44679b}
+.paydesk span{position:absolute;top:0;right:0;}
+.paymethod li{border:1px solid #ccc;display:inline-block;width:115px;cursor:pointer;}
+.paymethod .active{border-color:#44679b;}
+.l22{line-height:22px;}
+.knowledge{width:39%;height:280px;background:#f8f8f8;float:left;border-radius:10px;}
+.sellerinfo{width:100%;height:400px;background:#eef7fd;float:right;border-radius:10px;}
+.sellerinfo ul{background:#88cbfb;}
+.sellerinfo ul li{width:32%;display:inline-block;color:#fff;}
+.erweima{text-align:center;}
+.erweima div img{width:25%;height:283px;}
+.mt10{margin-top:10px;}
+.knowledge p{padding:10px;}
+.w80{width:80px;}
+.security h3{text-align:center;color:#000;}
+.security ul li{width:25%;float:left;display:inline-block;}
+.security ul li .img-div{float:left;}
+.security ul li .img-div img{width:64px;}
+.security ul li .content-div{float:right;width:75%;}
+.paybutton{text-align:center;}
+.paybutton button{color:#fff;padding:10px 20px;cursor:pointer;border:0;border-radius:10px;background:#8fba90}

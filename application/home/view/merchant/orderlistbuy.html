@@ -1,0 +1,265 @@
+{include file="Public:header_new"}
+<style>
+    .cards-item{ border:1px dashed #ccc; padding:10px; margin-bottom:5px; background:#fbfbfb; }
+                            .cards-item .form-group{ width:80%; margin-bottom:5px; }
+                            .cards-item .btn-remove{ float:right; border:1px solid #ccc; padding:5px; border-radius:2px;}
+                        </style>
+<div class="content-wrapper" id="pjax-container" style="min-height: 706px;">
+    <section class="content-header">
+        <h1>
+            订单列表
+        </h1>
+    </section>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-header">
+                        <h3 class="box-title"></h3>
+                        <div class="pull-right">
+                            <div class="btn-group pull-right" style="margin-right: 10px">
+                                <a data-href="" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#filter-modal"><i class="fa fa-filter"></i>&nbsp;&nbsp;筛选</a>
+                                <a href="/merchant/orderlistbuy" class="btn btn-sm btn-facebook"><i class="fa fa-undo"></i>&nbsp;&nbsp;重置</a>
+                            </div>
+                            <div class="modal fade" id="filter-modal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                                <span class="sr-only">Close</span>
+                                            </button>
+                                            <h4 class="modal-title" id="myModalLabel">筛选</h4>
+                                        </div>
+                                        <form action="/merchant/orderlistbuy" method="get" pjax-container="">
+                                            <div class="modal-body">
+                                                <div class="form">
+                                                    <div class="form-group">
+                                                        <div class="form-group">
+                                                            <label>订单号</label>
+                                                            <div class="input-group">
+                                                                <div class="input-group-addon">
+                                                                    <i class="fa fa-pencil"></i>
+                                                                </div>
+                                                                <input type="text" class="form-control username" placeholder="输入订单号,可模糊查找" name="ordersn" value="">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="form-group">
+                                                            <label>状态</label>
+                                                            <select class="form-control status select2-hidden-accessible" name="status" style="width: 100%;" tabindex="-1" aria-hidden="true">
+                                                                <option></option>
+                                                                <option value="0">待付款</option>
+                                                                <option value="1">待放行</option>
+                                                                <option value="4">已完成</option>
+                                                                <option value="5">已关闭</option>
+                                                                <option value="5">申诉中</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="form-group">
+                                                            <label>订单时间</label>
+                                                            <div class="input-group">
+                                                                <div class="input-group-addon">
+                                                                    <i class="fa fa-calendar"></i>
+                                                                </div>
+                                                                <input type="text" class="form-control" id="created_at_start" placeholder="起止时间" name="created_at[start]" value=""><span class="input-group-addon" style="border-left: 0; border-right: 0;">-</span>
+                                                                <input type="text" class="form-control" id="created_at_end" placeholder="起止时间" name="created_at[end]" value="">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-primary submit">提交</button>
+                                                <button type="reset" class="btn btn-warning pull-left">重置</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <span>
+                            <a class="btn btn-sm btn-primary grid-refresh"><i class="fa fa-refresh"></i> 刷新</a>
+                        </span>
+                    </div>
+                    <div class="tab-content">
+                        <div class="table-responsive" id="tab_886859313">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>订单编号</th>
+                                        <th>交易金额</th>
+                                        <th>交易数量</th>
+                                        <th>交易价格</th>
+                                        <th>创建时间</th>
+                                        <th>交易状态</th>
+                                        <th>支付信息</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {volist name="list" id="vo"}
+                                    <tr>
+                                        <td>{$vo.order_no}</td>
+                                        <td>{$vo.deal_amount}</td>
+                                        <td>{$vo.deal_num}</td>
+                                        <td>{$vo.deal_price}</td>
+                                        <td>{$vo['ctime']|date="Y-m-d H:i:s",###}</td>
+                                        <td>
+                                            {eq name="vo.status" value="0"}待付款{/eq}
+                                            {eq name="vo.status" value="1"}待放行{/eq}
+                                            {eq name="vo.status" value="4"}已完成{/eq}
+                                            {eq name="vo.status" value="5"}已关闭{/eq}
+                                            {eq name="vo.status" value="6"}申诉中{/eq}
+                                        </td>
+                                        <td>
+                                            <a id="{$vo.id}" class="btn btn-sm btn-success payinfo">查看</a>
+                                        </td>
+                                        <td>
+                                            {eq name="vo.status" value="0"}
+                                            <a id="{$vo.id}" class="btn btn-sm btn-danger biaoji">标记付款</a>
+                                            {/eq}
+                                            <a id="{$vo.id}" class="btn btn-sm btn-success shensu">申诉</a>
+                                        </td>
+                                    </tr>
+                                    {/volist}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="box-footer clearfix">
+                            {$list->render()}
+                        </div>
+                    </div>
+                </div>
+                <script>
+                </script>
+            </div>
+        </div>
+    </section>
+    <script src="/static/admin/js/layer/layer.js"></script>
+    <script data-exec-on-popstate="">
+    var type = 1;
+
+    function closetanchu() {
+        layer.closeAll('loading');
+    }
+    $('.payinfo').click(function() {
+        $.ajax({
+            url: "{:url('home/merchant/payinfo')}",
+            type: 'post',
+            data: { id: $(this).attr('id') },
+            dataType: 'text',
+            beforeSend: function() {
+                layer.load(0, { shade: [0.5, '#8F8F8F'] });
+            },
+            success: function(data) {
+                var str1 = data.replace(/\\/g, "");
+                var str2 = str1.replace(/rn/g, "");
+                var str = str2.replace(/"/g, "");
+                layer.open({
+                    type: 1,
+                    title: '支付信息',
+                    shadeClose: true,
+                    skin: 'layui-layer-rim', //加上边框
+                    area: ['500px', '500px'], //宽高
+                    content: str
+                });
+            },
+            complete: function() {
+                layer.closeAll('loading');
+            }
+        });
+    })
+    $('.biaoji').click(function() {
+        layer.load(0, { shade: [0.5, '#8F8F8F'] });
+        $.post("{:url('home/merchant/uptradeinner')}", { id: $(this).attr('id'), type: type }, function(data) {
+            shelf = data.url;
+            setTimeout("closetanchu()", 4000);
+            if (data.code == 1) {
+                layer.msg(data.msg, { icon: 1 });
+                window.location.reload();
+            } else {
+                layer.msg(data.msg, { icon: 2 });
+            }
+        });
+    });
+    $('.shensu').click(function() {
+        //alert($(this).attr('id'));
+        var id = $(this).attr('id');
+        layer.prompt({
+            title: '输入申诉理由，并确认',
+            formType: 2
+        }, function(val) {
+            if (val) {
+                $.post("{:url('home/merchant/shensu_ajax_trader')}", { id: id, content: val }, function(data) {
+                    if (data.code == 1) {
+                        layer.alert(data.msg, function(index) {
+                            self.location.reload();
+                        });
+                    } else {
+                        layer.msg(data.msg, { icon: 2 });
+                    }
+                });
+            }
+        });
+    });
+    $(function() {
+        $('#created_at_start').datetimepicker({ "format": "YYYY-MM-DD HH:mm:ss", "locale": "zh_CN" });
+        $('#created_at_end').datetimepicker({ "format": "YYYY-MM-DD HH:mm:ss", "locale": "zh_CN", "useCurrent": false });
+        $("#created_at_start").on("dp.change", function(e) {
+            $('#created_at_end').data("DateTimePicker").minDate(e.date);
+        });
+        $("#created_at_end").on("dp.change", function(e) {
+            $('#created_at_start').data("DateTimePicker").maxDate(e.date);
+        });
+        $('#end_at_start').datetimepicker({ "format": "YYYY-MM-DD HH:mm:ss", "locale": "zh_CN" });
+        $('#end_at_end').datetimepicker({ "format": "YYYY-MM-DD HH:mm:ss", "locale": "zh_CN", "useCurrent": false });
+        $("#end_at_start").on("dp.change", function(e) {
+            $('#end_at_end').data("DateTimePicker").minDate(e.date);
+        });
+        $("#end_at_end").on("dp.change", function(e) {
+            $('#end_at_start').data("DateTimePicker").maxDate(e.date);
+        });
+
+        $("#filter-modal .submit").click(function() {
+            $("#filter-modal").modal('toggle');
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
+        });
+
+        $(".status").select2({
+            placeholder: "选择"
+        });
+
+
+        $('.export-selected').click(function(e) {
+            e.preventDefault();
+
+            var rows = selectedRows().join(',');
+            if (!rows) {
+                return false;
+            }
+
+            var href = $(this).attr('href').replace('__rows__', rows);
+            location.href = href;
+        });
+
+
+        $('.grid-refresh').on('click', function() {
+            //$.pjax.reload('#pjax-container');
+            //toastr.success('刷新成功 !');
+            window.location.reload();
+        });
+
+
+        $('.grid-per-pager').on("change", function(e) {
+            //$.pjax({url: this.value, container: '#pjax-container'});
+        });
+
+    });
+    </script>
+</div>
+{include file="Public:footer_new"/}

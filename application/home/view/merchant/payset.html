@@ -1,0 +1,584 @@
+{include file="Public:header_new"/}
+<div class="content-wrapper" id="pjax-container" style="min-height: 414px;">
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="/message/index#tab_1464414772" data-toggle="tab">银行卡账号</a></li>
+                        <li><a href="/message/index#tab_886859313" data-toggle="tab">支付宝</a></li>
+                        <li><a href="/message/index#tab_1558780376" data-toggle="tab">微信支付</a></li>
+                        <li><a href="/message/index#tab_23892081" data-toggle="tab">云闪付</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab_1464414772">
+                            <form action="{:url('home/merchant/doaccount')}" method="post" accept-charset="UTF-8" class="form-horizontal" enctype="multipart/form-data" pjax-container="">
+                                <div class="box-body">
+                                    <div class="fields-group">
+                                        <div class="form-group ">
+                                            <label class="col-sm-2  control-label">姓名</label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+                                                    <input type="text" id="truename" name="truename" value="" class="form-control password" placeholder="您的真实姓名">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group ">
+                                            <label class="col-sm-2  control-label">银行卡号标识</label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+                                                    <input type="text" id="name" name="name" value="" class="form-control password" placeholder="银行卡标识">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group  ">
+                                            <label for="name" class="col-sm-2  control-label">开户银行</label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+                                                    <input type="text" id="c_bank" name="c_bank" value="" class="form-control password" placeholder="开户银行">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group  ">
+                                        <label for="password" class="col-sm-2  control-label">开户支行</label>
+                                        <div class="col-sm-8">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+                                                <input type="text" id="c_bank_detail" name="c_bank_detail" value="" class="form-control password" placeholder="开户支行">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group  ">
+                                        <label for="password_confirmation" class="col-sm-2  control-label">银行卡号</label>
+                                        <div class="col-sm-8">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+                                                <input type="text" id="c_bank_card" name="c_bank_card" value="" class="form-control c_bank_card" placeholder="银行卡号">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group  ">
+                                        <label for="password_confirmation" class="col-sm-2  control-label">确认卡号</label>
+                                        <div class="col-sm-8">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+                                                <input type="text" id="c_bank_card_again" name="c_bank_card_again" value="" class="form-control c_bank_card" placeholder="确认卡号">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="box-footer">
+                                        <div class="col-md-2">
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="btn-group pull-right">
+                                                <input type="hidden" name="id" id="id" value="" />
+                                                <button type="submit" class="btn btn-info pull-right" data-loading-text="&lt;i class=&#39;fa fa-spinner fa-spin &#39;&gt;&lt;/i&gt; 保存">保存</button>
+                                            </div>
+                                            <div class="btn-group pull-left">
+                                                <button type="reset" class="btn btn-warning">重置</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="tab-content">
+                                <div class="" id="">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>姓名</th>
+                                                <th>标识</th>
+                                                <th>开户银行</th>
+                                                <th>开户支行</th>
+                                                <th>银行卡号</th>
+                                                <th>创建时间</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {volist name="list" id="vo"}
+                                            <tr>
+                                                <td>{$vo.truename}</td>
+                                                <td>{$vo.name}</td>
+                                                <td>{$vo.c_bank}</td>
+                                                <td>{$vo.c_bank_detail}</td>
+                                                <td>{$vo.c_bank_card}</td>
+                                                <td>{:date('Y-m-d H:i', $vo['create_time'])}</td>
+                                                <td>
+                                                    <a href="javascript:;;" class="btn btn-sm btn-success edit" data-id='{$vo.id}'>编辑</a>
+                                                    <a id="{$vo.id}" class="btn btn-sm btn-danger del">删除</a>
+                                                </td>
+                                            </tr>
+                                            {/volist}
+                                        </tbody>
+
+                                    </table>
+                                </div>
+                                <div class="box-footer clearfix">
+                                    {$list->render()}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane " id="tab_886859313">
+                            <form action="{:url('home/merchant/doalipaynew')}" method="post" accept-charset="UTF-8" class="form-horizontal" enctype="multipart/form-data" pjax-container="">
+                                <div class="box-body">
+                                    <div class="fields-group">
+                                        <div class="form-group ">
+                                            <label class="col-sm-2  control-label">姓名</label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+                                                    <input type="text" id="zfbtruename" name="zfbtruename" class="form-control password" placeholder="您的真实姓名">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group ">
+                                            <label class="col-sm-2  control-label">账户标识</label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+                                                    <input type="text" id="zfbname" name="zfbname" class="form-control password" placeholder="填写用于区别的标识,如账户1,账户2">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group  ">
+                                            <label for="name" class="col-sm-2  control-label">支付宝账号</label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+                                                    <input type="text" id="alipay_account" name="alipay_account" value="" class="form-control alipay_account" placeholder="输入支付宝账号">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group  ">
+                                            <label for="avatar" class="col-sm-2  control-label">收款码</label>
+                                            <div class="col-sm-8">
+                                                <div class="file-input">
+                                                    <div class="file-preview ">
+                                                        <input type="file" class="avatar" name="avatar" data-initial-preview="__IMG__/zfb.png" data-initial-caption="请选择支付宝收款码" id="1542010388780">
+                                                        <input type="hidden" id="img" name="last_alipay_img" value="">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div id="kvFileinputModal" class="file-zoom-dialog modal fade" tabindex="-1" aria-labelledby="kvFileinputModalLabel">
+                                                <div class="modal-dialog modal-lg" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <div class="kv-zoom-actions pull-right"><button type="button" class="btn btn-default btn-header-toggle btn-toggleheader" title="Toggle header" data-toggle="button" aria-pressed="false" autocomplete="off"><i class="glyphicon glyphicon-resize-vertical"></i></button><button type="button" class="btn btn-default btn-fullscreen" title="Toggle full screen" data-toggle="button" aria-pressed="false" autocomplete="off"><i class="glyphicon glyphicon-fullscreen"></i></button><button type="button" class="btn btn-default btn-borderless" title="Toggle borderless mode" data-toggle="button" aria-pressed="false" autocomplete="off"><i class="glyphicon glyphicon-resize-full"></i></button><button type="button" class="btn btn-default btn-close" title="Close detailed preview" data-dismiss="modal" aria-hidden="true"><i class="glyphicon glyphicon-remove"></i></button></div>
+                                                            <h3 class="modal-title">Detailed Preview <small><span class="kv-zoom-title"></span></small></h3>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="floating-buttons"></div>
+                                                            <div class="kv-zoom-body file-zoom-content"></div>
+                                                            <button type="button" class="btn btn-navigate btn-prev" title="View previous file"><i class="glyphicon glyphicon-triangle-left"></i></button> <button type="button" class="btn btn-navigate btn-next" title="View next file"><i class="glyphicon glyphicon-triangle-right"></i></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                        <div class="box-footer">
+                                            <div class="col-md-2">
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="btn-group pull-right">
+                                                    <button type="submit" class="btn btn-info pull-right" data-loading-text="&lt;i class=&#39;fa fa-spinner fa-spin &#39;&gt;&lt;/i&gt; 保存">保存</button>
+                                                </div>
+                                                <div class="btn-group pull-left">
+                                                    <button type="reset" class="btn btn-warning">重置</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            </form>
+                            <div class="tab-content">
+                                <div class="" id="">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>姓名</th>
+                                                <th>标识</th>
+                                                <th>支付宝账号</th>
+                                                <th>收款码(点击图片查看)</th>
+                                                <th>创建时间</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {volist name="list2" id="vo"}
+                                            <tr>
+                                                <td>{$vo.truename}</td>
+                                                <td>{$vo.name}</td>
+                                                <td>{$vo.c_bank}</td>
+                                                <td><a onclick="show('{$vo.c_bank_detail}')"><img src="/uploads/face/{$vo.c_bank_detail}" style="width: 30px;"></a></td>
+                                                <td>{:date('Y-m-d H:i', $vo['create_time'])}</td>
+                                                <td>
+                                                   <!--  <a href="javascript:;;" class="btn btn-sm btn-success editzfb" data-id='{$vo.id}'>编辑</a> -->
+                                                    <a id="{$vo.id}" class="btn btn-sm btn-danger delzfb">删除</a>
+                                                </td>
+                                            </tr>
+                                            {/volist}
+                                        </tbody>
+
+                                    </table>
+                                </div>
+                                <div class="box-footer clearfix">
+                                    {$list->render()}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane " id="tab_1558780376">
+                        <form action="{:url('home/merchant/dowechatnew')}" method="post" accept-charset="UTF-8" class="form-horizontal" enctype="multipart/form-data" pjax-container="">
+                            <div class="box-body">
+                                <div class="fields-group">
+                                    <div class="form-group ">
+                                        <label class="col-sm-2  control-label">姓名</label>
+                                        <div class="col-sm-8">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+                                                <input type="text" id="wxtruename" name="wxtruename"  class="form-control password" placeholder="您的真实姓名">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                            <label class="col-sm-2  control-label">账户标识</label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+                                                    <input type="text" id="wxname" name="wxname" class="form-control password" placeholder="填写用于区别的标识,如账户1,账户2">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <div class="form-group  ">
+                                        <label for="name" class="col-sm-2  control-label">微信账号</label>
+                                        <div class="col-sm-8">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+                                                <input type="text" id="wechat_account" name="wechat_account" value="{$user['c_wechat_account']}" class="form-control wechat_account" placeholder="输入 微信账号">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group  ">
+                                    <label for="avatar" class="col-sm-2  control-label">收款码</label>
+                                    <div class="col-sm-8">
+                                        <div class="file-input">
+                                            <div class="file-preview ">
+                                                <input type="file" class="avatar2" name="avatar2" data-initial-preview="__IMG__/wx.png" data-initial-caption="请选择微信收款二维码" id="1542010388780">
+                                                <input type="hidden" id="img2" name="last_wechat_img" value="{$user.c_wechat_img}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="kvFileinputModal" class="file-zoom-dialog modal fade" tabindex="-1" aria-labelledby="kvFileinputModalLabel">
+                                        <div class="modal-dialog modal-lg" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <div class="kv-zoom-actions pull-right"><button type="button" class="btn btn-default btn-header-toggle btn-toggleheader" title="Toggle header" data-toggle="button" aria-pressed="false" autocomplete="off"><i class="glyphicon glyphicon-resize-vertical"></i></button><button type="button" class="btn btn-default btn-fullscreen" title="Toggle full screen" data-toggle="button" aria-pressed="false" autocomplete="off"><i class="glyphicon glyphicon-fullscreen"></i></button><button type="button" class="btn btn-default btn-borderless" title="Toggle borderless mode" data-toggle="button" aria-pressed="false" autocomplete="off"><i class="glyphicon glyphicon-resize-full"></i></button><button type="button" class="btn btn-default btn-close" title="Close detailed preview" data-dismiss="modal" aria-hidden="true"><i class="glyphicon glyphicon-remove"></i></button></div>
+                                                    <h3 class="modal-title">Detailed Preview <small><span class="kv-zoom-title"></span></small></h3>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="floating-buttons"></div>
+                                                    <div class="kv-zoom-body file-zoom-content"></div>
+                                                    <button type="button" class="btn btn-navigate btn-prev" title="View previous file"><i class="glyphicon glyphicon-triangle-left"></i></button> <button type="button" class="btn btn-navigate btn-next" title="View next file"><i class="glyphicon glyphicon-triangle-right"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="box-footer">
+                                    <div class="col-md-2">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="btn-group pull-right">
+                                            <button type="submit" class="btn btn-info pull-right" data-loading-text="&lt;i class=&#39;fa fa-spinner fa-spin &#39;&gt;&lt;/i&gt; 保存">保存</button>
+                                        </div>
+                                        <div class="btn-group pull-left">
+                                            <button type="reset" class="btn btn-warning">重置</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </form>
+                        <div class="tab-content">
+                                <div class="" id="">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>姓名</th>
+                                                <th>标识</th>
+                                                <th>微信账号</th>
+                                                <th>收款码(点击图片查看)</th>
+                                                <th>创建时间</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {volist name="list3" id="vo"}
+                                            <tr>
+                                                <td>{$vo.truename}</td>
+                                                <td>{$vo.name}</td>
+                                                <td>{$vo.c_bank}</td>
+                                                <td><a onclick="show('{$vo.c_bank_detail}')"><img src="/uploads/face/{$vo.c_bank_detail}" style="width: 30px;"></a></td>
+                                                <td>{:date('Y-m-d H:i', $vo['create_time'])}</td>
+                                                <td>
+                                                   <!--  <a href="javascript:;;" class="btn btn-sm btn-success editwx" data-id='{$vo.id}'>编辑</a> -->
+                                                    <a id="{$vo.id}" class="btn btn-sm btn-danger delwx">删除</a>
+                                                </td>
+                                            </tr>
+                                            {/volist}
+                                        </tbody>
+
+                                    </table>
+                                </div>
+                                <div class="box-footer clearfix">
+                                    {$list->render()}
+                                </div>
+                            </div>
+                    </div>
+                     <div class="tab-pane " id="tab_23892081">
+                        <form action="{:url('home/merchant/doysfnew')}" method="post" accept-charset="UTF-8" class="form-horizontal" enctype="multipart/form-data" pjax-container="">
+                            <div class="box-body">
+                                <div class="fields-group">
+                                    <div class="form-group ">
+                                        <label class="col-sm-2  control-label">姓名</label>
+                                        <div class="col-sm-8">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+                                                <input type="text" id="ysftruename" name="ysftruename"  class="form-control password" placeholder="您的真实姓名">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                            <label class="col-sm-2  control-label">账户标识</label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+                                                    <input type="text" id="ysfname" name="ysfname" class="form-control password" placeholder="填写用于区别的标识,如账户1,账户2">
+                                                </div>
+                                            </div>
+                                        </div>
+                                </div>
+                                <div class="form-group  ">
+                                    <label for="avatar" class="col-sm-2  control-label">收款码</label>
+                                    <div class="col-sm-8">
+                                        <div class="file-input">
+                                            <div class="file-preview ">
+                                                <input type="file" class="avatar2" name="avatar2" data-initial-preview="__IMG__/ysf.jpg" data-initial-caption="请选择云闪付收款码" id="ysf">
+                                                <input type="hidden" id="img2" name="ysfimg" value="{$user.c_wechat_img}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="kvFileinputModal" class="file-zoom-dialog modal fade" tabindex="-1" aria-labelledby="kvFileinputModalLabel">
+                                        <div class="modal-dialog modal-lg" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <div class="kv-zoom-actions pull-right"><button type="button" class="btn btn-default btn-header-toggle btn-toggleheader" title="Toggle header" data-toggle="button" aria-pressed="false" autocomplete="off"><i class="glyphicon glyphicon-resize-vertical"></i></button><button type="button" class="btn btn-default btn-fullscreen" title="Toggle full screen" data-toggle="button" aria-pressed="false" autocomplete="off"><i class="glyphicon glyphicon-fullscreen"></i></button><button type="button" class="btn btn-default btn-borderless" title="Toggle borderless mode" data-toggle="button" aria-pressed="false" autocomplete="off"><i class="glyphicon glyphicon-resize-full"></i></button><button type="button" class="btn btn-default btn-close" title="Close detailed preview" data-dismiss="modal" aria-hidden="true"><i class="glyphicon glyphicon-remove"></i></button></div>
+                                                    <h3 class="modal-title">Detailed Preview <small><span class="kv-zoom-title"></span></small></h3>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="floating-buttons"></div>
+                                                    <div class="kv-zoom-body file-zoom-content"></div>
+                                                    <button type="button" class="btn btn-navigate btn-prev" title="View previous file"><i class="glyphicon glyphicon-triangle-left"></i></button> <button type="button" class="btn btn-navigate btn-next" title="View next file"><i class="glyphicon glyphicon-triangle-right"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="box-footer">
+                                    <div class="col-md-2">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="btn-group pull-right">
+                                            <button type="submit" class="btn btn-info pull-right" data-loading-text="&lt;i class=&#39;fa fa-spinner fa-spin &#39;&gt;&lt;/i&gt; 保存">保存</button>
+                                        </div>
+                                        <div class="btn-group pull-left">
+                                            <button type="reset" class="btn btn-warning">重置</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </form>
+                        <div class="tab-content">
+                                <div class="" id="">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>姓名</th>
+                                                <th>标识</th>
+                                                <th>收款码(点击图片查看)</th>
+                                                <th>创建时间</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {volist name="list4" id="vo"}
+                                            <tr>
+                                                <td>{$vo.truename}</td>
+                                                <td>{$vo.name}</td>
+                                                <td><a onclick="show('{$vo.c_bank_detail}')"><img src="/uploads/face/{$vo.c_bank_detail}" style="width: 30px;"></a></td>
+                                                <td>{:date('Y-m-d H:i', $vo['create_time'])}</td>
+                                                <td>
+                                                   <!--  <a href="javascript:;;" class="btn btn-sm btn-success editwx" data-id='{$vo.id}'>编辑</a> -->
+                                                    <a id="{$vo.id}" class="btn btn-sm btn-danger delysf">删除</a>
+                                                </td>
+                                            </tr>
+                                            {/volist}
+                                        </tbody>
+
+                                    </table>
+                                </div>
+                                <div class="box-footer clearfix">
+                                    {$list->render()}
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+</section>
+<script src="/static/admin/js/layer/layer.js"></script>
+<script>
+   $('.edit').click(function(){
+    var c_bank_card = $(this).parent().prev().prev().html();
+    var c_bank_detail = $(this).parent().prev().prev().prev().html();
+    var c_bank = $(this).parent().prev().prev().prev().prev().html();
+    var name = $(this).parent().prev().prev().prev().prev().prev().html();
+    var truename = $(this).parent().prev().prev().prev().prev().prev().prev().html();
+    var id = $(this).attr('data-id');
+    $('#c_bank').val(c_bank);
+    $('#c_bank_detail').val(c_bank_detail);
+    $('#c_bank_card').val(c_bank_card);
+    $('#c_bank_card_again').val(c_bank_card);
+    $('#name').val(name);
+    $('#truename').val(truename);
+    $('#id').val(id);
+})
+$('.del').click(function(){
+    // $(this).parent().parent().remove();return;
+    var id = $(this).attr('id');
+    var obj = $(this);
+    layer.confirm('确认删除此条记录吗?', {icon: 3, title:'提示'}, function(index){
+        $.getJSON("{:url('home/merchant/delBank')}", {'id' : id}, function(res){
+            if(res.code == 1){
+                layer.msg(res.msg,{icon:1,time:1500,shade: 0.1});
+                obj.parent().parent().remove();
+                //window.location.reload();
+            }else{
+                layer.msg(res.msg,{icon:0,time:1500,shade: 0.1});
+            }
+        });
+        layer.close(index);
+    })
+})
+
+
+
+$('.delzfb').click(function(){
+    // $(this).parent().parent().remove();return;
+    var id = $(this).attr('id');
+    var obj = $(this);
+    layer.confirm('确认删除此条记录吗?', {icon: 3, title:'提示'}, function(index){
+        $.getJSON("{:url('home/merchant/delZfb')}", {'id' : id}, function(res){
+            if(res.code == 1){
+                layer.msg(res.msg,{icon:1,time:1500,shade: 0.1});
+                obj.parent().parent().remove();
+                //window.location.reload();
+            }else{
+                layer.msg(res.msg,{icon:0,time:1500,shade: 0.1});
+            }
+        });
+        layer.close(index);
+    })
+})
+$('.delwx').click(function(){
+    // $(this).parent().parent().remove();return;
+    var id = $(this).attr('id');
+    var obj = $(this);
+    layer.confirm('确认删除此条记录吗?', {icon: 3, title:'提示'}, function(index){
+        $.getJSON("{:url('home/merchant/delWx')}", {'id' : id}, function(res){
+            if(res.code == 1){
+                layer.msg(res.msg,{icon:1,time:1500,shade: 0.1});
+                obj.parent().parent().remove();
+                //window.location.reload();
+            }else{
+                layer.msg(res.msg,{icon:0,time:1500,shade: 0.1});
+            }
+        });
+        layer.close(index);
+    })
+})
+$('.delysf').click(function(){
+    // $(this).parent().parent().remove();return;
+    var id = $(this).attr('id');
+    var obj = $(this);
+    layer.confirm('确认删除此条记录吗?', {icon: 3, title:'提示'}, function(index){
+        $.getJSON("{:url('home/merchant/delYsf')}", {'id' : id}, function(res){
+            if(res.code == 1){
+                layer.msg(res.msg,{icon:1,time:1500,shade: 0.1});
+                obj.parent().parent().remove();
+                //window.location.reload();
+            }else{
+                layer.msg(res.msg,{icon:0,time:1500,shade: 0.1});
+            }
+        });
+        layer.close(index);
+    })
+})
+</script>
+<script data-exec-on-popstate="">
+$(function() {
+
+    $("input.avatar, input.avatar2").fileinput({ "overwriteInitial": true, "initialPreviewAsData": true, "browseLabel": "\u6d4f\u89c8", "showRemove": false, "showUpload": false, "deleteExtraData": { "avatar": "_file_del_", "_file_del_": "", "_token": "NMTpuxZn8hIn4gtRifTX85NwwTcNuM8UsF6ClPne", "_method": "PUT" }, "deleteUrl": "http:\/\/we.btc360.io\/admin\/386", "allowedFileTypes": ["image"] });
+
+});
+$('.avatar, .avatar2').change(function() {
+    var url = getObjectURL(this.files[0]); //获取本地的文件地址
+    if (url) {
+        $(this).parent().find('img').attr('src', url); //修改图片路径
+        //$('.kv-preview-data').attr('src',url);
+    } else {
+        $(this).parent().find('img').attr('src', defaultimage);
+        //$('.kv-preview-data').attr('src',url);
+    }
+});
+
+//本地URL地址解析
+function getObjectURL(file) {
+    //不存在选择路径补null
+    file = file ? file : null;
+    if (file == null) {
+        return null;
+    }
+    var url = null;
+    if (window.createObjectURL != undefined) { // basic
+        url = window.createObjectURL(file);
+    } else if (window.URL != undefined) { // mozilla(firefox)
+        url = window.URL.createObjectURL(file);
+    } else if (window.webkitURL != undefined) { // webkit or chrome
+        url = window.webkitURL.createObjectURL(file);
+    }
+    return url;
+}
+
+function show(url){
+  layer.open({
+  type: 1,
+  title: false,
+  closeBtn: 0,
+  area: ['300px','300px'],
+  skin: 'layui-layer-nobg', //没有背景色
+  shadeClose: true,
+  content: '<img style="width:300px;height:300px;" src="/uploads/face/'+url+'">'
+});
+}
+</script>
+</div>
+{include file="Public:footer_new"/}

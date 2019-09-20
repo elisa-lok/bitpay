@@ -1,0 +1,130 @@
+{include file="Public:header_new"}
+<style>
+    .cards-item{ border:1px dashed #ccc; padding:10px; margin-bottom:5px; background:#fbfbfb; }
+                            .cards-item .form-group{ width:80%; margin-bottom:5px; }
+                            .cards-item .btn-remove{ float:right; border:1px solid #ccc; padding:5px; border-radius:2px;}
+                        </style>
+<div class="content-wrapper" id="pjax-container" style="min-height: 706px;">
+    <section class="content-header">
+        <h1>
+            发布广告
+        </h1>
+        <!-- breadcrumb start -->
+        <!-- breadcrumb end -->
+    </section>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">编辑一个广告</h3>
+
+                    </div>
+                    <!-- form start -->
+                    <form action="/merchant/editad" method="post" accept-charset="UTF-8" class="form-horizontal" pjax-container="">
+                        <div class="box-body">
+                            <div class="fields-group">
+                                <div class="form-group">
+                                    <label for="currency" class="col-sm-3 control-label"><em class="text-danger">*</em> 出售数量：</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" name="amount" id="amount" value="{$ad.amount}" onblur="jisuan()" />
+                                    </div>
+                                </div>
+                                {eq name="usdt_price_way" value="1"}
+                                <div class="form-group">
+                                    <label for="currency" class="col-sm-3 control-label"><em class="text-danger">*</em> 出售价格：</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" name="price" id="price" value="{:getUsdtPrice()}" readOnly />
+                                    </div>
+                                </div>
+                                {else/}
+                                <div class="form-group">
+                                    <label for="currency" class="col-sm-3 control-label"><em class="text-danger">*</em> 出售价格：</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" onblur="jisuan()" style="display:inline-block;width:72%;" class="form-control" name="price" id="price" value="{$ad.price}" placeholder="价格区间{$usdt_price_min}~{$usdt_price_max}" />
+                                        <span style="font-weight:bold">参考价格：{:getUsdtPrice()}</span>
+                                    </div>
+                                </div>
+                                {/eq}
+                                <div class="form-group">
+                                    <label for="currency" class="col-sm-3 control-label"><em class="text-danger">*</em> 最小限额：</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" name="min_limit" id="min_limit" value="{$ad.min_limit}" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="currency" class="col-sm-3 control-label"><em class="text-danger">*</em> 最大限额：</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" name="max_limit" id="max_limit" value="{$ad.max_limit}" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="currency" class="col-sm-3 control-label"><em class="text-danger">*</em> 收款方式：</label>
+                                    <div class="col-sm-6">
+                                        {php}
+                                        $str = $ad['pay_method'];
+                                        $arr = explode(',', $str);
+                                        foreach($banks as $k=>$v){
+                                        if(isset($arr[0]) && $arr[0] == $v['id']){
+                                        echo '<label class="radio-inline"><input type="radio" name="pay_method[]" id="" value="'.$v['id'].'" checked>'.$v['name'].'</label>';
+                                        }else{
+                                        echo '<label class="radio-inline"><input type="radio" name="pay_method[]" id="" value="'.$v['id'].'">'.$v['name'].'</label>';
+                                        }
+                                        }
+                                        /*if(in_array(2, $arr)){
+                                        echo '<input type="checkbox" class="" name="pay_method[]" checked="checked" value="2" />银行转账';
+                                        }else{
+                                        echo '<input type="checkbox" class="" name="pay_method[]" value="2" />银行转账';
+                                        }*/
+                                        if(in_array(3, $arr)){
+                                        echo '<label class="checkbox-inline"><input type="checkbox" class="" name="pay_method[]" checked="checked" value="3" />支付宝</label>';
+                                        }else{
+                                        echo '<label class="checkbox-inline"><input type="checkbox" class="" name="pay_method[]" value="3" />支付宝</label>';
+                                        }
+                                        if(in_array(4, $arr)){
+                                        echo '<label class="checkbox-inline"><input type="checkbox" class="" name="pay_method[]" checked="checked" value="4" />微信支付</label>';
+                                        }else{
+                                        echo '<label class="checkbox-inline"><input type="checkbox" class="" name="pay_method[]" value="4" />微信支付</label>';
+                                        }
+                                        {/php}
+                                        <!-- <input type="checkbox" class="" name="pay_method[]" value="2"/>银行转账
+                        <input type="checkbox" class="" name="pay_method[]" value="3"/>支付宝
+                        <input type="checkbox" class="" name="pay_method[]" value="4"/>微信支付 -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                        <div class="box-footer">
+                            <div class="col-sm-2">
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="btn-group pull-right">
+                                    <input type="hidden" name="id" value="{$ad.id}" />
+                                    <button type="submit" class="btn btn-info pull-right" data-loading-text="&lt;i class=&#39;fa fa-spinner fa-spin &#39;&gt;&lt;/i&gt; 提交">提交</button>
+                                </div>
+                                <div class="btn-group pull-left">
+                                    <button type="button" class="btn btn-warning" onclick="window.location.href='/merchant/newad'">返回</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.box-footer -->
+                    </form>
+                </div>
+                <script>
+                </script>
+            </div>
+        </div>
+    </section>
+    <script src="/static/admin/js/layer/layer.js"></script>
+    <script data-exec-on-popstate="">
+    var type = 1;
+
+    function jisuan() {
+        var amount = $('#amount').val();
+        var price = $('#price').val();
+        $('#max_limit').val((amount * price).toFixed(2));
+    }
+    </script>
+</div>
+{include file="Public:footer_new"/}

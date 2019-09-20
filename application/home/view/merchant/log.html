@@ -1,0 +1,62 @@
+{include file="Public:header_new"}
+<style>
+                            .cards-item{ border:1px dashed #ccc; padding:10px; margin-bottom:5px; background:#fbfbfb; }
+                            .cards-item .form-group{ width:80%; margin-bottom:5px; }
+                            .cards-item .btn-remove{ float:right; border:1px solid #ccc; padding:5px; border-radius:2px;}
+                        </style>
+    <div class="content-wrapper" id="pjax-container" style="min-height: 706px;">
+            <section class="content-header"><h1>
+            日志列表
+            <small>查看</small>
+        </h1>
+
+        <!-- breadcrumb start -->
+                <!-- breadcrumb end -->
+
+    </section><section class="content"><div class="row"><div class="col-md-12">
+<div class="box box-info">
+    <div class="box-header with-border">
+        <h3 class="box-title">列表</h3>
+
+        <!-- <div class="box-tools">
+            <div class="btn-group pull-right" style="margin-right: 10px">
+                <a href="/merchant/myad" class="btn btn-sm btn-default"><i class="fa fa-list"></i>&nbsp;列表</a>
+            </div>
+        </div> -->
+    </div>
+    <!-- /.box-header -->
+
+    <!-- form start -->
+    <div class="tab-content">
+                <div class="" id="tab_886859313">
+            <table class="table">
+<thead><tr>
+<th>编号</th><th>描述</th><th>IP</th><th>地址</th>
+                    <th>时间</th>
+            </tr></thead>
+<tbody>
+{volist name="log" id="vo"}
+<tr>
+	<td>{$vo.log_id}</td>
+	<td>{$vo.description}</td>
+	<td>{$vo.ip}</td>
+	<td>{:getAddressByIp($vo['ip'])}</td>
+	<td>{$vo['add_time']|date="Y-m-d H:i:s",###}</td>
+</tr>
+{/volist}
+</tbody>
+</table>
+</div>
+  <div class="box-footer clearfix">
+		{$log->render()}
+    </div>      
+    </div>
+</div>
+
+<script>
+</script>
+</div></div>
+
+    </section>
+    </div>
+{include file="Public:footer_new"/}

@@ -1,0 +1,226 @@
+{include file="Public:header_new"}
+<style>
+    .cards-item{ border:1px dashed #ccc; padding:10px; margin-bottom:5px; background:#fbfbfb; }
+                            .cards-item .form-group{ width:80%; margin-bottom:5px; }
+                            .cards-item .btn-remove{ float:right; border:1px solid #ccc; padding:5px; border-radius:2px;}
+                        </style>
+<div class="content-wrapper" id="pjax-container" style="min-height: 706px;">
+    <section class="content-header">
+        <h1>
+            发布广告
+        </h1>
+    </section>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">创建一个广告</h3>
+                        <div class="box-tools">
+                            <div class="btn-group pull-right" style="margin-right: 10px">
+                                <a href="/merchant/newadbuy" class="btn btn-sm btn-success">
+                                    <i class="fa fa-save"></i>&nbsp;&nbsp;发布求购广告</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+                    <!-- form start -->
+                    <form action="/merchant/newad" method="post" accept-charset="UTF-8" class="form-horizontal" pjax-container="">
+                        <div class="box-body">
+                            <div class="fields-group">
+                                <div class="form-group">
+                                    <label for="currency" class="col-sm-3 control-label"><em class="text-danger">*</em> 出售数量：</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" name="amount" id="amount" onblur="jisuan()" />
+                                    </div>
+                                </div>
+                                {eq name="usdt_price_way" value="1"}
+                                <div class="form-group">
+                                    <label for="currency" class="col-sm-3 control-label"><em class="text-danger">*</em> 出售价格：</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" name="price" id="price" value="{:getUsdtPrice()}" readOnly />
+                                    </div>
+                                </div>
+                                {else/}
+                                <div class="form-group">
+                                    <label for="currency" class="col-sm-3 control-label"><em class="text-danger">*</em> 出售价格：</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" onblur="jisuan()" style="display:inline-block;width:72%;" class="form-control" name="price" id="price" value="" placeholder="价格区间{$usdt_price_min}~{$usdt_price_max}" />
+                                        <span style="font-weight:bold">参考价格：{:getUsdtPrice()}</span>
+                                    </div>
+                                </div>
+                                {/eq}
+                                <div class="form-group">
+                                    <label for="currency" class="col-sm-3 control-label"><em class="text-danger">*</em> 最小限额：</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" name="min_limit" id="min_limit" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="currency" class="col-sm-3 control-label"><em class="text-danger">*</em> 最大限额：</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" name="max_limit" id="max_limit" onblur="getMax()" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="currency" class="col-sm-3 control-label"><em class="text-danger">*</em> 收款方式：</label>
+                                    <div class="col-sm-6">
+                                         <label class="checkbox-inline">
+                                            <select class="form-control" name="pay_method[]">
+                                                <option value="">选择银行账户</option>
+                                                 {volist name="banks" id="v"}
+                                                <option value="{$v.id}">{$v.name}({$v.c_bank})</option>
+                                                 {/volist}
+                                            </select>
+                                        </label>
+                                        <!-- {volist name="banks" id="vo"}
+                                        <label class="radio-inline">
+                                            <input type="radio" name="pay_method[]" id="" value="{$vo.id}">{$vo.name}
+                                        </label>
+                                        {/volist} -->
+                                        <label class="checkbox-inline">
+                                            <select class="form-control" name="pay_method[]">
+                                                <option value="">选择支付宝账户</option>
+                                                 {volist name="zfb" id="v"}
+                                                <option value="{$v.id}">{$v.name}({$v.c_bank})</option>
+                                                 {/volist}
+                                            </select>
+                                            <!-- <input type="checkbox" class="" name="pay_method[]" value="3" />支付宝 -->
+                                            <!-- <input type="checkbox" class="" name="pay_method[]" value="3" />支付宝 -->
+                                        </label>
+                                        <label class="checkbox-inline">
+                                            <select class="form-control" name="pay_method[]">
+                                                <option value="">选择微信账户</option>
+                                                 {volist name="wx" id="v"}
+                                                <option value="{$v.id}">{$v.name}({$v.c_bank})</option>
+                                                 {/volist}
+                                            </select>
+                                            <!-- <input type="checkbox" class="" name="pay_method[]" value="4" />微信支付 -->
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                        <div class="box-footer">
+                            <div class="col-sm-2">
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="btn-group pull-right">
+                                    <button type="submit" class="btn btn-info pull-right" data-loading-text="&lt;i class=&#39;fa fa-spinner fa-spin &#39;&gt;&lt;/i&gt; 提交">提交</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.box-footer -->
+                    </form>
+                    <div class="tab-content">
+                        <div class="" id="tab_886859313">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>状态</th>
+                                        <th>编号</th>
+                                        <th>价格</th>
+                                        <th>交易数量</th>
+                                        <th>剩余数量</th>
+                                        <th>创建时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {volist name="list" id="vo"}
+                                    <tr>
+                                        <td>
+                                            {eq name="vo.state" value="1"}进行中{/eq}
+                                            {eq name="vo.state" value="2"}已下架{/eq}
+                                            {eq name="vo.state" value="4"}已冻结{/eq}
+                                        </td>
+                                        <td>{$vo.ad_no}</td>
+                                        <td>{$vo.price}cny</td>
+                                        <td>{$vo.deal}</td>
+                                        <td>{$vo.remain}</td>
+                                        <td>{$vo['add_time']|date="Y-m-d H:i:s",###}</td>
+                                        <td>
+                                            <a href="/merchant/editad?id={$vo.id}" class="btn btn-sm btn-success">编辑</a>
+                                            {eq name="vo.state" value="1"}
+                                            <a id="{$vo.id}" class="btn btn-sm btn-danger down">下架</a>
+                                            {/eq}
+                                            {eq name="vo.state" value="2"}
+                                            <a id="{$vo.id}" class="btn btn-sm btn-success up">上架</a>
+                                            {/eq}
+                                            {eq name="vo.state" value="4"}
+                                            <a id="{$vo.id}" class="btn btn-sm btn-success dong">上架</a>
+                                            {/eq}
+                                        </td>
+                                    </tr>
+                                    {/volist}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="box-footer clearfix">
+                            {$list->render()}
+                        </div>
+                    </div>
+                </div>
+                <script>
+                </script>
+            </div>
+        </div>
+    </section>
+    <script src="/static/admin/js/layer/layer.js"></script>
+    <script data-exec-on-popstate="">
+    var type = 1;
+
+    function jisuan() {
+        var amount = $('#amount').val();
+        var price = $('#price').val();
+        $('#max_limit').val((amount * price).toFixed(2));
+    }
+
+    function getMax() {
+        var max_limit = $('#max_limit').val();
+        var amount = $('#amount').val();
+        var price = $('#price').val();
+        var max = (amount * price).toFixed(2);
+        if (max < max_limit) {
+            $('#max_limit').val(max);
+        }
+    }
+
+    function closetanchu() {
+        layer.closeAll('loading');
+    }
+    $('.down').click(function() {
+        layer.load(0, { shade: [0.5, '#8F8F8F'] });
+        $.post("{:url('home/merchant/setShelf')}", { id: $(this).attr('id'), type: type, act: 2 }, function(data) {
+            shelf = data.url;
+            setTimeout("closetanchu()", 4000);
+            if (data.code == 1) {
+                layer.msg(data.msg, { icon: 1 });
+                window.location.reload();
+            } else {
+                layer.msg(data.msg, { icon: 2 });
+            }
+        });
+    });
+    $('.up').click(function() {
+        layer.load(0, { shade: [0.5, '#8F8F8F'] });
+        $.post("{:url('home/merchant/setShelf')}", { id: $(this).attr('id'), type: type, act: 1 }, function(data) {
+            shelf = data.url;
+            setTimeout("closetanchu()", 4000);
+            if (data.code == 1) {
+                layer.msg(data.msg, { icon: 1 });
+                window.location.reload();
+            } else {
+                layer.msg(data.msg, { icon: 2 });
+            }
+        });
+    });
+    $('.dong').click(function() {
+        layer.load(0, { shade: [0.5, '#8F8F8F'] });
+        setTimeout("closetanchu()", 3000);
+        layer.msg('请联系管理员解除冻结!', { icon: 2 });
+    });
+    </script>
+</div>
+{include file="Public:footer_new"/}

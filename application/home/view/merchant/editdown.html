@@ -1,0 +1,93 @@
+{include file="Public:header_new"}
+<style>
+                            .cards-item{ border:1px dashed #ccc; padding:10px; margin-bottom:5px; background:#fbfbfb; }
+                            .cards-item .form-group{ width:80%; margin-bottom:5px; }
+                            .cards-item .btn-remove{ float:right; border:1px solid #ccc; padding:5px; border-radius:2px;}
+                        </style>
+    <div class="content-wrapper" id="pjax-container" style="min-height: 706px;">
+            <section class="content-header"><h1>
+            编辑商户
+            <small>配置</small>
+        </h1>
+
+        <!-- breadcrumb start -->
+                <!-- breadcrumb end -->
+
+    </section><section class="content"><div class="row"><div class="col-md-12">
+<div class="box box-info">
+    <div class="box-header with-border">
+        <h3 class="box-title">编辑</h3>
+
+        <div class="box-tools">
+            <div class="btn-group pull-right" style="margin-right: 10px">
+                <a href="/merchant/downmerchant" class="btn btn-sm btn-default"><i class="fa fa-list"></i>&nbsp;列表</a>
+            </div>
+        </div>
+    </div>
+    <!-- /.box-header -->
+
+    <!-- form start -->
+    <form action="" method="post" accept-charset="UTF-8" class="form-horizontal" pjax-container="">
+        <div class="box-body">
+<div class="fields-group">
+
+                <div class="form-group form-group-USDT" style="display:block">
+                    <label class="col-sm-3 control-label">商户提币手续费</label>
+                    <div class="col-sm-9">
+                    	<input type="text" class="form-control" name="merchant_tibi_fee" value="{$merchant.merchant_tibi_fee}">
+                    </div>
+                </div>
+
+            </div>
+            <div class="fields-group">
+
+                <div class="form-group form-group-USDT" style="display:block">
+                    <label class="col-sm-3 control-label">用户提币手续费</label>
+                    <div class="col-sm-9">
+                    	<input type="text" class="form-control" name="user_withdraw_fee" value="{$merchant.user_withdraw_fee}">
+                    </div>
+                </div>
+
+            </div>
+            <div class="fields-group">
+
+                <div class="form-group form-group-USDT" style="display:block">
+                    <label class="col-sm-3 control-label">用户充值手续费</label>
+                    <div class="col-sm-9">
+                    	<input type="text" class="form-control" name="user_recharge_fee" value="{$merchant.user_recharge_fee}">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <!-- /.box-body -->
+
+        <div class="box-footer">
+
+            <div class="col-sm-2">
+				<input type="hidden" name="id" value="{$merchant.id}"/>
+            </div>
+            <div class="col-sm-8">
+                <div class="btn-group pull-right">
+                    <button type="submit" class="btn btn-info pull-right" data-loading-text="&lt;i class=&#39;fa fa-spinner fa-spin &#39;&gt;&lt;/i&gt; 提交">提交</button>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- /.box-footer -->
+    </form>
+</div>
+
+<script>
+</script>
+</div></div>
+
+    </section><script data-exec-on-popstate="">
+
+    $(function () {
+            });
+</script></div>
+{include file="Public:footer_new"/}

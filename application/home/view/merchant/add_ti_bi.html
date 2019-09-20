@@ -1,0 +1,220 @@
+{include file="Public:header_new"}
+<style>
+    .cards-item{ border:1px dashed #ccc; padding:10px; margin-bottom:5px; background:#fbfbfb; }
+                            .cards-item .form-group{ width:80%; margin-bottom:5px; }
+                            .cards-item .btn-remove{ float:right; border:1px solid #ccc; padding:5px; border-radius:2px;}
+                        </style>
+<div class="content-wrapper" id="pjax-container" style="min-height: 706px;">
+    <section class="content-header">
+        <h1>
+            提币
+            <small>创建</small>
+        </h1>
+        <!-- breadcrumb start -->
+        <!-- breadcrumb end -->
+    </section>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">创建</h3>
+                        <div class="box-tools">
+                            <div class="btn-group pull-right" style="margin-right: 10px">
+                                <a href="/merchant/tibi" class="btn btn-sm btn-default"><i class="fa fa-list"></i>&nbsp;列表</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+                    <!-- form start -->
+                    <form action="/merchant/addTiBi" method="post" accept-charset="UTF-8" class="form-horizontal" pjax-container="">
+                        <div class="box-body">
+                            <script>
+                                var bankcards = [];
+                var coinAddresses = [];
+
+                var currency = 'CNY'
+                function currencyChange(el){
+                    currency=el.value;
+                    $('.form-group-USDT,.form-group-CNY').hide();
+                    $('.form-group-'+currency).show();
+                    moneyChange();
+                }
+                var exchange_rate = '6.89';
+                function moneyChange() {
+                    var total = 0;
+                    $('.cards-groups-'+currency).find('input[date-type="money"]').each(function () {
+                        total += ( parseFloat(this.value) || 0);
+                    });
+                    $('#model-amount input').val(total);
+                    $('#model-amount span').html(currency);
+                    $('#exchange-amount').html('');
+                     // console.log(currency)
+                    if (currency == 'CNY') {
+                        $('#exchange-amount').html('&asymp; '+(total/exchange_rate).toFixed(2)+' USDT');
+                    }
+                }
+                function makeAdd(type, data) {
+                    return function (el) {
+                        var index = el.value;
+                        if(index==-1)return;
+                        var card = data[index>>0];
+                        if( $('.cards-groups-'+type+' .cards-item').last().find('input').filter(function () {
+                                return this.value !=''
+                            }).length!=0 ){
+                            $('.cards-groups-'+type+' .btn-group-add').click();
+                        }
+                        $('.cards-groups-'+type+' .cards-item').last().find('input').each(function () {
+                            var name = this.name.match(/([^\[\]]+)\]$/)[1];
+                            this.value = card[name]||'';
+                        })
+                        $('.cards-groups-'+type+' select').val('-1')
+                    }
+                }
+                function removeItem(el) {
+                    if ($(el).closest('.cards-groups').find('.cards-item').length <= 1) {
+                        return;
+                    }
+                    $(el).closest('.cards-item').remove();
+                }
+                var bankcardAdd = makeAdd('CNY',bankcards);
+                var coinAddressAdd = makeAdd('USDT',coinAddresses);
+            </script>
+                            <div class="fields-group">
+                                <div class="form-group 1">
+                                    <label for="currency" class="col-sm-3 control-label"><em class="text-danger">*</em> 提现币种</label>
+                                    <div class="col-sm-2">
+                                        <input type="hidden" name="currency"><select class="form-control" style="width: 100%;" name="payment[currency]" onchange="currencyChange(this)" id="currencySelect">
+                                            <!-- <option value="CNY">CNY</option> -->
+                                            <option value="USDT">USDT</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group form-group-USDT" style="display:block">
+                                    <label class="col-sm-3 control-label"><em class="text-danger">*</em> USDT提现</label>
+                                    <div class="col-sm-9">
+                                        <div class="cards-groups cards-groups-USDT">
+                                            <div class="cards-item">
+                                                <div class="form-group">
+                                                    <label for="cardno" class="col-sm-3 control-label"><em class="text-danger">*</em> 提币地址</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-pencil"></i></span>
+                                                        <input type="text" name="address" value="" class="form-control" placeholder="输入提币地址">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="cardno" class="col-sm-3 control-label"><em class="text-danger">*</em> 金额</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-pencil"></i></span>
+                                                        <input date-type="money" onchange="moneyChange(this)" type="text" name="num" value="" class="form-control" placeholder="输入金额">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="cardno" class="col-sm-3 control-label">备注</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-pencil"></i></span>
+                                                        <input type="text" name="remark" value="" class="form-control" placeholder="输入备注">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>&nbsp;
+                                    </div>
+                                </div>
+                                <div class="form-group 1">
+                                    <label for="amount" class="col-sm-3 control-label"><em class="text-danger">*</em> 提现数量</label>
+                                    <div class="col-sm-2">
+                                        <div class="input-group" id="model-amount">
+                                            <input readonly="" type="text" name="payment[amount]" value="" class="form-control"><span class="input-group-addon">USDT</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div style="line-height:30px;margin-left:-20px;" class="text-primary">
+                                            <span>可提余额：{$user['usdt']} USDT</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {eq name="show" value="1"}
+                                <div class="form-group 1">
+                                    <label for="amount" class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
+                                    <div class="col-sm-2">
+                                        <div class="input-group">
+                                            <input type="text" name="goole" value="" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                {/eq}
+                                <div class="text">
+                                    <label for="channel_remark" class="col-sm-3 control-label">&nbsp;</label>
+                                    <div class="col-sm-6">
+                                        <br><b> 出金提币说明：</b><br>
+                                        1. 交易时段：工作日9：00-21：00，在交易时段以外的时间发起出金提币，速度会稍慢于交易时段。<br>
+                                        2. 提币：每笔交易收取{$merchant_tibi_fee} USDT手续费。<br>
+                                        3. 提币最小限制：{$tibi_min}，提币最大限制：{$tibi_max}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                        <div class="box-footer">
+                            <input type="hidden" name="_token" value="piFYLypCM6otB4mslYDJHymlUgSwv30xcoPRhfLb">
+                            <div class="col-sm-2">
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="btn-group pull-right">
+                                    <button type="submit" class="btn btn-info pull-right" data-loading-text="&lt;i class=&#39;fa fa-spinner fa-spin &#39;&gt;&lt;/i&gt; 提交">提交</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.box-footer -->
+                    </form>
+                </div>
+                <script>
+                $('#currencySelect').trigger('change');
+                $(function() {
+                    var delay = 30;
+                    var now;
+                    var $btn_sms = $('.x-action-sms');
+                    $btn_sms.click(function() {
+                        if (this.disabled) {
+                            return;
+                        }
+                        this.disabled = true;
+
+                        $.ajax({
+                            url: '',
+                            type: 'post',
+                            data: { _token: LA.token },
+                            success: function(res) {
+                                if (res.code != 0) {
+                                    toastr.error(res.msg, null);
+                                    return;
+                                }
+
+                                now = delay;
+                                var timer = setInterval(function() {
+                                    now--;
+                                    if (now == 0) {
+                                        clearInterval(timer);
+                                        $btn_sms[0].disabled = false;
+                                        return;
+                                    }
+                                    $btn_sms.html(now + '秒 重新获取');
+                                }, 1000)
+                            },
+                            error: function() {
+                                $btn_sms[0].disabled = false;
+                                toastr.error('发生错误，请重试', null);
+                            }
+                        });
+
+                    })
+                })
+                </script>
+            </div>
+        </div>
+    </section>
+    <script data-exec-on-popstate="">
+    $(function() {});
+    </script>
+</div>
+{include file="Public:footer_new"/}

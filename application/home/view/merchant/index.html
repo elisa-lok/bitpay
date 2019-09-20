@@ -1,0 +1,325 @@
+{include file="Public:header_new"/}
+<script src="/static/admin/js/layer/layer.js"></script>
+
+<div class="content-wrapper" id="pjax-container" style="min-height: 706px;">
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-green"><i class="fa fa-usd"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">
+                                    <h5>账户余额(1 USDT=¥{$price})</h5>
+                                </span>
+                                <span class="info-box-number">{$merchant['usdt']}</span>
+                                <span class="info-box-number">≈¥{:round($merchant['usdt']*$price, 4)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-red"><i class="fa fa-usd"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">
+                                    <h5>冻结余额(1 USDT=¥{$price})</h5>
+                                </span>
+                                <span class="info-box-number">{$merchant['usdtd']}</span>
+                                <span class="info-box-number">≈¥{:round($merchant['usdtd']*$price, 4)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-red"><i class="fa fa-user-plus"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">
+                                    <h5>代理商</h5>
+                                </span>
+                                <span class="info-box-number">
+                                    {if condition="$merchant.agent_check eq 0 and $merchant.reg_type eq 3"}
+                                    <a href="/merchant/applyAgent">申请</a>
+                                    {elseif condition="$merchant.agent_check eq 1"/}
+                                    通过
+                                    {elseif condition="$merchant.agent_check eq 2"/}
+                                    拒绝
+                                    {elseif condition="$merchant.agent_check eq 3"/}
+                                    待审核
+                                    {/if}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <a href="/merchant/withdraw?status=1">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-aqua"><i class="fa fa-credit-card"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">
+                                        <h5>目前待审核提币记录</h5>
+                                    </span>
+                                    <span class="info-box-number">0</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="/merchant/tibi?status=1">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-red"><i class="fa fa-credit-card"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">
+                                        <h5>目前待审核提币卖币</h5>
+                                    </span>
+                                    <span class="info-box-number">0</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-green"><i class="fa fa-buysellads"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">
+                                    <h5>交易员</h5>
+                                </span>
+                                <span class="info-box-number">
+                                    {if condition="$merchant.trader_check eq 0 and $merchant.reg_type eq 2"}
+                                    <a href="/merchant/applyTrader">申请</a>
+                                    {elseif condition="$merchant.trader_check eq 1"/}
+                                    通过
+                                    {elseif condition="$merchant.trader_check eq 2"/}
+                                    拒绝
+                                    {elseif condition="$merchant.trader_check eq 3"/}
+                                    待审核
+                                    {/if}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {eq name="merchant['reg_type']" value="1"}
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>对接说明</h4>
+                        <div class="info-box" style="min-height:auto;">
+                            <table class="table" style="margin: 0;">
+                                <tbody>
+                                    <tr>
+                                        <td>商户使用手册：<a href="/商户使用手册.pdf" target="_blank" download="">下载</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>纯USDT充提对接文档下载：<a href="/api.pdf" target="_blank" download="">下载</a></td>
+                                        <td>充值RMB对接承兑商文档下载：<a href="/交易员api.pdf" target="_blank" download="">下载</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>纯USDT充提Demo下载：<a href="/商户对接-demo(PHP).rar" target="_blank" download="">下载</a></td>
+                                        <td>充值RMB对接Demo下载：<a href="/交易员对接-demo(PHP).rar" target="_blank" download="">下载</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h4>接口配置</h4>
+                        <div class="info-box" style="min-height:auto;">
+                            <table class="table" style="margin: 0;">
+                                <tbody>
+                                    <tr>
+                                        <th>商户ID</th>
+                                        <td>{$Think.session.user['appid']}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>商户MD5Key</th>
+                                        <td>{$Think.session.user['key']}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {/eq}
+                {eq name="merchant['agent_check']" value="1"}
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>邀请信息</h4>
+                        <div class="info-box" style="min-height:auto;">
+                            <table class="table" style="margin: 0;">
+                                <tbody>
+                                    <tr>
+                                        <th>邀请码</th>
+                                        <td><input type="text" id="invite" class="form-control" value="{$merchant['invite']}" readOnly /></td>
+                                        <td><input type="button" data-clipboard-target="#invite" id="copy_button1" class="btn btn-sm btn-info inviteCopyButton" value="复制"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>邀请链接(商户)</th>
+                                        <td><input type="text" id="inviteurl" class="form-control" readOnly value="http://{$_SERVER['HTTP_HOST']}/register?invite={$merchant['invite']}&type=1" /></td>
+                                        <td><button type="button" data-clipboard-target="#inviteurl" id="copy_button2" class="btn btn-sm btn-info inviteCopyButton">复制</button></td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h4>邀请信息</h4>
+                        <div class="info-box" style="min-height:auto;">
+                            <table class="table" style="margin: 0;">
+                                <tbody>
+                                   <tr>
+                                        <th>邀请链接(承兑商)</th>
+                                        <td><input type="text" id="inviteurl2" class="form-control" readOnly value="http://{$_SERVER['HTTP_HOST']}/register?invite={$merchant['invite']}&type=2" /></td>
+                                        <td><button type="button" data-clipboard-target="#inviteurl2" id="copy_button3" class="btn btn-sm btn-info inviteCopyButton">复制</button></td>
+                                    </tr>
+                                    <tr>
+                                        <th>邀请链接(代理)</th>
+                                        <td><input type="text" id="inviteurl3" class="form-control" readOnly value="http://{$_SERVER['HTTP_HOST']}/register?invite={$merchant['invite']}&type=3" /></td>
+                                        <td><button type="button" data-clipboard-target="#inviteurl3" id="copy_button4" class="btn btn-sm btn-info inviteCopyButton">复制</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {/eq}
+   {neq name="merchant['pid']" value="0"}
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>邀请信息</h4>
+                        <div class="info-box" style="min-height:auto;">
+                            <table class="table" style="margin: 0;">
+                                <tbody>
+                                    <tr>
+                                        <th>您的邀请人:</th>
+                                        <td><input type="text" id="invite" class="form-control" value="{$myacc['name']}" readOnly /></td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+ {/neq}
+                <div class="row">
+                    <div class="col-sm-12">
+                        {volist name='article' id='vo'}
+                        <div class="col-sm-6">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <i class="fa fa-cogs"></i>{$vo.name}
+                                </div>
+                                <div class="panel-body list-group">
+                                    {notempty name='vo.article'}
+                                    {volist name='vo.article' id='vv'}
+                                    <a href="/merchant/detail?id={$vv.id}" class="list-group-item">
+                                        {$vv.title}
+                                        <span class="badge">{:date("Y-m-d H:i:s", $vv['create_time'])}</span>
+                                    </a>
+                                    {/volist}
+                                    {/notempty}
+                                </div>
+                            </div>
+                        </div>
+                        {/volist}
+                    </div>
+                </div>
+                <div class="row" style="display:none;">
+                    <div class="col-md-6">
+                        <h4>近期订单量趋势图</h4>
+                        <div class="info-box" id="chart-1" style="height: 400px; -webkit-tap-highlight-color: transparent; user-select: none; position: relative;" _echarts_instance_="ec_1541645437776">
+                            <div style="position: relative; overflow: hidden; width: 614px; height: 400px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;"><canvas data-zr-dom-id="zr_0" width="767" height="500" style="position: absolute; left: 0px; top: 0px; width: 614px; height: 400px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas></div>
+                            <div></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h4>近期买卖币趋势图</h4>
+                        <div class="info-box" id="chart-2" style="height: 400px; -webkit-tap-highlight-color: transparent; user-select: none; position: relative;" _echarts_instance_="ec_1541645437777">
+                            <div style="position: relative; overflow: hidden; width: 614px; height: 400px; padding: 0px; margin: 0px; border-width: 0px;"><canvas data-zr-dom-id="zr_0" width="767" height="500" style="position: absolute; left: 0px; top: 0px; width: 614px; height: 400px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas></div>
+                            <div></div>
+                        </div>
+                    </div>
+                </div>
+                <script src="__JS__/echarts.common.min.js"></script>
+                <script>
+                var chart1 = echarts.init(document.getElementById('chart-1'));
+                chart1.setOption({
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: []
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [{
+                        name: '订单数量',
+                        data: [],
+                        type: 'line'
+                    }]
+                });
+                var chart2 = echarts.init(document.getElementById('chart-2'), 'walden');
+                chart2.setOption({
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: []
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [{
+                            name: '入金',
+                            data: [],
+                            type: 'line'
+                        },
+                        {
+                            name: '出金',
+                            data: [],
+                            type: 'line'
+                        }
+                    ]
+                });
+                </script>
+                <!-- <script src="__JS__/ZeroClipboard.min.js"></script> -->
+                 <script src="__JS__/pay/clipboard.min.js"></script>
+                <script>
+                $(document).ready(function() {
+                    var clip1 = new ClipboardJS("#copy_button1");
+                    var clip2 = new ClipboardJS("#copy_button2");
+                    var clip3 = new ClipboardJS("#copy_button3");
+                    var clip4 = new ClipboardJS("#copy_button4");
+                    // var clip1 = new ZeroClipboard(document.getElementById("copy_button1"));
+                    // var clip2 = new ZeroClipboard(document.getElementById("copy_button2"));
+                    clip1.on("success", function(e) {
+                        layer.msg('复制成功！', {icon: 1});
+                        // alert('复制成功');
+                    });
+                    clip2.on("success", function(e) {
+                        layer.msg('复制成功！', {icon: 1});
+                        // alert('复制成功');
+                    });
+                    clip3.on("success", function(e) {
+                        layer.msg('复制成功！', {icon: 1});
+                        // alert('复制成功');
+                    });
+                    clip4.on("success", function(e) {
+                        layer.msg('复制成功！', {icon: 1});
+                        // alert('复制成功');
+                    });
+                })
+                </script>
+            </div>
+        </div>
+    </section>
+    <script data-exec-on-popstate="">
+    $(function() {});
+    </script>
+</div>
+{include file="Public:footer_new"/}

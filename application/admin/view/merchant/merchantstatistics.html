@@ -1,0 +1,147 @@
+{include file="public/header" /}
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>商户统计列表</h5>
+        </div>
+        <div class="ibox-content">
+            <!--搜索框开始-->
+            <div class="row">
+                <div class="col-sm-12">
+                	<form name="admin_list_sea" class="form-search" method="post" action="{:url('merchantstatistics')}">
+                        <div class="col-sm-6">
+                            <div class="input-group">
+                            	<input type="text" id="key" class="form-control" style="width:33%;" name="key" value="{$val}" placeholder="排序字段" />
+                                <select name="order" class="form-control" id="order" style="width:33%;">
+                                	<option value="0" {empty name="order"}selected{/empty}>排序方式</option>
+                                	<option value="asc" {eq name="order" value="asc"}selected{/eq}>升序</option>
+                                	<option value="desc" {eq name="order" value="desc"}selected{/eq}>降序</option>
+                                </select>
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> 搜索</button>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!--搜索框结束-->
+            <div class="hr-line-dashed"></div>
+            <div class="example-wrap">
+                <div class="example">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="long-tr">
+                            	<th>ID</th>
+                                <th width="">所属部门</th>
+                                <th>手机号</th>
+                                <th><a data-toggle="tooltip" title="usdt" data-placement="top">USDT活动数量</a></th>
+                                <th><a data-toggle="tooltip" title="usdtd" data-placement="top">USDT冻结数量</a></th>
+                                <th><a data-toggle="tooltip" title="usdtt" data-placement="top">总数量</a></th>
+                                <th><a data-toggle="tooltip" title="recharge_amount" data-placement="top">充值数量</a></th>
+                                <th><a data-toggle="tooltip" title="withdraw_amount" data-placement="top">提币数量</a></th>
+                                <th><a data-toggle="tooltip" title="ad_on_sell" data-placement="top">在售广告数</a></th>
+								<th><a data-toggle="tooltip" title="ad_on_buy" data-placement="top">求购广告数</a></th>
+								<th><a data-toggle="tooltip" title="order_sell_success_num" data-placement="top">出售成功次数</a></th>
+								<th><a data-toggle="tooltip" title="order_buy_success_num" data-placement="top">求购成功次数</a></th>
+								<th><a data-toggle="tooltip" title="order_sell_usdt_amount" data-placement="top">总出售USDT数量</a></th>
+								<th><a data-toggle="tooltip" title="order_buy_usdt_amount" data-placement="top">总求购USDT数量</a></th>
+                            </tr>
+                        </thead>
+                        <script id="list-template" type="text/html">
+                            {{# for(var i=0;i<d.length;i++){  }}
+                            <tr class="long-td">
+								<td>{{d[i].id}}</td>
+                                <td>
+{{# if(d[i].reg_type == 1){ }}
+	商户
+{{# }else if(d[i].reg_type == 2){ }}
+	交易员
+{{# }else if(d[i].reg_type == 3){ }}
+	代理商
+{{# } }}
+</td>
+                                <td>{{d[i].mobile}}</td>
+                                <td>{{d[i].usdt}}</td>
+                                <td>{{d[i].usdtd}}</td>
+                                <td>{{d[i].usdtt}}</td>
+								<td>{{d[i].recharge_amount}}</td>
+                                <td>{{d[i].withdraw_amount}}</td>
+                                <td>{{d[i].ad_on_sell}}</td>
+                                <td>{{d[i].ad_on_buy}}</td>
+                                <td>{{d[i].order_sell_success_num}}</td>
+                                <td>{{d[i].order_buy_success_num}}</td>
+                                <td>{{d[i].order_sell_usdt_amount}}</td>
+                                <td>{{d[i].order_buy_usdt_amount}}</td>
+                            </tr>
+                            {{# } }}
+                        </script>
+                        <tbody id="list-content"></tbody>
+                    </table>
+                    <div id="AjaxPage" style=" text-align: right;"></div>
+                    <div id="allpage" style=" text-align: right;"></div>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+</div>
+<!-- End Panel Other -->
+</div>
+
+<!-- 加载动画 -->
+<div class="spiner-example">
+    <div class="sk-spinner sk-spinner-three-bounce">
+        <div class="sk-bounce1"></div>
+        <div class="sk-bounce2"></div>
+        <div class="sk-bounce3"></div>
+    </div>
+</div>
+
+{include file="public/footer" /}
+
+<script type="text/javascript">
+
+    //laypage分页
+    Ajaxpage();
+    function Ajaxpage(curr){
+        var key=$('#key').val();
+        var order = $('#order option:selected').val();
+        $.getJSON('{:url("Merchant/merchantstatistics")}', {page: curr || 1, key:key, order:order}, function(data){
+            $(".spiner-example").css('display','none'); //数据加载完关闭动画
+            if(data==''){
+                $("#list-content").html('<td colspan="12" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>');
+            }else{
+                var tpl = document.getElementById('list-template').innerHTML;
+                laytpl(tpl).render(data, function(html){
+                    document.getElementById('list-content').innerHTML = html;
+                });
+                laypage({
+                    cont: $('#AjaxPage'),//容器。值支持id名、原生dom对象，jquery对象,
+                    pages:'{$allpage}',//总页数
+                    skip: true,//是否开启跳页
+                    skin: '#1AB5B7',//分页组件颜色
+                    curr: curr || 1,
+                    groups: 3,//连续显示分页数
+                    jump: function(obj, first){
+                        if(!first){
+                            Ajaxpage(obj.curr)
+                        }
+                        $('#allpage').html('第'+ obj.curr +'页，共'+ obj.pages +'页');
+                    }
+                });
+            }
+        });
+    }
+    $(function () {
+    	$("[data-toggle='tooltip']").tooltip();
+    	$("[data-toggle='tooltip']").click(function(){
+    		console.log(1);
+    		var title = $(this).attr('data-original-title');$('#key').val(title);
+    	})
+    });
+</script>
+</body>
+</html>

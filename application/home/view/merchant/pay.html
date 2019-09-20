@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="__CSS__/pay.css">
+    <script type="text/javascript" charset="utf-8" src="__JS__/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="main">
+        <div class="content">
+            <!-- 内容开始 -->
+            <div class="paycontent">
+                <!-- 确认信息开始 -->
+                <div class="confirminfo">
+                    <h3>请确认您的充值信息:</h3>
+                    <div class="infodetail">
+                        <p class='p1050'>购买数量：<span>{$amount}USDT</span></p>
+                        <p class='p1050'>支付金额：<span class="red">￥<font class='f14'>{$money}</font>元</span></p>
+                        <div class="usdt">
+                            <a href="javascript:;;">
+                                <img src="__IMG__/what.png" />什么是USDT？
+                            </a>
+                        </div>
+                        <div class="descusdt hide">
+                            <p class=''>
+                                USDT是Tether公司推出的基于稳定价值货币美元（USD）的代币Tether USD（简称USDT），1 USDT=1美元。<br>
+
+USDT的发行和交易使用的是Omni（原Mastercoin）协议，它是一个基于比特币区块链的2.0币种。USDT的交易确认等参数与比特币是一致的。用户可以通过SWIFT电汇美元至Tether公司提供的银行帐户，或通过交易所换取USDT。赎回美元时，反向操作即可。用户也可在交易所用比特币换取USDT。<br>
+
+Tether公司严格遵守1：1的准备金保证，即每发行1枚USDT代币，其银行帐户都会有1美元的资金保障。用户可以在Tether平台进行资金查询，以保障透明度。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <span>
+                    支付倒计时：<font class="red"><em id='minute'>00</em>:<em id='second'>00</em></font>
+                </span>
+                <h3 class="mt20">交易方式</h3>
+                <ul class="paymethod mt10">
+                    {volist name="payarr" id="vo"}
+                    {eq name="vo" value="3"}
+                    <li class="p10 {eq name='key' value='0'}active{/eq}" onclick="" data-class='alipay' data-type="{$vo}">
+                        <img src="__IMG__/alipay.png" />支付宝扫码
+                    </li>
+                    {/eq}
+                    {gt name="vo" value="4"}
+                    <li class="p10 {eq name='key' value='0'}active{/eq}" data-class='bank' data-type="2">
+                        <img src="__IMG__/bank.png" />银联卡
+                    </li>
+                    {/gt}
+                    {eq name="vo" value="4"}
+                    <li class="p10 {eq name='key' value='0'}active{/eq}" data-class='wechatpay' data-type="4">
+                        <img src="__IMG__/wechatpay.png" />微信扫码
+                    </li>
+                    {/eq}
+                    {/volist}
+                </ul>
+                <p class='mt20 l22'>
+						1、数字货币购买将<font class='red'>随机匹配</font>不同卖家，同一个卖家所使用的银行卡也可能不同，<font class='red'>请按照每次所显示的付款信息打款</font>，请勿直接打款到之前充值过的卡号，<font class="red">否则可能无法到账</font>，造成的损失平台概不负责。
+						<br/>
+						2、转账时<font class='red'>请勿填写任何备注！</font>包括数字货币、USDT、充值、美金、外汇等字样。<font class='red'>否则可能导致卖家账户和您的账户被冻结</font>，造成的损失平台概不负责。
+						<br/>
+						3、<font class='red'>交易时间段：</font>8：00-23：00，其他时间的交易可能会延迟到下个交易时间段处理。
+						<br/>
+						4、<font class='red'>实际到账速度：</font>根据银行结算制度，在工作日的17：00以前，到账速度为实时到账；工作日17：00以后和周末节假日时间，到账速度可能略有延迟。到账时间取决于银行规定，请咨询您的银行。
+					</p>
+
+                <div class='sellerinfo'>
+                    <ul class='p10'>
+                        <li>卖家信用</li>
+                        <li>成功交易笔数：{$merchant.transact}笔</li>
+                        <li>平均确认时间：{$min}分{$second}秒</li>
+                    </ul>
+                    {volist name="payarr" id="vo"}
+                    {eq name="vo" value="3"}
+                    <div class='alipay erweima {gt name="key" value="0"}hide{/gt}'>
+                        <p class='f14 p10'>请用<img src="__IMG__/alipay2.png" class='w80' />扫码完成支付</p>
+                        <div class='mt10 payma'>
+                            <img src="/uploads/face/{$merchant.c_alipay_img}" style='' />
+                        </div>
+                        <p class='p10'>支付完成后，请点击下方的"我已付款"按钮</p>
+                    </div>
+                    {/eq}
+                    {gt name="vo" value="2"}
+                    <div class='bank erweima {gt name="key" value="0"}hide{/gt}'>
+                        <p class='f14 p10'>请用<img src="__IMG__/bank.png" class='' />完成支付</p>
+                        <div class='mt10 payma2'>
+                            <p>姓名：{$merchant.name}</p>
+                            <p class='mt10'>银行卡号：{$merchant.c_bank_card}</p>
+                        </div>
+                        <p class='p10'>支付完成后，请点击下方的"我已付款"按钮</p>
+                    </div>
+                    {/gt}
+                    {eq name="vo" value="4"}
+                    <div class='wechatpay erweima {gt name="key" value="0"}hide{/gt}'>
+                        <p class='f14 p10'>请用<img src="__IMG__/wechatpay.png" class='' />扫码完成支付</p>
+                        <div class='mt10 payma'>
+                            <img src="/uploads/face/{$merchant.c_wechat_img}" style='' />
+                        </div>
+                        <p class='p10'>支付完成后，请点击下方的"我已付款"按钮</p>
+                    </div>
+                    {/eq}
+                    {/volist}
+                </div>
+                <div class='clear'></div>
+            </div>
+
+            <div class='paybutton mt20'>
+                <input type="hidden" name="paymethod" value="{$payarr[0]}" />
+                {gt name='remaintime' value='0'}
+                <button type="button" onclick="uptrade()" class='paybutton'>我已付款</button>
+                {else/}
+                <button type="button" class='paybutton'>订单已关闭</button>
+                {/gt}
+            </div>
+        </div>
+    </div>
+    <!-- 收银台结束 -->
+    </div>
+    <!-- 内容结束 -->
+
+    </div>
+    </div>
+</body>
+<script>
+var flag;
+$('.usdt').mouseover(function() {
+    $('.descusdt').show();
+});
+$('.usdt').mouseout(function() {
+    $('.descusdt').hide();
+});
+$('.paymethod li').click(function() {
+    var type = $(this).attr('data-type');
+    var showclass = $(this).attr('data-class');
+    $('.paymethod li').removeClass('active');
+    $(this).addClass('active');
+    $('input[name="paymethod"]').val(type);
+    $('.erweima').hide();
+    $('.' + showclass).show();
+})
+var remaintime = { $remaintime | default = 0 };
+if (remaintime > 0) {
+    resetTime(remaintime);
+}
+CheckOutTime();
+
+function resetTime(time) {
+    var timer = null;
+    var t = time;
+    var m = 0;
+    var s = 0;
+    m = Math.floor(t / 60 % 60);
+    m < 10 && (m = '0' + m);
+    s = Math.floor(t % 60);
+
+    function countDown() {
+        s--;
+        s < 10 && (s = '0' + s);
+        if (s.length >= 3) {
+            s = 59;
+            m = "0" + (Number(m) - 1);
+        }
+        if (m.length >= 3) {
+            m = '00';
+            s = '00';
+            clearInterval(timer);
+        }
+        $('#minute').html(m);
+        $('#second').html(s);
+        //console.log(m+"分钟"+s+"秒");
+    }
+    timer = setInterval(countDown, 1000);
+}
+
+function CheckOutTime() {
+    var id = { $id | default = 0 };
+    $.post('{:url("home/merchant/CheckOutTime")}', { id: id }, function(data) {
+        if (data.code === 1) {
+            clearTimeout(flag);
+            $('.payma img').attr('src', '__IMG__/outtime.png');
+            $('.infodetail p span,.payma2 p').html('订单已关闭');
+            $('.paybutton').attr('disabled', true);
+        } else {
+            flag = setTimeout('CheckOutTime()', 3000);
+        }
+    })
+
+}
+
+function uptrade() {
+    if (!confirm('确认继续操作吗？')) {
+        return false;
+    }
+    var appid = "{$appid|default=''}";
+    var id = { $id | default = 0 };
+    $.post('{:url("home/merchant/uptrade")}', { id: id, appid: appid }, function(data) {
+        if (data.code == 1) {
+            alert('操作成功，请等待交易员释放');
+            window.location.href = data.msg;
+        } else {
+            alert(data.msg);
+        }
+    })
+}
+</script>
+
+</html>
