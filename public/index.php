@@ -17,8 +17,8 @@ define('UPLOAD_PATH', __DIR__ . '/../public');
 // 定义应用缓存目录
 define('RUNTIME_PATH', __DIR__ . '/../runtime/');
 // 开启调试模式
-define('APP_DEBUG', false);
+define('APP_DEBUG', FALSE);
 
-define('ADMIN_KEY', 'cudibs');
+define('ADMIN_KEY', '098qwelkjzxc');
 // 加载框架引导文件
 require __DIR__ . '/../thinkphp/start.php';
