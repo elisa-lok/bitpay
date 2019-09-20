@@ -238,12 +238,12 @@
                                 <input type="tel" name="mobile" id="mobile" class="j_text mt12" value="" placeholder="请输入手机号">
 
                             </div>
-                            <div class="list">
+                           <!-- <div class="list">
                                 <p class="j_p mt30">短信验证码：</p>
                                 <input type="number" name="smscode" id="smscode" class="j_text mt12" value="" placeholder="请输入短信验证码">
                                 <a type="button" name="getcode" id="getcode"  onclick="sendPhoneCode()">获取验证码</a>
 
-                            </div>
+                            </div>-->
                             <div class="list">
                                 <p class="j_p mt30">登录密码：</p>
                                 <input type="password" name="password" id="password" class="j_text mt12" placeholder="请输入登录密码">
@@ -270,7 +270,7 @@
                                 <input type="text" name="invite_code" id="invite_code" class="j_text mt12" value="{$Think.session.invite}" placeholder="请输入邀请码">
 
                             </div>
-                                                        <div class="list">
+                             <!-- <div class="list">
                                 <p class="j_p mt30">身份证正面照片：</p>
                                 <span class="message">
                                     <i>
@@ -289,7 +289,7 @@
                                     </i>
                                 </span>
 
-                            </div>
+                            </div>-->
 
                         </div>
                     </div>
@@ -363,9 +363,9 @@
     	if(!username){
     		 layer.msg('请输入姓名');return false;
     	}
-        if(!smscode){
+       /* if(!smscode){
             layer.msg('请输入短信验证码');return false;
-        }
+        }*/
     	if(!idcard){
     		layer.msg('请输入身份证号');return false;
     	}

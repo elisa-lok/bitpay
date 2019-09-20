@@ -27,16 +27,16 @@ class Login extends Base{
             $repassword = input('post.password_confirmation');
             $repaypassword = input('post.paypassword_confirmation');
 			$nickname = input('post.nickname');
-            $smscode = input('post.smscode');
+            //$smscode = input('post.smscode');
 			if(empty($nickname) || strlen($nickname) > 20){
                 $this->error('请填写正确的昵称');
             }
 			if(!checkName($name)){
 				$this->error('请输入您的正确姓名');
 			}
-            if(empty($smscode)){
+            /*if(empty($smscode)){
                 $this->error('请填写短信验证码');
-            }
+            }*/
             $model = new MerchantModel();
             $idfind = $model->getOneByParam($idcard, 'idcard');
            if(!$idfind){
@@ -82,7 +82,7 @@ class Login extends Base{
             if($pid == 0 && config('reg_invite_on') == 1){
                 $this->error('注册失败：邀请码填写错误');
             }
-            $files = request()->file('image');
+            /*$files = request()->file('image');
 			$imgarr = array();
             foreach($files as $file){
                 // 移动到框架应用根目录/public/uploads/ 目录下
@@ -104,7 +104,7 @@ class Login extends Base{
 
             if(empty($idcard_zheng) || empty($idcard_fan)){
                 $this->error('请上传照片');
-            }
+            }*/
             for(; true;) {
                 $appid = generate_password ();
                 if ($model->getOneByParam($appid, 'appid')) {
@@ -124,8 +124,8 @@ class Login extends Base{
             $param['paypassword'] = md5($paypassword);
             $param['pid'] = $pid;
             $param['idcard'] = $idcard;
-            $param['idcard_zheng'] = $imgarr[0];
-            $param['idcard_fan'] = $imgarr[1];
+            //$param['idcard_zheng'] = $imgarr[0];
+            //$param['idcard_fan'] = $imgarr[1];
             $param['appid'] = $appid;
             $param['key'] = $key;
             $param['addtime'] = time();
