@@ -241,7 +241,7 @@ class Merchant extends Controller{
             break;
         }
         if(empty($onlinead)){
-            $this->myerror('没有可以匹配的交易广告');
+            $this->myerror('没有可以匹配的交易挂单');
         }
         //开始冻结交易员usdt
         Db::startTrans();
@@ -363,7 +363,7 @@ class Merchant extends Controller{
 		// dump($ads);
          // $this->myerror($where);
         foreach($ads as $k=>$v){
-            //开始判断广告剩余
+            //开始判断挂单剩余
 			$total = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status','neq',5)->where('status','neq',9)->sum('deal_num');
             $actualamount = round($data['amount']/$v['price'], 8);
             if(($v['amount'] - $total) < $actualamount || $v['usdt'] < $actualamount){
@@ -388,7 +388,7 @@ class Merchant extends Controller{
             break;
         }
         if(empty($onlinead)){
-            $this->myerror('没有可以匹配的交易广告');
+            $this->myerror('没有可以匹配的交易挂单');
         }
         // $this->myerror($onlinead);
         //开始冻结交易员usdt

@@ -1441,7 +1441,7 @@ class Merchant extends Base{
             $model2 = new AdModel();
             $flag = $model2->insertOne(['userid'=>session('uid'),'add_time' => time(),'coin'=>'usdt','min_limit'=>$min_limit,'max_limit'=>$max_limit,'state'=>0,'pay_method'=>$pay_str,'ad_no'=>$ad_no,'amount'=>$amount,'price'=>$price,'state'=>1]);
             // $flag = $model2->insertOne(['userid'=>session('uid'),'add_time' => time(),'coin'=>'usdt','min_limit'=>$min_limit,'max_limit'=>$max_limit,'state'=>0,'pay_method'=>$pay_str,'ad_no'=>$ad_no,'amount'=>$amount,'price'=>$price,'state'=>1]);
-			//增加在售广告数
+			//增加在售挂单数
             $count = $model2->where('userid', session('uid'))->where('state', 1)->where('amount', 'gt', 0)->count();
             $model->updateOne(['id'=>session('uid'), 'ad_on_sell'=>$count]);
             if($flag['code'] == 1){
@@ -1513,7 +1513,7 @@ class Merchant extends Base{
             $haveadsum = Db::name('ad_buy')->where('userid', session('uid'))->where('state', 1)->count();
             $haveadsum = $haveadsum ? $haveadsum : 0;
             if($haveadsum > 20){
-                $this->error('求购广告最多发布20个');
+                $this->error('挂买最多发布20个');
             }
             if(empty($pay_method)){
                 $this->error('请选择收款方式');
@@ -1541,7 +1541,7 @@ class Merchant extends Base{
             $ad_no = $this->getadvno();
             $model2 = new AdbuyModel();
             $flag = $model2->insertOne(['userid'=>session('uid'),'add_time' => time(),'coin'=>'usdt','min_limit'=>$min_limit,'max_limit'=>$max_limit,'pay_method'=>$pay_str,'ad_no'=>$ad_no,'amount'=>$amount,'price'=>$price,'state'=>1]);
-            //增加求购广告数
+            //增加挂买数
             $count = $model2->where('userid', session('uid'))->where('state', 1)->where('amount', 'gt', 0)->count();
             $model->updateOne(['id'=>session('uid'), 'ad_on_buy'=>$count]);
             if($flag['code'] == 1){
@@ -1673,7 +1673,7 @@ class Merchant extends Base{
             $ad_no = $this->getadvno();
             $model2 = new AdModel();
             $flag = $model2->insertOne(['userid'=>session('uid'),'add_time' => time(),'coin'=>'usdt','min_limit'=>$min_limit,'max_limit'=>$max_limit,'state'=>0,'pay_method'=>$_POST['bank'],'pay_method2'=>$_POST['zfb'],'pay_method3'=>$_POST['wx'],'pay_method4'=>$_POST['ysf'],'ad_no'=>$ad_no,'amount'=>$amount,'price'=>$price,'state'=>1]);
-            //增加在售广告数
+            //增加在售挂单数
             $count = $model2->where('userid', session('uid'))->where('state', 1)->where('amount', 'gt', 0)->count();
             $model->updateOne(['id'=>session('uid'), 'ad_on_sell'=>$count]);
             if($flag['code'] == 1){
@@ -1775,7 +1775,7 @@ class Merchant extends Base{
             $haveadsum = Db::name('ad_buy')->where('userid', session('uid'))->where('state', 1)->count();
             $haveadsum = $haveadsum ? $haveadsum : 0;
             if($haveadsum > 20){
-                $this->error('求购广告最多发布20个');
+                $this->error('挂买最多发布20个');
             }
             if(empty($_POST['bank']) && empty($_POST['zfb']) &&empty($_POST['wx'])&&empty($_POST['ysf'])){
                 $this->error('请选择收款方式');
@@ -1812,7 +1812,7 @@ class Merchant extends Base{
             $ad_no = $this->getadvno();
             $model2 = new AdbuyModel();
             $flag = $model2->insertOne(['userid'=>session('uid'),'add_time' => time(),'coin'=>'usdt','min_limit'=>$min_limit,'max_limit'=>$max_limit,'pay_method'=>$_POST['bank'],'pay_method2'=>$_POST['zfb'],'pay_method3'=>$_POST['wx'],'pay_method4'=>$_POST['ysf'],'ad_no'=>$ad_no,'amount'=>$amount,'price'=>$price,'state'=>1]);
-            //增加求购广告数
+            //增加挂买数
             $count = $model2->where('userid', session('uid'))->where('state', 1)->where('amount', 'gt', 0)->count();
             $model->updateOne(['id'=>session('uid'), 'ad_on_buy'=>$count]);
 			if($flag['code'] == 1){
@@ -1868,11 +1868,11 @@ class Merchant extends Base{
             $where['userid'] = session('uid');
             $ad = $model2->getOne($where);
             if(empty($ad)){
-                $this->error('广告标识错误');
+                $this->error('挂单标识错误');
             }
             $order = Db::name('order_buy')->where(array('sell_sid'=>$id))->find();
             if(!empty($order)){
-                $this->error('该广告有订单，不能编辑');
+                $this->error('该挂单有订单，不能编辑');
             }
             $amount = input('post.amount');
             if($amount <= 0){
@@ -1978,7 +1978,7 @@ class Merchant extends Base{
         $model = new AdModel();
         $ad = $model->getOne($where);
         if(empty($ad)){
-            $this->error('广告标识错误');
+            $this->error('挂单标识错误');
         }
         $this->assign('ad', $ad);
          $this->assign('pricelimit', $pricelimit);
@@ -2017,11 +2017,11 @@ class Merchant extends Base{
             $where['userid'] = session('uid');
             $ad = $model2->getOne($where);
             if(empty($ad)){
-                $this->error('广告标识错误');
+                $this->error('挂单标识错误');
             }
             $order = Db::name('order_sell')->where(array('buy_bid'=>$id))->find();
             if(!empty($order)){
-                $this->error('该广告有订单，不能编辑');
+                $this->error('该挂单有订单，不能编辑');
             }
             $amount = input('post.amount');
             if($amount <= 0){
@@ -2068,7 +2068,7 @@ class Merchant extends Base{
             $haveadsum = Db::name('ad_buy')->where('userid', session('uid'))->where('state', 1)->count();
             $haveadsum = $haveadsum ? $haveadsum : 0;
             if($haveadsum > 20){
-                $this->error('购买广告最多发布20个');
+                $this->error('购买挂单最多发布20个');
             }
             if(empty($_POST['bank']) && empty($_POST['zfb']) &&empty($_POST['wx'])){
                 $this->error('请选择收款方式');
@@ -2118,7 +2118,7 @@ class Merchant extends Base{
         $model = new AdbuyModel();
         $ad = $model->getOne($where);
         if(empty($ad)){
-            $this->error('广告标识错误');
+            $this->error('挂单标识错误');
         }
         $this->assign('ad', $ad);
         $this->assign('usdt_price_min', $usdt_price_min);
@@ -2148,11 +2148,11 @@ class Merchant extends Base{
             $where['userid'] = session('uid');
             $ad = $model2->getOne($where);
             if(empty($ad)){
-                $this->error('广告标识错误');
+                $this->error('挂单标识错误');
             }
             $order = Db::name('order_buy')->where(array('sell_sid'=>$id))->find();
             if(!empty($order)){
-                $this->error('该广告有订单，不能编辑');
+                $this->error('该挂单有订单，不能编辑');
             }
             $amount = input('post.amount');
             if($amount <= 0){
@@ -2227,7 +2227,7 @@ class Merchant extends Base{
         $model = new AdModel();
         $ad = $model->getOne($where);
         if(empty($ad)){
-            $this->error('广告标识错误');
+            $this->error('挂单标识错误');
         }
         $this->assign('ad', $ad);
         $this->assign('usdt_price_min', $usdt_price_min);
@@ -2253,11 +2253,11 @@ class Merchant extends Base{
             $where['userid'] = session('uid');
             $ad = $model2->getOne($where);
             if(empty($ad)){
-                $this->error('广告标识错误');
+                $this->error('挂单标识错误');
             }
             $order = Db::name('order_sell')->where(array('buy_bid'=>$id))->find();
             if(!empty($order)){
-                $this->error('该广告有订单，不能编辑');
+                $this->error('该挂单有订单，不能编辑');
             }
             $amount = input('post.amount');
             if($amount <= 0){
@@ -2291,7 +2291,7 @@ class Merchant extends Base{
             $haveadsum = Db::name('ad_buy')->where('userid', session('uid'))->where('state', 1)->count();
             $haveadsum = $haveadsum ? $haveadsum : 0;
             if($haveadsum > 20){
-                $this->error('购买广告最多发布20个');
+                $this->error('购买挂单最多发布20个');
             }
             if(empty($pay_method)){
                 $this->error('请选择收款方式');
@@ -2332,7 +2332,7 @@ class Merchant extends Base{
         $model = new AdbuyModel();
         $ad = $model->getOne($where);
         if(empty($ad)){
-            $this->error('广告标识错误');
+            $this->error('挂单标识错误');
         }
         $this->assign('ad', $ad);
         $this->assign('usdt_price_min', $usdt_price_min);
@@ -2343,7 +2343,7 @@ class Merchant extends Base{
         $this->assign('banks', $banks);
         return $this->fetch();
     }
-    //广告上下架
+    //挂单上下架
     public function setShelf(){
         $id = input('post.id');
         $type = input('post.type');
@@ -2352,7 +2352,7 @@ class Merchant extends Base{
             $this->error('请登录操作');
         }
         if($type != 0 && $type != 1){
-            $this->error("广告类型错误！");
+            $this->error("挂单类型错误！");
         }
         $model = new AdModel();
         $model2 = new MerchantModel();
@@ -2360,10 +2360,10 @@ class Merchant extends Base{
         $where['userid'] = session('uid');
         $ad_info = $model->getOne($where);
         if (!$ad_info) {
-            $this->error("广告不存在！");
+            $this->error("挂单不存在！");
         }else{
             if($ad_info['state'] ==4){
-                $this->error("此广告已冻结禁止上下架操作！");
+                $this->error("此挂单已冻结禁止上下架操作！");
             }
         }
         $merchant = $model2->getUserByParam(session('uid'), 'id');
@@ -2392,7 +2392,7 @@ class Merchant extends Base{
             $this->error('请登录操作');
         }
         if($type != 0 && $type != 1){
-            $this->error("广告类型错误！");
+            $this->error("挂单类型错误！");
         }
         $model = new AdbuyModel();
         $model2 = new MerchantModel();
@@ -2400,10 +2400,10 @@ class Merchant extends Base{
         $where['userid'] = session('uid');
         $ad_info = $model->getOne($where);
         if (!$ad_info) {
-            $this->error("广告不存在！");
+            $this->error("挂单不存在！");
         }else{
             if($ad_info['state'] ==4){
-                $this->error("此广告已冻结禁止上下架操作！");
+                $this->error("此挂单已冻结禁止上下架操作！");
             }
         }
         $merchant = $model2->getUserByParam(session('uid'), 'id');
@@ -2411,7 +2411,7 @@ class Merchant extends Base{
             $haveadsum = Db::name('ad_buy')->where('userid', session('uid'))->where('state', 1)->count();
             $haveadsum = $haveadsum ? $haveadsum : 0;
             if($haveadsum > 20){
-                $this->error('开启失败：求购广告最多上架20个');
+                $this->error('开启失败：挂买最多上架20个');
             }
         }
 
@@ -2449,10 +2449,10 @@ class Merchant extends Base{
         $model2 = new MerchantModel();
         $ad = $model->getOne(['id'=>$id]);
         if(empty($ad)){
-            $this->error('广告不存在');
+            $this->error('挂单不存在');
         }
         if($ad['state'] != 1){
-            $this->error('广告未上架');
+            $this->error('挂单未上架');
         }
         $m = new \app\home\model\BankModel();
         $zfb = new \app\home\model\ZfbModel();
@@ -2472,7 +2472,7 @@ class Merchant extends Base{
         return $this->fetch();
     }
     public function trade_ajax(){
-        //type0买广告1卖广告 num用户要交易的数量 tid广告的id tamount用户要交易的价格
+        //type0买挂单1卖挂单 num用户要交易的数量 tid挂单的id tamount用户要交易的价格
         $type = 0;
         $num = input('post.qty');//数量
         $tid = input('post.tid');
@@ -2522,7 +2522,7 @@ class Merchant extends Base{
                  $this->error('请先设置您的云闪付账户信息');
             }
             if($tid<=0){
-                $this->error('广告不存在');
+                $this->error('挂单不存在');
             }
             if($num<=0){
                 $this->error('交易数量必须大于0');
@@ -2536,7 +2536,7 @@ class Merchant extends Base{
         if($type==0){
             $orderinfo = Db::name('ad_buy')->where(array('id'=>$tid))->find();
             if(!$orderinfo){
-                $this->error('此广告不存在');
+                $this->error('此挂单不存在');
             }
             // dump($orderinfo);die;
             // $pay_method = explode(',', $orderinfo['pay_method']);

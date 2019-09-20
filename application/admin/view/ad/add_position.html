@@ -5,7 +5,7 @@
         <div class="col-sm-12">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5>添加广告位</h5>
+                    <h5>添加挂单位</h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -21,7 +21,7 @@
                 <div class="ibox-content">
                     <form class="form-horizontal" name="add_position" id="add_position" method="post" action="{:url('add_position')}">
                         <div class="form-group">
-                            <label class="col-sm-3 control-label">广告位名称：</label>
+                            <label class="col-sm-3 control-label">挂单位名称：</label>
                             <div class="input-group col-sm-4">
                                 <input id="name" type="text" class="form-control" name="name" >
                             </div>
@@ -68,7 +68,7 @@
         
         function checkForm(){
             if( '' == $.trim($('#name').val())){
-                layer.msg('请输入广告位名称',{icon:2,time:1500,shade: 0.1}, function(index){
+                layer.msg('请输入挂单位名称',{icon:2,time:1500,shade: 0.1}, function(index){
                 layer.close(index);
                 });
                 return false;

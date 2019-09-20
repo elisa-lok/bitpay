@@ -338,14 +338,14 @@ class Cron extends Base
         $adtotal = Db::name('ad_sell')->where($adMap)->sum('amount');
         $adids = Db::name('ad_sell')->where($adMap)->column('id');
         $deal_nums = Db::name('order_buy')->where('sell_sid', 'in', $adids)->where('status', 'neq', 5)->where('status','neq',9)->sum('deal_num');
-        //现存挂单出售总USDT，计算所有出售广告的剩余数量
+        //现存挂单出售总USDT，计算所有挂卖的剩余数量
         $orderSellSum = $adtotal - $deal_nums;
-        //求购笔数，交易员求购广告数量
+        //求购笔数，交易员挂买数量
         $adBuySum = Db::name('ad_buy')->where($adMap)->count();
         $adbuytotal = Db::name('ad_buy')->where($adMap)->sum('amount');
         $adbuyids = Db::name('ad_buy')->where($adMap)->column('id');
         $dealbuy_nums = Db::name('order_sell')->where('buy_bid', 'in', $adbuyids)->where('status', 'neq', 5)->sum('deal_num');
-        //求购总数量，计算所有求购广告的剩余数量
+        //求购总数量，计算所有挂买的剩余数量
         $orderBuySum = $adbuytotal - $dealbuy_nums;
         $rs = Db::table('think_statistics')->insert([
             'platform_profit'=>$feePlatform, 'agent_reward'=>$feeAgent, 'trader_reward'=>$feeTrader,
@@ -361,7 +361,7 @@ class Cron extends Base
     }
     private function downad(){
         $remain = Db::name('config')->where('name', 'ad_down_remain_amount')->value('value');//充值手续费
-        //出售广告下架
+        //挂卖下架
         $sellids = Db::name('ad_sell')->field('id, amount, userid')->where('state', 1)->where('amount', 'gt', 0)->select();
         foreach($sellids as $k=>$v){
             $total = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 7)->sum('deal_num');
@@ -372,7 +372,7 @@ class Cron extends Base
                 Db::name('merchant')->where('id', $v['userid'])->setField('ad_on_sell', $nowads ? $nowads : 0);
             }
         }
-        //购买广告下架
+        //购买挂单下架
         $buyids = Db::name('ad_buy')->field('id, amount, userid')->where('state', 1)->where('amount', 'gt', 0)->select();
         foreach($buyids as $k=>$v){
             $total = Db::name('order_sell')->where('buy_bid', $v['id'])->where('status', 'neq', 5)->sum('deal_num');

@@ -31,7 +31,7 @@ class AdPositionModel extends Model
             if(false === $result){
                 return ['code' => -1, 'data' => '', 'msg' => $this->getError()];
             }else{
-                return ['code' => 1, 'data' => '', 'msg' => '添加广告位成功'];
+                return ['code' => 1, 'data' => '', 'msg' => '添加挂单位成功'];
             }
         }catch( PDOException $e){
             return ['code' => -2, 'data' => '', 'msg' => $e->getMessage()];
@@ -49,7 +49,7 @@ class AdPositionModel extends Model
             if(false === $result){
                 return ['code' => 0, 'data' => '', 'msg' => $this->getError()];
             }else{
-                return ['code' => 1, 'data' => '', 'msg' => '编辑广告位成功'];
+                return ['code' => 1, 'data' => '', 'msg' => '编辑挂单位成功'];
             }
         }catch( PDOException $e){
             return ['code' => 0, 'data' => '', 'msg' => $e->getMessage()];
@@ -67,7 +67,7 @@ class AdPositionModel extends Model
 
 
     /**
-     * [getAll 获取全部广告位]
+     * [getAll 获取全部挂单位]
      * @author [] [864491238@qq.com]
      */
     public function getAllPosition()
@@ -84,7 +84,7 @@ class AdPositionModel extends Model
     {
         try{
             $this->where('id', $id)->delete();
-            return ['code' => 1, 'data' => '', 'msg' => '删除广告位成功'];
+            return ['code' => 1, 'data' => '', 'msg' => '删除挂单位成功'];
         }catch( PDOException $e){
             return ['code' => 0, 'data' => '', 'msg' => $e->getMessage()];
         }

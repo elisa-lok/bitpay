@@ -7,7 +7,7 @@ use think\Validate;
 class BannerPositionValidate extends Validate
 {
     protected $rule = [
-       'name|广告位名称'  => 'require',
+       'name|挂单位名称'  => 'require',
        'orderby|排序'  	  => 'require',
     ];
 

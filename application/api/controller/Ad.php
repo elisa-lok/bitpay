@@ -5,15 +5,15 @@ use think\Controller;
 use think\Db;
 
 /**
- * swagger: 广告
+ * swagger: 挂单
  */
 class Ad
 {
 	/**
-	 * get: 广告列表
+	 * get: 挂单列表
 	 * path: list
 	 * method: list
-	 * param: position - {int} 广告位
+	 * param: position - {int} 挂单位
 	 */
 	public function list($position)
     {     
@@ -23,11 +23,11 @@ class Ad
 		if ($info) {
 			$data['code'] = 200;
 			$data['datas'] = $info;
-			$data['msg'] = '获取广告列表成功';
+			$data['msg'] = '获取挂单列表成功';
 			return json($data);	
 		} else {
 			$data['code'] = 404;
-			$data['msg'] = '获取广告列表失败';
+			$data['msg'] = '获取挂单列表失败';
 			return json($data);	
 		}		
 		

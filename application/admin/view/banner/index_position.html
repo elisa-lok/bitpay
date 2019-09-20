@@ -3,14 +3,14 @@
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="ibox float-e-margins">
         <div class="ibox-title">
-            <h5>广告位列表</h5>
+            <h5>挂单位列表</h5>
         </div>
         <div class="ibox-content">
             <div class="row">
                 <div class="col-sm-12">
                 <div  class="col-sm-2" style="width: 100px">
                     <div class="input-group" >
-                        <a href="{:url('add_position')}"><button class="btn btn-outline btn-primary" type="button">添加广告位</button></a>
+                        <a href="{:url('add_position')}"><button class="btn btn-outline btn-primary" type="button">添加挂单位</button></a>
                     </div>
                 </div>
                 </div>
@@ -91,11 +91,11 @@
 
 
 /**
- * [del_position 删除广告位]
+ * [del_position 删除挂单位]
  * @Author[田建龙 864491238@qq.com]
  */
 function del_position(id){
-    layer.confirm('确认删除此广告位?', {icon: 3, title:'提示'}, function(index){
+    layer.confirm('确认删除此挂单位?', {icon: 3, title:'提示'}, function(index){
         //do something
         $.getJSON('./del_position', {'id' : id}, function(res){
             if(res.code == 1){
@@ -113,7 +113,7 @@ function del_position(id){
 }
 
 /**
- * [position_state 广告位状态]
+ * [position_state 挂单位状态]
  * @Author[田建龙 864491238@qq.com]
  */
 function position_state(val){

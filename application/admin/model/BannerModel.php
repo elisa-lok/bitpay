@@ -30,7 +30,7 @@ class BannerModel extends Model
             if(false === $result){       
                 return ['code' => -1, 'data' => '', 'msg' => $this->getError()];
             }else{
-                return ['code' => 1, 'data' => '', 'msg' => '添加广告成功'];
+                return ['code' => 1, 'data' => '', 'msg' => '添加挂单成功'];
             }
         }catch( PDOException $e){
             return ['code' => -2, 'data' => '', 'msg' => $e->getMessage()];
@@ -50,7 +50,7 @@ class BannerModel extends Model
             if(false === $result){
                 return ['code' => 0, 'data' => '', 'msg' => $this->getError()];
             }else{
-                return ['code' => 1, 'data' => '', 'msg' => '编辑广告成功'];
+                return ['code' => 1, 'data' => '', 'msg' => '编辑挂单成功'];
             }
         }catch( PDOException $e){
             return ['code' => 0, 'data' => '', 'msg' => $e->getMessage()];
@@ -76,7 +76,7 @@ class BannerModel extends Model
         try{
             $map['closed']=1;
             $this->save($map, ['id' => $id]);
-            return ['code' => 1, 'data' => '', 'msg' => '删除广告成功'];
+            return ['code' => 1, 'data' => '', 'msg' => '删除挂单成功'];
         }catch( PDOException $e){
             return ['code' => 0, 'data' => '', 'msg' => $e->getMessage()];
         }

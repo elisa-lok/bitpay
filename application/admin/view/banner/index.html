@@ -3,20 +3,20 @@
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="ibox float-e-margins">
         <div class="ibox-title">
-            <h5>广告列表</h5>
+            <h5>挂单列表</h5>
         </div>
         <div class="ibox-content">
             <div class="row">
                 <div class="col-sm-12">
                 <div  class="col-sm-2" style="width: 100px">
                     <div class="input-group" >
-                        <a href="{:url('add')}"><button class="btn btn-outline btn-primary" type="button">添加广告</button></a>
+                        <a href="{:url('add')}"><button class="btn btn-outline btn-primary" type="button">添加挂单</button></a>
                     </div>
                 </div>
                     <form name="admin_list_sea" class="form-search" method="post" action="{:url('index')}">
                         <div class="col-sm-3">
                             <div class="input-group">
-                                <input type="text" id="key" class="form-control" name="key" value="{$val}" placeholder="输入需查询广告标题" />
+                                <input type="text" id="key" class="form-control" name="key" value="{$val}" placeholder="输入需查询挂单标题" />
                                 <span class="input-group-btn">
                                     <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> 搜索</button>
                                 </span>
@@ -34,8 +34,8 @@
                                 <th>ID</th>
                                 <th>标题</th>
                                 <th>链接地址</th>
-                                <th width="15%">广告位</th>
-                                <th>广告图</th>
+                                <th width="15%">挂单位</th>
+                                <th>挂单图</th>
                                 <th>开始时间</th>
                                 <th>结束时间</th>
                                 <th>状态</th>
@@ -152,7 +152,7 @@ function article_list(list){
 
 
 /**
- * [edit_ad 编辑广告]
+ * [edit_ad 编辑挂单]
  * @Author[田建龙 864491238@qq.com]
  */
 function edit(id){
@@ -162,11 +162,11 @@ function edit(id){
 
 
 /**
- * [del_ad 删除广告]
+ * [del_ad 删除挂单]
  * @Author[田建龙 864491238@qq.com]
  */
 function del(id){
-    layer.confirm('确认删除此广告?', {icon: 3, title:'提示'}, function(index){
+    layer.confirm('确认删除此挂单?', {icon: 3, title:'提示'}, function(index){
         $.getJSON('./del', {'id' : id}, function(res){
             if(res.code == 1){
                 layer.msg(res.msg,{icon:1,time:1500,shade: 0.1});
@@ -183,7 +183,7 @@ function del(id){
 
 
 /**
- * [ad_state 广告状态]
+ * [ad_state 挂单状态]
  * @Author[田建龙 864491238@qq.com]
  */
 function state(val){

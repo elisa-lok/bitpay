@@ -927,7 +927,7 @@ class Merchant extends Base{
         }
         $rs = Db::name('ad_buy')->delete($id);
         if($rs){
-            writelog(session('adminuid'),session('username'),'用户【'.session('username').'】删除广告:'.$id.'成功',1);
+            writelog(session('adminuid'),session('username'),'用户【'.session('username').'】删除挂单:'.$id.'成功',1);
             return json(['code'=>1, 'msg'=>'删除成功']);
         }else{
             writelog(session('adminuid'),session('username'),'用户【'.session('username').'】删除:'.$id.'失败',0);
@@ -942,10 +942,10 @@ class Merchant extends Base{
         }
         $rs = Db::name('ad_sell')->update(['id'=>$id, 'state'=>2]);
         if($rs){
-            writelog(session('adminuid'),session('username'),'用户【'.session('username').'】下架广告:'.$id.'成功',1);
+            writelog(session('adminuid'),session('username'),'用户【'.session('username').'】下架挂单:'.$id.'成功',1);
             return json(['code'=>1, 'msg'=>'下架成功']);
         }else{
-            writelog(session('adminuid'),session('username'),'用户【'.session('username').'】下架广告:'.$id.'失败',0);
+            writelog(session('adminuid'),session('username'),'用户【'.session('username').'】下架挂单:'.$id.'失败',0);
             return json(['code'=>0, 'msg'=>'下架失败']);
         }
     }
@@ -957,10 +957,10 @@ class Merchant extends Base{
         }
         $rs = Db::name('ad_buy')->update(['id'=>$id, 'state'=>2]);
         if($rs){
-             writelog(session('adminuid'),session('username'),'用户【'.session('username').'】下架广告:'.$id.'成功',1);
+             writelog(session('adminuid'),session('username'),'用户【'.session('username').'】下架挂单:'.$id.'成功',1);
             return json(['code'=>1, 'msg'=>'下架成功']);
         }else{
-            writelog(session('adminuid'),session('username'),'用户【'.session('username').'】下架广告:'.$id.'失败',0);
+            writelog(session('adminuid'),session('username'),'用户【'.session('username').'】下架挂单:'.$id.'失败',0);
             return json(['code'=>0, 'msg'=>'下架失败']);
         }
     }
@@ -972,10 +972,10 @@ class Merchant extends Base{
         }
         $rs = Db::name('ad_sell')->update(['id'=>$id, 'state'=>1]);
         if($rs){
-             writelog(session('adminuid'),session('username'),'用户【'.session('username').'】上架广告:'.$id.'成功',1);
+             writelog(session('adminuid'),session('username'),'用户【'.session('username').'】上架挂单:'.$id.'成功',1);
             return json(['code'=>1, 'msg'=>'上架成功']);
         }else{
-             writelog(session('adminuid'),session('username'),'用户【'.session('username').'】上架广告:'.$id.'失败',0);
+             writelog(session('adminuid'),session('username'),'用户【'.session('username').'】上架挂单:'.$id.'失败',0);
             return json(['code'=>0, 'msg'=>'上架失败']);
         }
     }
@@ -987,10 +987,10 @@ class Merchant extends Base{
         }
         $rs = Db::name('ad_buy')->update(['id'=>$id, 'state'=>1]);
         if($rs){
-            writelog(session('adminuid'),session('username'),'用户【'.session('username').'】上架广告:'.$id.'成功',1);
+            writelog(session('adminuid'),session('username'),'用户【'.session('username').'】上架挂单:'.$id.'成功',1);
             return json(['code'=>1, 'msg'=>'上架成功']);
         }else{
-             writelog(session('adminuid'),session('username'),'用户【'.session('username').'】上架广告:'.$id.'失败',0);
+             writelog(session('adminuid'),session('username'),'用户【'.session('username').'】上架挂单:'.$id.'失败',0);
             return json(['code'=>0, 'msg'=>'上架失败']);
         }
     }
@@ -1002,10 +1002,10 @@ class Merchant extends Base{
         }
         $rs = Db::name('ad_sell')->update(['id'=>$id, 'state'=>4]);
         if($rs){
-            writelog(session('adminuid'),session('username'),'用户【'.session('username').'】冻结广告:'.$id.'成功',1);
+            writelog(session('adminuid'),session('username'),'用户【'.session('username').'】冻结挂单:'.$id.'成功',1);
             return json(['code'=>1, 'msg'=>'冻结成功']);
         }else{
-           writelog(session('adminuid'),session('username'),'用户【'.session('username').'】冻结广告:'.$id.'失败',0);
+           writelog(session('adminuid'),session('username'),'用户【'.session('username').'】冻结挂单:'.$id.'失败',0);
             return json(['code'=>0, 'msg'=>'冻结失败']);
         }
     }
@@ -1017,10 +1017,10 @@ class Merchant extends Base{
         }
         $rs = Db::name('ad_buy')->update(['id'=>$id, 'state'=>4]);
         if($rs){
-             writelog(session('adminuid'),session('username'),'用户【'.session('username').'】冻结广告:'.$id.'成功',1);
+             writelog(session('adminuid'),session('username'),'用户【'.session('username').'】冻结挂单:'.$id.'成功',1);
             return json(['code'=>1, 'msg'=>'冻结成功']);
         }else{
-            writelog(session('adminuid'),session('username'),'用户【'.session('username').'】冻结广告:'.$id.'失败',0);
+            writelog(session('adminuid'),session('username'),'用户【'.session('username').'】冻结挂单:'.$id.'失败',0);
             return json(['code'=>0, 'msg'=>'冻结失败']);
         }
     }
@@ -1032,10 +1032,10 @@ class Merchant extends Base{
         }
         $rs = Db::name('ad_sell')->update(['id'=>$id, 'state'=>2]);
         if($rs){
-             writelog(session('adminuid'),session('username'),'用户【'.session('username').'】冻结广告:'.$id.'成功',1);
+             writelog(session('adminuid'),session('username'),'用户【'.session('username').'】冻结挂单:'.$id.'成功',1);
             return json(['code'=>1, 'msg'=>'冻结成功']);
         }else{
-            writelog(session('adminuid'),session('username'),'用户【'.session('username').'】冻结广告:'.$id.'失败',0);
+            writelog(session('adminuid'),session('username'),'用户【'.session('username').'】冻结挂单:'.$id.'失败',0);
             return json(['code'=>0, 'msg'=>'冻结失败']);
         }
     }
@@ -1047,10 +1047,10 @@ class Merchant extends Base{
         }
         $rs = Db::name('ad_buy')->update(['id'=>$id, 'state'=>2]);
         if($rs){
-            writelog(session('adminuid'),session('username'),'用户【'.session('username').'】冻结广告:'.$id.'成功',1);
+            writelog(session('adminuid'),session('username'),'用户【'.session('username').'】冻结挂单:'.$id.'成功',1);
             return json(['code'=>1, 'msg'=>'冻结成功']);
         }else{
-            writelog(session('adminuid'),session('username'),'用户【'.session('username').'】冻结广告:'.$id.'失败',0);
+            writelog(session('adminuid'),session('username'),'用户【'.session('username').'】冻结挂单:'.$id.'失败',0);
             return json(['code'=>0, 'msg'=>'冻结失败']);
         }
     }

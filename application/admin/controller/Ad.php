@@ -8,9 +8,9 @@ use think\Db;
 class Ad extends Base
 {
 
-    //*********************************************广告列表*********************************************//
+    //*********************************************挂单列表*********************************************//
     /**
-     * [index 广告列表]
+     * [index 挂单列表]
      * @return [type] [description]
      * @author [田建龙] [864491238@qq.com]
      */
@@ -41,7 +41,7 @@ class Ad extends Base
 
 
     /**
-     * [add_ad 添加广告]
+     * [add_ad 添加挂单]
      * @return [type] [description]
      * @author [田建龙] [864491238@qq.com]
      */
@@ -63,7 +63,7 @@ class Ad extends Base
 
 
     /**
-     * [edit_ad 编辑广告]
+     * [edit_ad 编辑挂单]
      * @return [type] [description]
      * @author [田建龙] [864491238@qq.com]
      */
@@ -83,7 +83,7 @@ class Ad extends Base
 
 
     /**
-     * [del_ad 删除广告]
+     * [del_ad 删除挂单]
      * @return [type] [description]
      * @author [田建龙] [864491238@qq.com]
      */
@@ -97,7 +97,7 @@ class Ad extends Base
 
 
     /**
-     * [ad_state 广告状态]
+     * [ad_state 挂单状态]
      * @return [type] [description]
      * @author [田建龙] [864491238@qq.com]
      */
@@ -119,9 +119,9 @@ class Ad extends Base
 
 
 
-    //*********************************************广告位*********************************************//
+    //*********************************************挂单位*********************************************//
     /**
-     * [index_position 广告位列表]
+     * [index_position 挂单位列表]
      * @return [type] [description]
      * @author [田建龙] [864491238@qq.com]
      */
@@ -141,7 +141,7 @@ class Ad extends Base
 
 
     /**
-     * [add_position 添加广告位]
+     * [add_position 添加挂单位]
      * @return [type] [description]
      * @author [田建龙] [864491238@qq.com]
      */
@@ -160,7 +160,7 @@ class Ad extends Base
 
 
     /**
-     * [edit_position 编辑广告位]
+     * [edit_position 编辑挂单位]
      * @return [type] [description]
      * @author [田建龙] [864491238@qq.com]
      */
@@ -180,7 +180,7 @@ class Ad extends Base
 
 
     /**
-     * [del_position 删除广告位]
+     * [del_position 删除挂单位]
      * @return [type] [description]
      * @author [田建龙] [864491238@qq.com]
      */
@@ -195,7 +195,7 @@ class Ad extends Base
 
 
     /**
-     * [position_state 广告位状态]
+     * [position_state 挂单位状态]
      * @return [type] [description]
      * @author [田建龙] [864491238@qq.com]
      */
