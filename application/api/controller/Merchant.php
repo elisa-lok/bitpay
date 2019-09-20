@@ -241,7 +241,7 @@ class Merchant extends Controller{
             break;
         }
         if(empty($onlinead)){
-            $this->myerror('没有可以匹配的交易挂单');
+            $this->myerror('暂无可用订单');
         }
         //开始冻结交易员usdt
         Db::startTrans();
@@ -388,7 +388,7 @@ class Merchant extends Controller{
             break;
         }
         if(empty($onlinead)){
-            $this->myerror('没有可以匹配的交易挂单');
+            $this->myerror('暂无可用订单');
         }
         // $this->myerror($onlinead);
         //开始冻结交易员usdt
