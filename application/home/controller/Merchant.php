@@ -2862,7 +2862,7 @@ class Merchant extends Base{
             $this->error('订单参数错误1');
         }
         if($order['buy_id'] != session('uid')){
-            $this->error('不是您的求购订单');
+            $this->error('不是您的买单');
         }
         if($order['status']==5){
             $this->error('此订单已取消');
@@ -3224,7 +3224,7 @@ class Merchant extends Base{
         return $this->fetch();
     }
 	/**
-     * 交易员求购订单申诉
+     * 交易员买单申诉
      */
     public function shensu_ajax_trader(){
         if(request()->isPost()){
