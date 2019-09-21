@@ -49,7 +49,7 @@ CREATE TABLE `think_ad_buy` (
   KEY `trust_only` (`trust_only`) USING BTREE,
   KEY `add_time` (`add_time`) USING BTREE,
   KEY `state` (`state`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
 
 /*Data for the table `think_ad_buy` */
 
@@ -58,7 +58,13 @@ insert  into `think_ad_buy`(`id`,`ad_no`,`userid`,`location`,`currency`,`margin`
 (2,'oekhy1567308500',4,0,0,0.00,1.00,7150.00,0,'',0,0,0,'1,1,1,1,1,1,1',1567308500,2,NULL,0,0,0.00,1000,7.15,0,2,0),
 (3,'nlgqm1567319731',4,0,0,0.00,1.00,714.00,0,'',0,0,0,'1,1,1,1,1,1,1',1567319731,2,NULL,0,0,0.00,100,7.14,0,2,0),
 (4,'ztdpg1567420751',4,0,0,0.00,1.00,7150.00,2,'',0,0,0,'1,1,1,1,1,1,1',1567420751,2,NULL,0,0,0.00,1000,7.15,2,0,0),
-(5,'cqkae1568949232',6,0,0,0.00,0.10,7.01,0,'',0,0,0,'1,1,1,1,1,1,1',1568949232,2,NULL,0,0,0.00,1,7.01,4,0,0);
+(5,'cqkae1568949232',6,0,0,0.00,0.10,7.01,0,'',0,0,0,'1,1,1,1,1,1,1',1568949232,2,NULL,0,0,0.00,1,7.01,4,0,0),
+(6,'zprca1569030077',9,0,0,0.00,7.04,699.00,0,'',0,0,0,'1,1,1,1,1,1,1',1569030077,2,NULL,0,0,0.00,100,7.00,6,0,0),
+(7,'rudnr1569030878',9,0,0,0.00,1.00,563.20,0,'',0,0,0,'1,1,1,1,1,1,1',1569030878,2,NULL,0,0,0.00,80,7.04,6,0,0),
+(8,'trrvh1569031159',10,0,0,0.00,1.00,70.40,0,'',0,0,0,'1,1,1,1,1,1,1',1569031159,2,NULL,0,0,0.00,10,7.04,5,0,0),
+(9,'dpupn1569031543',9,0,0,0.00,1.00,281.60,0,'',0,0,0,'1,1,1,1,1,1,1',1569031543,2,NULL,0,0,0.00,40,7.04,6,0,0),
+(10,'evnrt1569035602',9,0,0,0.00,1.00,352.00,0,'',0,0,0,'1,1,1,1,1,1,1',1569035602,2,NULL,0,0,0.00,50,7.05,6,0,0),
+(11,'fxzuu1569035903',10,0,0,0.00,1.00,352.50,0,'',0,0,0,'1,1,1,1,1,1,1',1569035903,2,NULL,0,0,0.00,50,7.05,5,0,0);
 
 /*Table structure for table `think_ad_sell` */
 
@@ -98,7 +104,7 @@ CREATE TABLE `think_ad_sell` (
   KEY `trust_only` (`trust_only`) USING BTREE,
   KEY `add_time` (`add_time`) USING BTREE,
   KEY `state` (`state`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8;
 
 /*Data for the table `think_ad_sell` */
 
@@ -151,8 +157,14 @@ insert  into `think_ad_sell`(`id`,`ad_no`,`userid`,`location`,`currency`,`margin
 (46,'jpkft1568890188',6,0,0,0.00,0.00,0.10,7.09,'','',0,0,'1,1,1,1,1,1,1',1568890188,2,NULL,1,0,0.00,7.09,0,1,4,0,0),
 (47,'ufkhn1568890690',6,0,0,0.00,0.00,0.10,7.08,'','',0,0,'1,1,1,1,1,1,1',1568890690,2,NULL,1,0,0.00,7.08,0,1,4,0,0),
 (48,'zmrtu1568890987',6,0,0,0.00,0.00,0.10,7.09,'','',0,0,'1,1,1,1,1,1,1',1568890987,2,NULL,1,0,0.00,7.09,0,1,4,0,0),
-(49,'nccnm1568964182',9,0,0,0.00,0.00,1.00,705.00,'','',0,0,'1,1,1,1,1,1,1',1568964182,1,NULL,1,0,0.00,7.04,0,100,6,0,0),
-(50,'jhniq1568966803',9,0,0,0.00,0.00,1.00,705.00,'','',0,0,'1,1,1,1,1,1,1',1568966803,1,NULL,1,0,0.00,7.05,0,100,6,0,0);
+(49,'nccnm1568964182',9,0,0,0.00,0.00,1.00,705.00,'','',0,0,'1,1,1,1,1,1,1',1568964182,2,NULL,1,0,0.00,7.04,0,100,6,0,0),
+(50,'jhniq1568966803',9,0,0,0.00,0.00,1.00,705.00,'','',0,0,'1,1,1,1,1,1,1',1568966803,2,NULL,1,0,0.00,7.05,0,100,6,0,0),
+(51,'gphuw1569028809',10,0,0,0.00,0.00,1.00,712.00,'3','',0,0,'1,1,1,1,1,1,1',1569028809,2,NULL,1,0,0.00,7.11,0,100,0,0,0),
+(52,'slbzv1569028810',10,0,0,0.00,0.00,1.00,712.00,'3','',0,0,'1,1,1,1,1,1,1',1569028810,2,NULL,1,0,0.00,7.11,0,100,0,0,0),
+(53,'bxyhk1569030847',10,0,0,0.00,0.00,1.00,711.00,'','',0,0,'1,1,1,1,1,1,1',1569030847,2,NULL,1,0,0.00,7.11,0,100,5,0,0),
+(54,'oenap1569031886',10,0,0,0.00,0.00,1.00,711.00,'','',0,0,'1,1,1,1,1,1,1',1569031886,2,NULL,1,0,0.00,7.11,0,100,5,0,0),
+(55,'oynbj1569032622',10,0,0,0.00,0.00,1.00,711.00,'','',0,0,'1,1,1,1,1,1,1',1569032622,2,NULL,1,0,0.00,7.11,0,100,5,0,0),
+(56,'jurpq1569035514',10,0,0,0.00,0.00,1.00,640.80,'','',0,0,'1,1,1,1,1,1,1',1569035514,1,NULL,1,0,0.00,7.12,0,90,5,0,0);
 
 /*Table structure for table `think_address` */
 
@@ -390,7 +402,7 @@ CREATE TABLE `think_admin` (
 /*Data for the table `think_admin` */
 
 insert  into `think_admin`(`id`,`username`,`password`,`portrait`,`loginnum`,`last_login_ip`,`last_login_time`,`real_name`,`status`,`groupid`,`token`) values 
-(1,'admin','bcdc0b231056d9acf93c00c58ddab31b','20161122\\admin.jpg',525,'183.31.245.151',1568964236,'admin',1,1,'41a8f96765efb4db193e5932bf353acc'),
+(1,'admin','bcdc0b231056d9acf93c00c58ddab31b','20161122\\admin.jpg',540,'183.31.245.151',1569048346,'admin',1,1,'41a8f96765efb4db193e5932bf353acc'),
 (29,'cus1','f3c44112258ecd8847c8378855a5dde7','',2,'127.0.0.1',1567234646,'客服一',1,23,'6fd73eb569c520f42b3478fe5cfbc7c0');
 
 /*Table structure for table `think_agent_reward` */
@@ -604,18 +616,18 @@ insert  into `think_auth_rule`(`id`,`name`,`title`,`type`,`status`,`css`,`condit
 (94,'admin/merchant/agentreward','代理奖励',1,1,'','',102,49,1543066579,1543066579),
 (95,'admin/merchant/adlist','挂卖列表',1,1,'','',101,52,1446535750,1446535750),
 (96,'admin/merchant/orderlist','匹配订单列表',1,1,'','',101,53,1446535750,1446535750),
-(97,'admin/merchant/traderrecharge','交易员充币列表',1,1,'','',101,51,1446535750,1446535750),
-(98,'admin/merchant/buyadlist','交易员挂买单',1,1,'','',101,54,1446535750,1446535750),
-(99,'admin/merchant/orderlistbuy','交易员买单',1,1,'','',101,54,1446535750,1446535750),
-(100,'admin/merchant/traderreward','交易员奖励',1,1,'','',101,49,1446535750,1446535750),
+(97,'admin/merchant/traderrecharge','承兑商充币列表',1,1,'','',101,51,1446535750,1446535750),
+(98,'admin/merchant/buyadlist','承兑商挂买单',1,1,'','',101,54,1446535750,1446535750),
+(99,'admin/merchant/orderlistbuy','承兑商求购订单',1,1,'','',101,54,1446535750,1446535750),
+(100,'admin/merchant/traderreward','承兑商奖励',1,1,'','',101,49,1446535750,1446535750),
 (101,'#','承兑商管理',1,1,'fa fa-user','',0,3,1446535750,1446535750),
 (102,'#','代理商管理',1,1,'fa fa-user','',0,4,1446535750,1446535750),
 (103,'admin/merchant/index?reg_type=2','承兑商列表',1,1,'','',101,0,1543066579,1543066579),
 (104,'admin/merchant/index?reg_type=3','代理商列表',1,1,'','',102,0,1543066579,1543066579),
 (105,'#','交易管理',1,0,'fa fa-image','',0,3,1555559364,1555561185),
 (106,'admin/merchant/orderlist','盘口订单',1,0,' Example of exchange','',105,50,1555559706,1555559853),
-(107,'admin/merchant/orderlistbuy?reg_type=1','商户卖单列表',1,1,'','',84,52,1446535750,1446535750),
-(108,'admin/merchant/orderlistbuy?reg_type=3','代理商卖单列表',1,1,'','',102,2,1446535750,1446535750),
+(107,'admin/merchant/orderlistbuy?reg_type=1','商户出售订单列表',1,1,'','',84,52,1446535750,1446535750),
+(108,'admin/merchant/orderlistbuy?reg_type=3','代理商出售订单列表',1,1,'','',102,2,1446535750,1446535750),
 (109,'#','统计管理',1,1,'fa fa-cube','',0,7,1446535750,1446535750),
 (110,'admin/merchant/statistics','平台统计',1,1,'','',109,0,1446535750,1446535750),
 (111,'admin/merchant/merchantstatistics','商户统计',1,1,'','',109,0,1446535750,1446535750),
@@ -627,7 +639,7 @@ insert  into `think_auth_rule`(`id`,`name`,`title`,`type`,`status`,`css`,`condit
 (118,'admin/merchant/addresslist','钱包地址列表',1,1,'','',1,50,1566994828,1566994828),
 (119,'admin/merchant/merchant_check','商户注册审核',1,1,'','',91,50,1567009697,1567009697),
 (120,'admin/merchant/merchant_agent_check','代理审核',1,1,'','',91,50,1567009697,1567009697),
-(121,'admin/merchant/merchant_trader_check','交易员审核',1,1,'','',91,50,1567009697,1567009697),
+(121,'admin/merchant/merchant_trader_check','承兑商审核',1,1,'','',91,50,1567009697,1567009697),
 (122,'admin/merchant/merchant_status','更改会员状态',1,1,'','',91,50,1567009697,1567009697),
 (123,'admin/merchant/del_merchant','删除会员',1,1,'','',91,50,1567009697,1567009697),
 (124,'admin/merchant/edit_merchant','编辑会员',1,1,'','',91,50,1567009697,1567009697),
@@ -720,15 +732,15 @@ insert  into `think_config`(`id`,`name`,`value`) values
 (13,'alisms_appsecret',''),
 (14,'alisms_signname',''),
 (15,'logo','20190901/e51cc260c53245891bfa550d58e78b90.png'),
-(16,'merchant_tibi_fee','3'),
+(16,'merchant_tibi_fee','0.28'),
 (17,'user_tibi_fee',''),
 (18,'user_recharge_fee',''),
 (19,'merchant_tibi_max','10000'),
 (20,'merchant_tibi_min','100'),
 (21,'usdt_confirms','6'),
-(22,'agent_tibi_fee','0.2'),
-(23,'agent_withdraw_fee','0.2'),
-(24,'agent_recharge_fee','0.3'),
+(22,'agent_tibi_fee','0'),
+(23,'agent_withdraw_fee','0'),
+(24,'agent_recharge_fee','1'),
 (25,'usdt_price_way','2'),
 (26,'usdt_price_min','6'),
 (27,'usdt_price_max','8'),
@@ -739,14 +751,14 @@ insert  into `think_config`(`id`,`name`,`value`) values
 (32,'trader_merchant_fee','3'),
 (33,'usdt_price_way_buy','2'),
 (34,'usdt_price_min_buy','6'),
-(35,'usdt_buy_trader_fee','0.2'),
-(36,'usdt_buy_merchant_fee','0.05'),
+(35,'usdt_buy_trader_fee','0.1'),
+(36,'usdt_buy_merchant_fee','0'),
 (37,'usdt_price_max_buy','8'),
 (38,'trader_platform_get','1'),
 (39,'reg_invite_on','0'),
 (40,'usdt_pwd','zrCzPx8ozSfWjJqN4iQ81'),
 (41,'usdt_fee','0'),
-(43,'ad_down_remain_amount','10'),
+(43,'ad_down_remain_amount','15'),
 (44,'trader_parent_get','5'),
 (45,'trader_merchant_parent_get','3'),
 (46,'trader_pp_max_unfinished_order','100'),
@@ -767,7 +779,7 @@ insert  into `think_config`(`id`,`name`,`value`) values
 (61,'feeaddrprive','0x05F72bE0CB7Cf86f41a49788C7CCaCC3DC80034C'),
 (63,'usdt_price_add','0.07'),
 (62,'usdtabi_bak','[{\"constant\":true,\"inputs\":[],\"name\":\"name\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_upgradedAddress\",\"type\":\"address\"}],\"name\":\"deprecate\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_spender\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"deprecated\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_evilUser\",\"type\":\"address\"}],\"name\":\"addBlackList\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"upgradedAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"address\"}],\"name\":\"balances\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"decimals\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"maximumFee\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"_totalSupply\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"unpause\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_maker\",\"type\":\"address\"}],\"name\":\"getBlackListStatus\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"address\"},{\"name\":\"\",\"type\":\"address\"}],\"name\":\"allowed\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"paused\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"who\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"pause\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getOwner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"symbol\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newBasisPoints\",\"type\":\"uint256\"},{\"name\":\"newMaxFee\",\"type\":\"uint256\"}],\"name\":\"setParams\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"issue\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"redeem\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_spender\",\"type\":\"address\"}],\"name\":\"allowance\",\"outputs\":[{\"name\":\"remaining\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"basisPointsRate\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"address\"}],\"name\":\"isBlackListed\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_clearedUser\",\"type\":\"address\"}],\"name\":\"removeBlackList\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"MAX_UINT\",\"outputs\":[{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_blackListedUser\",\"type\":\"address\"}],\"name\":\"destroyBlackFunds\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"name\":\"_initialSupply\",\"type\":\"uint256\"},{\"name\":\"_name\",\"type\":\"string\"},{\"name\":\"_symbol\",\"type\":\"string\"},{\"name\":\"_decimals\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Issue\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Redeem\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"newAddress\",\"type\":\"address\"}],\"name\":\"Deprecate\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"feeBasisPoints\",\"type\":\"uint256\"},{\"indexed\":false,\"name\":\"maxFee\",\"type\":\"uint256\"}],\"name\":\"Params\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_blackListedUser\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"_balance\",\"type\":\"uint256\"}],\"name\":\"DestroyedBlackFunds\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_user\",\"type\":\"address\"}],\"name\":\"AddedBlackList\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"_user\",\"type\":\"address\"}],\"name\":\"RemovedBlackList\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"spender\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[],\"name\":\"Pause\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[],\"name\":\"Unpause\",\"type\":\"event\"}]'),
-(64,'usdt_price_add_buy','-0.04');
+(64,'usdt_price_add_buy','0');
 
 /*Table structure for table `think_financelog` */
 
@@ -783,168 +795,9 @@ CREATE TABLE `think_financelog` (
   `add_time` int(11) DEFAULT NULL COMMENT '添加时间',
   `op` varchar(255) DEFAULT NULL COMMENT '操作员',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=158 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 /*Data for the table `think_financelog` */
-
-insert  into `think_financelog`(`id`,`uid`,`user`,`note`,`amount`,`status`,`add_time`,`op`) values 
-(1,1,'商户','买入USDT_f1','95.1136044908',0,1567306659,'承兑商二'),
-(2,1,'商户','卖出USDT_冻结1','70.6293706293',1,1567308652,'商户'),
-(3,4,'承兑商二','买入USDT_f2','70.6293706293',0,1567308882,'商户'),
-(4,1,'商户','买入USDT_f1','127.0014025224',0,1567309752,'承兑商二'),
-(5,1,'商户','买入USDT_f1','16.3562412384',0,1567317061,'承兑商二'),
-(6,1,'商户','买入USDT_f1','137.1725105198',0,1567317070,'承兑商二'),
-(7,1,'商户','买入USDT_f1','10.0336605866',0,1567317480,'承兑商二'),
-(8,1,'商户','买入USDT_f1','59.5097493004',0,1567319041,'承兑商二'),
-(9,1,'商户','买入USDT_f1','112.019635343',0,1567319141,'承兑商二'),
-(10,1,'商户','买入USDT_f1','4.231197775',0,1567319245,'承兑商二'),
-(11,1,'商户','买入USDT_f1','50.6378830062',0,1567319407,'承兑商二'),
-(12,1,'商户','卖出USDT_冻结1','14.08963585344',1,1567319819,'商户'),
-(13,4,'承兑商二','买入USDT_f2','14.1456582624',0,1567319996,'商户'),
-(14,1,'商户','买入USDT_f1','62.239554314',0,1567325251,'承兑商二'),
-(15,4,'承兑商二','后台修改USDT余额','18396.69805022',1,1567325428,'admin'),
-(16,1,'商户','后台修改USDT余额','207.67230874',0,1567327705,'admin'),
-(17,1,'商户','买入USDT_f1','122.8036211707',0,1567327999,'承兑商二'),
-(18,1,'商户','后台修改USDT余额','122.80362117',1,1567328350,'admin'),
-(19,4,'承兑商二','后台修改USDT余额','126.60167131',0,1567328420,'admin'),
-(20,1,'商户','买入USDT_f1','70.3325905248',0,1567328519,'承兑商二'),
-(21,1,'商户','后台修改USDT余额','70.33259052',1,1567328663,'admin'),
-(22,4,'承兑商二','后台修改USDT余额','70.4735376',0,1567328694,'admin'),
-(23,1,'商户','买入USDT_f1','69.7465181014',0,1567328838,'承兑商二'),
-(24,4,'承兑商二','后台修改USDT余额','71.16991643',0,1567329260,'admin'),
-(25,1,'商户','买入USDT_f1','139.08205841',0,1567329534,'承兑商二'),
-(26,4,'承兑商二','后台修改USDT余额','139.08205841',0,1567329585,'admin'),
-(27,1,'商户','后台修改USDT余额','208.82857651',1,1567329606,'admin'),
-(28,1,'商户','买入USDT_f1','13.649025068',0,1567329775,'承兑商二'),
-(29,4,'承兑商二','后台修改USDT余额','13.9275766',0,1567329970,'admin'),
-(30,1,'商户','后台修改USDT余额','13.64902507',1,1567329990,'admin'),
-(31,1,'商户','买入USDT_f1','136.3004172418',0,1567330139,'承兑商二'),
-(32,4,'承兑商二','后台修改USDT余额','139.08205841',0,1567330161,'admin'),
-(33,1,'商户','后台修改USDT余额','136.30041724',1,1567330182,'admin'),
-(34,1,'商户','买入USDT_f1','980',0,1567330252,'承兑商二'),
-(35,4,'承兑商二','后台修改USDT余额','1000',0,1567330564,'admin'),
-(36,1,'商户','后台修改USDT余额','980',1,1567330592,'admin'),
-(37,1,'商户','买入USDT_f1','980',0,1567330698,'承兑商二'),
-(38,4,'承兑商二','后台修改USDT余额','1000',0,1567330756,'admin'),
-(39,1,'商户','后台修改USDT余额','980',1,1567330771,'admin'),
-(40,1,'商户','买入USDT_f1','980',0,1567331058,'承兑商二'),
-(41,1,'商户','后台修改USDT余额','980',1,1567331287,'admin'),
-(42,4,'承兑商二','后台修改USDT余额','1000',0,1567331371,'admin'),
-(43,1,'商户','买入USDT_f1','996',0,1567331523,'承兑商二'),
-(44,1,'商户','后台修改USDT余额','996',1,1567331827,'admin'),
-(45,4,'承兑商二','后台修改USDT余额','1000',0,1567331902,'admin'),
-(46,1,'商户','买入USDT_f1','1000',0,1567331993,'承兑商二'),
-(47,4,'承兑商二','后台修改USDT余额','1000',0,1567332292,'admin'),
-(48,1,'商户','后台修改USDT余额','1000',1,1567332333,'admin'),
-(49,1,'商户','买入USDT_f1','996',0,1567332402,'承兑商二'),
-(50,3,'代理商','后台修改USDT余额','1000',0,1567332738,'admin'),
-(51,4,'承兑商二','后台修改USDT余额','1000',0,1567333413,'admin'),
-(52,1,'商户','买入USDT_f1','996',0,1567333546,'承兑商二'),
-(53,1,'商户','后台修改USDT余额','1992',1,1567334879,'admin'),
-(54,1,'商户','后台修改USDT余额','392.7',0,1567334976,'admin'),
-(55,4,'承兑商二','后台修改USDT余额','1392.7',0,1567335002,'admin'),
-(56,2,'承兑商','提币_1','10.00000000',1,1567335803,'admin'),
-(57,4,'承兑商二','后台修改USDT余额','392.7',1,1567337509,'admin'),
-(58,1,'商户','后台修改USDT余额','392.7',1,1567337537,'admin'),
-(59,1,'商户','买入USDT_f1','970',0,1567337614,'承兑商二'),
-(60,4,'承兑商二','交易员利润_f1','5',0,1567337614,'承兑商二'),
-(61,4,'承兑商二','后台修改USDT余额','995',0,1567337868,'admin'),
-(62,1,'商户','买入USDT_f1','970',0,1567337920,'承兑商二'),
-(63,4,'承兑商二','交易员利润_f1','2',0,1567337920,'承兑商二'),
-(64,4,'承兑商二','后台修改USDT余额','998',0,1567338033,'admin'),
-(65,1,'商户','后台修改USDT余额','1940',1,1567338072,'admin'),
-(66,1,'商户','买入USDT_f1','970',0,1567338136,'承兑商二'),
-(67,4,'承兑商二','交易员利润_f1','1.5',0,1567338136,'承兑商二'),
-(68,1,'商户','后台修改USDT余额','970',1,1567338242,'admin'),
-(69,1,'商户','后台修改USDT余额','1000',1,1567338261,'admin'),
-(70,4,'承兑商二','后台修改USDT余额','998.5',0,1567338330,'admin'),
-(71,1,'商户','买入USDT_f1','996.5',0,1567338470,'承兑商二'),
-(72,4,'承兑商二','后台修改USDT余额','1000',0,1567338749,'admin'),
-(73,1,'商户','后台修改USDT余额','996.5',1,1567338777,'admin'),
-(74,1,'商户','买入USDT_f1','996.5',0,1567338874,'承兑商二'),
-(75,1,'商户','后台修改USDT余额','3.5',0,1567338990,'admin'),
-(76,4,'承兑商二','后台修改USDT余额','1000',0,1567339017,'admin'),
-(77,1,'商户','买入USDT_f1','996.5',0,1567339111,'承兑商二'),
-(78,4,'承兑商二','后台修改USDT余额','1000',0,1567339214,'admin'),
-(79,1,'商户','后台修改USDT余额','1996.5',1,1567339302,'admin'),
-(80,1,'商户','买入USDT_f1','965',0,1567339326,'承兑商二'),
-(81,4,'承兑商二','交易员利润_f1','1.5',0,1567339326,'承兑商二'),
-(82,1,'商户','后台修改USDT余额','965',1,1567339553,'admin'),
-(83,4,'承兑商二','后台修改USDT余额','998.5',0,1567339571,'admin'),
-(84,1,'商户','买入USDT_f1','992',0,1567339733,'承兑商二'),
-(85,4,'承兑商二','交易员利润_f1','1.5',0,1567339733,'承兑商二'),
-(86,1,'商户','后台修改USDT余额','992',1,1567339819,'admin'),
-(87,4,'承兑商二','后台修改USDT余额','998.5',0,1567339832,'admin'),
-(88,1,'商户','买入USDT_f1','995',0,1567339889,'承兑商二'),
-(89,4,'承兑商二','交易员利润_f1','1.5',0,1567339889,'承兑商二'),
-(90,4,'承兑商二','后台修改USDT余额','998.5',0,1567340031,'admin'),
-(91,1,'商户','后台修改USDT余额','995',1,1567340049,'admin'),
-(92,1,'商户','买入USDT_f1','996',0,1567340109,'承兑商二'),
-(93,4,'承兑商二','交易员利润_f1','1.5',0,1567340109,'承兑商二'),
-(94,1,'商户','后台修改USDT余额','4',0,1567340194,'admin'),
-(95,4,'承兑商二','后台修改USDT余额','998.5',0,1567340207,'admin'),
-(96,1,'商户','买入USDT_f1','996.5',0,1567340273,'承兑商二'),
-(97,4,'承兑商二','交易员利润_f1','1.5',0,1567340273,'承兑商二'),
-(98,4,'承兑商二','后台修改USDT余额','9998.5',0,1567341691,'admin'),
-(99,1,'商户','后台修改USDT余额','1996.5',1,1567341715,'admin'),
-(100,1,'商户','买入USDT_f1','9965',0,1567341820,'承兑商二'),
-(101,4,'承兑商二','后台修改USDT余额','1000',0,1567341950,'admin'),
-(102,1,'商户','后台修改USDT余额','9965',1,1567341970,'admin'),
-(103,1,'商户','买入USDT_f1','996.5',0,1567342042,'承兑商二'),
-(104,4,'承兑商二','交易员利润_f1','1.5',0,1567342042,'承兑商二'),
-(105,4,'承兑商二','后台修改USDT余额','998.5',0,1567349722,'admin'),
-(106,1,'商户','后台修改USDT余额','996.5',1,1567349742,'admin'),
-(107,1,'商户','买入USDT_f1','13.8788300819',0,1567349977,'承兑商二'),
-(108,4,'承兑商二','交易员利润_f1','0.0208913649',0,1567349977,'承兑商二'),
-(109,4,'承兑商二','后台修改USDT余额','1013.90668524',0,1567350114,'admin'),
-(110,1,'商户','买入USDT_f1','13.8788300819',0,1567350197,'承兑商二'),
-(111,4,'承兑商二','交易员利润_f1','0.0208913649',0,1567350197,'承兑商二'),
-(112,4,'承兑商二','后台修改USDT余额','986.09331476',1,1567419514,'admin'),
-(113,4,'承兑商二','后台修改USDT余额','1000',0,1567419608,'admin'),
-(114,6,'陈超','后台修改USDT余额','1000',0,1567420168,'admin'),
-(115,1,'商户','买入USDT_f1','13.85952711956',0,1567420349,'承兑商二'),
-(116,4,'承兑商二','交易员利润_f1','0.02086230876',0,1567420349,'承兑商二'),
-(117,4,'承兑商二','后台修改USDT余额','986.11265647',1,1567420611,'admin'),
-(118,2,'承兑商','后台修改USDT余额','7994.71549102',1,1567420710,'admin'),
-(119,2,'承兑商','后台修改USDT余额','7994.71549102',1,1567420717,'admin'),
-(120,2,'承兑商','后台修改USDT余额','7994.71549102',1,1567420720,'admin'),
-(121,2,'承兑商','后台修改USDT余额','7994.71549102',1,1567420722,'admin'),
-(122,2,'承兑商','后台修改USDT余额','7994.71549102',1,1567420727,'admin'),
-(123,2,'承兑商','后台修改USDT余额','7994.71549102',1,1567420748,'admin'),
-(124,2,'承兑商','后台修改USDT冻结余额','1673.98182177',1,1567420748,'admin'),
-(125,1,'商户','买入USDT_f1','990.98686030211',0,1567420978,'承兑商'),
-(126,2,'承兑商','交易员利润_f1','1.49170124481',0,1567420978,'承兑商'),
-(127,2,'承兑商','后台修改USDT余额','1.49170124',1,1567421151,'admin'),
-(128,2,'承兑商','后台修改USDT冻结余额','5.53250346',1,1567421151,'admin'),
-(129,1,'商户','买入USDT_f1','996.5',0,1567421254,'承兑商二'),
-(130,4,'承兑商二','交易员利润_f1','1.5',0,1567421254,'承兑商二'),
-(131,1,'商户','买入USDT_f1','138.59527120557',0,1567421299,'承兑商'),
-(132,2,'承兑商','交易员利润_f1','0.208623087615',0,1567421299,'承兑商'),
-(133,2,'承兑商','后台修改USDT余额','138.87343532',0,1567421363,'admin'),
-(134,1,'商户','买入USDT_f1','996.5',0,1567421464,'承兑商'),
-(135,2,'承兑商','交易员利润_f1','1.5',0,1567421464,'承兑商'),
-(136,4,'承兑商二','后台修改USDT余额','998.5',0,1567434706,'admin'),
-(137,1,'商户','买入USDT_f1','996.5',0,1567434807,'承兑商二'),
-(138,4,'承兑商二','交易员利润_f1','1.5',0,1567434807,'承兑商二'),
-(139,1,'商户','后台修改USDT余额','3160.69931879',1,1567478741,'admin'),
-(140,1,'商户','提币_1','500.00000000',1,1567479025,'admin'),
-(141,3,'代理商','提币_1','500.00000000',1,1567479767,'admin'),
-(142,4,'承兑商二','后台修改USDT余额','998.5',0,1568354846,'admin'),
-(143,1,'商户','买入USDT_f1','20.185877313895',0,1568354947,'承兑商二'),
-(144,1,'商户','买入USDT_f1','67.523181171705',0,1568355216,'承兑商二'),
-(145,1,'商户','买入USDT_f1','95.95399429506',0,1568355377,'承兑商二'),
-(146,1,'商户','买入USDT_f1','115.85556348241',0,1568355482,'承兑商二'),
-(147,4,'承兑商二','后台修改USDT余额','300.57061341',0,1568355538,'admin'),
-(148,1,'商户','买入USDT_f1','142.15406561678',0,1568355609,'承兑商二'),
-(149,4,'承兑商二','后台修改USDT余额','142.65335235',0,1568355682,'admin'),
-(150,4,'承兑商二','后台修改USDT余额','142.65335235',0,1568355774,'admin'),
-(151,1,'商户','买入USDT_f1','142.15406561678',0,1568355822,'承兑商二'),
-(152,1,'商户','买入USDT_f1','996.5',0,1568355936,'承兑商二'),
-(153,4,'承兑商二','后台修改USDT余额','1000',0,1568355994,'admin'),
-(154,1,'商户','买入USDT_f1','996.5',0,1568356057,'承兑商二'),
-(155,4,'承兑商二','后台修改USDT余额','1000',0,1568356185,'admin'),
-(156,1,'商户','买入USDT_f1','996.5',0,1568356252,'承兑商二'),
-(157,9,'一千','买入USDT_f1','28.40909091',0,1568966730,'一千');
 
 /*Table structure for table `think_log` */
 
@@ -959,7 +812,7 @@ CREATE TABLE `think_log` (
   `status` tinyint(1) DEFAULT NULL COMMENT '1 成功 2 失败',
   `add_time` int(11) DEFAULT NULL COMMENT '添加时间',
   PRIMARY KEY (`log_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=239 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 /*Data for the table `think_log` */
 
@@ -974,12 +827,9 @@ CREATE TABLE `think_login_log` (
   `update_time` int(11) DEFAULT NULL,
   `online` smallint(6) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=75 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Data for the table `think_login_log` */
-
-insert  into `think_login_log`(`id`,`merchant_id`,`login_time`,`update_time`,`online`) values 
-(74,9,1568970664,1568971716,1);
 
 /*Table structure for table `think_member` */
 
@@ -1056,7 +906,7 @@ CREATE TABLE `think_merchant` (
   `pid` int(11) DEFAULT '0',
   `reg_check` tinyint(4) DEFAULT '0' COMMENT '0:待审核，1:通过，2：拒绝',
   `agent_check` tinyint(4) DEFAULT '0' COMMENT '0:未提交，1：通过，2：拒绝，3：已提交申请',
-  `trader_check` tinyint(4) DEFAULT '0' COMMENT '交易员审核，0:未提交，1：通过，2：拒绝，3：已提交申请',
+  `trader_check` tinyint(4) DEFAULT '0' COMMENT '承兑商审核，0:未提交，1：通过，2：拒绝，3：已提交申请',
   `usdtb` varchar(200) DEFAULT NULL COMMENT 'omni地址',
   `usdte` varchar(255) DEFAULT NULL COMMENT 'erc地址',
   `trader_recharge_fee` decimal(10,4) DEFAULT '0.0000',
@@ -1089,25 +939,9 @@ CREATE TABLE `think_merchant` (
   `order_buy_usdt_amount` decimal(20,8) DEFAULT '0.00000000' COMMENT '总求购usdt数量',
   `nickname` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Data for the table `think_merchant` */
-
-insert  into `think_merchant`(`id`,`name`,`mobile`,`password`,`paypassword`,`invite`,`idcard`,`idcard_zheng`,`idcard_fan`,`appid`,`key`,`addtime`,`status`,`usdt`,`usdtd`,`headpic`,`ga`,`merchant_tibi_fee`,`user_withdraw_fee`,`user_recharge_fee`,`pid`,`reg_check`,`agent_check`,`trader_check`,`usdtb`,`usdte`,`trader_recharge_fee`,`c_bank`,`c_bank_detail`,`c_bank_card`,`c_wechat_account`,`c_wechat_img`,`c_alipay_account`,`c_alipay_img`,`transact`,`averge`,`online`,`pp_amount`,`transact_buy`,`averge_buy`,`trader_trader_get`,`trader_parent_get`,`trader_merchant_parent_get`,`pptrader`,`merchant_pk_fee`,`reg_type`,`recharge_amount`,`withdraw_amount`,`ad_on_sell`,`ad_on_buy`,`order_sell_success_num`,`order_buy_success_num`,`order_sell_usdt_amount`,`order_buy_usdt_amount`,`nickname`) values 
-(1,'商户','13579246810','4297f44b13955235245b2497399d7a93','e10adc3949ba59abbe56e057f20f883e',NULL,'123456789012345678','20190829/159d42ce9d24a24eb9edc0e0f478873a.png','20190829/4787ebebbbc424cc5f2f78f3d0c3ed88.png','QndLSfX9Q0uaVuak','24ccfcdb5d8f5b7a86e9df6348a20347',1567083094,1,4073.32674750,0.00000000,NULL,'IB7KS5ON3OPT7R5C|0|0',3.0000,0.0000,0.0000,0,1,0,0,NULL,NULL,0.0000,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,0,0.00,0.00,0.00,'',0.35,1,0.00000000,500.00000000,0,0,4,59,195.81900648,37923.15842311,'测试商户'),
-(3,'代理商','13800138002','4297f44b13955235245b2497399d7a93','e10adc3949ba59abbe56e057f20f883e','JHKZNB','123456789012345672','20190829/c9c1743ce060be6483ab63f67b61e404.png','20190829/3b940ccbd2c812acd3e5416299950e3f.png','LZHidkVZjcbC1EKs','7c59f21bc1f63d1f67adee78cc87977d',1567083174,1,500.00000000,0.00000000,NULL,'PVOIL2HQICVLBUTN|0|0',2.0000,0.0000,0.0000,0,1,1,0,NULL,NULL,0.0000,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,0,0.00,0.15,0.10,'',0.30,3,0.00000000,500.00000000,0,0,0,0,0.00000000,0.00000000,'测试代理商'),
-(6,'陈超','18596386668','4297f44b13955235245b2497399d7a93','e3ceb5881a0a1fdaad01296d7554868d',NULL,'370983198701100558','20190902/a02fa6ad96ea2ee5df9cbd88f8528404.jpg','20190902/bc65b9143e7c5831f99e45fb1315d1c9.jpg','cIPBDs97dP2iMklV','c46c36e3f2dcccd54806a89c373ae856',1567419865,1,1000.00000000,0.00000000,NULL,'IB7KS5ON3OPT7R5C|0|0',2.0000,0.0000,0.0000,3,1,0,1,NULL,'0xd8865a9f321e8241629afca7e447d89b1937f11b',0.0000,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,0,0.15,0.00,0.00,'',0.00,2,0.00000000,0.00000000,0,0,0,0,0.00000000,0.00000000,'小霸王'),
-(8,'郝栋超','13383309776','e10adc3949ba59abbe56e057f20f883e','7c7ac29f70178840ea655e24e76aa0b0',NULL,'130481198702031078','20190915/2b6718db8ea910abebb238e30ee33dc3.jpg','20190915/1dec7f830d88a38792d64af87171a446.png','DtATYOzUr91UeU5b','ee9ce85f380ac79852902ae63cf52aee',1568533961,1,0.00000000,0.00000000,NULL,NULL,0.0000,0.0000,0.0000,0,1,0,0,NULL,NULL,0.0000,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,0,0.00,0.00,0.00,NULL,0.00,1,0.00000000,0.00000000,0,0,0,0,0.00000000,0.00000000,'1111'),
-(9,'一千','13113427817','e10adc3949ba59abbe56e057f20f883e','4297f44b13955235245b2497399d7a93',NULL,'123456789123456789',NULL,NULL,'DLOdMb8TwPTS6nbo','de502d24fe6e4ab8ba5487d691612690',1568947791,1,99886.36363636,113.63636364,NULL,'EPQJHOLBRB6CCKKC|0|1',0.0000,0.0000,0.0000,0,1,0,1,NULL,'0xe996036921340f77df97e15f0a4b628e6139362d',0.0000,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,107,1,6,0,0,0.00,0.00,0.00,NULL,0.00,2,0.00000000,0.00000000,2,0,1,1,28.40909091,28.40909091,'一千'),
-(10,'王艳','13373156547','830bd55ee7d5ce1b2c4eab5240bcd06b','78707fab6fc79c5ae989fc0bbf64984d',NULL,'220303197608312220',NULL,NULL,'mVYlycy0neBFSrqh','ef637161ddb35124bde90f1c1e2fa520',1568948433,1,0.00000000,0.00000000,NULL,'UGUKV5JPTETGAAL7|1|1',0.0000,0.0000,0.0000,0,1,0,1,NULL,'0x315d9ad61efb1a438ecfa06247f710fcb980567b',0.0000,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,0,0.00,0.00,0.00,NULL,0.00,2,0.00000000,0.00000000,0,0,0,0,0.00000000,0.00000000,'sun'),
-(11,'许丽云','13336586882','8a6f2805b4515ac12058e79e66539be9','7608f7253d78eb019e039e84148bb235',NULL,'44172119740924302X',NULL,NULL,'ivmsOtWnjUSO74yT','5434a115b0896a80aef137352b6a7d23',1568951811,1,0.00000000,0.00000000,NULL,NULL,0.0000,0.0000,0.0000,0,1,0,1,NULL,NULL,0.0000,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,0,0.00,0.00,0.00,NULL,0.00,2,0.00000000,0.00000000,0,0,0,0,0.00000000,0.00000000,'云云'),
-(12,'于舰','18202647891','213d498290a953b188a12d38e3838041','87eadfc269a9e040bc75ec176045c6f3',NULL,'220303198801222619',NULL,NULL,'TEwEruGuO0RHWmFO','2c5bbe06c46f44274555e0d4fc6da8f2',1568953633,1,0.00000000,0.00000000,NULL,'X5RBI43FBD55B3JD|1|1',0.0000,0.0000,0.0000,0,1,0,1,NULL,NULL,0.0000,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,0,0.00,0.00,0.00,NULL,0.00,2,0.00000000,0.00000000,0,0,0,0,0.00000000,0.00000000,'于舰'),
-(13,'王唯','13304348490','213d498290a953b188a12d38e3838041','87eadfc269a9e040bc75ec176045c6f3',NULL,'220303196306072626',NULL,NULL,'iOeVrtx7Cje5TCmi','ff025d9b7ea5821c97c68c4541cffc37',1568953833,1,0.00000000,0.00000000,NULL,'IIRTCDE6JIBSOAAM|1|1',0.0000,0.0000,0.0000,0,1,0,1,NULL,NULL,0.0000,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,0,0.00,0.00,0.00,NULL,0.00,2,0.00000000,0.00000000,0,0,0,0,0.00000000,0.00000000,'王唯'),
-(14,'赖尾','15917082238','8a6f2805b4515ac12058e79e66539be9','7608f7253d78eb019e039e84148bb235',NULL,'441721196712013011',NULL,NULL,'mGajmU1edLKTccWb','787249468bd2dbb3786a6a2f3941a5f3',1568955711,1,0.00000000,0.00000000,NULL,NULL,0.0000,0.0000,0.0000,0,1,0,1,NULL,NULL,0.0000,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,0,0.00,0.00,0.00,NULL,0.00,2,0.00000000,0.00000000,0,0,0,0,0.00000000,0.00000000,'中国人'),
-(15,'刘丽','15633971910','830bd55ee7d5ce1b2c4eab5240bcd06b','2f673c63a1851b9f6ee457bbcbda2ff1',NULL,'130221198202285322',NULL,NULL,'MgL7OrgkPVBtPxMW','f9e4b1a9d793e23ab104b4afb70217a7',1568959123,1,0.00000000,0.00000000,NULL,NULL,0.0000,0.0000,0.0000,0,1,0,1,NULL,NULL,0.0000,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,0,0.00,0.00,0.00,NULL,0.00,2,0.00000000,0.00000000,0,0,0,0,0.00000000,0.00000000,'sen'),
-(16,'杨小琴','13680672731','8a6f2805b4515ac12058e79e66539be9','7608f7253d78eb019e039e84148bb235',NULL,'440923197103081040',NULL,NULL,'sptXHPSnvHZfH8o2','8c0e916a996e4c50be6140a72b2a789b',1568959278,1,0.00000000,0.00000000,NULL,NULL,0.0000,0.0000,0.0000,0,1,0,1,NULL,NULL,0.0000,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,0,0.00,0.00,0.00,NULL,0.00,2,0.00000000,0.00000000,0,0,0,0,0.00000000,0.00000000,'琴声依旧'),
-(17,'黄承帅','13542629758','8a6f2805b4515ac12058e79e66539be9','7608f7253d78eb019e039e84148bb235',NULL,'440726196708065215',NULL,NULL,'SdNzsuNPLer7adzW','16e52c7d9afbabbb405b3035e59243fd',1568959552,1,0.00000000,0.00000000,NULL,NULL,0.0000,0.0000,0.0000,0,1,0,1,NULL,NULL,0.0000,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,0,0.00,0.00,0.00,NULL,0.00,2,0.00000000,0.00000000,0,0,0,0,0.00000000,0.00000000,'知足常乐'),
-(18,'陈生','12345678912','e10adc3949ba59abbe56e057f20f883e','4297f44b13955235245b2497399d7a93',NULL,'123456789987654321',NULL,NULL,'zt5cfIW6O1Uo7pDj','8c4e10d2abbba640a04382af9ac79e79',1568961118,1,0.00000000,0.00000000,NULL,'GQHKLD6NKZJQQ4F5|0|1',0.0000,0.0000,0.0000,0,1,0,0,NULL,NULL,0.0000,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,0,0,0.00,0.00,0.00,NULL,0.00,1,0.00000000,0.00000000,0,0,0,0,0.00000000,0.00000000,'陈生');
 
 /*Table structure for table `think_merchant_apilog` */
 
@@ -1141,14 +975,9 @@ CREATE TABLE `think_merchant_bankcard` (
   `update_time` int(11) DEFAULT '0',
   `truename` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Data for the table `think_merchant_bankcard` */
-
-insert  into `think_merchant_bankcard`(`id`,`merchant_id`,`name`,`c_bank`,`c_bank_detail`,`c_bank_card`,`create_time`,`update_time`,`truename`) values 
-(1,2,'银行卡1','中国银行','北京支行','10000000000000',1567128420,1567128420,'张三'),
-(2,4,'李四的卡','建设银行','北京支行','1029389182903',1567129833,1567129833,'李四'),
-(3,10,'1','建行','凤凰北支行','6236683090003736005',1568948983,1568948983,'王艳');
 
 /*Table structure for table `think_merchant_log` */
 
@@ -1163,12 +992,9 @@ CREATE TABLE `think_merchant_log` (
   `status` tinyint(1) DEFAULT NULL COMMENT '1 成功 2 失败',
   `add_time` int(11) DEFAULT NULL COMMENT '添加时间',
   PRIMARY KEY (`log_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=75 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 /*Data for the table `think_merchant_log` */
-
-insert  into `think_merchant_log`(`log_id`,`admin_id`,`admin_name`,`description`,`ip`,`status`,`add_time`) values 
-(74,9,'一千','用户【一千】登录成功','183.31.245.151',1,1568970664);
 
 /*Table structure for table `think_merchant_recharge` */
 
@@ -1282,14 +1108,9 @@ CREATE TABLE `think_merchant_withdraw` (
   `ordersn` varchar(255) DEFAULT NULL COMMENT '订单号，唯一标识',
   `type` smallint(6) DEFAULT NULL COMMENT '1:走钱包,2:不走钱包',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Data for the table `think_merchant_withdraw` */
-
-insert  into `think_merchant_withdraw`(`id`,`merchant_id`,`username`,`address`,`num`,`fee`,`mum`,`note`,`txid`,`addtime`,`status`,`endtime`,`ordersn`,`type`) values 
-(1,2,NULL,'0x8499b4e12BA8F8C36a23FcEeCDBAee29Efd5Ab72',10.00000000,3.00000000,7.00000000,'','',1567227202,1,1567335803,'M2T8312720265812PS788',2),
-(2,1,NULL,'0x05F72bE0CB7Cf86f41a49788C7CCaCC3DC80034C',500.00000000,6.00000000,494.00000000,'','',1567478879,1,1567479025,'M1T9037887951587PS112',2),
-(3,3,NULL,'0x05F72bE0CB7Cf86f41a49788C7CCaCC3DC80034C',500.00000000,5.00000000,495.00000000,'','',1567479739,1,1567479767,'M3T9037973919624PS256',2);
 
 /*Table structure for table `think_merchant_wx` */
 
@@ -1306,14 +1127,9 @@ CREATE TABLE `think_merchant_wx` (
   `update_time` int(11) DEFAULT '0',
   `truename` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Data for the table `think_merchant_wx` */
-
-insert  into `think_merchant_wx`(`id`,`merchant_id`,`name`,`c_bank`,`c_bank_detail`,`c_bank_card`,`create_time`,`update_time`,`truename`) values 
-(1,2,'微信账户1','123','20190830/e387a79f85c878b49e190a485e60c5d5.png',NULL,1567134696,1567134696,'司法局'),
-(2,4,'1','1','20190901/7ed61295f96bce831000d24c8053d0ee.jpg',NULL,1567306550,1567306550,'1'),
-(3,10,'2','15833523795','20190920/70979ff338184f4dde61040a7e4fde2d.jpg',NULL,1568949248,1568949248,'王艳');
 
 /*Table structure for table `think_merchant_ysf` */
 
@@ -1330,12 +1146,9 @@ CREATE TABLE `think_merchant_ysf` (
   `update_time` int(11) DEFAULT '0',
   `truename` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Data for the table `think_merchant_ysf` */
-
-insert  into `think_merchant_ysf`(`id`,`merchant_id`,`name`,`c_bank`,`c_bank_detail`,`c_bank_card`,`create_time`,`update_time`,`truename`) values 
-(1,2,'云闪付1',NULL,'20190830/5a675f3bb8c080f943b0ecd3d10d804e.png',NULL,1567132720,1567132720,'设计费');
 
 /*Table structure for table `think_merchant_zfb` */
 
@@ -1352,17 +1165,9 @@ CREATE TABLE `think_merchant_zfb` (
   `update_time` int(11) DEFAULT '0',
   `truename` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Data for the table `think_merchant_zfb` */
-
-insert  into `think_merchant_zfb`(`id`,`merchant_id`,`name`,`c_bank`,`c_bank_detail`,`c_bank_card`,`create_time`,`update_time`,`truename`) values 
-(1,2,'支付宝1','123@123.com','20190830/b6bc103112f2890984d0b7f53eb14d5f.png',NULL,1567128449,1567128449,'张三'),
-(2,4,'李四支付宝','12303@123.com','20190830/4e01536d74dbb81570492b553b1fc9db.png',NULL,1567129866,1567129866,'李四'),
-(3,1,'1这是考虑的','123@123.com','20190831/26f813e2a0c06983bfbeaed6e8303617.png',NULL,1567229748,1567229748,'水电费'),
-(4,6,'支付1','','20190919/4d65850ea8160523e4793f0c6c089bd9.jpg',NULL,1568890167,1568890167,'陈超'),
-(5,10,'1','15833523795','20190920/6c37f5816ace28600f1785e8fbe3b2e9.jpg',NULL,1568949145,1568949145,'王艳'),
-(6,9,'支付宝1','13113427817','20190920/70e0da32baf5bbb4018f32c2bb506c68.jpg',NULL,1568964162,1568964162,'陈楚钦');
 
 /*Table structure for table `think_order_buy` */
 
@@ -1399,20 +1204,15 @@ CREATE TABLE `think_order_buy` (
   `return_url` varchar(255) DEFAULT NULL,
   `notify_url` varchar(255) DEFAULT NULL,
   `orderid` varchar(255) DEFAULT NULL,
-  `platform_fee` decimal(20,8) DEFAULT '0.00000000' COMMENT '平台利润，交易员释放订单时更新',
+  `platform_fee` decimal(20,8) DEFAULT '0.00000000' COMMENT '平台利润，承兑商释放订单时更新',
   PRIMARY KEY (`id`),
   UNIQUE KEY `order_no` (`order_no`) USING BTREE,
   KEY `buy_id` (`buy_id`) USING BTREE,
   KEY `sell_id` (`sell_id`) USING BTREE,
   KEY `status` (`status`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=62 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Data for the table `think_order_buy` */
-
-insert  into `think_order_buy`(`id`,`buy_id`,`buy_bid`,`sell_id`,`sell_sid`,`deal_amount`,`deal_price`,`deal_ctype`,`deal_num`,`ctime`,`dktime`,`ltime`,`status`,`desc`,`finished_time`,`order_no`,`cancle_op`,`buy_pj`,`sell_pj`,`su_type`,`su_reason`,`sutp`,`type`,`deal_coin`,`fee`,`buy_username`,`buy_address`,`return_url`,`notify_url`,`orderid`,`platform_fee`) values 
-(59,9,0,9,49,200.00,7.04,0,28.40909091,1568965947,0,15,5,NULL,NULL,'E1234567899638523744',0,0,0,0,NULL,NULL,1,0,0.00000000,'tets111','0xe996036921340f77df97e15f0a4b628e6139362d','http://baidu.com/test.php','http://baidu.com/test.php','E1234567899638523744',0.00000000),
-(60,9,0,9,49,200.00,7.04,0,28.40909091,1568966603,1568966623,15,4,NULL,1568966730,'E1234567899638524064',0,0,0,0,NULL,NULL,1,0,0.00000000,'tets111','0xe996036921340f77df97e15f0a4b628e6139362d','http://baidu.com/test.php','http://baidu.com/test.php','E1234567899638524064',0.00000000),
-(61,9,0,9,49,200.00,7.04,0,28.40909091,1568967085,1568967112,15,6,NULL,NULL,'E1234567899638523561',0,0,0,0,'金额不对',NULL,1,0,0.00000000,'tets111','0xe996036921340f77df97e15f0a4b628e6139362d','http://192.168.56.1/PHP/test_cc.php','http://192.168.56.1/PHP/test_cc.php','E1234567899638523561',0.00000000);
 
 /*Table structure for table `think_order_sell` */
 
@@ -1445,7 +1245,7 @@ CREATE TABLE `think_order_sell` (
   `deal_coin` int(10) NOT NULL DEFAULT '0',
   `fee` decimal(20,8) NOT NULL DEFAULT '0.00000000',
   `getpaymethod` varchar(255) DEFAULT NULL,
-  `buyer_fee` decimal(20,8) DEFAULT '0.00000000' COMMENT '买家手续费，即交易员',
+  `buyer_fee` decimal(20,8) DEFAULT '0.00000000' COMMENT '买家手续费，即承兑商',
   `pay` varchar(255) DEFAULT NULL COMMENT '银行卡',
   `pay2` varchar(255) DEFAULT NULL COMMENT '支付宝',
   `pay3` varchar(255) DEFAULT NULL COMMENT '微信',
@@ -1455,7 +1255,7 @@ CREATE TABLE `think_order_sell` (
   KEY `buy_id` (`buy_id`) USING BTREE,
   KEY `sell_id` (`sell_id`) USING BTREE,
   KEY `status` (`status`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Data for the table `think_order_sell` */
 
@@ -1486,17 +1286,17 @@ CREATE TABLE `think_statistics` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `platform_profit` decimal(20,8) DEFAULT '0.00000000' COMMENT '平台利润，所有平台的手续费',
   `agent_reward` decimal(20,8) DEFAULT '0.00000000' COMMENT '代理商奖励总和',
-  `trader_reward` decimal(20,8) DEFAULT '0.00000000' COMMENT '交易员奖励总和',
+  `trader_reward` decimal(20,8) DEFAULT '0.00000000' COMMENT '承兑商奖励总和',
   `platform_usdt_amount` decimal(20,8) DEFAULT '0.00000000' COMMENT '平台现存usdt总数量，所有会员类型账户的冻结加活动',
   `recharge_total` decimal(20,8) DEFAULT '0.00000000' COMMENT '总充值数量',
   `withdraw_total` decimal(20,8) DEFAULT '0.00000000' COMMENT '总提币数量',
-  `ad_sell_on_total` int(11) DEFAULT '0' COMMENT '现存挂单出售笔数，交易员发布出售的单子，不含下架的，不含数量低于0的',
-  `order_sell_amount` decimal(20,8) DEFAULT '0.00000000' COMMENT '现存挂单出售总USDT，所有交易员挂单出售的usdt数量',
-  `ad_buy_on_total` int(11) DEFAULT '0' COMMENT '求购笔数，交易员挂买单数量',
+  `ad_sell_on_total` int(11) DEFAULT '0' COMMENT '现存挂单出售笔数，承兑商发布出售的单子，不含下架的，不含数量低于0的',
+  `order_sell_amount` decimal(20,8) DEFAULT '0.00000000' COMMENT '现存挂单出售总USDT，所有承兑商挂单出售的usdt数量',
+  `ad_buy_on_total` int(11) DEFAULT '0' COMMENT '求购笔数，承兑商挂买单数量',
   `order_buy_amount` decimal(20,8) DEFAULT '0.00000000' COMMENT '求购总数量，挂单购买的总usdt数量',
   `create_time` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=23 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
 
 /*Data for the table `think_statistics` */
 
@@ -1522,7 +1322,8 @@ insert  into `think_statistics`(`id`,`platform_profit`,`agent_reward`,`trader_re
 (19,306.02930185,0.00000000,23.76296936,5573.32674750,0.00000000,996.00000000,0,0.00000000,0,0.00000000,1568736001),
 (20,306.02930185,0.00000000,23.76296936,5573.32674750,0.00000000,996.00000000,0,0.00000000,0,0.00000000,1568741402),
 (21,306.02930185,0.00000000,23.76296936,5573.32674750,0.00000000,996.00000000,0,0.00000000,0,0.00000000,1568827801),
-(22,306.02930185,0.00000000,23.76296936,5573.32674750,0.00000000,996.00000000,0,0.00000000,0,0.00000000,1568914203);
+(22,306.02930185,0.00000000,23.76296936,5573.32674750,0.00000000,996.00000000,0,0.00000000,0,0.00000000,1568914203),
+(23,14.00000000,0.00000000,23.76296936,105573.32674750,0.00000000,996.00000000,2,143.18181818,0,0.00000000,1569000601);
 
 /*Table structure for table `think_trader_reward` */
 

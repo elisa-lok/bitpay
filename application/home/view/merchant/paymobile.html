@@ -271,14 +271,14 @@ function CheckOutTime(){
 
 }
 function uptrade(){
-	if(!confirm('确认付款后,请等待交易员放行,确认吗？')){
+	if(!confirm('确认付款后,请等待承兑商放行,确认吗？')){
 		return false;
 	}
 	var appid = "{$appid|default=''}";
 	var id = {$id|default=0};
 	$.post('{:url("home/merchant/uptrade")}', {id:id, appid:appid}, function(data){
 		if(data.code == 1){
-			alert('操作成功，请等待交易员释放');window.location.href=data.msg;
+			alert('操作成功，请等待承兑商释放');window.location.href=data.msg;
 		}else{
 			alert(data.msg);
 		}

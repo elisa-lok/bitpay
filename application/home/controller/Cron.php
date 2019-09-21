@@ -305,7 +305,7 @@ class Cron extends Base
         }
     }
     private function statistics(){
-        //平台利润，所有平台的手续费,用户充值手续费+用户提币手续费+商户提币手续费+场外交易商户手续(不计算为0)+场外交易平台利润+交易员求购商户手续费+交易员求购交易员手续费
+        //平台利润，所有平台的手续费,用户充值手续费+用户提币手续费+商户提币手续费+场外交易商户手续(不计算为0)+场外交易平台利润+承兑商求购商户手续费+承兑商求购承兑商手续费
         $feeMap['status'] = 1;
         $fee1 = getTotalInfo($feeMap, 'merchant_user_recharge', 'fee');
         $fee2 = getTotalInfo($feeMap, 'merchant_user_withdraw', 'fee');
@@ -317,7 +317,7 @@ class Cron extends Base
         $feePlatform = $fee1+$fee2+$fee3+$fee4+$fee5+$fee6;
         //代理商奖励总和
         $feeAgent = getTotalInfo(true, 'agent_reward', 'amount');
-        //交易员奖励总和
+        //承兑商奖励总和
         $feeTrader = getTotalInfo(true, 'trader_reward', 'amount');
         //平台现存usdt总数量，所有会员类型账户的冻结加活动
         $usdtSum1 = getTotalInfo(true, 'merchant', 'usdt');
@@ -331,7 +331,7 @@ class Cron extends Base
         $merchantTi = getTotalInfo($feeMap, 'merchant_withdraw', 'mum');
         $userTi = getTotalInfo($feeMap, 'merchant_user_withdraw', 'mum');
         $withdrawSum = $merchantTi + $userTi;
-        //现存挂单出售笔数，交易员发布出售的单子，不含下架的，不含数量低于0的
+        //现存挂单出售笔数，承兑商发布出售的单子，不含下架的，不含数量低于0的
         $adMap['state'] = 1;
         $adMap['amount'] = ['gt', 0];
         $adSellSum = Db::name('ad_sell')->where($adMap)->count();
@@ -340,7 +340,7 @@ class Cron extends Base
         $deal_nums = Db::name('order_buy')->where('sell_sid', 'in', $adids)->where('status', 'neq', 5)->where('status','neq',9)->sum('deal_num');
         //现存挂单出售总USDT，计算所有挂卖的剩余数量
         $orderSellSum = $adtotal - $deal_nums;
-        //求购笔数，交易员挂买数量
+        //求购笔数，承兑商挂买数量
         $adBuySum = Db::name('ad_buy')->where($adMap)->count();
         $adbuytotal = Db::name('ad_buy')->where($adMap)->sum('amount');
         $adbuyids = Db::name('ad_buy')->where($adMap)->column('id');

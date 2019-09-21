@@ -916,7 +916,7 @@ class Merchant extends Base{
         $model = new MerchantModel();
         $merchant = $model->getUserByParam(session('uid'), 'id');
         if($merchant['trader_check'] != 1){
-            $this->error('请先申请交易员', url('home/merchant/index'));
+            $this->error('请先申请承兑商', url('home/merchant/index'));
         }
         // dump(config('wallettype'));
          $qianbao1 = $merchant['usdtb'];
@@ -1406,7 +1406,7 @@ class Merchant extends Base{
             $model = new MerchantModel();
             $user = $model->getUserByParam(session('uid'), 'id');
             if($user['trader_check'] != 1){
-                $this->error('您的交易员资格未通过');
+                $this->error('您的承兑商资格未通过');
             }
             //$haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->where('state', 1)->sum('amount');
             $haveadsum = 0;
@@ -1508,7 +1508,7 @@ class Merchant extends Base{
             $model = new MerchantModel();
             $user = $model->getUserByParam(session('uid'), 'id');
             if($user['trader_check'] != 1){
-                $this->error('您的交易员资格未通过');
+                $this->error('您的承兑商资格未通过');
             }
             $haveadsum = Db::name('ad_buy')->where('userid', session('uid'))->where('state', 1)->count();
             $haveadsum = $haveadsum ? $haveadsum : 0;
@@ -1629,7 +1629,7 @@ class Merchant extends Base{
             $model = new MerchantModel();
             $user = $model->getUserByParam(session('uid'), 'id');
             if($user['trader_check'] != 1){
-                $this->error('您的交易员资格未通过');
+                $this->error('您的承兑商资格未通过');
             }
             $haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->where('state', 1)->sum('amount');
             // $haveadsum = 0;
@@ -1770,7 +1770,7 @@ class Merchant extends Base{
             $model = new MerchantModel();
             $user = $model->getUserByParam(session('uid'), 'id');
             if($user['trader_check'] != 1){
-                $this->error('您的交易员资格未通过');
+                $this->error('您的承兑商资格未通过');
             }
             $haveadsum = Db::name('ad_buy')->where('userid', session('uid'))->where('state', 1)->count();
             $haveadsum = $haveadsum ? $haveadsum : 0;
@@ -1922,7 +1922,7 @@ class Merchant extends Base{
 
             $user = $model->getUserByParam(session('uid'), 'id');
             if($user['trader_check'] != 1){
-                $this->error('您的交易员资格未通过');
+                $this->error('您的承兑商资格未通过');
             }
             $haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->where('state', 1)->sum('amount');
             $haveadsum = $haveadsum ? $haveadsum : 0;
@@ -2063,7 +2063,7 @@ class Merchant extends Base{
 
             $user = $model->getUserByParam(session('uid'), 'id');
             if($user['trader_check'] != 1){
-                $this->error('您的交易员资格未通过');
+                $this->error('您的承兑商资格未通过');
             }
             $haveadsum = Db::name('ad_buy')->where('userid', session('uid'))->where('state', 1)->count();
             $haveadsum = $haveadsum ? $haveadsum : 0;
@@ -2181,7 +2181,7 @@ class Merchant extends Base{
 
             $user = $model->getUserByParam(session('uid'), 'id');
             if($user['trader_check'] != 1){
-                $this->error('您的交易员资格未通过');
+                $this->error('您的承兑商资格未通过');
             }
             $haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->where('state', 1)->sum('amount');
             $haveadsum = $haveadsum ? $haveadsum : 0;
@@ -2286,7 +2286,7 @@ class Merchant extends Base{
 
             $user = $model->getUserByParam(session('uid'), 'id');
             if($user['trader_check'] != 1){
-                $this->error('您的交易员资格未通过');
+                $this->error('您的承兑商资格未通过');
             }
             $haveadsum = Db::name('ad_buy')->where('userid', session('uid'))->where('state', 1)->count();
             $haveadsum = $haveadsum ? $haveadsum : 0;
@@ -2850,7 +2850,7 @@ class Merchant extends Base{
         }
     }
 	/**
-     * 交易员标记付款
+     * 承兑商标记付款
      */
     public function uptradeinner(){
         if(!session('uid')){
@@ -3017,7 +3017,7 @@ class Merchant extends Base{
             $platformGet = config('trader_platform_get');
             $platformGet = $platformGet ? $platformGet : 0;
             $platformMoney = $platformGet*$orderinfo['deal_num']/100;
-            //交易员利润
+            //承兑商利润
             $traderGet = $merchant['trader_trader_get'];
             $traderGet = $traderGet ? $traderGet : 0;
             $traderMoney = $traderGet*$orderinfo['deal_num']/100;
@@ -3025,7 +3025,7 @@ class Merchant extends Base{
             if($merchant['pid']){
                 $traderP = $model2->getUserByParam($merchant['pid'], 'id');
                 if($traderP['agent_check'] == 1 && $traderP['trader_parent_get']){
-                    //交易员代理利润
+                    //承兑商代理利润
 					$tpexist = 1;
                     $traderParentGet = $traderP['trader_parent_get'];
                     $traderParentGet = $traderParentGet ? $traderParentGet : 0;
@@ -3042,7 +3042,7 @@ class Merchant extends Base{
                     $traderMParentMoney = $traderMParentGet*$orderinfo['deal_num']/100;
                 }
             }
-            //平台，交易员代理，商户代理，交易员，商户只能得到这么多，多的给平台
+            //平台，承兑商代理，商户代理，承兑商，商户只能得到这么多，多的给平台
             $moneyArr = getMoneyByLevel($pkdec, $platformMoney, $traderParentMoney, $traderMParentMoney, $traderMoney);
             $mum = $mum - $pkdec;
             $traderParentMoney = $moneyArr[1];
@@ -3064,13 +3064,13 @@ class Merchant extends Base{
                 $tt = $total[0]['total'];
                 $transact = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->value('transact');
                 $rs5 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->update(['averge'=>intval($tt/$transact)]);
-				//交易员利润
+				//承兑商利润
                 $rs6 = $rs7 = $rs8 = $rs9 = $rs10 = $rs11 = true;
                 if($traderMoney > 0){
                     $rs6 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $traderMoney);
                     $rs7 = Db::table('think_trader_reward')->insert(['uid'=>$orderinfo['sell_id'], 'orderid'=>$orderinfo['id'], 'amount'=>$traderMoney, 'type'=>0, 'create_time'=>time()]);
                 }
-                //交易员代理利润
+                //承兑商代理利润
                 if($traderParentMoney > 0 && $tpexist){
                     $rsarr = agentReward($merchant['pid'], $orderinfo['sell_id'], $traderParentMoney, 3);//3
                     $rs8 = $rsarr[0];$rs9 = $rsarr[1];
@@ -3085,7 +3085,7 @@ class Merchant extends Base{
                     Db::commit();
                 financelog($orderinfo['buy_id'],$mum,'买入USDT_f1',0,session('user.name'));//添加日志
                 if($traderMoney>0){
-                    financelog($orderinfo['sell_id'],$traderMoney,'交易员利润_f1',0,session('user.name'));//添加日志
+                    financelog($orderinfo['sell_id'],$traderMoney,'承兑商利润_f1',0,session('user.name'));//添加日志
                 }
 
 					getStatisticsOfOrder($orderinfo['buy_id'], $orderinfo['sell_id'], $mum, $orderinfo['deal_num']);
@@ -3224,7 +3224,7 @@ class Merchant extends Base{
         return $this->fetch();
     }
 	/**
-     * 交易员买单申诉
+     * 承兑商买单申诉
      */
     public function shensu_ajax_trader(){
         if(request()->isPost()){

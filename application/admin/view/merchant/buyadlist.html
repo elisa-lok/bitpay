@@ -4,7 +4,7 @@
     <!-- Panel Other -->
     <div class="ibox float-e-margins">
         <div class="ibox-title">
-            <h5>交易员购买挂单列表</h5>
+            <h5>承兑商购买挂单列表</h5>
         </div>
         <div class="ibox-content">
             <!--搜索框开始-->
@@ -18,7 +18,7 @@
                     <form name="admin_list_sea" class="form-search" method="post" action="{:url('buyadlist')}">
                         <div class="col-sm-6">
                             <div class="input-group">
-                                <input type="text" id="key" class="form-control" style="width:40%;" name="key" value="{$val}" placeholder="输入交易员姓名/手机号" />
+                                <input type="text" id="key" class="form-control" style="width:40%;" name="key" value="{$val}" placeholder="输入承兑商姓名/手机号" />
  <input type="text" id="oid" class="form-control" style="width:40%;" name="oid" value="{$oid}" placeholder="输入订单号" />
                                 <select name="status" class="form-control" id="status" style="width:20%;">
                                 	<option value="0" {empty name="status"}selected{/empty}>选择状态</option>
@@ -42,7 +42,7 @@
                         <thead>
                             <tr class="long-tr">
                             	<th>编号</th>
-                                <th width="">交易员</th>
+                                <th width="">承兑商</th>
                                 <th>收款方式</th>
                                 <th>价格</th>
                                 <th>总量</th>

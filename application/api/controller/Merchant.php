@@ -148,7 +148,7 @@ class Merchant extends Controller{
         $this->mysuccess(['status'=>$withdraw['status'], 'txid'=>$withdraw['txid']]);
     }
     /**
-     * 请求交易员充值
+     * 请求承兑商充值
      * amount:充值数量
      * address:充值地址
      * username:充值用户名
@@ -191,12 +191,12 @@ class Merchant extends Controller{
                 $this->myerror('您有未完成的订单');
             }
         }
-		//设置交易员在线状态
+		//设置承兑商在线状态
         $ids = Db::name('login_log')->where('online=1 and unix_timestamp(now())-update_time<1800')->column('merchant_id');
         $sql = 'Update think_merchant set online=0';
         $result=Db::query($sql);
         Db::name('merchant')->where('id', 'in', $ids)->update(['online'=>1]);
-        //系统自动选择在线的交易员和能够交易这个金额的交易员
+        //系统自动选择在线的承兑商和能够交易这个金额的承兑商
         $where['state'] = 1;
         $where['amount'] = ['egt', $data['amount']];
         $where['usdt'] = ['egt', $data['amount']];
@@ -225,7 +225,7 @@ class Merchant extends Controller{
 			if($v['max_limit'] < $actualamount){
                 continue;
             }
-			//判断交易员是否被其它盘口设置过
+			//判断承兑商是否被其它盘口设置过
             if(empty($pptrader)){
                 $find = Db::name('merchant')->where('pptrader', 'like', '%'.$v['traderid'].'%')->find();
                 if(!empty($find)){
@@ -243,7 +243,7 @@ class Merchant extends Controller{
         if(empty($onlinead)){
             $this->myerror('暂无可用订单');
         }
-        //开始冻结交易员usdt
+        //开始冻结承兑商usdt
         Db::startTrans();
         try{
             $rs1 = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setDec('usdt', $data['amount']);
@@ -270,7 +270,7 @@ class Merchant extends Controller{
             if($rs1 && $rs2 && $rs3 && $rs4){
                 // 提交事务
                 Db::commit();
-                //todo 发送短信给交易员
+                //todo 发送短信给承兑商
                 if(!empty($onlinead['mobile'])){
 					$send_content = Db::table('think_config')->where('name', 'send_message_content')->value('value');
 					if($send_content){
@@ -294,7 +294,7 @@ class Merchant extends Controller{
         }
     }
 	/**
-     * 请求交易员充值，按rmb
+     * 请求承兑商充值，按rmb
      * amount:充值人民币
      * address:充值地址
      * username:充值用户名
@@ -337,12 +337,12 @@ class Merchant extends Controller{
                 $this->myerror('您有未完成的订单');
             }
         }
-        //设置交易员在线状态
+        //设置承兑商在线状态
         $ids = Db::name('login_log')->where('online=1 and unix_timestamp(now())-update_time<1800')->column('merchant_id');
         $sql = 'Update think_merchant set online=0';
         $result=Db::query($sql);
         Db::name('merchant')->where('id', 'in', $ids)->update(['online'=>1]);
-        //系统自动选择在线的交易员和能够交易这个金额的交易员
+        //系统自动选择在线的承兑商和能够交易这个金额的承兑商
         $where['state'] = 1;
         $where['min_limit'] = ['elt', $data['amount']];
 		$where['max_limit'] = ['egt', $data['amount']];
@@ -370,7 +370,7 @@ class Merchant extends Controller{
 				//dump(1);die;
                 continue;
             }
-			//判断交易员是否被其它盘口设置过
+			//判断承兑商是否被其它盘口设置过
             if(empty($pptrader)){
                 $find = Db::name('merchant')->where('pptrader', 'like', '%'.$v['traderid'].'%')->find();
                 if(!empty($find)){
@@ -391,7 +391,7 @@ class Merchant extends Controller{
             $this->myerror('暂无可用订单');
         }
         // $this->myerror($onlinead);
-        //开始冻结交易员usdt
+        //开始冻结承兑商usdt
         Db::startTrans();
         try{
             $rs1 = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setDec('usdt', $actualamount);
@@ -419,7 +419,7 @@ class Merchant extends Controller{
             if($rs1 && $rs2 && $rs3 && $rs4){
                 // 提交事务
                 Db::commit();
-                //todo 发送短信给交易员
+                //todo 发送短信给承兑商
                 if(!empty($onlinead['mobile'])){
                     $content = str_replace('{usdt}',$actualamount,config('send_message_content'));
                     send_moble($onlinead['mobile'], $content);

@@ -153,25 +153,25 @@
                         {eq name="merchant['trader_check']" value="1"}
                         <div class="hr-line-dashed"></div>
                         <div class="form-group">
-                            <label class="col-sm-3 control-label">交易员充值手续费：</label>
+                            <label class="col-sm-3 control-label">承兑商充值手续费：</label>
                             <div class="input-group col-sm-4">
-                                <input id="trader_recharge_fee" type="text" class="form-control" name="trader_recharge_fee" value="{$merchant.trader_recharge_fee}" placeholder="请输入交易员充值手续费">%
+                                <input id="trader_recharge_fee" type="text" class="form-control" name="trader_recharge_fee" value="{$merchant.trader_recharge_fee}" placeholder="请输入承兑商充值手续费">%
                             </div>
                         </div>
 						<div class="hr-line-dashed"></div>
                         <div class="form-group">
-                            <label class="col-sm-3 control-label">交易员利润：</label>
+                            <label class="col-sm-3 control-label">承兑商利润：</label>
                             <div class="input-group col-sm-4">
-                                <input id="trader_trader_get" type="text" class="form-control" name="trader_trader_get" value="{$merchant.trader_trader_get}" placeholder="请输入交易员利润">%
+                                <input id="trader_trader_get" type="text" class="form-control" name="trader_trader_get" value="{$merchant.trader_trader_get}" placeholder="请输入承兑商利润">%
                             </div>
                         </div>
                         {/eq}
 						{eq name="merchant['agent_check']" value="1"}
                         <div class="hr-line-dashed"></div>
                         <div class="form-group">
-                            <label class="col-sm-3 control-label">下级交易员卖单利润：</label>
+                            <label class="col-sm-3 control-label">下级承兑商卖单利润：</label>
                             <div class="input-group col-sm-4">
-                                <input id="trader_parent_get" type="text" class="form-control" name="trader_parent_get" value="{$merchant.trader_parent_get}" placeholder="下级交易员卖单利润">%
+                                <input id="trader_parent_get" type="text" class="form-control" name="trader_parent_get" value="{$merchant.trader_parent_get}" placeholder="下级承兑商卖单利润">%
                             </div>
                         </div>
                         <div class="hr-line-dashed"></div>
@@ -191,7 +191,7 @@
                         </div>
 						<div class="hr-line-dashed"></div>
                         <div class="form-group">
-                            <label class="col-sm-3 control-label">匹配交易员：</label>
+                            <label class="col-sm-3 control-label">匹配承兑商：</label>
                             <div class="input-group col-sm-9">
                                 <div class="radio i-checks">
                                 	{volist name="traders" id="vo"}

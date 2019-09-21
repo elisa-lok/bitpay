@@ -477,7 +477,7 @@ function send_moble($moble, $content) {
 	$sign    = Db::table('think_config')->where('name', 'web_site_title')->value('value');
 	$content = '【' . $sign . '】' . $content;
 	// $url     = $url . '/?Uid=' . $user . '&Key=' . $key . '&smsMob=' . $moble . '&smsText=' . $content;
-	$url = 'http://utf8.sms.webchinese.cn/?Uid=gaoyuanme&Key=e52c8b397c679177fc70&smsMob=' . $moble . '&smsText=' . $content;
+	$url     = 'http://utf8.sms.webchinese.cn/?Uid=gaoyuanme&Key=e52c8b397c679177fc70&smsMob=' . $moble . '&smsText=' . $content;
 	$ch      = curl_init();
 	$timeout = 5;
 	curl_setopt($ch, CURLOPT_URL, $url);
@@ -527,11 +527,7 @@ function financelog($uid, $amount, $note, $status, $op) {
 
 	$user = Db::name('merchant')->where('id', $uid)->find();
 	$rs   = Db::table('think_financelog')->insert(['uid' => $uid, 'user' => $user['name'], 'note' => $note, 'amount' => $amount, 'status' => $status, 'add_time' => time(), 'op' => $op]);
-	if ($rs) {
-		return $rs;
-	} else {
-		return '记录失败';
-	}
+	return $rs ? $rs : '记录失败';
 }
 
 function getMoneyByLevel($total, $pm, $tpm, $mpm, $tm) {

@@ -4,7 +4,7 @@
     <!-- Panel Other -->
     <div class="ibox float-e-margins">
         <div class="ibox-title">
-            <h5>交易员买单列表</h5>
+            <h5>承兑商买单列表</h5>
         </div>
         <div class="ibox-content">
             <!--搜索框开始-->
@@ -18,7 +18,7 @@
                     <form name="admin_list_sea" class="form-search" method="post" action="{:url('orderlistbuy')}">
                         <div class="col-sm-6">
                             <div class="input-group">
-                                <input type="text" id="key" class="form-control" style="width:40%;" name="key" value="{$val}" placeholder="输入交易员姓名/手机号" />
+                                <input type="text" id="key" class="form-control" style="width:40%;" name="key" value="{$val}" placeholder="输入承兑商姓名/手机号" />
                                  <input type="text" id="oid" class="form-control" style="width:40%;" name="oid" value="{$oid}" placeholder="输入订单号" />
                                 <select name="status" class="form-control" id="status" style="width:20%;">
                                 	<option value="0" {empty name="status"}selected{/empty}>选择状态</option>
@@ -43,7 +43,7 @@
                     <table class="table table-bordered table-hover">
                         <thead>
                             <tr class="long-tr">
-                                <th width="">交易员</th>
+                                <th width="">承兑商</th>
                                 <th>商家</th>
                                 <th>订单号</th>
                                 <th>单价</th>
@@ -94,7 +94,7 @@
 								<td>
 {{# if(d[i].status == 6){ }}
 	<a href="javascript:;" onclick="success('{{d[i].id}}')" class="btn btn-primary btn-outline btn-xs">
-                                        申诉:币给交易员</a>
+                                        申诉:币给承兑商</a>
 	<a href="javascript:;" onclick="fail('{{d[i].id}}')" class="btn btn-primary btn-outline btn-xs">
                                         申诉:币给商户</a>
 {{# } }}

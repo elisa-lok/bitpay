@@ -116,7 +116,7 @@ class Index extends Base{
         $rechargeMap['addtime'] = ['between', [$beginThismonth, $endThismonth]];
         //$recharge = Db::name('merchant_user_recharge')->where('status=1')->sum('num');
         $rechargeMonth = getTotalInfo($rechargeMap, 'merchant_user_recharge', 'num');
-        //交易员充值
+        //承兑商充值
         $rechargeMonth2 = getTotalInfo($rechargeMap, 'merchant_recharge', 'num');
         $this->assign('rechargeMonth', $rechargeMonth+$rechargeMonth2);
         $rechargeMap['addtime'] = ['between', [$beginWeek, $endWeek]];

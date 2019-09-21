@@ -52,7 +52,7 @@
                                 <ul class="nav nav-tabs">
                                     <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true">基本配置</a></li>
                                     <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false">内容配置</a></li>
-                                    <li class=""><a data-toggle="tab" href="#tab-5" aria-expanded="false">交易员配置</a></li>
+                                    <li class=""><a data-toggle="tab" href="#tab-5" aria-expanded="false">承兑商配置</a></li>
                                     <li class=""><a data-toggle="tab" href="#tab-3" aria-expanded="false">系统配置</a></li>
                                     <li class=""><a data-toggle="tab" href="#tab-4" aria-expanded="false">短信配置</a></li>
                                    {php}
@@ -416,7 +416,7 @@
                                         </div>
                                         <div class="hr-line-dashed"></div>
                                         <div class="form-group">
-                                            <label class="col-sm-2 control-label">交易员求购商户手续费：</label>
+                                            <label class="col-sm-2 control-label">承兑商求购商户手续费：</label>
                                             <div class="input-group col-sm-4">
                                                 <input type="text" class="form-control" name="config[usdt_buy_merchant_fee]" value="{$config.usdt_buy_merchant_fee}">
                                                 <span class="help-block m-b-none"><i class="fa fa-info-circle"></i>百分比</span>
@@ -424,7 +424,7 @@
                                         </div>
                                         <div class="hr-line-dashed"></div>
                                         <div class="form-group">
-                                            <label class="col-sm-2 control-label">交易员求购交易员手续费：</label>
+                                            <label class="col-sm-2 control-label">承兑商求购承兑商手续费：</label>
                                             <div class="input-group col-sm-4">
                                                 <input type="text" class="form-control" name="config[usdt_buy_trader_fee]" value="{$config.usdt_buy_trader_fee}">
                                                 <span class="help-block m-b-none"><i class="fa fa-info-circle"></i>百分比</span>
@@ -448,7 +448,7 @@
                                         </div>
 										<div class="hr-line-dashed"></div>
                                         <div class="form-group">
-                                            <label class="col-sm-2 control-label">交易员匹配未完成订单数量限制：</label>
+                                            <label class="col-sm-2 control-label">承兑商匹配未完成订单数量限制：</label>
                                             <div class="input-group col-sm-4">
                                                 <input type="text" class="form-control" name="config[trader_pp_max_unfinished_order]" value="{$config.trader_pp_max_unfinished_order}">
                                                 <span class="help-block m-b-none"><i class="fa fa-info-circle">大于等于这个值不会被匹配</i></span>

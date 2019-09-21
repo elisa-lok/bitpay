@@ -942,7 +942,7 @@ class Merchant extends Base{
         $buymerchant = Db::name('merchant')->where('id', $orderinfo['buy_id'])->find();
         $trader = Db::name('merchant')->where('id', $orderinfo['sell_id'])->find();
         if($trader['usdtd'] < $orderinfo['deal_num']){
-            return json(['code'=>0, 'msg'=>'交易员冻结不足']);
+            return json(['code'=>0, 'msg'=>'承兑商冻结不足']);
         }
         Db::startTrans();
         try{
@@ -982,7 +982,7 @@ class Merchant extends Base{
         }
     }
 	/**
-     * 币给交易员
+     * 币给承兑商
      * @return unknown
      */
     public function sssuccessbuy(){
@@ -1050,7 +1050,7 @@ class Merchant extends Base{
         $buymerchant = Db::name('merchant')->where('id', $orderinfo['buy_id'])->find();
         $trader = Db::name('merchant')->where('id', $orderinfo['sell_id'])->find();
         if($trader['usdtd'] < $orderinfo['deal_num']){
-            return json(['code'=>0, 'msg'=>'交易员冻结不足']);
+            return json(['code'=>0, 'msg'=>'承兑商冻结不足']);
         }
 		//盘口费率
         $pkfee = $buymerchant['merchant_pk_fee'];
@@ -1060,7 +1060,7 @@ class Merchant extends Base{
         $platformGet = config('trader_platform_get');
         $platformGet = $platformGet ? $platformGet : 0;
         $platformMoney = $platformGet*$orderinfo['deal_num']/100;
-        //交易员利润
+        //承兑商利润
         $traderGet = $trader['trader_trader_get'];
         $traderGet = $traderGet ? $traderGet : 0;
         $traderMoney = $traderGet*$orderinfo['deal_num']/100;
@@ -1069,7 +1069,7 @@ class Merchant extends Base{
         if($trader['pid']){
             $traderP = $model2->getUserByParam($trader['pid'], 'id');
             if($traderP['agent_check'] == 1 && $traderP['trader_parent_get']){
-                //交易员代理利润
+                //承兑商代理利润
 				$tpexist = 1;
                 $traderParentGet = $traderP['trader_parent_get'];
                 $traderParentGet = $traderParentGet ? $traderParentGet : 0;
@@ -1086,7 +1086,7 @@ class Merchant extends Base{
                 $traderMParentMoney = $traderMParentGet*$orderinfo['deal_num']/100;
             }
         }
-        //平台，交易员代理，商户代理，交易员，商户只能得到这么多，多的给平台
+        //平台，承兑商代理，商户代理，承兑商，商户只能得到这么多，多的给平台
         $moneyArr = getMoneyByLevel($pkdec, $platformMoney, $traderParentMoney, $traderMParentMoney, $traderMoney);
         $mum = $mum - $pkdec;
         $traderParentMoney = $moneyArr[1];
@@ -1102,13 +1102,13 @@ class Merchant extends Base{
             $tt = $total[0]['total'];
             $transact = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->value('transact');
             $rs5 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->update(['averge'=>intval($tt/$transact)]);
-			//交易员利润
+			//承兑商利润
             $rs6 = $rs7 = $rs8 = $rs9 = $rs10 = $rs11 = true;
             if($traderMoney > 0){
                 $rs6 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $traderMoney);
                 $rs7 = Db::table('think_trader_reward')->insert(['uid'=>$orderinfo['sell_id'], 'orderid'=>$orderinfo['id'], 'amount'=>$traderMoney, 'type'=>0, 'create_time'=>time()]);
             }
-            //交易员代理利润
+            //承兑商代理利润
             if($traderParentMoney > 0 && $tpexist){
                 $rsarr = agentReward($trader['pid'], $orderinfo['sell_id'], $traderParentMoney, 3);//3
                 $rs8 = $rsarr[0];$rs9 = $rsarr[1];
