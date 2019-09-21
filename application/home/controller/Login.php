@@ -311,7 +311,7 @@ class Login extends Base{
                 $code = rand(100000,999999);
                 $content = '您的验证码为:'.$code.'.验证码有效时间为2分钟.如不是本人操作,请忽略.';
                 // $result = 2;
-                $result = send_moble($mobile,$content);
+                $result = sendSms($mobile,$content);
                 if($result>0){
                     session($mobile.'_code',$code); //验证码超时
                     session($mobile.'_time',time());
@@ -345,7 +345,7 @@ class Login extends Base{
                 $code = rand(100000,999999);
                 $content = '您的验证码为:'.$code.'.验证码有效时间为2分钟.如不是本人操作,请忽略.';
                 // $result = 2;
-                $result = send_moble($mobile,$content);
+                $result = sendSms($mobile,$content);
                 if($result>0){
                     session($mobile.'_mcode',$code); //验证码超时
                     session($mobile.'_time',time());

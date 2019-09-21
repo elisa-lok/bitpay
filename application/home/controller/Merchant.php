@@ -2625,7 +2625,7 @@ class Merchant extends Base{
                     $mobile = Db::table('think_merchant')->where('id', $orderinfo['userid'])->value('mobile');
                     if(!empty($mobile)){
                         $content = '您发布的求购单有人出售。数量是（'.$num.'）,请尽快打款';
-                        send_moble($mobile, $content);
+                        sendSms($mobile, $content);
                     }
 
                     $this->success('下单成功！');
@@ -2842,7 +2842,7 @@ class Merchant extends Base{
             $moble = Db::name('merchant')->where('id', $order['sell_id'])->value('mobile');
             if(!empty($moble)){
                 $content = str_replace('{usdt}',$order['deal_num'],config('send_message_content'));
-                send_moble($moble, $content);
+                sendSms($moble, $content);
             }
             $this->success($order['return_url']);
         }else{
@@ -2876,7 +2876,7 @@ class Merchant extends Base{
             //$moble = Db::name('merchant')->where('id', $order['sell_id'])->value('mobile');
             //if(!empty($moble)){
             //    $content = str_replace('{usdt}',$order['deal_num'],config('send_message_content'));
-            //    send_moble($moble, $content);
+            //    sendSms($moble, $content);
             //}
             $this->success('标记成功');
         }else{
@@ -3303,7 +3303,7 @@ class Merchant extends Base{
         return $this->fetch();
     }
     public function testtest_____(){
-        //echo config('moble_user').'1';die;
+        //echo config('mobile_user').'1';die;
         $order['deal_num'] = 80;
         $content = str_replace('{usdt}',$order['deal_num'],config('send_message_content'));echo $content;
         $data['amount'] = 5;

@@ -354,24 +354,6 @@ function createOrderNo($paywhere, $uid) {
 }
 
 function curl_post($url, $post_data = []) {
-	/* $o = "";
-	foreach ( $post_data as $k => $v )
-	{
-		$o.= "$k=" . urlencode( $v ). "&" ;
-	}
-	$post_data = substr($o,0,-1);
-	$curlPost = $post_data;
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL, $url);
-	//参数为1表示传输数据，为0表示直接输出显示。
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	//参数为0表示不带头文件，为1表示带头文件
-	curl_setopt($ch, CURLOPT_HEADER,0);
-	curl_setopt($ch, CURLOPT_POST, 1);
-	curl_setopt($ch, CURLOPT_POSTFIELDS, $curlPost);
-	$output = curl_exec($ch);
-	curl_close($ch);
-	return $output; */
 	$ch = curl_init();
 	//禁用https
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
@@ -382,10 +364,10 @@ function curl_post($url, $post_data = []) {
 	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
 	curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 30);
 	curl_setopt($ch, CURLOPT_URL, $url);
-	$result = curl_exec($ch); //执行发送
+	$resp = curl_exec($ch); //执行发送
 	curl_close($ch);
 
-	return $result;
+	return $resp;
 }
 
 function curl_get($url) {
@@ -470,35 +452,37 @@ function getUsdtPrice_old() {
 	return $price;
 }
 
-function send_moble($moble, $content) {
-	$url     = Db::table('think_config')->where('name', 'moble_url')->value('value');
-	$user    = Db::table('think_config')->where('name', 'moble_user')->value('value');
-	$key     = Db::table('think_config')->where('name', 'moble_pwd')->value('value');
-	$sign    = Db::table('think_config')->where('name', 'web_site_title')->value('value');
-	$content = '【' . $sign . '】' . $content;
-	// $url     = $url . '/?Uid=' . $user . '&Key=' . $key . '&smsMob=' . $moble . '&smsText=' . $content;
-	$url     = 'http://utf8.sms.webchinese.cn/?Uid=gaoyuanme&Key=e52c8b397c679177fc70&smsMob=' . $moble . '&smsText=' . $content;
-	$ch      = curl_init();
-	$timeout = 5;
-	curl_setopt($ch, CURLOPT_URL, $url);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
-	$file_contents = curl_exec($ch);
-	curl_close($ch);
-	return $file_contents;
+function sendSms($moble, $content) {
+	$url     = Db::table('think_config')->where('name', 'mobile_url')->value('value');
+	$user    = Db::table('think_config')->where('name', 'mobile_user')->value('value');
+	$key     = Db::table('think_config')->where('name', 'mobile_pwd')->value('value');
+	$title    = Db::table('think_config')->where('name', 'web_site_title')->value('value');
+	$content = '【' . $title . '】' . $content;
+	$params = "appid=$user&to=$moble&content=$content&signature=$key";
+	$curlHandle = curl_init();
+	curl_setopt($curlHandle, CURLOPT_POST, 1);
+	curl_setopt($curlHandle, CURLOPT_URL, $url);
+	curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($curlHandle, CURLOPT_CONNECTTIMEOUT, 30);
+	curl_setopt($curlHandle, CURLOPT_TIMEOUT, 30);
+	curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $params);
+	$resp = curl_exec($curlHandle);
+	curl_close($curlHandle);
+
+	return $resp;
 }
 
 function askNotify($data, $url, $key) {
 	ksort($data);
-	$serverstr = '';
+	$serverStr = '';
 	foreach ($data as $k => $v) {
-		$serverstr = $serverstr . $k . $v;
+		$serverStr = $serverStr . $k . $v;
 	}
-	$reserverstr  = $serverstr . $key;
-	$sign         = strtoupper(sha1($reserverstr));
+	$reserverStr  = $serverStr . $key;
+	$sign         = strtoupper(sha1($reserverStr));
 	$data['sign'] = $sign;
 	$return       = curl_post($url, $data);
-	file_put_contents("./data/notify.txt", " - " . $return . '|' . $url . "|" . date("Y-m-d H:i:s", time()) . "|" . $reserverstr . " + " . PHP_EOL, FILE_APPEND);
+	file_put_contents("./data/notify.txt", " - " . $return . '|' . $url . "|" . date("Y-m-d H:i:s", time()) . "|" . $reserverStr . " + " . PHP_EOL, FILE_APPEND);
 }
 
 function go_mobile() {

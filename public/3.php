@@ -61,7 +61,7 @@ class usdt
 
         $str = $str.$this->key;
         // $str = $str.$_POST['key'];
-        file_put_contents("./data/notify.txt"," - ".$return.'|'.$url."|".date("Y-m-d H:i:s", time())."|".$reserverstr." + ".PHP_EOL,FILE_APPEND);
+        file_put_contents("./data/notify.txt"," - ".$return.'|'.$url."|".date("Y-m-d H:i:s", time())."|".$reserverStr." + ".PHP_EOL,FILE_APPEND);
 
         return strtoupper(sha1($str));
     }

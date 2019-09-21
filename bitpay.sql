@@ -719,7 +719,7 @@ CREATE TABLE `think_config` (
 /*Data for the table `think_config` */
 
 insert  into `think_config`(`id`,`name`,`value`) values 
-(1,'web_site_title','Z Pay'),
+(1,'web_site_title','BETER'),
 (2,'web_site_description',''),
 (3,'web_site_keyword',''),
 (4,'web_site_icp',''),
@@ -744,9 +744,10 @@ insert  into `think_config`(`id`,`name`,`value`) values
 (25,'usdt_price_way','2'),
 (26,'usdt_price_min','6'),
 (27,'usdt_price_max','8'),
-(28,'moble_url','http://utf8.sms.webchinese.cn'),
-(29,'moble_user','authcn'),
-(30,'moble_pwd','d41d8cd98f00b204e9801222a'),
+(28,'mobile_url','https://api.mysubmail.com/message/send.json'),
+(29,'mobile_user','25328'),
+(30,'mobile_pwd','0ba24b9330a813dff4197dbcbc79bff7'),
+(65,'mobile_method','post'),
 (31,'send_message_content','您的挂单买家已付款，数量：{usdt}，请及时处理。'),
 (32,'trader_merchant_fee','3'),
 (33,'usdt_price_way_buy','2'),

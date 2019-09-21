@@ -276,7 +276,7 @@ class Merchant extends Controller{
 					if($send_content){
 						$content = str_replace('{usdt}',$data['amount'],$send_content);//dump($content);
 						//$this->myerror($onlinead['mobile']);die;
-						send_moble($onlinead['mobile'], $content);
+						sendSms($onlinead['mobile'], $content);
 					}
                 }
                 $http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
@@ -422,7 +422,7 @@ class Merchant extends Controller{
                 //todo 发送短信给承兑商
                 if(!empty($onlinead['mobile'])){
                     $content = str_replace('{usdt}',$actualamount,config('send_message_content'));
-                    send_moble($onlinead['mobile'], $content);
+                    sendSms($onlinead['mobile'], $content);
                 }
                 $http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
                 $url = $http_type . $_SERVER['HTTP_HOST'] . '/merchant/pay?id='.$rs2.'&appid='.$data['appid'];
@@ -457,12 +457,12 @@ class Merchant extends Controller{
         // echo json_encode(array('status'=>0,'err'=>$data));
         // echo json_encode(array('status'=>0,'err'=>$data['sign']));
         unset($data['sign']);
-        $serverstr = "";
+        $serverStr = "";
         foreach ($data as $k => $v) {
-            $serverstr = $serverstr.$k.$v;
+            $serverStr = $serverStr.$k.$v;
         }
-        $reserverstr=$serverstr.$appsecret_arr['key'];
-        $reserverSign = strtoupper(sha1($reserverstr));
+        $reserverStr=$serverStr.$appsecret_arr['key'];
+        $reserverSign = strtoupper(sha1($reserverStr));
 
          // $reserverSign = $this->sign($data,$appsecret_arr['key']);
         // echo json_encode(array('status'=>0,'err'=>$reserverSign));exit;
