@@ -748,7 +748,7 @@ insert  into `think_config`(`id`,`name`,`value`) values
 (29,'mobile_user','25328'),
 (30,'mobile_pwd','0ba24b9330a813dff4197dbcbc79bff7'),
 (65,'mobile_method','post'),
-(31,'send_message_content','您的挂单买家已付款，数量：{usdt}，请及时处理。'),
+(31,'send_message_content','您的挂单号:{tx_id}买家已付款，数量：{usdt}，请及时处理。'),
 (32,'trader_merchant_fee','3'),
 (33,'usdt_price_way_buy','2'),
 (34,'usdt_price_min_buy','6'),

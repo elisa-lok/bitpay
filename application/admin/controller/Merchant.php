@@ -1366,7 +1366,7 @@ class Merchant extends Base{
         $platformGet = config('trader_platform_get');
         $platformGet = $platformGet ? $platformGet : 0;
         $platformMoney = $platformGet*$orderinfo['deal_num']/100;
-        //承兑商利润
+        //承兑商卖单奖励
         $traderGet = $trader['trader_trader_get'];
         $traderGet = $traderGet ? $traderGet : 0;
         $traderMoney = $traderGet*$orderinfo['deal_num']/100;
@@ -1421,7 +1421,7 @@ class Merchant extends Base{
             $tt = $total[0]['total'];
             $transact = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->value('transact');
             $rs5 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->update(['averge'=>intval($tt/$transact)]);
-			//承兑商利润
+			//承兑商卖单奖励
             $rs6 = $rs7 = $rs8 = $rs9 = $rs10 = $rs11 = true;
             if($traderMoney > 0){
                 $rs6 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $traderMoney);
@@ -1442,7 +1442,7 @@ class Merchant extends Base{
                 Db::commit();
                  financelog($orderinfo['sell_id'],$mum,'卖出USDT_释放',0,session('username'));//添加日志
                  financelog($orderinfo['buy_id'],$mum,'买入USDT_2',0,session('username'));//添加日志
-                 financelog($orderinfo['sell_id'],$traderMoney,'卖出USDT_承兑商利润_2',1,session('username'));//添加日志
+                 financelog($orderinfo['sell_id'],$traderMoney,'卖出USDT_承兑商卖单奖励_2',1,session('username'));//添加日志
                     // financelog($orderinfo['buy_id'],$mum,'买入USDT',0);//添加日志
 				getStatisticsOfOrder($orderinfo['buy_id'], $orderinfo['sell_id'], $mum, $orderinfo['deal_num']);
                 //请求回调接口
