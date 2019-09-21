@@ -1,0 +1,10 @@
+TRUNCATE TABLE `think_login_log`;
+TRUNCATE TABLE `think_log`;
+TRUNCATE TABLE `think_merchant_log`;
+TRUNCATE TABLE `think_order_buy`;
+TRUNCATE TABLE `think_order_sell`;
+TRUNCATE TABLE `think_statistics`;
+UPDATE `think_merchant` SET `usdt` = 1000,`usdtd`=0, `order_sell_success_num` = 0, `order_buy_success_num` =0,`ad_on_sell`=0,`ad_on_buy`=0;
+TRUNCATE TABLE `think_statistics`;
+TRUNCATE TABLE `think_agent_reward`;
+TRUNCATE TABLE `think_trader_reward`;

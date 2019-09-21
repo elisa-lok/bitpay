@@ -49,7 +49,7 @@ CREATE TABLE `think_ad_buy` (
   KEY `trust_only` (`trust_only`) USING BTREE,
   KEY `add_time` (`add_time`) USING BTREE,
   KEY `state` (`state`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_ad_buy` */
 
@@ -104,7 +104,7 @@ CREATE TABLE `think_ad_sell` (
   KEY `trust_only` (`trust_only`) USING BTREE,
   KEY `add_time` (`add_time`) USING BTREE,
   KEY `state` (`state`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_ad_sell` */
 
@@ -181,16 +181,16 @@ CREATE TABLE `think_address` (
   `password` varchar(255) DEFAULT NULL COMMENT 'ETH钱包地址密码',
   `privatekey` varchar(255) DEFAULT NULL COMMENT '私钥',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=194 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=194 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_address` */
 
 insert  into `think_address`(`id`,`uid`,`address`,`status`,`addtime`,`note`,`type`,`password`,`privatekey`) values 
-(1,4,'0x6d8ffc3c999de02900a7e13a58ee5472b0029a59',1,'1567311649',NULL,'eth',NULL,'b27042bfe4a8e617388c0a259f275d0415acd8d0f904f352de1078fc0aec5f1d'),
-(2,5,'0x0f491c4675a84d7c40e538b1737568ae48d40f21',1,'1567311651',NULL,'eth',NULL,'17523262c573f3eb2285a9ea302665cd7db72460ff043b670421b214409cb6fa'),
-(3,6,'0xd8865a9f321e8241629afca7e447d89b1937f11b',1,'1567311651',NULL,'eth',NULL,'5ecb0dc4657947daf6af0a0d13dd4516ec8d94356fba19f9a0f023d2dbf485a6'),
-(4,10,'0x315d9ad61efb1a438ecfa06247f710fcb980567b',1,'1567311652',NULL,'eth',NULL,'7b6ff5d9872e2029d7f7766beb89a20c89ff459c40d1dcbab4dde0dfcc627f1e'),
-(5,9,'0xe996036921340f77df97e15f0a4b628e6139362d',1,'1567311653',NULL,'eth',NULL,'b7eb779515022b6b7fab4df3cfe4e089976cefc2770280343c86c340b58f5c7f'),
+(1,NULL,'0x6d8ffc3c999de02900a7e13a58ee5472b0029a59',1,'1567311649',NULL,'eth',NULL,'b27042bfe4a8e617388c0a259f275d0415acd8d0f904f352de1078fc0aec5f1d'),
+(2,NULL,'0x0f491c4675a84d7c40e538b1737568ae48d40f21',1,'1567311651',NULL,'eth',NULL,'17523262c573f3eb2285a9ea302665cd7db72460ff043b670421b214409cb6fa'),
+(3,NULL,'0xd8865a9f321e8241629afca7e447d89b1937f11b',1,'1567311651',NULL,'eth',NULL,'5ecb0dc4657947daf6af0a0d13dd4516ec8d94356fba19f9a0f023d2dbf485a6'),
+(4,NULL,'0x315d9ad61efb1a438ecfa06247f710fcb980567b',1,'1567311652',NULL,'eth',NULL,'7b6ff5d9872e2029d7f7766beb89a20c89ff459c40d1dcbab4dde0dfcc627f1e'),
+(5,NULL,'0xe996036921340f77df97e15f0a4b628e6139362d',1,'1567311653',NULL,'eth',NULL,'b7eb779515022b6b7fab4df3cfe4e089976cefc2770280343c86c340b58f5c7f'),
 (6,NULL,'0x032280dd29514a79fe9144220d1330e414a2f8ab',0,'1567311654',NULL,'eth',NULL,'d6b7ac271d9e138940af38f12d5025e539f05f3c01a66050a42acf117b27c4ae'),
 (7,NULL,'0x989bc6f55132b51e6d751d65fbba79007f37b23a',0,'1567311654',NULL,'eth',NULL,'5397603926eef49b1e48dfc6884d106322bb8a8dbdc5d168628c5dd4e42c2802'),
 (8,NULL,'0xe415a6c98b310a86718d276dbfeb6861ce688c7a',0,'1567311656',NULL,'eth',NULL,'3630a74f66be4703121914c23a769739e359e932a1ad1ada494ff1f2c57c4f52'),
@@ -397,7 +397,7 @@ CREATE TABLE `think_admin` (
   `groupid` int(11) DEFAULT '1' COMMENT '用户角色id',
   `token` varchar(32) COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=30 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=MyISAM AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8_bin;
 
 /*Data for the table `think_admin` */
 
@@ -417,7 +417,7 @@ CREATE TABLE `think_agent_reward` (
   `type` tinyint(4) DEFAULT '0' COMMENT '0:商户提币，1：用户提币，2：用户充值',
   `create_time` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_agent_reward` */
 
@@ -444,7 +444,7 @@ CREATE TABLE `think_article` (
   `update_time` int(11) DEFAULT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`),
   KEY `a_title` (`title`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='文章表';
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COMMENT='文章表';
 
 /*Data for the table `think_article` */
 
@@ -463,7 +463,7 @@ CREATE TABLE `think_article_cate` (
   `update_time` int(11) DEFAULT NULL COMMENT '更新时间',
   `status` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_article_cate` */
 
@@ -483,7 +483,7 @@ CREATE TABLE `think_auth_group` (
   `create_time` int(11) DEFAULT NULL,
   `update_time` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_auth_group` */
 
@@ -502,7 +502,7 @@ CREATE TABLE `think_auth_group_access` (
   UNIQUE KEY `uid_group_id` (`uid`,`group_id`),
   KEY `uid` (`uid`),
   KEY `group_id` (`group_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_auth_group_access` */
 
@@ -534,7 +534,7 @@ CREATE TABLE `think_auth_rule` (
   `create_time` int(11) NOT NULL DEFAULT '0' COMMENT '添加时间',
   `update_time` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=127 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=127 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_auth_rule` */
 
@@ -662,7 +662,7 @@ CREATE TABLE `think_banner` (
   `closed` tinyint(1) DEFAULT '0',
   `orderby` tinyint(3) DEFAULT '100',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=53 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_banner` */
 
@@ -681,7 +681,7 @@ CREATE TABLE `think_banner_position` (
   `update_time` int(11) DEFAULT NULL COMMENT '更新时间',
   `status` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=29 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_banner_position` */
 
@@ -700,7 +700,7 @@ CREATE TABLE `think_coin_log` (
   `coin_type` tinyint(4) DEFAULT '0' COMMENT '0:usdt，1:btc',
   `create_time` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_coin_log` */
 
@@ -714,7 +714,7 @@ CREATE TABLE `think_config` (
   `value` text COMMENT '配置值',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_name` (`name`)
-) ENGINE=MyISAM AUTO_INCREMENT=65 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_config` */
 
@@ -796,7 +796,7 @@ CREATE TABLE `think_financelog` (
   `add_time` int(11) DEFAULT NULL COMMENT '添加时间',
   `op` varchar(255) DEFAULT NULL COMMENT '操作员',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_financelog` */
 
@@ -813,7 +813,7 @@ CREATE TABLE `think_log` (
   `status` tinyint(1) DEFAULT NULL COMMENT '1 成功 2 失败',
   `add_time` int(11) DEFAULT NULL COMMENT '添加时间',
   PRIMARY KEY (`log_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_log` */
 
@@ -828,7 +828,7 @@ CREATE TABLE `think_login_log` (
   `update_time` int(11) DEFAULT NULL,
   `online` smallint(6) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_login_log` */
 
@@ -855,7 +855,7 @@ CREATE TABLE `think_member` (
   `token` char(32) DEFAULT '0' COMMENT '令牌',
   `session_id` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=212066 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=212066 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_member` */
 
@@ -870,7 +870,7 @@ CREATE TABLE `think_member_group` (
   `create_time` int(11) DEFAULT NULL COMMENT '留言回复时间',
   `update_time` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=127 DEFAULT CHARSET=utf8 COMMENT='文章评论表';
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COMMENT='文章评论表';
 
 /*Data for the table `think_member_group` */
 
@@ -940,7 +940,7 @@ CREATE TABLE `think_merchant` (
   `order_buy_usdt_amount` decimal(20,8) DEFAULT '0.00000000' COMMENT '总求购usdt数量',
   `nickname` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_merchant` */
 
@@ -957,7 +957,7 @@ CREATE TABLE `think_merchant_apilog` (
   `return_param` text,
   `create_time` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_merchant_apilog` */
 
@@ -976,7 +976,7 @@ CREATE TABLE `think_merchant_bankcard` (
   `update_time` int(11) DEFAULT '0',
   `truename` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_merchant_bankcard` */
 
@@ -993,7 +993,7 @@ CREATE TABLE `think_merchant_log` (
   `status` tinyint(1) DEFAULT NULL COMMENT '1 成功 2 失败',
   `add_time` int(11) DEFAULT NULL COMMENT '添加时间',
   PRIMARY KEY (`log_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_merchant_log` */
 
@@ -1015,7 +1015,7 @@ CREATE TABLE `think_merchant_recharge` (
   `status` tinyint(2) DEFAULT '0' COMMENT '状态',
   `confirmations` tinyint(4) DEFAULT '0' COMMENT '确认数',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_merchant_recharge` */
 
@@ -1030,7 +1030,7 @@ CREATE TABLE `think_merchant_user_address` (
   `address` varchar(255) DEFAULT NULL COMMENT '钱包地址',
   `addtime` int(11) DEFAULT NULL COMMENT '申请时间',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_merchant_user_address` */
 
@@ -1062,7 +1062,7 @@ CREATE TABLE `think_merchant_user_recharge` (
   `status` tinyint(2) DEFAULT '0' COMMENT '状态',
   `confirmations` tinyint(4) DEFAULT '0' COMMENT '确认数',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_merchant_user_recharge` */
 
@@ -1085,7 +1085,7 @@ CREATE TABLE `think_merchant_user_withdraw` (
   `ordersn` varchar(255) DEFAULT NULL COMMENT '订单号唯一标识',
   `type` smallint(6) DEFAULT NULL COMMENT '1:走钱包,2:不走钱包',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_merchant_user_withdraw` */
 
@@ -1109,7 +1109,7 @@ CREATE TABLE `think_merchant_withdraw` (
   `ordersn` varchar(255) DEFAULT NULL COMMENT '订单号，唯一标识',
   `type` smallint(6) DEFAULT NULL COMMENT '1:走钱包,2:不走钱包',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_merchant_withdraw` */
 
@@ -1128,7 +1128,7 @@ CREATE TABLE `think_merchant_wx` (
   `update_time` int(11) DEFAULT '0',
   `truename` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_merchant_wx` */
 
@@ -1147,7 +1147,7 @@ CREATE TABLE `think_merchant_ysf` (
   `update_time` int(11) DEFAULT '0',
   `truename` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_merchant_ysf` */
 
@@ -1166,7 +1166,7 @@ CREATE TABLE `think_merchant_zfb` (
   `update_time` int(11) DEFAULT '0',
   `truename` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_merchant_zfb` */
 
@@ -1211,7 +1211,7 @@ CREATE TABLE `think_order_buy` (
   KEY `buy_id` (`buy_id`) USING BTREE,
   KEY `sell_id` (`sell_id`) USING BTREE,
   KEY `status` (`status`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_order_buy` */
 
@@ -1256,7 +1256,7 @@ CREATE TABLE `think_order_sell` (
   KEY `buy_id` (`buy_id`) USING BTREE,
   KEY `sell_id` (`sell_id`) USING BTREE,
   KEY `status` (`status`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_order_sell` */
 
@@ -1272,7 +1272,7 @@ CREATE TABLE `think_question` (
   `reply` varchar(255) DEFAULT NULL COMMENT '回复',
   `addtime` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_question` */
 
@@ -1297,7 +1297,7 @@ CREATE TABLE `think_statistics` (
   `order_buy_amount` decimal(20,8) DEFAULT '0.00000000' COMMENT '求购总数量，挂单购买的总usdt数量',
   `create_time` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_statistics` */
 
@@ -1339,7 +1339,7 @@ CREATE TABLE `think_trader_reward` (
   `create_time` int(11) DEFAULT NULL,
   `orderid` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_trader_reward` */
 
@@ -1375,7 +1375,7 @@ CREATE TABLE `think_user` (
   `status` tinyint(1) DEFAULT NULL COMMENT '1激活  0 未激活',
   `token` varchar(255) DEFAULT '0' COMMENT '令牌',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `think_user` */
 

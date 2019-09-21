@@ -3063,38 +3063,23 @@ class Merchant extends Base {
 
 	public function sfbtc_ajax() {//放行usdt
 		if (request()->isPost()) {
-			if (!session('uid')) {
-				$this->error('请登录操作');
-			}
+			!session('uid') && $this->error('请登录操作');
 			$id               = input('post.id');
 			$model            = new OrderModel();
 			$model2           = new MerchantModel();
 			$where['id']      = $id;
 			$where['sell_id'] = session('uid');
 			$orderinfo        = $model->getOne($where);
-			if (empty($orderinfo)) {
-				$this->error('订单不存在');
-			}
-			if ($orderinfo['status'] == 5) {
-				$this->error('订单已经被取消');
-			}
-			if ($orderinfo['status'] == 6) {
-				$this->error('订单申诉中，无法释放');
-			}
-			if ($orderinfo['status'] == 0) {//20190830修改,不打款,也可以确认
-				$nopay = 1;//20190830修改
-				// $this->error('此订单对方已经拍下还未付款');
-			} else {
-				$nopay = 0;
-			}
-			if ($orderinfo['status'] >= 3) {
-				$this->error('此订单已经释放无需再次释放');
-			}
+			empty($orderinfo) && $this->error('订单不存在');
+			($orderinfo['status'] == 5) && $this->error('订单已经被取消');
+			($orderinfo['status'] == 6) && $this->error('订单申诉中，无法释放');
+			//20190830修改,不打款,也可以确认
+			$nopay = ($orderinfo['status'] == 0) ? 1 : 0;//20190830修改
+			// $this->error('此订单对方已经拍下还未付款');
+			($orderinfo['status'] >= 3) && $this->error('此订单已经释放无需再次释放');
 			$merchant    = $model2->getUserByParam(session('uid'), 'id');
 			$buymerchant = $model2->getUserByParam($orderinfo['buy_id'], 'id');
-			if ($merchant['usdtd'] < $orderinfo['deal_num']) {
-				$this->error('您的冻结不足，释放失败');
-			}
+			($merchant['usdtd'] < $orderinfo['deal_num']) && $this->error('您的冻结不足，释放失败');
 
 			$sfee = 0;
 			$mum  = $orderinfo['deal_num'] - $sfee;
