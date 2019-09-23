@@ -2,216 +2,215 @@
 <link rel="stylesheet" type="text/css" href="/static/admin/webupload/webuploader.css">
 <link rel="stylesheet" type="text/css" href="/static/admin/webupload/style.css">
 <style>
-.file-item{float: left; position: relative; width: 110px;height: 110px; margin: 0 20px 20px 0; padding: 4px;}
-.file-item .info{overflow: hidden;}
-.uploader-list{width: 100%; overflow: hidden;}
+	.file-item {float: left; position: relative; width: 110px;height: 110px; margin: 0 20px 20px 0; padding: 4px;}
+	.file-item .info {overflow: hidden;}
+	.uploader-list {width: 100%; overflow: hidden;}
 </style>
 <body class="gray-bg">
 <div class="wrapper wrapper-content animated fadeInRight">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="ibox float-e-margins">
-                <div class="ibox-title">
-                    <h5>编辑商户</h5>
-                    <div class="ibox-tools">
-                        <a class="collapse-link">
-                            <i class="fa fa-chevron-up"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="ibox-content">
-                    <form class="form-horizontal" name="edit_member" id="edit_member" method="post" action="{:url('edit_merchant')}">
-                        <input type="hidden" name="id" value="{$merchant.id}">
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">姓名：</label>
-                            <div class="input-group col-sm-4">
-                                <input id="account" type="text" class="form-control" name="name" value="{$merchant.name}" placeholder="请输入姓名">
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">手机号：</label>
-                            <div class="input-group col-sm-4">
-                                <input id="nickname" type="text" class="form-control" name="mobile" value="{$merchant.mobile}" placeholder="请输入手机号">
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">密码：</label>
-                            <div class="input-group col-sm-4">
-                                <input id="password" type="password" class="form-control" name="password" placeholder="请输入密码">
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">邀请人：</label>
-                            <div class="input-group col-sm-4">
-                                <input id="nickname" type="text" class="form-control" name="pid" value="{$merchant.pid}" placeholder="请输入邀请人id">
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">身份证号：</label>
-                            <div class="input-group col-sm-4">
-                                <input id="nickname" type="text" class="form-control" name="idcard" value="{$merchant.idcard}" placeholder="请输入身份证号">
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">正面：</label>
-                            <div class="input-group col-sm-4">
-                                <input type="hidden" id="idcard_zheng" name="idcard_zheng" value="{$merchant.idcard_zheng}">
-                                <div id="fileList" class="uploader-list" style="float:right"></div>
-                                <div id="imgPicker" style="float:left">选择头像</div>
-                                <img id="img_data" class="img-circle" height="80px" width="80px" style="float:left;margin-left: 50px;margin-top: -10px;" src="/uploads/idcard/{$merchant.idcard_zheng}" onerror="this.src='/static/admin/images/head_default.gif'"/>
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">反面：</label>
-                            <div class="input-group col-sm-4">
-                                <input type="hidden" id="idcard_fan" name="idcard_fan" value="{$merchant.idcard_fan}">
-                                <div id="fileList2" class="uploader-list" style="float:right"></div>
-                                <div id="imgPicker2" style="float:left">选择头像</div>
-                                <img id="img_data2" class="img-circle" height="80px" width="80px" style="float:left;margin-left: 50px;margin-top: -10px;" src="/uploads/idcard/{$merchant.idcard_fan}" onerror="this.src='/static/admin/images/head_default.gif'"/>
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">appid：</label>
-                            <div class="input-group col-sm-4">
-                                <input id="appid" type="text" class="form-control" name="appid" value="{$merchant.appid}" placeholder="请输入appid">
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">key：</label>
-                            <div class="input-group col-sm-4">
-                                <input id="key" type="text" class="form-control" name="key" value="{$merchant.key}" placeholder="请输入密钥">
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">状态：</label>
-                            <div class="input-group col-sm-4">
-                                <div class="radio i-checks">
-                                    <input type="radio" name='status' value="1" {if condition="$merchant['status'] eq 1 "}checked{/if}/>开启&nbsp;&nbsp;
-                                    <input type="radio" name='status' value="0" {if condition="$merchant['status'] eq 0 "}checked{/if}/>禁用&nbsp;&nbsp;
-                                </div>
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">可用USDT：</label>
-                            <div class="input-group col-sm-4">
-                                <input id="usdt" type="text" class="form-control" name="usdt" value="{$merchant.usdt}" placeholder="请输入可用usdt">
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">冻结USDT：</label>
-                            <div class="input-group col-sm-4">
-                                <input id="usdtd" type="text" class="form-control" name="usdtd" value="{$merchant.usdtd}" placeholder="请输入冻结usdt">
-                            </div>
-                        </div>
-						 <!-- <div class="hr-line-dashed"></div>
-						   <div class="form-group">
-                            <label class="col-sm-3 control-label">USDT地址：</label>
-                            <div class="input-group col-sm-4">
-                                <input id="usdtb" type="text" class="form-control" name="usdtb" value="{$merchant.usdtb}" placeholder="USDT地址：">
-                            </div>
-                        </div> -->
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="ibox float-e-margins">
+				<div class="ibox-title">
+					<h5>编辑商户</h5>
+					<div class="ibox-tools">
+						<a class="collapse-link">
+							<i class="fa fa-chevron-up"></i>
+						</a>
+					</div>
+				</div>
+				<div class="ibox-content">
+					<form class="form-horizontal" name="edit_member" id="edit_member" method="post" action="{:url('edit_merchant')}">
+						<input type="hidden" name="id" value="{$merchant.id}">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">姓名：</label>
+							<div class="input-group col-sm-4">
+								<input id="account" type="text" class="form-control" name="name" value="{$merchant.name}" placeholder="请输入姓名">
+							</div>
+						</div>
 						<div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">提币手续费：</label>
-                            <div class="input-group col-sm-4">
-                                <input id="merchant_tibi_fee" type="text" class="form-control" name="merchant_tibi_fee" value="{$merchant.merchant_tibi_fee}" placeholder="请输入提币手续费">个
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">盘口提币手续费：</label>
-                            <div class="input-group col-sm-4">
-                                <input id="user_withdraw_fee" type="text" class="form-control" name="user_withdraw_fee" value="{$merchant.user_withdraw_fee}" placeholder="请输入盘口提币手续费">%
-                            </div>
-                        </div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">手机号：</label>
+							<div class="input-group col-sm-4">
+								<input id="nickname" type="text" class="form-control" name="mobile" value="{$merchant.mobile}" placeholder="请输入手机号">
+							</div>
+						</div>
 						<div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">用户充值手续费：</label>
-                            <div class="input-group col-sm-4">
-                                <input id="user_recharge_fee" type="text" class="form-control" name="user_recharge_fee" value="{$merchant.user_recharge_fee}" placeholder="请输入用户充值手续费">%
-                            </div>
-                        </div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">密码：</label>
+							<div class="input-group col-sm-4">
+								<input id="password" type="password" class="form-control" name="password" placeholder="请输入密码">
+							</div>
+						</div>
 						<div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">商户盘口费率：</label>
-                            <div class="input-group col-sm-4">
-                                <input id="merchant_pk_fee" type="text" class="form-control" name="merchant_pk_fee" value="{$merchant.merchant_pk_fee}" placeholder="请输入商户盘口费率">%
-                            </div>
-                        </div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">邀请人：</label>
+							<div class="input-group col-sm-4">
+								<input id="nickname" type="text" class="form-control" name="pid" value="{$merchant.pid}" placeholder="请输入邀请人id">
+							</div>
+						</div>
+						<div class="hr-line-dashed"></div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">身份证号：</label>
+							<div class="input-group col-sm-4">
+								<input id="nickname" type="text" class="form-control" name="idcard" value="{$merchant.idcard}" placeholder="请输入身份证号">
+							</div>
+						</div>
+						<div class="hr-line-dashed"></div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">正面：</label>
+							<div class="input-group col-sm-4">
+								<input type="hidden" id="idcard_zheng" name="idcard_zheng" value="{$merchant.idcard_zheng}">
+								<div id="fileList" class="uploader-list" style="float:right"></div>
+								<div id="imgPicker" style="float:left">选择头像</div>
+								<img id="img_data" class="img-circle" height="80px" width="80px" style="float:left;margin-left: 50px;margin-top: -10px;" src="/uploads/idcard/{$merchant.idcard_zheng}" onerror="this.src='/static/admin/images/head_default.gif'"/>
+							</div>
+						</div>
+						<div class="hr-line-dashed"></div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">反面：</label>
+							<div class="input-group col-sm-4">
+								<input type="hidden" id="idcard_fan" name="idcard_fan" value="{$merchant.idcard_fan}">
+								<div id="fileList2" class="uploader-list" style="float:right"></div>
+								<div id="imgPicker2" style="float:left">选择头像</div>
+								<img id="img_data2" class="img-circle" height="80px" width="80px" style="float:left;margin-left: 50px;margin-top: -10px;" src="/uploads/idcard/{$merchant.idcard_fan}" onerror="this.src='/static/admin/images/head_default.gif'"/>
+							</div>
+						</div>
+						<div class="hr-line-dashed"></div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">appid：</label>
+							<div class="input-group col-sm-4">
+								<input id="appid" type="text" class="form-control" name="appid" value="{$merchant.appid}" placeholder="请输入appid">
+							</div>
+						</div>
+						<div class="hr-line-dashed"></div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">key：</label>
+							<div class="input-group col-sm-4">
+								<input id="key" type="text" class="form-control" name="key" value="{$merchant.key}" placeholder="请输入密钥">
+							</div>
+						</div>
+						<div class="hr-line-dashed"></div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">状态：</label>
+							<div class="input-group col-sm-4">
+								<div class="radio i-checks">
+									<input type="radio" name='status' value="1" {if condition="$merchant['status'] eq 1 " }checked{/if}/>开启&nbsp;&nbsp;
+									<input type="radio" name='status' value="0" {if condition="$merchant['status'] eq 0 " }checked{/if}/>禁用&nbsp;&nbsp;
+								</div>
+							</div>
+						</div>
+						<div class="hr-line-dashed"></div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">可用USDT：</label>
+							<div class="input-group col-sm-4">
+								<input id="usdt" type="text" class="form-control" name="usdt" value="{$merchant.usdt}" placeholder="请输入可用usdt">
+							</div>
+						</div>
+						<div class="hr-line-dashed"></div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">冻结USDT：</label>
+							<div class="input-group col-sm-4">
+								<input id="usdtd" type="text" class="form-control" name="usdtd" value="{$merchant.usdtd}" placeholder="请输入冻结usdt">
+							</div>
+						</div>
+						<!-- <div class="hr-line-dashed"></div>
+						  <div class="form-group">
+						   <label class="col-sm-3 control-label">USDT地址：</label>
+						   <div class="input-group col-sm-4">
+							   <input id="usdtb" type="text" class="form-control" name="usdtb" value="{$merchant.usdtb}" placeholder="USDT地址：">
+						   </div>
+					   </div> -->
+						<div class="hr-line-dashed"></div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">提币手续费：</label>
+							<div class="input-group col-sm-4">
+								<input id="merchant_tibi_fee" type="text" class="form-control" name="merchant_tibi_fee" value="{$merchant.merchant_tibi_fee}" placeholder="请输入提币手续费">个
+							</div>
+						</div>
+						<div class="hr-line-dashed"></div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">盘口提币手续费：</label>
+							<div class="input-group col-sm-4">
+								<input id="user_withdraw_fee" type="text" class="form-control" name="user_withdraw_fee" value="{$merchant.user_withdraw_fee}" placeholder="请输入盘口提币手续费">%
+							</div>
+						</div>
+						<div class="hr-line-dashed"></div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">用户充值手续费：</label>
+							<div class="input-group col-sm-4">
+								<input id="user_recharge_fee" type="text" class="form-control" name="user_recharge_fee" value="{$merchant.user_recharge_fee}" placeholder="请输入用户充值手续费">%
+							</div>
+						</div>
+						<div class="hr-line-dashed"></div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">商户盘口费率：</label>
+							<div class="input-group col-sm-4">
+								<input id="merchant_pk_fee" type="text" class="form-control" name="merchant_pk_fee" value="{$merchant.merchant_pk_fee}" placeholder="请输入商户盘口费率">%
+							</div>
+						</div>
 
-                        {eq name="merchant['trader_check']" value="1"}
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">承兑商充值手续费：</label>
-                            <div class="input-group col-sm-4">
-                                <input id="trader_recharge_fee" type="text" class="form-control" name="trader_recharge_fee" value="{$merchant.trader_recharge_fee}" placeholder="请输入承兑商充值手续费">%
-                            </div>
-                        </div>
+						{eq name="merchant['trader_check']" value="1"}
 						<div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">承兑商卖单奖励：</label>
-                            <div class="input-group col-sm-4">
-                                <input id="trader_trader_get" type="text" class="form-control" name="trader_trader_get" value="{$merchant.trader_trader_get}" placeholder="请输入承兑商卖单奖励">%
-                            </div>
-                        </div>
-                        {/eq}
+						<div class="form-group">
+							<label class="col-sm-3 control-label">承兑商充值手续费：</label>
+							<div class="input-group col-sm-4">
+								<input id="trader_recharge_fee" type="text" class="form-control" name="trader_recharge_fee" value="{$merchant.trader_recharge_fee}" placeholder="请输入承兑商充值手续费">%
+							</div>
+						</div>
+						<div class="hr-line-dashed"></div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">承兑商卖单奖励：</label>
+							<div class="input-group col-sm-4">
+								<input id="trader_trader_get" type="text" class="form-control" name="trader_trader_get" value="{$merchant.trader_trader_get}" placeholder="请输入承兑商卖单奖励">%
+							</div>
+						</div>
+						{/eq}
 						{eq name="merchant['agent_check']" value="1"}
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">下级承兑商卖单利润：</label>
-                            <div class="input-group col-sm-4">
-                                <input id="trader_parent_get" type="text" class="form-control" name="trader_parent_get" value="{$merchant.trader_parent_get}" placeholder="下级承兑商卖单利润">%
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">下级商户购买订单利润：</label>
-                            <div class="input-group col-sm-4">
-                                <input id="trader_merchant_parent_get" type="text" class="form-control" name="trader_merchant_parent_get" value="{$merchant.trader_merchant_parent_get}" placeholder="下级商户购买订单利润">%
-                            </div>
-                        </div>
-                        {/eq}
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">谷歌验证：</label>
-                            <div class="input-group col-sm-4">
-                                <input id="ga" type="text" class="form-control" name="ga" value="{$merchant.ga}" placeholder="请输入谷歌验证码">
-                            </div>
-                        </div>
 						<div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">匹配承兑商：</label>
-                            <div class="input-group col-sm-9">
-                                <div class="radio i-checks">
-                                	{volist name="traders" id="vo"}
-                                    <input type="checkbox" name='pptrader[]' {eq name='vo.ispp' value='1'}checked{/eq} value="{$vo.id}"/>{$vo.name}&nbsp;&nbsp;
-                                    {/volist}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <div class="col-sm-4 col-sm-offset-3">
-                                <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> 保存</button>&nbsp;&nbsp;&nbsp;
-                                <a class="btn btn-danger" href="javascript:history.go(-1);"><i class="fa fa-close"></i> 返回</a>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">下级承兑商卖单利润：</label>
+							<div class="input-group col-sm-4">
+								<input id="trader_parent_get" type="text" class="form-control" name="trader_parent_get" value="{$merchant.trader_parent_get}" placeholder="下级承兑商卖单利润">%
+							</div>
+						</div>
+						<div class="hr-line-dashed"></div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">下级商户购买订单利润：</label>
+							<div class="input-group col-sm-4">
+								<input id="trader_merchant_parent_get" type="text" class="form-control" name="trader_merchant_parent_get" value="{$merchant.trader_merchant_parent_get}" placeholder="下级商户购买订单利润">%
+							</div>
+						</div>
+						{/eq}
+						<div class="hr-line-dashed"></div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">谷歌验证：</label>
+							<div class="input-group col-sm-4">
+								<input id="ga" type="text" class="form-control" name="ga" value="{$merchant.ga}" placeholder="请输入谷歌验证码">
+							</div>
+						</div>
+						<div class="hr-line-dashed"></div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">匹配承兑商：</label>
+							<div class="input-group col-sm-9">
+								<div class="radio i-checks">
+									<input type="checkbox" name='pptrader' {if condition="$status == 1" }checked{/if} value="1"/>所有
+
+								</div>
+							</div>
+						</div>
+						<div class="hr-line-dashed"></div>
+						<div class="form-group">
+							<div class="col-sm-4 col-sm-offset-3">
+								<button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> 保存</button>&nbsp;&nbsp;&nbsp;
+								<a class="btn btn-danger" href="javascript:history.go(-1);"><i class="fa fa-close"></i> 返回</a>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 {include file="public/footer" /}
 <script type="text/javascript" src="/static/admin/webupload/webuploader.min.js"></script>
@@ -221,19 +220,19 @@
     //上传图片,初始化WebUploader
     var uploader = WebUploader.create({
 
-        auto: true,// 选完文件后，是否自动上传。
-        swf: '/static/admin/webupload/Uploader.swf',// swf文件路径
-        server: "{:url('Upload/uploadidcard')}",// 文件接收服务端。
-        duplicate :true,// 重复上传图片，true为可重复false为不可重复
-        pick: '#imgPicker',// 选择文件的按钮。可选。
+        auto     : true,// 选完文件后，是否自动上传。
+        swf      : '/static/admin/webupload/Uploader.swf',// swf文件路径
+        server   : "{:url('Upload/uploadidcard')}",// 文件接收服务端。
+        duplicate: true,// 重复上传图片，true为可重复false为不可重复
+        pick     : '#imgPicker',// 选择文件的按钮。可选。
 
         accept: {
-            title: 'Images',
+            title     : 'Images',
             extensions: 'gif,jpg,jpeg,bmp,png',
-            mimeTypes: 'image/jpg,image/jpeg,image/png'
+            mimeTypes : 'image/jpg,image/jpeg,image/png'
         },
 
-        'onUploadSuccess': function(file, data, response) {
+        'onUploadSuccess': function (file, data, response) {
             $("#idcard_zheng").val(data._raw);
             $("#img_data").attr('src', '/uploads/idcard/' + data._raw).show();
         }
@@ -242,60 +241,60 @@
     //上传图片,初始化WebUploader
     var uploader = WebUploader.create({
 
-        auto: true,// 选完文件后，是否自动上传。
-        swf: '/static/admin/webupload/Uploader.swf',// swf文件路径
-        server: "{:url('Upload/uploadidcard')}",// 文件接收服务端。
-        duplicate :true,// 重复上传图片，true为可重复false为不可重复
-        pick: '#imgPicker2',// 选择文件的按钮。可选。
+        auto     : true,// 选完文件后，是否自动上传。
+        swf      : '/static/admin/webupload/Uploader.swf',// swf文件路径
+        server   : "{:url('Upload/uploadidcard')}",// 文件接收服务端。
+        duplicate: true,// 重复上传图片，true为可重复false为不可重复
+        pick     : '#imgPicker2',// 选择文件的按钮。可选。
 
         accept: {
-            title: 'Images',
+            title     : 'Images',
             extensions: 'gif,jpg,jpeg,bmp,png',
-            mimeTypes: 'image/jpg,image/jpeg,image/png'
+            mimeTypes : 'image/jpg,image/jpeg,image/png'
         },
 
-        'onUploadSuccess': function(file, data, response) {
+        'onUploadSuccess': function (file, data, response) {
             $("#idcard_fan").val(data._raw);
             $("#img_data2").attr('src', '/uploads/idcard/' + data._raw).show();
         }
     });
 
-    uploader.on( 'fileQueued', function( file ) {
-        $list.html( '<div id="' + file.id + '" class="item">' +
+    uploader.on('fileQueued', function (file) {
+        $list.html('<div id="' + file.id + '" class="item">' +
             '<h4 class="info">' + file.name + '</h4>' +
             '<p class="state">正在上传...</p>' +
-        '</div>' );
+            '</div>');
     });
 
     // 文件上传成功
-    uploader.on( 'uploadSuccess', function( file ) {
-        $( '#'+file.id ).find('p.state').text('上传成功！');
+    uploader.on('uploadSuccess', function (file) {
+        $('#' + file.id).find('p.state').text('上传成功！');
     });
 
     // 文件上传失败，显示上传出错。
-    uploader.on( 'uploadError', function( file ) {
-        $( '#'+file.id ).find('p.state').text('上传出错!');
+    uploader.on('uploadError', function (file) {
+        $('#' + file.id).find('p.state').text('上传出错!');
     });
 
     //提交
-    $(function(){
+    $(function () {
         $('#edit_member').ajaxForm({
             beforeSubmit: checkForm,
-            success: complete,
-            dataType: 'json'
+            success     : complete,
+            dataType    : 'json'
         });
 
-        function checkForm(){
+        function checkForm() {
 
         }
 
-        function complete(data){
-            if(data.code==1){
-                layer.msg(data.msg, {icon: 6,time:1500,shade: 0.1}, function(index){
-                    window.location.href="{:url('merchant/index?reg_type='.$reg_type)}";
+        function complete(data) {
+            if (data.code == 1) {
+                layer.msg(data.msg, {icon: 6, time: 1500, shade: 0.1}, function (index) {
+                    window.location.href = "{:url('merchant/index?reg_type='.$reg_type)}";
                 });
-            }else{
-                layer.msg(data.msg, {icon: 5,time:1500,shade: 0.1});
+            } else {
+                layer.msg(data.msg, {icon: 5, time: 1500, shade: 0.1});
                 return false;
             }
         }
