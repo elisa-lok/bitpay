@@ -422,7 +422,6 @@ function getUsdtPrice() {
 		$buyprice  = 7.00;
 		$sellprice = 7.00;
 	}
-	return 7.00;
 	// dump($sellprice);
 
 	// if($data_arr[0]['price_cny']>0){
