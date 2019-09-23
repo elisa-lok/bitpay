@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#2196f3">
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: gap:">
+    <title>Overux</title>
+    <link rel="stylesheet" href="css/framework7.min.css">
+
+    <!-- Custom style  -->
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="apple-touch-icon" href="img/f7-icon-square.png">
+    <link rel="icon" href="img/f7-icon.png">
+</head>
+
+<body>
+    <div id="Overux" class="sidebar-fill">
+        <div class="statusbar"></div>
+        <!-- left menu code  -->
+        <div class="panel panel-left panel-cover">
+            <div class="page">
+                <div class="page-content">
+                    <a href="/profile/" class="profile-block panel-close">
+                        <div class="media-block ">
+                            <figure class="avatar avatar-40">
+                                <img src="img/user1.png" alt="">
+                            </figure>
+                            <div class="media-content">
+                                <div class="media-block-title">
+                                    <h4>John Doe <span class="status-online bg-color-success"></span></h4>
+                                    <p class="mb-0"><small>India</small></p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="clear"></div>
+                    <div class="block list links-list mt-0">
+                        <ul class="accordion-list">
+                            <li>
+                                <a href="/welcome/" class="panel-close">
+                                    <div class="item-title">
+                                        <i class="icon f7-icons ios-only">star</i>
+                                        <i class="icon material-icons md-only">star</i> Welcome
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="accordion-item">
+                                <a href="" class="item-link item-content">
+                                    <div class="item-title">
+                                        <i class="icon f7-icons ios-only">menu</i>
+                                        <i class="icon material-icons md-only">menu</i> Menu
+                                    </div>
+                                </a>
+                                <div class="accordion-item-content">
+                                    <a href="#" class="panel-open link" data-panel="left">
+                             Menu Overlay (This)
+                            </a>
+                                    <a href="#" class="panel-open link" data-panel="right">
+                             Push Content
+                            </a>
+                                    <a href="#" class="panel-close link popup-open" data-popup=".popup-fullmenu">
+                             Full Screen
+                            </a>
+                                </div>
+                            </li>
+                            <li class="accordion-item">
+                                <a href="" class="item-link item-content">
+                                    <div class="item-title">
+                                        <i class="icon f7-icons ios-only">data</i>
+                                        <i class="icon material-icons md-only">poll</i> Project
+                                    </div>
+                                </a>
+                                <div class="accordion-item-content">
+                                    <a href="/dashboard/" class="panel-close link">
+                                        <div class="item-title">Dashboard
+                                        </div>
+                                    </a>
+                                    <a href="/projects/" class="panel-close link">
+                                        <div class="item-title">Projects
+                                        </div>
+                                    </a>
+                                    <a href="/projectdetail/" class="panel-close link">
+                                        <div class="item-title">Project Details
+                                        </div>
+                                    </a>
+                                </div>
+                            </li>
+
+                            <li>
+                                <a href="/profile/" class="panel-close">
+                                    <div class="item-title">
+                                        <i class="icon f7-icons ios-only">person</i>
+                                        <i class="icon material-icons md-only">person</i> User Profile
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/aboutus/" class="panel-close">
+                                    <div class="item-title">
+                                        <i class="icon f7-icons ios-only">world</i>
+                                        <i class="icon material-icons md-only">domain</i> About
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/color-themes/" class="panel-close">
+                                    <div class="item-title">
+                                        <i class="icon f7-icons ios-only">keyboard_fill</i>
+                                        <i class="icon material-icons md-only">format_color_fill</i> Color Scheme
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/component/" class="panel-close">
+                                    <div class="item-title">
+                                        <i class="icon f7-icons ios-only">bolt_round</i>
+                                        <i class="icon material-icons md-only">pages</i> Component
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/load-something-that-doesnt-exist/" class="panel-close">
+                                    <div class="item-title">
+                                        <i class="icon f7-icons ios-only">info_fill</i>
+                                        <i class="icon material-icons md-only">warning</i> Default Route (404)
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+
+                    </div>
+                    <div class="block">
+                        <a href="/" class="col button button-outline button-round-0 color-white panel-close">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- left menu code  -->
+
+        <!-- right menu code  -->
+        <div class="panel panel-right panel-reveal">
+            <div class="view view-init view-right" name="right" data-url="/">
+                <div class="page ">
+                    <div class="navbar">
+                        <div class="navbar-inner sliding">
+                            <div class="title">Right Panel</div>
+                        </div>
+                    </div>
+                    <div class="page-content">
+                        <div class="block">
+                            <p class="color-white">This is a right side panel. You can close it by clicking outsite or on this link: <a href="#" class="panel-close">close me</a>. You can put here anything, even another isolated view.</p>
+                        </div>
+                        <div class="block-title">Panel Navigation</div>
+                        <div class="list links-list">
+                            <ul>
+                                <li><a href="/panel-right-1/">Right panel page 1</a></li>
+                                <li><a href="/panel-right-2/">Right panel page 2</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- right menu code  -->
+
+        <div class="view view-main view-init ios-edges" data-url="/">
+            <div class="page">
+                <div class="background"><img src="img/city2.jpg" alt=""></div>
+                <div class="page-content login-page">
+                    <div class="block text-center">
+                        <img src="img/logo-w.png" alt="" class="login-logo">
+                        <h1 class="login-title"><small>Welcome to,</small><br>Overux</h1>
+                        <br>
+                        <h3 class="color-white  ">Sign in</h3>
+                    </div>
+                    <div class="row">
+                        <div class="col-10"></div>
+                        <div class="col-80">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="list no-hairlines-md inputs-logins">
+                                        <ul>
+                                            <li class="item-content item-input">
+                                                <div class="item-media">
+                                                    <i class="icon f7-icons ios-only">person</i>
+                                                    <i class="icon material-icons md-only">person</i>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-input-wrap">
+                                                        <input type="text" placeholder="Username">
+                                                        <span class="input-clear-button"></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="item-content item-input">
+                                                <div class="item-media">
+                                                    <i class="icon f7-icons ios-only">lock</i>
+                                                    <i class="icon material-icons md-only">lock</i>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-input-wrap">
+                                                        <input type="password" placeholder="Your password">
+                                                        <span class="input-clear-button"></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col"><a href="/dashboard/" class="col button color-green rounded button-fill">Sign In</a></div>
+                            </div>
+                            <br>
+                            <br>
+                            <div class="row">
+                                <div class="col-60">
+                                    <a href="" class="color-white col">Forgot password?</a>
+                                </div>
+                                <div class="col-40 text-right">
+                                    <a href="/register/" class="color-white col">Sign up</a>
+                                </div>
+                            </div>
+                            <br>
+                        </div>
+                        <div class="col-10"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+            
+        
+        <!-- full screen menu code  -->
+        <div class="popup popup-fullmenu">
+            <div class="view">
+                <div class="page">
+                    <div class="page-content fullscreen-menu">
+                        <a href="" class="popup-close color-white link closebutton"><i class="icon f7-icons">close</i></a>
+                        <a href="/profile/" class="block user-fullmenu popup-close">
+                            <figure>
+                                <img src="img/user1.png" alt="">
+                            </figure>
+                            <div class="media-content">
+                                <h3>John Doe<br><small>India</small></h3>
+                            </div>
+                        </a>
+                        <div class="block">
+                            <div class="menulist">
+                                <ul>
+                                    <li>
+                                        <a href="/dashboard/" class="popup-close">
+                                            <div class="item-title">
+                                                <i class="icon f7-icons ios-only">data</i>
+                                                <i class="icon material-icons md-only">poll</i> Dashboard
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/projects/" class="popup-close">
+                                            <div class="item-title">
+                                                <i class="icon f7-icons ios-only">bag</i>
+                                                <i class="icon material-icons md-only">add_shopping_cart</i> Projects
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/projectdetail/" class="popup-close">
+                                            <div class="item-title">
+                                                <i class="icon f7-icons ios-only">document_text</i>
+                                                <i class="icon material-icons md-only">filter_none</i> Details
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/profile/" class="popup-close">
+                                            <div class="item-title">
+                                                <i class="icon f7-icons ios-only">person</i>
+                                                <i class="icon material-icons md-only">person</i> Profile
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/aboutus/" class="popup-close">
+                                            <div class="item-title">
+                                                <i class="icon f7-icons ios-only">world</i>
+                                                <i class="icon material-icons md-only">domain</i> About
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/component/" class="popup-close">
+                                            <div class="item-title">
+                                                <i class="icon f7-icons ios-only">bolt_round</i>
+                                                <i class="icon material-icons md-only">pages</i> Component
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="block text-center">
+                            <a href="/" class="button-round button button-outline color-white popup-close autowidthbtn">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- full screen menu code  -->
+    </div>
+
+    <script src="js/framework7.min.js"></script>
+    <script src="js/routes.js"></script>
+
+    <!-- jquery -->
+    <script src="js/jquery-3.3.1.min.js"></script>
+
+    <!-- sparklines js -->
+    <script src="js/jquery.sparkline.min.js"></script>
+
+    <!-- Google chart js -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+
+    <!-- app js -->
+    <script src="js/app.js"></script>
+</body>
+
+</html>

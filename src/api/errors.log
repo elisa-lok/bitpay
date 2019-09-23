@@ -1,0 +1,32 @@
+********************************************************
+[T] 	2019-05-29 17:33:21
+[F] 	/home/share/PHP/gitlab.com/studiox/xpay_srv/src/api/app/controllers/TestController.php : 13
+[C] 	0
+[M] 	这个是错的
+#0 [internal function]: BITPAY\Api\Controllers\TestController->index()
+#1 [internal function]: Phalcon\Mvc\Micro\LazyLoader->__call('index', Array)
+#2 [internal function]: Phalcon\Mvc\Micro\LazyLoader->callMethod('index', Array, NULL)
+#3 /home/share/PHP/gitlab.com/studiox/xpay_srv/src/api/public/index.php(11): Phalcon\Mvc\Micro->handle()
+#4 {main}
+
+********************************************************
+[T] 	2019-05-29 17:35:59
+[F] 	/home/share/PHP/gitlab.com/studiox/xpay_srv/src/api/app/controllers/TestController.php : 13
+[C] 	0
+[M] 	这个是错的
+#0 [internal function]: BITPAY\Api\Controllers\TestController->index()
+#1 [internal function]: Phalcon\Mvc\Micro\LazyLoader->__call('index', Array)
+#2 [internal function]: Phalcon\Mvc\Micro\LazyLoader->callMethod('index', Array, NULL)
+#3 /home/share/PHP/gitlab.com/studiox/xpay_srv/src/api/public/index.php(11): Phalcon\Mvc\Micro->handle()
+#4 {main}
+
+********************************************************
+[T] 	2019-05-30 09:48:02
+[F] 	/home/share/PHP/gitlab.com/studiox/xpay_srv/src/api/app/controllers/TestController.php : 13
+[C] 	0
+[M] 	这个是错的
+#0 [internal function]: BITPAY\Api\Controllers\TestController->index()
+#1 [internal function]: Phalcon\Mvc\Micro\LazyLoader->__call('index', Array)
+#2 [internal function]: Phalcon\Mvc\Micro\LazyLoader->callMethod('index', Array, NULL)
+#3 /home/share/PHP/gitlab.com/studiox/xpay_srv/src/api/public/index.php(11): Phalcon\Mvc\Micro->handle()
+#4 {main}

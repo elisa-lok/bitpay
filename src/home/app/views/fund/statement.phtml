@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>对账单</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="stylesheet" href="/static/css/font.css">
+	<link rel="stylesheet" href="/static/css/style.css">
+
+</head>
+
+<body>
+<div class="x-nav">
+        <span class="layui-breadcrumb">
+            <a href="javascript:">首页</a> <a><cite>对账单</cite></a>
+        </span>
+	<a class="layui-btn layui-btn-sm" style="margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+		<i class="layui-icon layui-icon-refresh"></i>
+	</a>
+</div>
+<div class="x-body">
+	<!-- search -->
+	<form class="layui-form we-search" method="POST">
+		<div class="layui-input-inline">
+			<input type="text" name="ctime_bucket" class="layui-input ctime_bucket" placeholder="处理时间">
+		</div>
+		<div class="layui-input-inline">
+			<button class="layui-btn" lay-submit lay-filter="searchForm"><i class="layui-icon">&#xe615;</i></button>
+		</div>
+	</form>
+	<!-- table -->
+	<div class="table-scroll">
+		<table id="tableId" class="layui-hide"></table>
+	</div>
+	<script type="text/html" id="buttonTpl">
+		{{#  if(d.state == 1){ }}
+		<span class="layui-badge layui-bg-green"> 开启 </span>
+		{{#  } else { }}
+		<span class="layui-badge layui-bg-red"> 关闭 </span>
+		{{#  } }}
+	</script>
+	<script type="text/html" id="barDemo">
+		<a title="编辑" lay-event="edit" href="javascript:"> <i class="layui-icon layui-icon-edit"></i> </a>
+		<a title="删除" lay-event="del" href="javascript:"> <i class="layui-icon layui-icon-delete"></i> </a>
+	</script>
+</div>
+<script src="/static/layui/layui.js"></script>
+<script src="/static/js/admin.js"></script>
+<script>
+    // 面包屑需要依赖`element`模块
+    // 页面调用xShow()打开<iframe/>
+    layui.use(['table', 'form', 'element', 'laydate'], function () {
+        var table = layui.table, form = layui.form, element = layui.element, laydate = layui.laydate;
+
+		form.on('submit(searchForm)', function (data) {if(data.field.ctime_bucket){renderTable(data.field);}return false;}); // 提交表单数据
+
+        // 时间渲染
+        laydate.render({elem: '.ctime_bucket'});
+
+        renderTable(null); // 初始化没渲染表格
+
+        // 表格渲染
+        function renderTable(dateField) {
+            table.render({
+                elem  : '#tableId',
+                method: 'post',
+                url   : '/fund/statement',
+                where : dateField,
+                // 分页
+                page  : { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+                    layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'], //自定义分页布局
+                    groups: 3,      //显示连续页码数
+                    first : '首页', //不显示首页
+                    last  : '末页', //不显示尾页
+                },
+                limits: [25, 50, 100],
+                limit : 25, //每页默认显示的数量
+                cols  : [
+                    [
+                        {field: 'tx_no', title: '日期', minWidth: 90, align: 'center'}
+                        , {field: 'tx_out_no', title: '总单数', minWidth: 90, align: 'center'}
+                        , {field: 'prod_id', title: '成功单数', minWidth: 90, align: 'center'}
+                        , {field: 'amt_all', title: '成功总额', minWidth: 90, align: 'center'}
+                        , {field: 'amt_rec', title: '未付单数', minWidth: 90, align: 'center'}
+                        , {field: 'fee_all', title: '未付总额', minWidth: 90, align: 'center'}
+                        , {field: 'state', title: '冻结单数', minWidth: 80, align: 'center'}
+                        , {field: 'state', title: '冻结总额', minWidth: 80, align: 'center'}
+                    ],
+                ],
+            })
+        }
+    })
+</script>
+</body>
+
+</html>
