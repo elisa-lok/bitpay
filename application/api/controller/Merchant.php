@@ -40,6 +40,17 @@ class Merchant extends Controller {
 		$this->mysuccess($return);
 	}
 
+	public function check_code() {
+		$captch_code = "";//用于记录验证码内容
+		//生成4位随机验证码内容
+		for ($i = 0; $i < 5; $i++) {
+			$str         = 'abcdefghijkmnpqrstuvwxyABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
+			$fontcontent = substr($str, rand(0, strlen($str) - 1), 1);//从$data对象中随机获取一个字符
+			$captch_code .= $fontcontent;
+		}
+		return $captch_code;
+	}
+
 	/**
 	 * 生成地址
 	 * @param $username 用户名
@@ -211,7 +222,7 @@ class Merchant extends Controller {
 			}
 		}
 		//设置承兑商在线状态
-		$ids    = Db::name('login_log')->where('online=1 and unix_timestamp(now())-update_time<1800')->column('merchant_id');
+		$ids = Db::name('login_log')->where('online=1 and unix_timestamp(now())-update_time<1800')->column('merchant_id');
 		Db::query('Update think_merchant set online=0');
 		Db::name('merchant')->where('id', 'in', $ids)->update(['online' => 1]);
 		//系统自动选择在线的承兑商和能够交易这个金额的承兑商
@@ -281,6 +292,7 @@ class Merchant extends Controller {
 				'return_url'   => $data['return_url'],
 				'notify_url'   => $data['notify_url'],
 				'orderid'      => $data['orderid'],
+				'check_code'   => $this->check_code(),
 				'status'       => 1
 			]);
 			if ($rs1 && $rs2 && $rs3 && $rs4) {
@@ -293,6 +305,7 @@ class Merchant extends Controller {
 
 						$content = str_replace('{usdt}', $data['amount'], $send_content);//dump($content);
 						$content = str_replace('{tx_id}', $onlinead['id'], $content);//dump($content);
+						$content = str_replace('{check_code}', $this->check_code(), $content);//dump($content);
 						//$this->myerror($onlinead['mobile']);die;
 						sendSms($onlinead['mobile'], $content);
 					}
@@ -409,6 +422,7 @@ class Merchant extends Controller {
 		if (empty($onlinead)) {
 			$this->myerror('暂无可用订单');
 		}
+
 		// $this->myerror($onlinead);
 		//开始冻结承兑商usdt
 		Db::startTrans();
@@ -432,6 +446,7 @@ class Merchant extends Controller {
 				'return_url'   => $data['return_url'],
 				'notify_url'   => $data['notify_url'],
 				'orderid'      => $data['orderid'],
+				'check_code'   => $this->check_code(),
 				'status'       => 0,
 			]);
 
@@ -442,6 +457,7 @@ class Merchant extends Controller {
 				if (!empty($onlinead['mobile'])) {
 					$content = str_replace('{usdt}', $actualamount, config('send_message_content'));
 					$content = str_replace('{tx_id}', $onlinead['id'], $content);
+					$content = str_replace('{check_code}', $this->check_code(), $content);
 					sendSms($onlinead['mobile'], $content);
 				}
 				$http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
