@@ -8,3 +8,7 @@ UPDATE `think_merchant` SET `usdt` = 1000,`usdtd`=0, `order_sell_success_num` = 
 TRUNCATE TABLE `think_statistics`;
 TRUNCATE TABLE `think_agent_reward`;
 TRUNCATE TABLE `think_trader_reward`;
+TRUNCATE TABLE `think_ad_buy`;
+TRUNCATE TABLE `think_ad_sell`;
+TRUNCATE TABLE `think_address`;
+TRUNCATE TABLE `think_financelog`;
