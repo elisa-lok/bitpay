@@ -40,15 +40,15 @@ class Merchant extends Controller {
 		$this->mysuccess($return);
 	}
 
-	public function check_code() {
-		$captch_code = "";//用于记录验证码内容
-		//生成4位随机验证码内容
-		for ($i = 0; $i < 5; $i++) {
-			$str         = 'abcdefghijkmnpqrstuvwxyABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
-			$fontcontent = substr($str, rand(0, strlen($str) - 1), 1);//从$data对象中随机获取一个字符
-			$captch_code .= $fontcontent;
+	public function check_code(int $len = 5, string $char = '') {
+		$c       = '0123456789';
+		$char    = $char == '' ? $c : $char;
+		$charLen = strlen($char);
+		$str     = '';
+		for ($i = 0; $i < $len; $i++) {
+			$str .= $char[rand(0, $charLen - 1)];
 		}
-		return $captch_code;
+		return $str;
 	}
 
 	/**
@@ -273,6 +273,7 @@ class Merchant extends Controller {
 		//开始冻结承兑商usdt
 		Db::startTrans();
 		try {
+			$checkCode = $this->check_code();
 			$rs1 = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setDec('usdt', $data['amount']);
 			$rs3 = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setInc('usdtd', $data['amount']);
 			$rs4 = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setInc('pp_amount', 1);
@@ -292,7 +293,7 @@ class Merchant extends Controller {
 				'return_url'   => $data['return_url'],
 				'notify_url'   => $data['notify_url'],
 				'orderid'      => $data['orderid'],
-				'check_code'   => $this->check_code(),
+				'check_code'   => $checkCode,
 				'status'       => 1
 			]);
 			if ($rs1 && $rs2 && $rs3 && $rs4) {
@@ -305,7 +306,7 @@ class Merchant extends Controller {
 
 						$content = str_replace('{usdt}', $data['amount'], $send_content);//dump($content);
 						$content = str_replace('{tx_id}', $onlinead['id'], $content);//dump($content);
-						$content = str_replace('{check_code}', $this->check_code(), $content);//dump($content);
+						$content = str_replace('{check_code}', $checkCode, $content);//dump($content);
 						//$this->myerror($onlinead['mobile']);die;
 						sendSms($onlinead['mobile'], $content);
 					}
@@ -427,6 +428,7 @@ class Merchant extends Controller {
 		//开始冻结承兑商usdt
 		Db::startTrans();
 		try {
+			$checkCode = $this->check_code();
 			$rs1 = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setDec('usdt', $actualamount);
 			$rs3 = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setInc('usdtd', $actualamount);
 			$rs4 = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setInc('pp_amount', 1);
@@ -446,7 +448,7 @@ class Merchant extends Controller {
 				'return_url'   => $data['return_url'],
 				'notify_url'   => $data['notify_url'],
 				'orderid'      => $data['orderid'],
-				'check_code'   => $this->check_code(),
+				'check_code'   => $checkCode,
 				'status'       => 0,
 			]);
 
@@ -457,7 +459,7 @@ class Merchant extends Controller {
 				if (!empty($onlinead['mobile'])) {
 					$content = str_replace('{usdt}', $actualamount, config('send_message_content'));
 					$content = str_replace('{tx_id}', $onlinead['id'], $content);
-					$content = str_replace('{check_code}', $this->check_code(), $content);
+					$content = str_replace('{check_code}', $checkCode, $content);
 					sendSms($onlinead['mobile'], $content);
 				}
 				$http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
