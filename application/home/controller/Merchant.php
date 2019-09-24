@@ -2705,7 +2705,7 @@ class Merchant extends Base {
 					//todo:发送短信给买家
 					$mobile = Db::table('think_merchant')->where('id', $orderinfo['userid'])->value('mobile');
 					if (!empty($mobile)) {
-						$content = '您发布的求购单有人出售。数量是（' . $num . '）,请尽快打款';
+						$content = '您发布的买单有人出售。数量:' . $num . ',请尽快处理';
 						sendSms($mobile, $content);
 					}
 
@@ -2927,7 +2927,7 @@ class Merchant extends Base {
 		if ($rs) {
 			$moble = Db::name('merchant')->where('id', $order['sell_id'])->value('mobile');
 			if (!empty($moble)) {
-				$content = str_replace('{usdt}', $order['deal_num'], config('send_message_content'));
+				$content = str_replace('{usdt}', round($order['deal_num'],2), config('send_message_content'));
 				$content = str_replace('{tx_id}', $id, $content);
 				sendSms($moble, $content);
 			}
@@ -3388,7 +3388,7 @@ class Merchant extends Base {
 	public function testtest_____() {
 		//echo config('mobile_user').'1';die;
 		$order['deal_num'] = 80;
-		$content           = str_replace('{usdt}', $order['deal_num'], config('send_message_content'));
+		$content           = str_replace('{usdt}', round($order['deal_num'],2), config('send_message_content'));
 		echo $content;
 		$data['amount']  = 5;
 		$where['state']  = 1;
@@ -3413,11 +3413,7 @@ class Merchant extends Base {
 		}
 		$adv_no  = $code . time();
 		$advsell = Db::name('ad_sell')->where(['ad_no' => $adv_no])->find();
-		if (!empty($advsell)) {
-			$this->getadvno();
-		} else {
-			return $adv_no;
-		}
+		return empty($advsell) ?  $adv_no : $this->getadvno();
 	}
 }
 
