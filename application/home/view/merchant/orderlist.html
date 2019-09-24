@@ -97,6 +97,7 @@
                                         <th>交易数量</th>
                                         <th>交易价格</th>
                                         <th>创建时间</th>
+                                        <th>校验码</th>
                                         <th>交易状态</th>
                                         <th>操作</th>
                                     </tr>
@@ -110,6 +111,7 @@
                                         <td>{$vo.deal_num}</td>
                                         <td>{$vo.deal_price}</td>
                                         <td>{$vo['ctime']|date="Y-m-d H:i:s",###}</td>
+                                        <td>{$vo.check_code}</td>
                                         <td>
                                             {eq name="vo.status" value="0"}待付款{/eq}
                                             {eq name="vo.status" value="1"}待放行{/eq}
