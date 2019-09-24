@@ -176,7 +176,7 @@ func createQrcode(q *QRCODE) (string, string, string, error) {
 }
 
 func imageEncode(q *QRCODE, w io.Writer, m image.Image) error {
-	//imgw, _ := os.Create(strconv.Itoa(rand.Int())+".png")
+	//imgw, _ := os.Create("qrcode.png")
 	//png.Encode(imgw, m)
 	//defer imgw.Close()
 
