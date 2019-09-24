@@ -270,6 +270,7 @@ class Merchant extends Base {
 			}
 			if (!empty($param['pptrader'])) {
 				$traders_id        = $member->where('trader_check', 1)->order('id asc')->column('id');
+				shuffle($traders_id);
 				$param['pptrader'] = implode(',', $traders_id);
 			} else {
 				$param['pptrader'] = '';
