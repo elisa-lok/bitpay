@@ -305,8 +305,8 @@ class Merchant extends Controller {
 					if ($send_content) {
 
 						$content = str_replace('{usdt}', round($data['amount'],2), $send_content);//dump($content);
-						$content = str_replace('{tx_id}', $onlinead['id'], $content);//dump($content);
-						$content = str_replace('{check_code}', $checkCode, $content);//dump($content);
+						$content = str_replace('{tx_id}', $onlinead["id"], $content);//dump($content);
+						$content = str_replace('{check_code}', "$checkCode", $content);//dump($content);
 						//$this->myerror($onlinead['mobile']);die;
 						sendSms($onlinead['mobile'], $content);
 					}
@@ -458,8 +458,8 @@ class Merchant extends Controller {
 				//todo 发送短信给承兑商
 				if (!empty($onlinead['mobile'])) {
 					$content = str_replace('{usdt}', round($actualamount,2), config('send_message_content'));
-					$content = str_replace('{tx_id}', $onlinead['id'], $content);
-					$content = str_replace('{check_code}', $checkCode, $content);
+					$content = str_replace('{tx_id}', $onlinead["id"], $content);
+					$content = str_replace('{check_code}', "$checkCode", $content);
 					sendSms($onlinead['mobile'], $content);
 				}
 				$http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
