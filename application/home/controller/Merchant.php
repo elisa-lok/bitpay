@@ -2705,6 +2705,7 @@ class Merchant extends Base {
 					//todo:发送短信给买家
 					$mobile = Db::table('think_merchant')->where('id', $orderinfo['userid'])->value('mobile');
 					if (!empty($mobile)) {
+						// $content = '您发布的买单有人出售。数量:' . $num . ',交易码:{check_code} ,请尽快处理';
 						$content = '您发布的买单有人出售。数量:' . $num . ',请尽快处理';
 						sendSms($mobile, $content);
 					}

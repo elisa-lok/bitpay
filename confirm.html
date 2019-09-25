@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Confirm Transaction</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+	<style type="text/css">
+		body { padding: 0; margin: 0; overflow-x: hidden; }
+		h5, h3 { text-transform: capitalize; }
+		img { max-width: 20%; }
+		.b-t { border-top: 1px solid #ddd; }
+		@media(max-width: 768px) {
+			.container { padding-left: 0; padding-right: 0; }
+			.text-right { text-align: center !important; }
+			.pull-right { float: none; text-align: center; }
+			h1, h2, h3, h4, .center { text-align: center; }
+			.bg-light.p-5:nth-child(1) { padding: 1rem !important; }
+			img { max-width: 30%; margin: 0 auto; display: block; }
+			.p-5 { padding: 1rem !important; }
+			.text-right h5:nth-child(3) { padding-top: 15px !important; }
+			.pt-5 { padding-top: 1rem !important }
+		}
+	</style>
+</head>
+<body>
+<div class="container">
+	<div class="bg-light p-5">
+		<h2 class="text-center m-0">CONFIRMATION</h2>
+		<div class="row pt-3 mb-2">
+			<div class="col-md-6 pull-left">
+				<h4>xBitBay.com</h4>
+			</div>
+			<div class="col-md-6 text-right">
+				<h5 class="pt-4">TX #{订单号}</h5>
+				<p class="text-muted mb-0"><i>匹配时间: 4 Dec, 2019</i></p>
+			</div>
+		</div>
+		<div class="row b-t pt-5">
+			<div class="col-md-6 pt-3 center">
+				<h5>Information</h5>
+				<p>挂单单号<br>2019092912093484</p>
+				<p>挂单时间<br>6781 45P</p>
+			</div>
+			<div class="col-md-6 text-right">
+				<h5>付款方详情</h5>
+				<p>
+					用户ID: <span>1425782</span><br>
+					用户账户: <span>138***0027</span><br>
+					Payment Type: Root<br>
+					Name: John Doe
+				</p>
+			</div>
+		</div>
+		<table class="table">
+			<tr>
+				<thead>
+				<td>交易币种</td>
+				<td>交易汇率</td>
+				<td>交易数量</td>
+				<td>付款时间</td>
+				</thead>
+			</tr>
+			<tr>
+				<td>USDT</td>
+				<td>7.05</td>
+				<td>100,00.00</td>
+				<td>2019-09-24 13:23</td>
+			</tr>
+		</table>
+	</div>
+	<div class="bg-dark text-white p-5">
+		<div class="row">
+			<div class="col-md-7">
+			</div>
+			<div class="col-md-2 text-right">
+				<h6>应收币种</h6>
+				<h3>CNY</h3>
+			</div>
+			<div class="col-md-3 text-right">
+				<h6>应收总额</h6>
+				<h3>￥234,234</h3>
+			</div>
+		</div>
+		<hr style="background: #FFF">
+		<div class="toolbar">
+			<div class="text-right">
+				<button class="btn btn-secondary" data-toggle="modal" data-target="#modalIncorrect">
+					<i class="fa fa-file-pdf-o"></i> 金额不符?</button>
+				<button class="btn btn-info" data-toggle="modal" data-target="#modalLater"><i class="fa fa-file-pdf-o"></i>
+					稍后处理</button>
+				<button class="btn btn-success" data-toggle="modal" data-target="#modalReceived">
+					<i class="fa fa-file-pdf-o"></i> 确认收款</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal modalReceived -->
+<div class="modal" id="modalReceived" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+	 aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title " id="exampleModalLongTitle">交易确认</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<h3 class="text-danger text-center">Warning</h3>
+				<p class="small">
+					* 请核对交易码和金额是否相符<br>
+					* 请务必在点击确认按钮钱前确认您已经收到对应货币的数额<br>
+					* 一旦点击确认, 对方将收到您在平台上挂单对应货币的数额, 交易将无法回退<br>
+					* 如果收到金额不符可点击金额不符进入人工处理流程
+				</p>
+				<hr>
+				<form id="submitConfirm">
+					<div class="form-group">
+						<input type="text" name="tx[no]" class="form-control text-center" autocomplete="off" placeholder="订单号" value="这里需要填入订单好">
+						<input type="text" name="tx[trade_code]" class="form-control text-center" id="trade-code" maxlength="5" autocomplete="off" placeholder="请输入交易码" onKeyUp="this.value=this.value.replace(/[^0-9]/g,'')">
+					</div>
+					<div class="form-group">
+						<input type="password" name="tx[secure_psw]" class="form-control text-center" id="secure-psw" autocomplete="off" placeholder="请输入安全密码">
+						<div id="confirm-warning" class="text-center small">&nbsp;看看</div>
+					</div>
+				</form>
+				<div class="text-right">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+					<button type="button" class="btn btn-primary" onclick="confirmFunc()">确认已收款</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->
+<div class="modal" id="modalIncorrect" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+	 aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title " id="exampleModalLongTitle">争议处理</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<h3 class="text-danger text-center">Warning</h3>
+				<p class="small">
+					* 确认交易金额与收到金额是否一致,如一致请取消<br>
+					* 请核对交易码与交易单是否一致<br>
+					* 一旦确认将进入争议流程, 整个争议流程双方如僵持将导致流程变长<br>
+					* 进入争议流程后, 双方将需要提供转账截图以及银行流水等信息<br>
+					<b>* 如恶意进入争议流程,你的账号在严重情况下将被冻结</b>
+				</p>
+				<hr>
+				<form id="submitDisputed">
+					<div class="form-group">
+						<input type="text" name="tx[no]" class="form-control text-center" autocomplete="off" placeholder="订单号" value="这里需要填入订单好">
+						<input type="text" name="tx[amt]" class="form-control text-center" id="trade-code"  onKeyUp="this.value=this.value.replace(/[^0-9.]/g,'')" autocomplete="off" placeholder="请输入实际收到金额">
+					</div>
+					<div class="form-group">
+						<input type="text" name="tx[trade_code]" class="form-control text-center" id="trade-code" maxlength="5" autocomplete="off" placeholder="请输入交易码" onKeyUp="this.value=this.value.replace(/[^0-9]/g,'')">
+					</div>
+					<div class="form-group">
+						<input type="password" name="tx[secure_psw]" class="form-control text-center" id="secure-psw" autocomplete="off" placeholder="请输入安全密码">
+						<div id="disputed-warning" class="text-center small">&nbsp;这里是警告信息</div>
+					</div>
+				</form>
+				<div class="text-right">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+					<button type="button" class="btn btn-danger" onclick="disputedFunc()">确认收到金额不一致</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="modalLater" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+	 aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">页面关闭</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				点击关闭,当前页面关闭,但您可稍后重新进入进行处理
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-danger" onclick="closeMe()">关闭当前页面</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->
+<script>
+    function closeMe() {
+        var win = window.open("", "_self"); /* url = "" or "about:blank"; target="_self" */
+        win.close();
+    }
+
+    function disputedFunc() {
+        $.ajax({
+            type: "POST",
+            url: 'https://baidu.com/bank/purchase',
+            data: $('#submitDisputed').serialize(),
+            dataType: "json",
+            success: function (res) {
+                if (res.code === 200) {
+                    $(".confirm-warning").addClass("text-success").html('确认成功,稍后将关闭网页')
+                    closeMe();
+                } else {
+                    console.log(res);
+                    $(".confirm-warning").addClass("text-danger").html('未知錯誤')
+                }
+            },
+            error: function (err) {
+                if (err.responseJSON.msg === '') {
+                    console.log(err);
+                    $(".confirm-warning").addClass("text-danger").html('未知錯誤')
+                } else {
+                    $(".confirm-warning").addClass("text-danger").html(err.responseJSON.msg)
+                }
+            }
+        });
+    }
+
+    function confirmFunc() {
+        $.ajax({
+            type: "POST",
+            url: 'https://baidu.com',
+            data: $('#submitConfirm').serialize(),
+            dataType: "json",
+            success: function (res) {
+                if (res.code === 200) {
+                    window.location.href = "https://baidu.com/bank/purchase"
+                } else {
+                    console.log(res);
+                    $(".warn-text").addClass("text-danger").html('未知錯誤')
+                }
+            },
+            error: function (err) {
+                if (err.responseJSON.msg === '') {
+                    console.log(err);
+                    $(".warn-text").addClass("text-danger").html('未知錯誤')
+                } else {
+                    $(".warn-text").addClass("text-danger").html(err.responseJSON.msg)
+                }
+            }
+        });
+    }
+</script>
+<script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+
+</html>
