@@ -1,5 +1,5 @@
 /**
- * Framework7 3.6.7
+ * Framework7 4.5.1
  * Full featured mobile HTML framework for building iOS & Android apps
  * http://framework7.io/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: February 13, 2019
+ * Released on: September 19, 2019
  */
 
 (function (global, factory) {
@@ -17,7 +17,7 @@
 }(this, function () { 'use strict';
 
   /**
-   * Template7 1.4.1
+   * Template7 1.4.2
    * Mobile-first HTML template engine
    * 
    * http://www.idangero.us/template7/
@@ -28,7 +28,7 @@
    * 
    * Licensed under MIT
    * 
-   * Released on: February 5, 2019
+   * Released on: June 14, 2019
    */
 
   var t7ctx;
@@ -260,7 +260,11 @@
             else { variable = undefined; }
           });
         }
-        if (typeof variable === 'string') {
+        if (
+          (typeof variable === 'string')
+          || Array.isArray(variable)
+          || (variable.constructor && variable.constructor === Object)
+        ) {
           variable = JSON.stringify(variable);
         }
         if (variable === undefined) { variable = 'undefined'; }
@@ -268,6 +272,7 @@
         arr.push(variable);
         return arr;
       }, []).join('');
+
     },
     parseJsParents: function parseJsParents(expression, parents) {
       return expression.split(/([+ \-*^()&=|<>!%:?])/g).reduce(function (arr, part) {
@@ -379,6 +384,7 @@
       return p.compiled(ctx, options.data, options.root);
     },
     escape: function escape(context) {
+      if (typeof context === 'undefined' || context === null) { return ''; }
       if (typeof context !== 'string') {
         throw new Error('Template7: Passed context to "escape" helper should be a string');
       }
@@ -2526,55 +2532,6 @@
     }
   }
 
-  var createPromise = function createPromise(handler) {
-    var resolved = false;
-    var rejected = false;
-    var resolveArgs;
-    var rejectArgs;
-    var promiseHandlers = {
-      then: undefined,
-      catch: undefined,
-    };
-    var promise = {
-      then: function then(thenHandler) {
-        if (resolved) {
-          thenHandler.apply(void 0, resolveArgs);
-        } else {
-          promiseHandlers.then = thenHandler;
-        }
-        return promise;
-      },
-      catch: function catch$1(catchHandler) {
-        if (rejected) {
-          catchHandler.apply(void 0, rejectArgs);
-        } else {
-          promiseHandlers.catch = catchHandler;
-        }
-        return promise;
-      },
-    };
-
-    function resolve() {
-      var args = [], len = arguments.length;
-      while ( len-- ) args[ len ] = arguments[ len ];
-
-      resolved = true;
-      if (promiseHandlers.then) { promiseHandlers.then.apply(promiseHandlers, args); }
-      else { resolveArgs = args; }
-    }
-    function reject() {
-      var args = [], len = arguments.length;
-      while ( len-- ) args[ len ] = arguments[ len ];
-
-      rejected = true;
-      if (promiseHandlers.catch) { promiseHandlers.catch.apply(promiseHandlers, args); }
-      else { rejectArgs = args; }
-    }
-    handler(resolve, reject);
-
-    return promise;
-  };
-
   var uniqueNumber = 1;
 
   var Utils = {
@@ -2590,6 +2547,8 @@
       return mask.replace(/x/g, function () { return map[Math.floor((Math.random() * length))]; });
     },
     mdPreloaderContent: "\n    <span class=\"preloader-inner\">\n      <span class=\"preloader-inner-gap\"></span>\n      <span class=\"preloader-inner-left\">\n          <span class=\"preloader-inner-half-circle\"></span>\n      </span>\n      <span class=\"preloader-inner-right\">\n          <span class=\"preloader-inner-half-circle\"></span>\n      </span>\n    </span>\n  ".trim(),
+    iosPreloaderContent: ("\n    <span class=\"preloader-inner\">\n      " + ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(function () { return '<span class="preloader-inner-line"></span>'; }).join('')) + "\n    </span>\n  ").trim(),
+    auroraPreloaderContent: "\n    <span class=\"preloader-inner\">\n      <span class=\"preloader-inner-circle\"></span>\n    </span>\n  ",
     eventNameToColonCase: function eventNameToColonCase(eventName) {
       var hasColon;
       return eventName.split('').map(function (char, index) {
@@ -2634,18 +2593,11 @@
     now: function now() {
       return Date.now();
     },
-    promise: function promise(handler) {
-      return win.Promise ? new Promise(handler) : createPromise(handler);
-    },
     requestAnimationFrame: function requestAnimationFrame(callback) {
-      if (win.requestAnimationFrame) { return win.requestAnimationFrame(callback); }
-      if (win.webkitRequestAnimationFrame) { return win.webkitRequestAnimationFrame(callback); }
-      return win.setTimeout(callback, 1000 / 60);
+      return win.requestAnimationFrame(callback);
     },
     cancelAnimationFrame: function cancelAnimationFrame(id) {
-      if (win.cancelAnimationFrame) { return win.cancelAnimationFrame(id); }
-      if (win.webkitCancelAnimationFrame) { return win.webkitCancelAnimationFrame(id); }
-      return win.clearTimeout(id);
+      return win.cancelAnimationFrame(id);
     },
     removeDiacritics: function removeDiacritics(str) {
       return str.replace(/[^\u0000-\u007E]/g, function (a) { return diacriticsMap[a] || a; });
@@ -2827,7 +2779,166 @@
       }
       return to;
     },
+    colorHexToRgb: function colorHexToRgb(hex) {
+      var h = hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, function (m, r, g, b) { return r + r + g + g + b + b; });
+      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(h);
+      return result
+        ? result.slice(1).map(function (n) { return parseInt(n, 16); })
+        : null;
+    },
+    colorRgbToHex: function colorRgbToHex(r, g, b) {
+      var result = [r, g, b].map(function (n) {
+        var hex = n.toString(16);
+        return hex.length === 1 ? ("0" + hex) : hex;
+      }).join('');
+      return ("#" + result);
+    },
+    colorRgbToHsl: function colorRgbToHsl(r, g, b) {
+      r /= 255; // eslint-disable-line
+      g /= 255; // eslint-disable-line
+      b /= 255; // eslint-disable-line
+      var max = Math.max(r, g, b);
+      var min = Math.min(r, g, b);
+      var d = max - min;
+      var h;
+      if (d === 0) { h = 0; }
+      else if (max === r) { h = ((g - b) / d) % 6; }
+      else if (max === g) { h = (b - r) / d + 2; }
+      else if (max === b) { h = (r - g) / d + 4; }
+      var l = (min + max) / 2;
+      var s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+      if (h < 0) { h = 360 / 60 + h; }
+      return [h * 60, s, l];
+    },
+    colorHslToRgb: function colorHslToRgb(h, s, l) {
+      var c = (1 - Math.abs(2 * l - 1)) * s;
+      var hp = h / 60;
+      var x = c * (1 - Math.abs((hp % 2) - 1));
+      var rgb1;
+      if (Number.isNaN(h) || typeof h === 'undefined') {
+        rgb1 = [0, 0, 0];
+      } else if (hp <= 1) { rgb1 = [c, x, 0]; }
+      else if (hp <= 2) { rgb1 = [x, c, 0]; }
+      else if (hp <= 3) { rgb1 = [0, c, x]; }
+      else if (hp <= 4) { rgb1 = [0, x, c]; }
+      else if (hp <= 5) { rgb1 = [x, 0, c]; }
+      else if (hp <= 6) { rgb1 = [c, 0, x]; }
+      var m = l - (c / 2);
+      return rgb1.map(function (n) { return Math.max(0, Math.min(255, Math.round(255 * (n + m)))); });
+    },
+    colorHsbToHsl: function colorHsbToHsl(h, s, b) {
+      var HSL = {
+        h: h,
+        s: 0,
+        l: 0,
+      };
+      var HSB = { h: h, s: s, b: b };
+
+      HSL.l = (2 - HSB.s) * HSB.b / 2;
+      HSL.s = HSL.l && HSL.l < 1 ? HSB.s * HSB.b / (HSL.l < 0.5 ? HSL.l * 2 : 2 - HSL.l * 2) : HSL.s;
+
+      return [HSL.h, HSL.s, HSL.l];
+    },
+    colorHslToHsb: function colorHslToHsb(h, s, l) {
+      var HSB = {
+        h: h,
+        s: 0,
+        b: 0,
+      };
+      var HSL = { h: h, s: s, l: l };
+
+      var t = HSL.s * (HSL.l < 0.5 ? HSL.l : 1 - HSL.l);
+      HSB.b = HSL.l + t;
+      HSB.s = HSL.l > 0 ? 2 * t / HSB.b : HSB.s;
+
+      return [HSB.h, HSB.s, HSB.b];
+    },
+    colorThemeCSSProperties: function colorThemeCSSProperties() {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
+      var hex;
+      var rgb;
+      if (args.length === 1) {
+        hex = args[0];
+        rgb = Utils.colorHexToRgb(hex);
+      } else if (args.length === 3) {
+        rgb = args;
+        hex = Utils.colorRgbToHex.apply(Utils, rgb);
+      }
+      if (!rgb) { return {}; }
+      var hsl = Utils.colorRgbToHsl.apply(Utils, rgb);
+      var hslShade = [hsl[0], hsl[1], Math.max(0, (hsl[2] - 0.08))];
+      var hslTint = [hsl[0], hsl[1], Math.max(0, (hsl[2] + 0.08))];
+      var shade = Utils.colorRgbToHex.apply(Utils, Utils.colorHslToRgb.apply(Utils, hslShade));
+      var tint = Utils.colorRgbToHex.apply(Utils, Utils.colorHslToRgb.apply(Utils, hslTint));
+      return {
+        '--f7-theme-color': hex,
+        '--f7-theme-color-rgb': rgb.join(', '),
+        '--f7-theme-color-shade': shade,
+        '--f7-theme-color-tint': tint,
+      };
+    },
   };
+
+  var Support = (function Support() {
+    var testDiv = doc.createElement('div');
+
+    return {
+      touch: (function checkTouch() {
+        return !!((win.navigator.maxTouchPoints > 0) || ('ontouchstart' in win) || (win.DocumentTouch && doc instanceof win.DocumentTouch));
+      }()),
+
+      pointerEvents: !!(win.navigator.pointerEnabled || win.PointerEvent || ('maxTouchPoints' in win.navigator && win.navigator.maxTouchPoints > 0)),
+      prefixedPointerEvents: !!win.navigator.msPointerEnabled,
+
+      transition: (function checkTransition() {
+        var style = testDiv.style;
+        return ('transition' in style || 'webkitTransition' in style || 'MozTransition' in style);
+      }()),
+      transforms3d: (win.Modernizr && win.Modernizr.csstransforms3d === true) || (function checkTransforms3d() {
+        var style = testDiv.style;
+        return ('webkitPerspective' in style || 'MozPerspective' in style || 'OPerspective' in style || 'MsPerspective' in style || 'perspective' in style);
+      }()),
+
+      flexbox: (function checkFlexbox() {
+        var div = doc.createElement('div').style;
+        var styles = ('alignItems webkitAlignItems webkitBoxAlign msFlexAlign mozBoxAlign webkitFlexDirection msFlexDirection mozBoxDirection mozBoxOrient webkitBoxDirection webkitBoxOrient').split(' ');
+        for (var i = 0; i < styles.length; i += 1) {
+          if (styles[i] in div) { return true; }
+        }
+        return false;
+      }()),
+
+      observer: (function checkObserver() {
+        return ('MutationObserver' in win || 'WebkitMutationObserver' in win);
+      }()),
+
+      passiveListener: (function checkPassiveListener() {
+        var supportsPassive = false;
+        try {
+          var opts = Object.defineProperty({}, 'passive', {
+            // eslint-disable-next-line
+            get: function get() {
+              supportsPassive = true;
+            },
+          });
+          win.addEventListener('testPassiveListener', null, opts);
+        } catch (e) {
+          // No support
+        }
+        return supportsPassive;
+      }()),
+
+      gestures: (function checkGestures() {
+        return 'ongesturestart' in win;
+      }()),
+
+      intersectionObserver: (function checkObserver() {
+        return ('IntersectionObserver' in win);
+      }()),
+    };
+  }());
 
   var Device = (function Device() {
     var platform = win.navigator.platform;
@@ -2850,6 +2961,7 @@
       windows: false,
       cordova: !!(win.cordova || win.phonegap),
       phonegap: !!(win.cordova || win.phonegap),
+      electron: false,
     };
 
     var screenWidth = win.screen.width;
@@ -2867,8 +2979,24 @@
     var ie = ua.indexOf('MSIE ') >= 0 || ua.indexOf('Trident/') >= 0;
     var edge = ua.indexOf('Edge/') >= 0;
     var firefox = ua.indexOf('Gecko/') >= 0 && ua.indexOf('Firefox/') >= 0;
-    var macos = platform === 'MacIntel';
     var windows = platform === 'Win32';
+    var electron = ua.toLowerCase().indexOf('electron') >= 0;
+    var macos = platform === 'MacIntel';
+
+    // iPadOs 13 fix
+    if (!ipad
+      && macos
+      && Support.touch
+      && (
+        (screenWidth === 1024 && screenHeight === 1366) // Pro 12.9
+        || (screenWidth === 834 && screenHeight === 1194) // Pro 11
+        || (screenWidth === 834 && screenHeight === 1112) // Pro 10.5
+        || (screenWidth === 768 && screenHeight === 1024) // other
+      )
+    ) {
+      ipad = ua.match(/(Version)\/([\d.]+)/);
+      macos = false;
+    }
 
     device.ie = ie;
     device.edge = edge;
@@ -2876,7 +3004,7 @@
 
     // Windows
     if (windowsPhone) {
-      device.os = 'windows';
+      device.os = 'windowsPhone';
       device.osVersion = windowsPhone[2];
       device.windowsPhone = true;
     }
@@ -2903,7 +3031,7 @@
     }
     if (ipod) {
       device.osVersion = ipod[3] ? ipod[3].replace(/_/g, '.') : null;
-      device.iphone = true;
+      device.ipod = true;
     }
     // iOS 8+ changed UA
     if (device.ios && device.osVersion && ua.indexOf('Version/') >= 0) {
@@ -2914,30 +3042,33 @@
 
     // Webview
     device.webView = !!((iphone || ipad || ipod) && (ua.match(/.*AppleWebKit(?!.*Safari)/i) || win.navigator.standalone))
-                       || (win.matchMedia && win.matchMedia('(display-mode: standalone)').matches);
+      || (win.matchMedia && win.matchMedia('(display-mode: standalone)').matches);
     device.webview = device.webView;
     device.standalone = device.webView;
 
-
     // Desktop
-    device.desktop = !(device.os || device.android || device.webView);
+    device.desktop = !(device.ios || device.android || device.windowsPhone) || electron;
     if (device.desktop) {
+      device.electron = electron;
       device.macos = macos;
       device.windows = windows;
+      if (device.macos) {
+        device.os = 'macos';
+      }
+      if (device.windows) {
+        device.os = 'windows';
+      }
     }
 
-    // Minimal UI
-    if (device.os && device.os === 'ios') {
-      var osVersionArr = device.osVersion.split('.');
-      var metaViewport = doc.querySelector('meta[name="viewport"]');
-      device.minimalUi = !device.webView
-        && (ipod || iphone)
-        && (osVersionArr[0] * 1 === 7 ? osVersionArr[1] * 1 >= 1 : osVersionArr[0] * 1 > 7)
-        && metaViewport && metaViewport.getAttribute('content').indexOf('minimal-ui') >= 0;
-    }
+    // Meta statusbar
+    var metaStatusbar = doc.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
 
     // Check for status bar and fullscreen app mode
     device.needsStatusbarOverlay = function needsStatusbarOverlay() {
+      if (device.desktop) { return false; }
+      if (device.standalone && device.ios && metaStatusbar && metaStatusbar.content === 'black-translucent') {
+        return true;
+      }
       if ((device.webView || (device.android && device.cordova)) && (win.innerWidth * win.innerHeight === win.screen.width * win.screen.height)) {
         if (device.iphoneX && (win.orientation === 90 || win.orientation === -90)) {
           return false;
@@ -2951,31 +3082,33 @@
     // Pixel Ratio
     device.pixelRatio = win.devicePixelRatio || 1;
 
+    // Color Scheme
+    var DARK = '(prefers-color-scheme: dark)';
+    var LIGHT = '(prefers-color-scheme: light)';
+    device.prefersColorScheme = function prefersColorTheme() {
+      var theme;
+      if (win.matchMedia && win.matchMedia(LIGHT).matches) {
+        theme = 'light';
+      }
+      if (win.matchMedia && win.matchMedia(DARK).matches) {
+        theme = 'dark';
+      }
+      return theme;
+    };
+
     // Export object
     return device;
   }());
 
-  var Framework7Class = function Framework7Class(params, parents) {
-    if ( params === void 0 ) params = {};
+  var EventsClass = function EventsClass(parents) {
     if ( parents === void 0 ) parents = [];
 
     var self = this;
-    self.params = params;
-
-    // Events
     self.eventsParents = parents;
     self.eventsListeners = {};
-
-    if (self.params && self.params.on) {
-      Object.keys(self.params.on).forEach(function (eventName) {
-        self.on(eventName, self.params.on[eventName]);
-      });
-    }
   };
 
-  var staticAccessors$1 = { components: { configurable: true } };
-
-  Framework7Class.prototype.on = function on (events, handler, priority) {
+  EventsClass.prototype.on = function on (events, handler, priority) {
     var self = this;
     if (typeof handler !== 'function') { return self; }
     var method = priority ? 'unshift' : 'push';
@@ -2986,7 +3119,7 @@
     return self;
   };
 
-  Framework7Class.prototype.once = function once (events, handler, priority) {
+  EventsClass.prototype.once = function once (events, handler, priority) {
     var self = this;
     if (typeof handler !== 'function') { return self; }
     function onceHandler() {
@@ -3003,7 +3136,7 @@
     return self.on(events, onceHandler, priority);
   };
 
-  Framework7Class.prototype.off = function off (events, handler) {
+  EventsClass.prototype.off = function off (events, handler) {
     var self = this;
     if (!self.eventsListeners) { return self; }
     events.split(' ').forEach(function (event) {
@@ -3020,7 +3153,7 @@
     return self;
   };
 
-  Framework7Class.prototype.emit = function emit () {
+  EventsClass.prototype.emit = function emit () {
       var args = [], len = arguments.length;
       while ( len-- ) args[ len ] = arguments[ len ];
 
@@ -3064,134 +3197,159 @@
     return self;
   };
 
-  // eslint-disable-next-line
-  Framework7Class.prototype.useModuleParams = function useModuleParams (module, instanceParams) {
-    if (module.params) {
-      var originalParams = {};
-      Object.keys(module.params).forEach(function (paramKey) {
-        if (typeof instanceParams[paramKey] === 'undefined') { return; }
-        originalParams[paramKey] = Utils.extend({}, instanceParams[paramKey]);
-      });
-      Utils.extend(instanceParams, module.params);
-      Object.keys(originalParams).forEach(function (paramKey) {
-        Utils.extend(instanceParams[paramKey], originalParams[paramKey]);
-      });
-    }
-  };
+  var Framework7Class = /*@__PURE__*/(function (EventsClass) {
+    function Framework7Class(params, parents) {
+      if ( params === void 0 ) params = {};
+      if ( parents === void 0 ) parents = [];
 
-  Framework7Class.prototype.useModulesParams = function useModulesParams (instanceParams) {
-    var instance = this;
-    if (!instance.modules) { return; }
-    Object.keys(instance.modules).forEach(function (moduleName) {
-      var module = instance.modules[moduleName];
-      // Extend params
-      if (module.params) {
-        Utils.extend(instanceParams, module.params);
+      EventsClass.call(this, parents);
+      var self = this;
+      self.params = params;
+
+      if (self.params && self.params.on) {
+        Object.keys(self.params.on).forEach(function (eventName) {
+          self.on(eventName, self.params.on[eventName]);
+        });
       }
-    });
-  };
+    }
 
-  Framework7Class.prototype.useModule = function useModule (moduleName, moduleParams) {
+    if ( EventsClass ) Framework7Class.__proto__ = EventsClass;
+    Framework7Class.prototype = Object.create( EventsClass && EventsClass.prototype );
+    Framework7Class.prototype.constructor = Framework7Class;
+
+    var staticAccessors = { components: { configurable: true } };
+
+    // eslint-disable-next-line
+    Framework7Class.prototype.useModuleParams = function useModuleParams (module, instanceParams) {
+      if (module.params) {
+        var originalParams = {};
+        Object.keys(module.params).forEach(function (paramKey) {
+          if (typeof instanceParams[paramKey] === 'undefined') { return; }
+          originalParams[paramKey] = Utils.extend({}, instanceParams[paramKey]);
+        });
+        Utils.extend(instanceParams, module.params);
+        Object.keys(originalParams).forEach(function (paramKey) {
+          Utils.extend(instanceParams[paramKey], originalParams[paramKey]);
+        });
+      }
+    };
+
+    Framework7Class.prototype.useModulesParams = function useModulesParams (instanceParams) {
+      var instance = this;
+      if (!instance.modules) { return; }
+      Object.keys(instance.modules).forEach(function (moduleName) {
+        var module = instance.modules[moduleName];
+        // Extend params
+        if (module.params) {
+          Utils.extend(instanceParams, module.params);
+        }
+      });
+    };
+
+    Framework7Class.prototype.useModule = function useModule (moduleName, moduleParams) {
       if ( moduleName === void 0 ) moduleName = '';
       if ( moduleParams === void 0 ) moduleParams = {};
 
-    var instance = this;
-    if (!instance.modules) { return; }
-    var module = typeof moduleName === 'string' ? instance.modules[moduleName] : moduleName;
-    if (!module) { return; }
+      var instance = this;
+      if (!instance.modules) { return; }
+      var module = typeof moduleName === 'string' ? instance.modules[moduleName] : moduleName;
+      if (!module) { return; }
 
-    // Extend instance methods and props
-    if (module.instance) {
-      Object.keys(module.instance).forEach(function (modulePropName) {
-        var moduleProp = module.instance[modulePropName];
-        if (typeof moduleProp === 'function') {
-          instance[modulePropName] = moduleProp.bind(instance);
-        } else {
-          instance[modulePropName] = moduleProp;
-        }
-      });
-    }
-    // Add event listeners
-    if (module.on && instance.on) {
-      Object.keys(module.on).forEach(function (moduleEventName) {
-        instance.on(moduleEventName, module.on[moduleEventName]);
-      });
-    }
-    // Add vnode hooks
-    if (module.vnode) {
-      if (!instance.vnodeHooks) { instance.vnodeHooks = {}; }
-      Object.keys(module.vnode).forEach(function (vnodeId) {
-        Object.keys(module.vnode[vnodeId]).forEach(function (hookName) {
-          var handler = module.vnode[vnodeId][hookName];
-          if (!instance.vnodeHooks[hookName]) { instance.vnodeHooks[hookName] = {}; }
-          if (!instance.vnodeHooks[hookName][vnodeId]) { instance.vnodeHooks[hookName][vnodeId] = []; }
-          instance.vnodeHooks[hookName][vnodeId].push(handler.bind(instance));
+      // Extend instance methods and props
+      if (module.instance) {
+        Object.keys(module.instance).forEach(function (modulePropName) {
+          var moduleProp = module.instance[modulePropName];
+          if (typeof moduleProp === 'function') {
+            instance[modulePropName] = moduleProp.bind(instance);
+          } else {
+            instance[modulePropName] = moduleProp;
+          }
         });
-      });
-    }
-    // Module create callback
-    if (module.create) {
-      module.create.bind(instance)(moduleParams);
-    }
-  };
+      }
+      // Add event listeners
+      if (module.on && instance.on) {
+        Object.keys(module.on).forEach(function (moduleEventName) {
+          instance.on(moduleEventName, module.on[moduleEventName]);
+        });
+      }
+      // Add vnode hooks
+      if (module.vnode) {
+        if (!instance.vnodeHooks) { instance.vnodeHooks = {}; }
+        Object.keys(module.vnode).forEach(function (vnodeId) {
+          Object.keys(module.vnode[vnodeId]).forEach(function (hookName) {
+            var handler = module.vnode[vnodeId][hookName];
+            if (!instance.vnodeHooks[hookName]) { instance.vnodeHooks[hookName] = {}; }
+            if (!instance.vnodeHooks[hookName][vnodeId]) { instance.vnodeHooks[hookName][vnodeId] = []; }
+            instance.vnodeHooks[hookName][vnodeId].push(handler.bind(instance));
+          });
+        });
+      }
+      // Module create callback
+      if (module.create) {
+        module.create.bind(instance)(moduleParams);
+      }
+    };
 
-  Framework7Class.prototype.useModules = function useModules (modulesParams) {
+    Framework7Class.prototype.useModules = function useModules (modulesParams) {
       if ( modulesParams === void 0 ) modulesParams = {};
 
-    var instance = this;
-    if (!instance.modules) { return; }
-    Object.keys(instance.modules).forEach(function (moduleName) {
-      var moduleParams = modulesParams[moduleName] || {};
-      instance.useModule(moduleName, moduleParams);
-    });
-  };
+      var instance = this;
+      if (!instance.modules) { return; }
+      Object.keys(instance.modules).forEach(function (moduleName) {
+        var moduleParams = modulesParams[moduleName] || {};
+        instance.useModule(moduleName, moduleParams);
+      });
+    };
 
-  staticAccessors$1.components.set = function (components) {
-    var Class = this;
-    if (!Class.use) { return; }
-    Class.use(components);
-  };
+    staticAccessors.components.set = function (components) {
+      var Class = this;
+      if (!Class.use) { return; }
+      Class.use(components);
+    };
 
-  Framework7Class.installModule = function installModule (module) {
+    Framework7Class.installModule = function installModule (module) {
       var params = [], len = arguments.length - 1;
       while ( len-- > 0 ) params[ len ] = arguments[ len + 1 ];
 
-    var Class = this;
-    if (!Class.prototype.modules) { Class.prototype.modules = {}; }
-    var name = module.name || (((Object.keys(Class.prototype.modules).length) + "_" + (Utils.now())));
-    Class.prototype.modules[name] = module;
-    // Prototype
-    if (module.proto) {
-      Object.keys(module.proto).forEach(function (key) {
-        Class.prototype[key] = module.proto[key];
-      });
-    }
-    // Class
-    if (module.static) {
-      Object.keys(module.static).forEach(function (key) {
-        Class[key] = module.static[key];
-      });
-    }
-    // Callback
-    if (module.install) {
-      module.install.apply(Class, params);
-    }
-    return Class;
-  };
-
-  Framework7Class.use = function use (module) {
-      var params = [], len = arguments.length - 1;
-      while ( len-- > 0 ) params[ len ] = arguments[ len + 1 ];
-
-    var Class = this;
-    if (Array.isArray(module)) {
-      module.forEach(function (m) { return Class.installModule(m); });
+      var Class = this;
+      if (!Class.prototype.modules) { Class.prototype.modules = {}; }
+      var name = module.name || (((Object.keys(Class.prototype.modules).length) + "_" + (Utils.now())));
+      Class.prototype.modules[name] = module;
+      // Prototype
+      if (module.proto) {
+        Object.keys(module.proto).forEach(function (key) {
+          Class.prototype[key] = module.proto[key];
+        });
+      }
+      // Class
+      if (module.static) {
+        Object.keys(module.static).forEach(function (key) {
+          Class[key] = module.static[key];
+        });
+      }
+      // Callback
+      if (module.install) {
+        module.install.apply(Class, params);
+      }
       return Class;
-    }
-    return Class.installModule.apply(Class, [ module ].concat( params ));
-  };
+    };
 
-  Object.defineProperties( Framework7Class, staticAccessors$1 );
+    Framework7Class.use = function use (module) {
+      var params = [], len = arguments.length - 1;
+      while ( len-- > 0 ) params[ len ] = arguments[ len + 1 ];
+
+      var Class = this;
+      if (Array.isArray(module)) {
+        module.forEach(function (m) { return Class.installModule(m); });
+        return Class;
+      }
+      return Class.installModule.apply(Class, [ module ].concat( params ));
+    };
+
+    Object.defineProperties( Framework7Class, staticAccessors );
+
+    return Framework7Class;
+  }(EventsClass));
 
   function ConstructorMethods (parameters) {
     if ( parameters === void 0 ) parameters = {};
@@ -3414,9 +3572,12 @@
     });
   }
 
-  var Framework7 = /*@__PURE__*/(function (Framework7Class$$1) {
+  var Framework7 = /*@__PURE__*/(function (Framework7Class) {
     function Framework7(params) {
-      Framework7Class$$1.call(this, params);
+      Framework7Class.call(this, params);
+      if (Framework7.instance) {
+        throw new Error('Framework7 is already initialized and can\'t be initialized more than once');
+      }
 
       var passedParams = Utils.extend({}, params);
 
@@ -3437,6 +3598,7 @@
         lazyModulesPath: null,
         initOnDeviceReady: true,
         init: true,
+        autoDarkTheme: false,
       };
 
       // Extend defaults with modules params
@@ -3465,7 +3627,9 @@
         // Theme
         theme: (function getTheme() {
           if (app.params.theme === 'auto') {
-            return Device.ios ? 'ios' : 'md';
+            if (Device.ios) { return 'ios'; }
+            if (Device.desktop && Device.electron) { return 'aurora'; }
+            return 'md';
           }
           return app.params.theme;
         }()),
@@ -3484,6 +3648,28 @@
       // Init Data & Methods
       app.initData();
 
+      // Auto Dark Theme
+      var DARK = '(prefers-color-scheme: dark)';
+      var LIGHT = '(prefers-color-scheme: light)';
+      app.mq = {};
+      if (win.matchMedia) {
+        app.mq.dark = win.matchMedia(DARK);
+        app.mq.light = win.matchMedia(LIGHT);
+      }
+      app.colorSchemeListener = function colorSchemeListener(ref) {
+        var matches = ref.matches;
+        var media = ref.media;
+
+        if (!matches) {
+          return;
+        }
+        var html = doc.querySelector('html');
+        if (media === DARK) {
+          html.classList.add('theme-dark');
+        } else if (media === LIGHT) {
+          html.classList.remove('theme-dark');
+        }
+      };
       // Init
       if (app.params.init) {
         if (Device.cordova && app.params.initOnDeviceReady) {
@@ -3498,12 +3684,12 @@
       return app;
     }
 
-    if ( Framework7Class$$1 ) Framework7.__proto__ = Framework7Class$$1;
-    Framework7.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) Framework7.__proto__ = Framework7Class;
+    Framework7.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     Framework7.prototype.constructor = Framework7;
 
     var prototypeAccessors = { $: { configurable: true },t7: { configurable: true } };
-    var staticAccessors = { Dom7: { configurable: true },$: { configurable: true },Template7: { configurable: true },Class: { configurable: true } };
+    var staticAccessors = { Dom7: { configurable: true },$: { configurable: true },Template7: { configurable: true },Class: { configurable: true },Events: { configurable: true } };
 
     Framework7.prototype.initData = function initData () {
       var app = this;
@@ -3528,6 +3714,28 @@
       }
     };
 
+    Framework7.prototype.enableAutoDarkTheme = function enableAutoDarkTheme () {
+      if (!win.matchMedia) { return; }
+      var app = this;
+      var html = doc.querySelector('html');
+      if (app.mq.dark && app.mq.light) {
+        app.mq.dark.addListener(app.colorSchemeListener);
+        app.mq.light.addListener(app.colorSchemeListener);
+      }
+      if (app.mq.dark && app.mq.dark.matches) {
+        html.classList.add('theme-dark');
+      } else if (app.mq.light && app.mq.light.matches) {
+        html.classList.remove('theme-dark');
+      }
+    };
+
+    Framework7.prototype.disableAutoDarkTheme = function disableAutoDarkTheme () {
+      if (!win.matchMedia) { return; }
+      var app = this;
+      if (app.mq.dark) { app.mq.dark.removeListener(app.colorSchemeListener); }
+      if (app.mq.light) { app.mq.light.removeListener(app.colorSchemeListener); }
+    };
+
     Framework7.prototype.init = function init () {
       var app = this;
       if (app.initialized) { return app; }
@@ -3537,6 +3745,11 @@
       // RTL attr
       if (app.rtl) {
         $('html').attr('dir', 'rtl');
+      }
+
+      // Auto Dark Theme
+      if (app.params.autoDarkTheme) {
+        app.enableAutoDarkTheme();
       }
 
       // Root class
@@ -3557,7 +3770,7 @@
     };
 
     // eslint-disable-next-line
-    Framework7.prototype.loadModule = function loadModule$$1 () {
+    Framework7.prototype.loadModule = function loadModule () {
       var args = [], len = arguments.length;
       while ( len-- ) args[ len ] = arguments[ len ];
 
@@ -3600,7 +3813,11 @@
     };
 
     staticAccessors.Class.get = function () {
-      return Framework7Class$$1;
+      return Framework7Class;
+    };
+
+    staticAccessors.Events.get = function () {
+      return EventsClass;
     };
 
     Object.defineProperties( Framework7.prototype, prototypeAccessors );
@@ -3629,14 +3846,19 @@
       init: function init() {
         var classNames = [];
         var html = doc.querySelector('html');
+        var metaStatusbar = doc.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
         if (!html) { return; }
+        if (Device.standalone && Device.ios && metaStatusbar && metaStatusbar.content === 'black-translucent') {
+          classNames.push('device-full-viewport');
+        }
+
         // Pixel Ratio
         classNames.push(("device-pixel-ratio-" + (Math.floor(Device.pixelRatio))));
         if (Device.pixelRatio >= 2) {
           classNames.push('device-retina');
         }
         // OS classes
-        if (Device.os) {
+        if (Device.os && !Device.desktop) {
           classNames.push(
             ("device-" + (Device.os)),
             ("device-" + (Device.os) + "-" + (Device.osVersion.split('.')[0])),
@@ -3653,8 +3875,9 @@
           }
         } else if (Device.desktop) {
           classNames.push('device-desktop');
-          if (Device.macos) { classNames.push('device-macos'); }
-          else if (Device.windows) { classNames.push('device-windows'); }
+          if (Device.os) {
+            classNames.push(("device-" + (Device.os)));
+          }
         }
         if (Device.cordova || Device.phonegap) {
           classNames.push('device-cordova');
@@ -3667,75 +3890,6 @@
       },
     },
   };
-
-  var Support = (function Support() {
-    var positionSticky = (function supportPositionSticky() {
-      var support = false;
-      var div = doc.createElement('div');
-      ('sticky -webkit-sticky -moz-sticky').split(' ').forEach(function (prop) {
-        if (support) { return; }
-        div.style.position = prop;
-        if (div.style.position === prop) {
-          support = true;
-        }
-      });
-      return support;
-    }());
-
-    var testDiv = doc.createElement('div');
-
-    return {
-      positionSticky: positionSticky,
-      touch: (function checkTouch() {
-        return !!((win.navigator.maxTouchPoints > 0) || ('ontouchstart' in win) || (win.DocumentTouch && doc instanceof win.DocumentTouch));
-      }()),
-
-      pointerEvents: !!(win.navigator.pointerEnabled || win.PointerEvent || ('maxTouchPoints' in win.navigator)),
-      prefixedPointerEvents: !!win.navigator.msPointerEnabled,
-
-      transition: (function checkTransition() {
-        var style = testDiv.style;
-        return ('transition' in style || 'webkitTransition' in style || 'MozTransition' in style);
-      }()),
-      transforms3d: (win.Modernizr && win.Modernizr.csstransforms3d === true) || (function checkTransforms3d() {
-        var style = testDiv.style;
-        return ('webkitPerspective' in style || 'MozPerspective' in style || 'OPerspective' in style || 'MsPerspective' in style || 'perspective' in style);
-      }()),
-
-      flexbox: (function checkFlexbox() {
-        var div = doc.createElement('div').style;
-        var styles = ('alignItems webkitAlignItems webkitBoxAlign msFlexAlign mozBoxAlign webkitFlexDirection msFlexDirection mozBoxDirection mozBoxOrient webkitBoxDirection webkitBoxOrient').split(' ');
-        for (var i = 0; i < styles.length; i += 1) {
-          if (styles[i] in div) { return true; }
-        }
-        return false;
-      }()),
-
-      observer: (function checkObserver() {
-        return ('MutationObserver' in win || 'WebkitMutationObserver' in win);
-      }()),
-
-      passiveListener: (function checkPassiveListener() {
-        var supportsPassive = false;
-        try {
-          var opts = Object.defineProperty({}, 'passive', {
-            // eslint-disable-next-line
-            get: function get() {
-              supportsPassive = true;
-            },
-          });
-          win.addEventListener('testPassiveListener', null, opts);
-        } catch (e) {
-          // No support
-        }
-        return supportsPassive;
-      }()),
-
-      gestures: (function checkGestures() {
-        return 'ongesturestart' in win;
-      }()),
-    };
-  }());
 
   var SupportModule = {
     name: 'support',
@@ -3750,9 +3904,6 @@
         var html = doc.querySelector('html');
         if (!html) { return; }
         var classNames = [];
-        if (Support.positionSticky) {
-          classNames.push('support-position-sticky');
-        }
         // Add html classes
         classNames.forEach(function (className) {
           html.classList.add(className);
@@ -3809,11 +3960,6 @@
       },
       orientationchange: function orientationchange() {
         var app = this;
-        if (app.device && app.device.minimalUi) {
-          if (win.orientation === 90 || win.orientation === -90) {
-            doc.body.scrollTop = 0;
-          }
-        }
         // Fix iPad weird body scroll
         if (app.device.ipad) {
           doc.body.scrollLeft = 0;
@@ -4016,6 +4162,9 @@
         xhr.setRequestHeader('Content-Type', options.contentType);
       }
     }
+    if (options.dataType === 'json' && (!options.headers || !options.headers.Accept)) {
+      xhr.setRequestHeader('Accept', 'application/json');
+    }
 
     // Additional headers
     if (options.headers) {
@@ -4141,31 +4290,106 @@
     }
     return Request(requestOptions);
   }
-  Request.get = function get() {
-    var args = [], len = arguments.length;
-    while ( len-- ) args[ len ] = arguments[ len ];
+  function RequestShortcutPromise(method) {
+    var args = [], len = arguments.length - 1;
+    while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
 
-    return RequestShortcut.apply(void 0, [ 'get' ].concat( args ));
-  };
-  Request.post = function post() {
-    var args = [], len = arguments.length;
-    while ( len-- ) args[ len ] = arguments[ len ];
+    var url = args[0];
+    var data = args[1];
+    var dataType = args[2];
+    return new Promise(function (resolve, reject) {
+      RequestShortcut(
+        method,
+        url,
+        data,
+        function (response) {
+          resolve(response);
+        },
+        function (xhr, status) {
+          reject(status);
+        },
+        dataType
+      );
+    });
+  }
+  Object.assign(Request, {
+    get: function () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
 
-    return RequestShortcut.apply(void 0, [ 'post' ].concat( args ));
-  };
-  Request.json = function json() {
-    var args = [], len = arguments.length;
-    while ( len-- ) args[ len ] = arguments[ len ];
+      return RequestShortcut.apply(void 0, [ 'get' ].concat( args ));
+  },
+    post: function () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
 
-    return RequestShortcut.apply(void 0, [ 'json' ].concat( args ));
-  };
-  Request.getJSON = Request.json;
-  Request.postJSON = function postJSON() {
-    var args = [], len = arguments.length;
-    while ( len-- ) args[ len ] = arguments[ len ];
+      return RequestShortcut.apply(void 0, [ 'post' ].concat( args ));
+  },
+    json: function () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
 
-    return RequestShortcut.apply(void 0, [ 'postJSON' ].concat( args ));
+      return RequestShortcut.apply(void 0, [ 'json' ].concat( args ));
+  },
+    getJSON: function () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
+      return RequestShortcut.apply(void 0, [ 'json' ].concat( args ));
+  },
+    postJSON: function () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
+      return RequestShortcut.apply(void 0, [ 'postJSON' ].concat( args ));
+  },
+  });
+
+  Request.promise = function requestPromise(requestOptions) {
+    return new Promise(function (resolve, reject) {
+      Request(Object.assign(requestOptions, {
+        success: function success(data) {
+          resolve(data);
+        },
+        error: function error(xhr, status) {
+          reject(status);
+        },
+      }));
+    });
   };
+  Object.assign(Request.promise, {
+    get: function () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
+      return RequestShortcutPromise.apply(void 0, [ 'get' ].concat( args ));
+  },
+    post: function () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
+      return RequestShortcutPromise.apply(void 0, [ 'post' ].concat( args ));
+  },
+    json: function () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
+      return RequestShortcutPromise.apply(void 0, [ 'json' ].concat( args ));
+  },
+    getJSON: function () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
+      return RequestShortcutPromise.apply(void 0, [ 'json' ].concat( args ));
+  },
+    postJSON: function () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
+      return RequestShortcutPromise.apply(void 0, [ 'postJSON' ].concat( args ));
+  },
+  });
+
   Request.setup = function setup(options) {
     if (options.type && !options.method) {
       Utils.extend(options, { method: options.type });
@@ -4188,7 +4412,7 @@
   function initTouch() {
     var app = this;
     var params = app.params.touch;
-    var useRipple = app.theme === 'md' && params.materialRipple;
+    var useRipple = params[((app.theme) + "TouchRipple")];
 
     if (Device.ios && Device.webView) {
       // Strange hack required for iOS 8 webview to work on inputs
@@ -4206,6 +4430,7 @@
     var isMoved;
     var tapHoldFired;
     var tapHoldTimeout;
+    var preventClick;
 
     var activableElement;
     var activeTimeout;
@@ -4227,11 +4452,30 @@
       if (parents.length > 0) {
         activable = activable ? activable.add(parents) : parents;
       }
+      if (activable && activable.length > 1) {
+        var newActivable = [];
+        var preventPropagation;
+        for (var i = 0; i < activable.length; i += 1) {
+          if (!preventPropagation) {
+            newActivable.push(activable[i]);
+            if (activable.eq(i).hasClass('prevent-active-state-propagation')
+              || activable.eq(i).hasClass('no-active-state-propagation')
+            ) {
+              preventPropagation = true;
+            }
+          }
+        }
+        activable = $(newActivable);
+      }
       return activable || target;
     }
 
+    function isInsideScrollableViewLight(el) {
+      var pageContent = el.parents('.page-content');
+      return pageContent.length > 0;
+    }
     function isInsideScrollableView(el) {
-      var pageContent = el.parents('.page-content, .panel');
+      var pageContent = el.parents('.page-content');
 
       if (pageContent.length === 0) {
         return false;
@@ -4324,7 +4568,7 @@
 
     // Ripple handlers
     function findRippleElement(el) {
-      var rippleElements = params.materialRippleElements;
+      var rippleElements = params.touchRippleElements;
       var $el = $(el);
       if ($el.is(rippleElements)) {
         if ($el.hasClass('no-ripple')) {
@@ -4358,10 +4602,17 @@
         rippleTarget = undefined;
         return;
       }
-      if (!isInsideScrollableView(rippleTarget)) {
+      var inScrollable = params.fastClicks
+        ? isInsideScrollableView(rippleTarget)
+        : isInsideScrollableViewLight(rippleTarget);
+
+      if (!inScrollable) {
+        removeRipple();
         createRipple(rippleTarget, touchStartX, touchStartY);
       } else {
+        clearTimeout(rippleTimeout);
         rippleTimeout = setTimeout(function () {
+          removeRipple();
           createRipple(rippleTarget, touchStartX, touchStartY);
         }, 80);
       }
@@ -4371,9 +4622,7 @@
       removeRipple();
     }
     function rippleTouchEnd() {
-      if (rippleWave) {
-        removeRipple();
-      } else if (rippleTarget && !isMoved) {
+      if (!rippleWave && rippleTarget && !isMoved) {
         clearTimeout(rippleTimeout);
         createRipple(rippleTarget, touchStartX, touchStartY);
         setTimeout(removeRipple, 0);
@@ -4425,7 +4674,9 @@
         // Upon tapping, we give the scrolling time to stop, then we grab the element based where the user tapped.
         setTimeout(function () {
           targetElement = doc.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-          targetElement.dispatchEvent(evt);
+          if (targetElement) {
+            targetElement.dispatchEvent(evt);
+          }
         }, 10);
       } else {
         targetElement.dispatchEvent(evt);
@@ -4503,17 +4754,10 @@
 
       if (params.activeState) {
         activableElement = findActivableElement(targetElement);
-        // If it's inside a scrollable view, we don't trigger active-state yet,
-        // because it can be a scroll instead. Based on the link:
-        // http://labnote.beedesk.com/click-scroll-and-pseudo-active-on-mobile-webk
-        if (!isInsideScrollableView(activableElement)) {
-          addActive();
-        } else {
-          activeTimeout = setTimeout(addActive, 80);
-        }
+        activeTimeout = setTimeout(addActive, 0);
       }
       if (useRipple) {
-        rippleTouchStart(targetElement, touchStartX, touchStartY);
+        rippleTouchStart(targetElement);
       }
       return true;
     }
@@ -4701,6 +4945,132 @@
       return allowClick;
     }
 
+    function handleTouchStartLight(e) {
+      isMoved = false;
+      tapHoldFired = false;
+      preventClick = false;
+      if (e.targetTouches.length > 1) {
+        if (activableElement) { removeActive(); }
+        return true;
+      }
+      if (e.touches.length > 1 && activableElement) {
+        removeActive();
+      }
+      if (params.tapHold) {
+        if (tapHoldTimeout) { clearTimeout(tapHoldTimeout); }
+        tapHoldTimeout = setTimeout(function () {
+          if (e && e.touches && e.touches.length > 1) { return; }
+          tapHoldFired = true;
+          e.preventDefault();
+          preventClick = true;
+          $(e.target).trigger('taphold');
+        }, params.tapHoldDelay);
+      }
+      targetElement = e.target;
+      touchStartX = e.targetTouches[0].pageX;
+      touchStartY = e.targetTouches[0].pageY;
+
+      if (params.activeState) {
+        activableElement = findActivableElement(targetElement);
+        if (!isInsideScrollableViewLight(activableElement)) {
+          addActive();
+        } else {
+          activeTimeout = setTimeout(addActive, 80);
+        }
+      }
+      if (useRipple) {
+        rippleTouchStart(targetElement);
+      }
+      return true;
+    }
+    function handleTouchMoveLight(e) {
+      var touch;
+      var distance;
+      if (e.type === 'touchmove') {
+        touch = e.targetTouches[0];
+        distance = params.touchClicksDistanceThreshold;
+        // if (touch && touch.touchType === 'stylus') {
+        //   distance = 5;
+        // } else {
+        //   distance = 3;
+        // }
+      }
+
+      if (distance && touch) {
+        var pageX = touch.pageX;
+        var pageY = touch.pageY;
+        if (Math.abs(pageX - touchStartX) > distance || Math.abs(pageY - touchStartY) > distance) {
+          isMoved = true;
+        }
+      } else {
+        isMoved = true;
+      }
+      if (isMoved) {
+        preventClick = true;
+        if (params.tapHold) {
+          clearTimeout(tapHoldTimeout);
+        }
+        if (params.activeState) {
+          clearTimeout(activeTimeout);
+          removeActive();
+        }
+        if (useRipple) {
+          rippleTouchMove();
+        }
+      }
+    }
+    function handleTouchEndLight(e) {
+      clearTimeout(activeTimeout);
+      clearTimeout(tapHoldTimeout);
+      if (doc.activeElement === e.target) {
+        if (params.activeState) { removeActive(); }
+        if (useRipple) {
+          rippleTouchEnd();
+        }
+        return true;
+      }
+      if (params.activeState) {
+        addActive();
+        setTimeout(removeActive, 0);
+      }
+      if (useRipple) {
+        rippleTouchEnd();
+      }
+      if ((params.tapHoldPreventClicks && tapHoldFired) || preventClick) {
+        if (e.cancelable) { e.preventDefault(); }
+        preventClick = true;
+        return false;
+      }
+      return true;
+    }
+    function handleClickLight(e) {
+      var localPreventClick = preventClick;
+      if (targetElement && e.target !== targetElement) {
+        localPreventClick = true;
+      }
+      if (params.tapHold && params.tapHoldPreventClicks && tapHoldFired) {
+        localPreventClick = true;
+      }
+      if (localPreventClick) {
+        e.stopImmediatePropagation();
+        e.stopPropagation();
+        e.preventDefault();
+      }
+
+      if (params.tapHold) {
+        tapHoldTimeout = setTimeout(
+          function () {
+            tapHoldFired = false;
+          },
+          (Device.ios || Device.androidChrome ? 100 : 400)
+        );
+      }
+      preventClick = false;
+      targetElement = null;
+
+      return !localPreventClick;
+    }
+
     function emitAppTouchEvent(name, e) {
       app.emit({
         events: name,
@@ -4758,10 +5128,18 @@
     }
 
     if (Support.touch) {
-      app.on('click', handleClick);
-      app.on('touchstart', handleTouchStart);
-      app.on('touchmove', handleTouchMove);
-      app.on('touchend', handleTouchEnd);
+      if (params.fastClicks) {
+        app.on('click', handleClick);
+        app.on('touchstart', handleTouchStart);
+        app.on('touchmove', handleTouchMove);
+        app.on('touchend', handleTouchEnd);
+      } else {
+        app.on('click', handleClickLight);
+        app.on('touchstart', handleTouchStartLight);
+        app.on('touchmove', handleTouchMoveLight);
+        app.on('touchend', handleTouchEndLight);
+      }
+
       doc.addEventListener('touchcancel', handleTouchCancel, { passive: true });
     } else if (params.activeState) {
       app.on('touchstart', handleMouseDown);
@@ -4784,21 +5162,25 @@
     params: {
       touch: {
         // Fast clicks
-        fastClicks: true,
+        fastClicks: false,
         fastClicksDistanceThreshold: 10,
         fastClicksDelayBetweenClicks: 50,
         fastClicksExclude: '', // CSS selector
+        // Clicks
+        touchClicksDistanceThreshold: 5,
         // ContextMenu
-        disableContextMenu: true,
+        disableContextMenu: false,
         // Tap Hold
         tapHold: false,
         tapHoldDelay: 750,
         tapHoldPreventClicks: true,
         // Active State
         activeState: true,
-        activeStateElements: 'a, button, label, span, .actions-button, .stepper-button, .stepper-button-plus, .stepper-button-minus',
-        materialRipple: true,
-        materialRippleElements: '.ripple, .link, .item-link, .links-list a, .button, button, .input-clear-button, .dialog-button, .tab-link, .item-radio, .item-checkbox, .actions-button, .searchbar-disable-button, .fab a, .checkbox, .radio, .data-table .sortable-cell:not(.input-cell), .notification-close-button, .stepper-button, .stepper-button-minus, .stepper-button-plus',
+        activeStateElements: 'a, button, label, span, .actions-button, .stepper-button, .stepper-button-plus, .stepper-button-minus, .card-expandable, .menu-item, .link, .item-link',
+        mdTouchRipple: true,
+        iosTouchRipple: false,
+        auroraTouchRipple: false,
+        touchRippleElements: '.ripple, .link, .item-link, .list-button, .links-list a, .button, button, .input-clear-button, .dialog-button, .tab-link, .item-radio, .item-checkbox, .actions-button, .searchbar-disable-button, .fab a, .checkbox, .radio, .data-table .sortable-cell:not(.input-cell), .notification-close-button, .stepper-button, .stepper-button-minus, .stepper-button-plus, .menu-item-content',
       },
     },
     instance: {
@@ -5334,35 +5716,250 @@
     var isMoved = false;
     var touchesStart = {};
     var isScrolling;
-    var currentPage = [];
-    var previousPage = [];
+    var $currentPageEl = [];
+    var $previousPageEl = [];
     var viewContainerWidth;
     var touchesDiff;
     var allowViewTouchMove = true;
     var touchStartTime;
-    var currentNavbar = [];
-    var previousNavbar = [];
-    var currentNavElements;
-    var previousNavElements;
-    var activeNavBackIcon;
-    var activeNavBackIconText;
-    var previousNavBackIcon;
-    // let previousNavBackIconText;
+    var $currentNavbarInnerEl = [];
+    var $previousNavbarInnerEl = [];
     var dynamicNavbar;
     var separateNavbar;
-    var pageShadow;
-    var pageOpacity;
-    var navbarWidth;
+    var $pageShadowEl;
+    var $pageOpacityEl;
+
+    var animatableNavEls;
 
     var paramsSwipeBackAnimateShadow = params[((app.theme) + "SwipeBackAnimateShadow")];
     var paramsSwipeBackAnimateOpacity = params[((app.theme) + "SwipeBackAnimateOpacity")];
     var paramsSwipeBackActiveArea = params[((app.theme) + "SwipeBackActiveArea")];
     var paramsSwipeBackThreshold = params[((app.theme) + "SwipeBackThreshold")];
 
+    var transformOrigin = app.rtl ? 'right center' : 'left center';
+
+    function animatableNavElements() {
+      var els = [];
+      var inverter = app.rtl ? -1 : 1;
+      var currentNavIsLarge = $currentNavbarInnerEl.hasClass('navbar-inner-large');
+      var previousNavIsLarge = $previousNavbarInnerEl.hasClass('navbar-inner-large');
+      var fromLarge = currentNavIsLarge && !$currentNavbarInnerEl.hasClass('navbar-inner-large-collapsed');
+      var toLarge = previousNavIsLarge && !$previousNavbarInnerEl.hasClass('navbar-inner-large-collapsed');
+      var $currentNavElements = $currentNavbarInnerEl.children('.left, .title, .right, .subnavbar, .fading, .title-large');
+      var $previousNavElements = $previousNavbarInnerEl.children('.left, .title, .right, .subnavbar, .fading, .title-large');
+      var activeNavBackIconText;
+      var previousNavBackIconText;
+
+      if (params.iosAnimateNavbarBackIcon) {
+        if ($currentNavbarInnerEl.hasClass('sliding')) {
+          activeNavBackIconText = $currentNavbarInnerEl.children('.left').find('.back .icon + span').eq(0);
+        } else {
+          activeNavBackIconText = $currentNavbarInnerEl.children('.left.sliding').find('.back .icon + span').eq(0);
+        }
+        if ($previousNavbarInnerEl.hasClass('sliding')) {
+          previousNavBackIconText = $previousNavbarInnerEl.children('.left').find('.back .icon + span').eq(0);
+        } else {
+          previousNavBackIconText = $previousNavbarInnerEl.children('.left.sliding').find('.back .icon + span').eq(0);
+        }
+        if (activeNavBackIconText.length) {
+          $previousNavElements.each(function (index, el) {
+            if (!$(el).hasClass('title')) { return; }
+            el.f7NavbarLeftOffset += activeNavBackIconText.prev('.icon')[0].offsetWidth;
+          });
+        }
+      }
+      $currentNavElements
+        .each(function (index, navEl) {
+          var $navEl = $(navEl);
+          var isSubnavbar = $navEl.hasClass('subnavbar');
+          var isLeft = $navEl.hasClass('left');
+          var isTitle = $navEl.hasClass('title');
+          if (!fromLarge && $navEl.hasClass('.title-large')) { return; }
+          var el = {
+            el: navEl,
+          };
+          if (fromLarge) {
+            if (isTitle) { return; }
+            if ($navEl.hasClass('title-large')) {
+              if (!separateNavbar) { return; }
+              if (toLarge) {
+                if (els.indexOf(el) < 0) { els.push(el); }
+                el.overflow = 'visible';
+                el.transform = 'translateX(100%)';
+                $navEl.find('.title-large-text, .title-large-inner').each(function (subIndex, subNavEl) {
+                  els.push({
+                    el: subNavEl,
+                    transform: function (progress) { return ("translateX(" + (-100 + progress * 100 * inverter) + "%)"); },
+                  });
+                });
+              } else {
+                if (els.indexOf(el) < 0) { els.push(el); }
+                el.overflow = 'hidden';
+                el.transform = function (progress) { return ("translateY(calc(" + (-progress) + " * var(--f7-navbar-large-title-height)))"); };
+                $navEl.find('.title-large-text, .title-large-inner').each(function (subIndex, subNavEl) {
+                  els.push({
+                    el: subNavEl,
+                    transform: function (progress) { return ("translateX(" + (progress * 100 * inverter) + "%) translateY(calc(" + progress + " * var(--f7-navbar-large-title-height)))"); },
+                  });
+                });
+              }
+              return;
+            }
+          }
+          if (toLarge) {
+            if (!fromLarge) {
+              if ($navEl.hasClass('title-large')) {
+                if (!separateNavbar) { return; }
+                if (els.indexOf(el) < 0) { els.push(el); }
+                el.opacity = 0;
+              }
+            }
+            if (isLeft && separateNavbar) {
+              if (els.indexOf(el) < 0) { els.push(el); }
+              el.opacity = function (progress) { return (1 - (Math.pow( progress, 0.33 ))); };
+              $navEl.find('.back span').each(function (subIndex, subNavEl) {
+                els.push({
+                  el: subNavEl,
+                  'transform-origin': transformOrigin,
+                  transform: function (progress) { return ("translateY(calc(var(--f7-navbar-height) * " + progress + ")) scale(" + (1 + (1 * progress)) + ")"); },
+                });
+              });
+              return;
+            }
+          }
+          if ($navEl.hasClass('title-large')) { return; }
+          var isSliding = $navEl.hasClass('sliding') || $currentNavbarInnerEl.hasClass('sliding');
+          if (els.indexOf(el) < 0) { els.push(el); }
+          if (!isSubnavbar || (isSubnavbar && !isSliding)) {
+            el.opacity = function (progress) { return (1 - (Math.pow( progress, 0.33 ))); };
+          }
+          if (isSliding) {
+            var transformTarget = el;
+            if (isLeft && activeNavBackIconText.length && params.iosAnimateNavbarBackIcon) {
+              var textEl = { el: activeNavBackIconText[0] };
+              transformTarget = textEl;
+              els.push(textEl);
+            }
+            transformTarget.transform = function (progress) {
+              var activeNavTranslate = progress * transformTarget.el.f7NavbarRightOffset;
+              if (Device.pixelRatio === 1) { activeNavTranslate = Math.round(activeNavTranslate); }
+              if (isSubnavbar && currentNavIsLarge && separateNavbar) {
+                return ("translate3d(" + activeNavTranslate + "px, calc(-1 * var(--f7-navbar-large-collapse-progress) * var(--f7-navbar-large-title-height)), 0)");
+              }
+              return ("translate3d(" + activeNavTranslate + "px,0,0)");
+            };
+          }
+        });
+      $previousNavElements
+        .each(function (index, navEl) {
+          var $navEl = $(navEl);
+          var isSubnavbar = $navEl.hasClass('subnavbar');
+          var isLeft = $navEl.hasClass('left');
+          var isTitle = $navEl.hasClass('title');
+          var el = {
+            el: navEl,
+          };
+          if (toLarge) {
+            if (isTitle) { return; }
+            if (els.indexOf(el) < 0) { els.push(el); }
+
+            if ($navEl.hasClass('title-large')) {
+              if (!separateNavbar) { return; }
+              if (fromLarge) {
+                el.opacity = 1;
+                el.overflow = 'visible';
+                el.transform = 'translateY(0)';
+                $navEl.find('.title-large-text').each(function (subIndex, subNavEl) {
+                  els.push({
+                    el: subNavEl,
+                    'transform-origin': transformOrigin,
+                    opacity: function (progress) { return (Math.pow( progress, 3 )); },
+                    transform: function (progress) { return ("translateY(calc(" + (-1 + progress * 1) + " * var(--f7-navbar-large-title-height))) scale(" + (0.5 + progress * 0.5) + ")"); },
+                  });
+                });
+              } else {
+                el.transform = function (progress) { return ("translateY(calc(" + (progress - 1) + " * var(--f7-navbar-large-title-height)))"); };
+                el.opacity = 1;
+                el.overflow = 'hidden';
+                $navEl.find('.title-large-text').each(function (subIndex, subNavEl) {
+                  els.push({
+                    el: subNavEl,
+                    'transform-origin': transformOrigin,
+                    opacity: function (progress) { return (Math.pow( progress, 3 )); },
+                    transform: function (progress) { return ("scale(" + (0.5 + progress * 0.5) + ")"); },
+                  });
+                });
+              }
+              $navEl.find('.title-large-inner').each(function (subIndex, subNavEl) {
+                els.push({
+                  el: subNavEl,
+                  'transform-origin': transformOrigin,
+                  opacity: function (progress) { return (Math.pow( progress, 3 )); },
+                  transform: function (progress) { return ("translateX(" + (-100 * (1 - progress) * inverter) + "%)"); },
+                });
+              });
+              return;
+            }
+          }
+          if ($navEl.hasClass('title-large')) { return; }
+          var isSliding = $navEl.hasClass('sliding') || $previousNavbarInnerEl.hasClass('sliding');
+          if (els.indexOf(el) < 0) { els.push(el); }
+          if (!isSubnavbar || (isSubnavbar && !isSliding)) {
+            el.opacity = function (progress) { return (Math.pow( progress, 3 )); };
+          }
+          if (isSliding) {
+            var transformTarget = el;
+            if (isLeft && previousNavBackIconText.length && params.iosAnimateNavbarBackIcon) {
+              var textEl = { el: previousNavBackIconText[0] };
+              transformTarget = textEl;
+              els.push(textEl);
+            }
+            transformTarget.transform = function (progress) {
+              var previousNavTranslate = transformTarget.el.f7NavbarLeftOffset * (1 - progress);
+              if (Device.pixelRatio === 1) { previousNavTranslate = Math.round(previousNavTranslate); }
+              if (isSubnavbar && previousNavIsLarge && separateNavbar) {
+                return ("translate3d(" + previousNavTranslate + "px, calc(-1 * var(--f7-navbar-large-collapse-progress) * var(--f7-navbar-large-title-height)), 0)");
+              }
+              return ("translate3d(" + previousNavTranslate + "px,0,0)");
+            };
+          }
+        });
+      return els;
+    }
+
+    function setAnimatableNavElements(ref) {
+      if ( ref === void 0 ) ref = {};
+      var progress = ref.progress;
+      var reset = ref.reset;
+      var transition = ref.transition;
+
+      var styles = ['overflow', 'transform', 'transform-origin', 'opacity'];
+      for (var i = 0; i < animatableNavEls.length; i += 1) {
+        var el = animatableNavEls[i];
+        if (el && el.el) {
+          if (transition === true) { el.el.classList.add('navbar-page-transitioning'); }
+          if (transition === false) { el.el.classList.remove('navbar-page-transitioning'); }
+          for (var j = 0; j < styles.length; j += 1) {
+            var styleProp = styles[j];
+            if (el[styleProp]) {
+              if (reset) {
+                el.el.style[styleProp] = '';
+              } else if (typeof el[styleProp] === 'function') {
+                el.el.style[styleProp] = el[styleProp](progress);
+              } else {
+                el.el.style[styleProp] = el[styleProp];
+              }
+            }
+          }
+        }
+      }
+    }
+
     function handleTouchStart(e) {
       var swipeBackEnabled = params[((app.theme) + "SwipeBack")];
       if (!allowViewTouchMove || !swipeBackEnabled || isTouched || (app.swipeout && app.swipeout.el) || !router.allowPageChange) { return; }
       if ($(e.target).closest('.range-slider, .calendar-months').length > 0) { return; }
+      if ($(e.target).closest('.page-master, .page-master-detail').length > 0 && params.masterDetailBreakpoint > 0 && app.width >= params.masterDetailBreakpoint) { return; }
       isMoved = false;
       isTouched = true;
       isScrolling = undefined;
@@ -5394,10 +5991,12 @@
           if (app.rtl && swipeout.find('.swipeout-actions-right').length > 0) { cancel = true; }
         }
 
-        currentPage = target.closest('.page');
-        if (currentPage.hasClass('no-swipeback') || target.closest('.no-swipeback').length > 0) { cancel = true; }
-        previousPage = $el.find('.page-previous:not(.stacked)');
-
+        $currentPageEl = target.closest('.page');
+        if ($currentPageEl.hasClass('no-swipeback') || target.closest('.no-swipeback, .card-opened').length > 0) { cancel = true; }
+        $previousPageEl = $el.find('.page-previous:not(.stacked)');
+        if ($previousPageEl.length > 1) {
+          $previousPageEl = $previousPageEl.eq($previousPageEl.length - 1);
+        }
         var notFromBorder = touchesStart.x - $el.offset().left > paramsSwipeBackActiveArea;
         viewContainerWidth = $el.width();
         if (app.rtl) {
@@ -5406,52 +6005,40 @@
           notFromBorder = touchesStart.x - $el.offset().left > paramsSwipeBackActiveArea;
         }
         if (notFromBorder) { cancel = true; }
-        if (previousPage.length === 0 || currentPage.length === 0) { cancel = true; }
+        if ($previousPageEl.length === 0 || $currentPageEl.length === 0) { cancel = true; }
         if (cancel) {
           isTouched = false;
           return;
         }
 
         if (paramsSwipeBackAnimateShadow) {
-          pageShadow = currentPage.find('.page-shadow-effect');
-          if (pageShadow.length === 0) {
-            pageShadow = $('<div class="page-shadow-effect"></div>');
-            currentPage.append(pageShadow);
+          $pageShadowEl = $currentPageEl.find('.page-shadow-effect');
+          if ($pageShadowEl.length === 0) {
+            $pageShadowEl = $('<div class="page-shadow-effect"></div>');
+            $currentPageEl.append($pageShadowEl);
           }
         }
         if (paramsSwipeBackAnimateOpacity) {
-          pageOpacity = previousPage.find('.page-opacity-effect');
-          if (pageOpacity.length === 0) {
-            pageOpacity = $('<div class="page-opacity-effect"></div>');
-            previousPage.append(pageOpacity);
+          $pageOpacityEl = $previousPageEl.find('.page-opacity-effect');
+          if ($pageOpacityEl.length === 0) {
+            $pageOpacityEl = $('<div class="page-opacity-effect"></div>');
+            $previousPageEl.append($pageOpacityEl);
           }
         }
 
         if (dynamicNavbar) {
           if (separateNavbar) {
-            currentNavbar = $navbarEl.find('.navbar-current:not(.stacked)');
-            previousNavbar = $navbarEl.find('.navbar-previous:not(.stacked)');
+            $currentNavbarInnerEl = $navbarEl.find('.navbar-current:not(.stacked)');
+            $previousNavbarInnerEl = $navbarEl.find('.navbar-previous:not(.stacked)');
           } else {
-            currentNavbar = currentPage.children('.navbar').children('.navbar-inner');
-            previousNavbar = previousPage.children('.navbar').children('.navbar-inner');
+            $currentNavbarInnerEl = $currentPageEl.children('.navbar').children('.navbar-inner');
+            $previousNavbarInnerEl = $previousPageEl.children('.navbar').children('.navbar-inner');
           }
-          navbarWidth = $navbarEl[0].offsetWidth;
-          currentNavElements = currentNavbar.children('.left, .title, .right, .subnavbar, .fading');
-          previousNavElements = previousNavbar.children('.left, .title, .right, .subnavbar, .fading');
-          if (params.iosAnimateNavbarBackIcon) {
-            if (currentNavbar.hasClass('sliding')) {
-              activeNavBackIcon = currentNavbar.children('.left').find('.back .icon');
-              activeNavBackIconText = currentNavbar.children('.left').find('.back span').eq(0);
-            } else {
-              activeNavBackIcon = currentNavbar.children('.left.sliding').find('.back .icon');
-              activeNavBackIconText = currentNavbar.children('.left.sliding').find('.back span').eq(0);
-            }
-            if (previousNavbar.hasClass('sliding')) {
-              previousNavBackIcon = previousNavbar.children('.left').find('.back .icon');
-            } else {
-              previousNavBackIcon = previousNavbar.children('.left.sliding').find('.back .icon');
-            }
+          if ($previousNavbarInnerEl.length > 1) {
+            $previousNavbarInnerEl = $previousNavbarInnerEl.eq($previousNavbarInnerEl.length - 1);
           }
+
+          animatableNavEls = animatableNavElements();
         }
 
         // Close/Hide Any Picker
@@ -5470,15 +6057,16 @@
       // Touches diff
       touchesDiff = (pageX - touchesStart.x - paramsSwipeBackThreshold) * inverter;
       if (touchesDiff < 0) { touchesDiff = 0; }
-      var percentage = touchesDiff / viewContainerWidth;
+      var percentage = Math.min(Math.max(touchesDiff / viewContainerWidth, 0), 1);
 
       // Swipe Back Callback
       var callbackData = {
         percentage: percentage,
-        currentPageEl: currentPage[0],
-        previousPageEl: previousPage[0],
-        currentNavbarEl: currentNavbar[0],
-        previousNavbarEl: previousNavbar[0],
+        progress: percentage,
+        currentPageEl: $currentPageEl[0],
+        previousPageEl: $previousPageEl[0],
+        currentNavbarEl: $currentNavbarInnerEl[0],
+        previousNavbarEl: $previousNavbarInnerEl[0],
       };
       $el.trigger('swipeback:move', callbackData);
       router.emit('swipebackMove', callbackData);
@@ -5486,66 +6074,33 @@
       // Transform pages
       var currentPageTranslate = touchesDiff * inverter;
       var previousPageTranslate = ((touchesDiff / 5) - (viewContainerWidth / 5)) * inverter;
+      if (!app.rtl) {
+        currentPageTranslate = Math.min(currentPageTranslate, viewContainerWidth);
+        previousPageTranslate = Math.min(previousPageTranslate, 0);
+      } else {
+        currentPageTranslate = Math.max(currentPageTranslate, -viewContainerWidth);
+        previousPageTranslate = Math.max(previousPageTranslate, 0);
+      }
       if (Device.pixelRatio === 1) {
         currentPageTranslate = Math.round(currentPageTranslate);
         previousPageTranslate = Math.round(previousPageTranslate);
       }
 
       router.swipeBackActive = true;
-      $([currentPage[0], previousPage[0]]).addClass('page-swipeback-active');
+      $([$currentPageEl[0], $previousPageEl[0]]).addClass('page-swipeback-active');
 
-      currentPage.transform(("translate3d(" + currentPageTranslate + "px,0,0)"));
-      if (paramsSwipeBackAnimateShadow) { pageShadow[0].style.opacity = 1 - (1 * percentage); }
+      $currentPageEl.transform(("translate3d(" + currentPageTranslate + "px,0,0)"));
+      if (paramsSwipeBackAnimateShadow) { $pageShadowEl[0].style.opacity = 1 - (1 * percentage); }
 
-      if (app.theme !== 'md') {
-        previousPage.transform(("translate3d(" + previousPageTranslate + "px,0,0)"));
+      if (app.theme === 'ios') {
+        $previousPageEl.transform(("translate3d(" + previousPageTranslate + "px,0,0)"));
       }
-      if (paramsSwipeBackAnimateOpacity) { pageOpacity[0].style.opacity = 1 - (1 * percentage); }
+      if (paramsSwipeBackAnimateOpacity) { $pageShadowEl[0].style.opacity = 1 - (1 * percentage); }
 
       // Dynamic Navbars Animation
-      if (dynamicNavbar) {
-        currentNavElements.each(function (index, navEl) {
-          var $navEl = $(navEl);
-          if (!$navEl.is('.subnavbar')) { $navEl[0].style.opacity = (1 - (Math.pow( percentage, 0.33 ))); }
-          if ($navEl[0].className.indexOf('sliding') >= 0 || currentNavbar.hasClass('sliding')) {
-            var activeNavTranslate = percentage * $navEl[0].f7NavbarRightOffset;
-            if (Device.pixelRatio === 1) { activeNavTranslate = Math.round(activeNavTranslate); }
-            $navEl.transform(("translate3d(" + activeNavTranslate + "px,0,0)"));
-            if (params.iosAnimateNavbarBackIcon) {
-              if ($navEl[0].className.indexOf('left') >= 0 && activeNavBackIcon.length > 0) {
-                var iconTranslate = -activeNavTranslate;
-                if (!separateNavbar) {
-                  iconTranslate -= navbarWidth * percentage;
-                }
-                activeNavBackIcon.transform(("translate3d(" + iconTranslate + "px,0,0)"));
-              }
-            }
-          }
-        });
-        previousNavElements.each(function (index, navEl) {
-          var $navEl = $(navEl);
-          if (!$navEl.is('.subnavbar')) { $navEl[0].style.opacity = (Math.pow( percentage, 3 )); }
-          if ($navEl[0].className.indexOf('sliding') >= 0 || previousNavbar.hasClass('sliding')) {
-            var previousNavTranslate = $navEl[0].f7NavbarLeftOffset * (1 - percentage);
-            if ($navEl[0].className.indexOf('title') >= 0 && activeNavBackIcon && activeNavBackIcon.length && activeNavBackIconText.length) {
-              previousNavTranslate = ($navEl[0].f7NavbarLeftOffset + activeNavBackIconText[0].offsetLeft) * (1 - percentage);
-            } else {
-              previousNavTranslate = $navEl[0].f7NavbarLeftOffset * (1 - percentage);
-            }
-            if (Device.pixelRatio === 1) { previousNavTranslate = Math.round(previousNavTranslate); }
-            $navEl.transform(("translate3d(" + previousNavTranslate + "px,0,0)"));
-            if (params.iosAnimateNavbarBackIcon) {
-              if ($navEl[0].className.indexOf('left') >= 0 && previousNavBackIcon.length > 0) {
-                var iconTranslate = -previousNavTranslate;
-                if (!separateNavbar) {
-                  iconTranslate += (navbarWidth / 5) * (1 - percentage);
-                }
-                previousNavBackIcon.transform(("translate3d(" + iconTranslate + "px,0,0)"));
-              }
-            }
-          }
-        });
-      }
+      if (!dynamicNavbar) { return; }
+
+      setAnimatableNavElements({ progress: percentage });
     }
     function handleTouchEnd() {
       app.preventSwipePanelBySwipeBack = false;
@@ -5557,16 +6112,13 @@
       isTouched = false;
       isMoved = false;
       router.swipeBackActive = false;
-      $([currentPage[0], previousPage[0]]).removeClass('page-swipeback-active');
+      $([$currentPageEl[0], $previousPageEl[0]]).removeClass('page-swipeback-active');
       if (touchesDiff === 0) {
-        $([currentPage[0], previousPage[0]]).transform('');
-        if (pageShadow && pageShadow.length > 0) { pageShadow.remove(); }
-        if (pageOpacity && pageOpacity.length > 0) { pageOpacity.remove(); }
+        $([$currentPageEl[0], $previousPageEl[0]]).transform('');
+        if ($pageShadowEl && $pageShadowEl.length > 0) { $pageShadowEl.remove(); }
+        if ($pageOpacityEl && $pageOpacityEl.length > 0) { $pageOpacityEl.remove(); }
         if (dynamicNavbar) {
-          currentNavElements.transform('').css({ opacity: '' });
-          previousNavElements.transform('').css({ opacity: '' });
-          if (activeNavBackIcon && activeNavBackIcon.length > 0) { activeNavBackIcon.transform(''); }
-          if (previousNavBackIcon && activeNavBackIcon.length > 0) { previousNavBackIcon.transform(''); }
+          setAnimatableNavElements({ reset: true });
         }
         return;
       }
@@ -5577,67 +6129,42 @@
         (timeDiff < 300 && touchesDiff > 10)
         || (timeDiff >= 300 && touchesDiff > viewContainerWidth / 2)
       ) {
-        currentPage.removeClass('page-current').addClass(("page-next" + (app.theme === 'md' ? ' page-next-on-right' : '')));
-        previousPage.removeClass('page-previous').addClass('page-current').removeAttr('aria-hidden');
-        if (pageShadow) { pageShadow[0].style.opacity = ''; }
-        if (pageOpacity) { pageOpacity[0].style.opacity = ''; }
+        $currentPageEl.removeClass('page-current').addClass(("page-next" + (app.theme !== 'ios' ? ' page-next-on-right' : '')));
+        $previousPageEl.removeClass('page-previous').addClass('page-current').removeAttr('aria-hidden');
+        if ($pageShadowEl) { $pageShadowEl[0].style.opacity = ''; }
+        if ($pageOpacityEl) { $pageOpacityEl[0].style.opacity = ''; }
         if (dynamicNavbar) {
-          currentNavbar.removeClass('navbar-current').addClass('navbar-next');
-          previousNavbar.removeClass('navbar-previous').addClass('navbar-current').removeAttr('aria-hidden');
+          $currentNavbarInnerEl.removeClass('navbar-current').addClass('navbar-next');
+          $previousNavbarInnerEl.removeClass('navbar-previous').addClass('navbar-current').removeAttr('aria-hidden');
         }
         pageChanged = true;
       }
       // Reset custom styles
       // Add transitioning class for transition-duration
-      $([currentPage[0], previousPage[0]]).addClass('page-transitioning page-transitioning-swipeback').transform('');
+      $([$currentPageEl[0], $previousPageEl[0]]).addClass('page-transitioning page-transitioning-swipeback').transform('');
 
       if (dynamicNavbar) {
-        currentNavElements.css({ opacity: '' })
-          .each(function (navElIndex, navEl) {
-            var translate = pageChanged ? navEl.f7NavbarRightOffset : 0;
-            var sliding = $(navEl);
-            var iconTranslate = pageChanged ? -translate : 0;
-            if (!separateNavbar && pageChanged) { iconTranslate -= navbarWidth; }
-            sliding.transform(("translate3d(" + translate + "px,0,0)"));
-            if (params.iosAnimateNavbarBackIcon) {
-              if (sliding.hasClass('left') && activeNavBackIcon.length > 0) {
-                activeNavBackIcon.addClass('navbar-transitioning').transform(("translate3d(" + iconTranslate + "px,0,0)"));
-              }
-            }
-          }).addClass('navbar-transitioning');
-
-        previousNavElements.transform('').css({ opacity: '' }).each(function (navElIndex, navEl) {
-          var translate = pageChanged ? 0 : navEl.f7NavbarLeftOffset;
-          var sliding = $(navEl);
-          var iconTranslate = pageChanged ? 0 : -translate;
-          if (!separateNavbar && !pageChanged) { iconTranslate += navbarWidth / 5; }
-          sliding.transform(("translate3d(" + translate + "px,0,0)"));
-          if (params.iosAnimateNavbarBackIcon) {
-            if (sliding.hasClass('left') && previousNavBackIcon.length > 0) {
-              previousNavBackIcon.addClass('navbar-transitioning').transform(("translate3d(" + iconTranslate + "px,0,0)"));
-            }
-          }
-        }).addClass('navbar-transitioning');
+        setAnimatableNavElements({ progress: pageChanged ? 1 : 0, transition: true });
       }
       allowViewTouchMove = false;
       router.allowPageChange = false;
 
       // Swipe Back Callback
       var callbackData = {
-        currentPageEl: currentPage[0],
-        previousPageEl: previousPage[0],
-        currentNavbarEl: currentNavbar[0],
-        previousNavbarEl: previousNavbar[0],
+        currentPageEl: $currentPageEl[0],
+        previousPageEl: $previousPageEl[0],
+        currentNavbarEl: $currentNavbarInnerEl[0],
+        previousNavbarEl: $previousNavbarInnerEl[0],
       };
 
       if (pageChanged) {
         // Update Route
-        router.currentRoute = previousPage[0].f7Page.route;
-        router.currentPage = previousPage[0];
+        router.currentRoute = $previousPageEl[0].f7Page.route;
+        router.currentPage = $previousPageEl[0];
 
         // Page before animation callback
-        router.pageCallback('beforeOut', currentPage, currentNavbar, 'current', 'next', { route: currentPage[0].f7Page.route, swipeBack: true });
-        router.pageCallback('beforeIn', previousPage, previousNavbar, 'previous', 'current', { route: previousPage[0].f7Page.route, swipeBack: true });
+        router.pageCallback('beforeOut', $currentPageEl, $currentNavbarInnerEl, 'current', 'next', { route: $currentPageEl[0].f7Page.route, swipeBack: true });
+        router.pageCallback('beforeIn', $previousPageEl, $previousNavbarInnerEl, 'previous', 'current', { route: $previousPageEl[0].f7Page.route, swipeBack: true }, $currentPageEl[0]);
 
         $el.trigger('swipeback:beforechange', callbackData);
         router.emit('swipebackBeforeChange', callbackData);
@@ -5646,14 +6173,10 @@
         router.emit('swipebackBeforeReset', callbackData);
       }
 
-      currentPage.transitionEnd(function () {
-        $([currentPage[0], previousPage[0]]).removeClass('page-transitioning page-transitioning-swipeback');
-
+      $currentPageEl.transitionEnd(function () {
+        $([$currentPageEl[0], $previousPageEl[0]]).removeClass('page-transitioning page-transitioning-swipeback');
         if (dynamicNavbar) {
-          currentNavElements.removeClass('navbar-transitioning').css({ opacity: '' }).transform('');
-          previousNavElements.removeClass('navbar-transitioning').css({ opacity: '' }).transform('');
-          if (activeNavBackIcon && activeNavBackIcon.length > 0) { activeNavBackIcon.removeClass('navbar-transitioning'); }
-          if (previousNavBackIcon && previousNavBackIcon.length > 0) { previousNavBackIcon.removeClass('navbar-transitioning'); }
+          setAnimatableNavElements({ reset: true, transition: false });
         }
         allowViewTouchMove = true;
         router.allowPageChange = true;
@@ -5671,20 +6194,20 @@
           }
 
           // Page after animation callback
-          router.pageCallback('afterOut', currentPage, currentNavbar, 'current', 'next', { route: currentPage[0].f7Page.route, swipeBack: true });
-          router.pageCallback('afterIn', previousPage, previousNavbar, 'previous', 'current', { route: previousPage[0].f7Page.route, swipeBack: true });
+          router.pageCallback('afterOut', $currentPageEl, $currentNavbarInnerEl, 'current', 'next', { route: $currentPageEl[0].f7Page.route, swipeBack: true });
+          router.pageCallback('afterIn', $previousPageEl, $previousNavbarInnerEl, 'previous', 'current', { route: $previousPageEl[0].f7Page.route, swipeBack: true });
 
           // Remove Old Page
-          if (params.stackPages && router.initialPages.indexOf(currentPage[0]) >= 0) {
-            currentPage.addClass('stacked');
+          if (params.stackPages && router.initialPages.indexOf($currentPageEl[0]) >= 0) {
+            $currentPageEl.addClass('stacked');
             if (separateNavbar) {
-              currentNavbar.addClass('stacked');
+              $currentNavbarInnerEl.addClass('stacked');
             }
           } else {
-            router.pageCallback('beforeRemove', currentPage, currentNavbar, 'next', { swipeBack: true });
-            router.removePage(currentPage);
+            router.pageCallback('beforeRemove', $currentPageEl, $currentNavbarInnerEl, 'next', { swipeBack: true });
+            router.removePage($currentPageEl);
             if (separateNavbar) {
-              router.removeNavbar(currentNavbar);
+              router.removeNavbar($currentNavbarInnerEl);
             }
           }
 
@@ -5700,8 +6223,8 @@
           $el.trigger('swipeback:afterreset', callbackData);
           router.emit('swipebackAfterReset', callbackData);
         }
-        if (pageShadow && pageShadow.length > 0) { pageShadow.remove(); }
-        if (pageOpacity && pageOpacity.length > 0) { pageOpacity.remove(); }
+        if ($pageShadowEl && $pageShadowEl.length > 0) { $pageShadowEl.remove(); }
+        if ($pageOpacityEl && $pageOpacityEl.length > 0) { $pageOpacityEl.remove(); }
       });
     }
 
@@ -5867,8 +6390,14 @@
       reloadPrevious: false,
       reloadAll: false,
       clearPreviousHistory: false,
+      reloadDetail: router.params.reloadDetail,
       on: {},
     }, forwardOptions);
+
+    var masterDetailEnabled = router.params.masterDetailBreakpoint > 0;
+    var isMaster = masterDetailEnabled && options.route && options.route.route && options.route.route.master === true;
+    var masterPageEl;
+    var otherDetailPageEl;
 
     var currentRouteIsModal = router.currentRoute.modal;
     var modalType;
@@ -5965,27 +6494,65 @@
       return router;
     }
 
+    // Find Detail' master page
+    var isDetail;
+    var reloadDetail;
+    if (masterDetailEnabled && !options.reloadAll) {
+      for (var i = 0; i < $pagesInView.length; i += 1) {
+        if (!masterPageEl
+          && $pagesInView[i].classList.contains('page-master')
+        ) {
+          masterPageEl = $pagesInView[i];
+          continue; // eslint-disable-line
+        }
+      }
+      isDetail = !isMaster && masterPageEl;
+
+      if (isDetail) {
+        // Find Other Detail
+        if (masterPageEl) {
+          for (var i$1 = 0; i$1 < $pagesInView.length; i$1 += 1) {
+            if ($pagesInView[i$1].classList.contains('page-master-detail')
+            ) {
+              otherDetailPageEl = $pagesInView[i$1];
+              continue; // eslint-disable-line
+            }
+          }
+        }
+      }
+      reloadDetail = isDetail && options.reloadDetail && app.width >= router.params.masterDetailBreakpoint && masterPageEl;
+    }
+
     // New Page
     var newPagePosition = 'next';
-    if (options.reloadCurrent || options.reloadAll) {
+    if (options.reloadCurrent || options.reloadAll || reloadDetail) {
       newPagePosition = 'current';
     } else if (options.reloadPrevious) {
       newPagePosition = 'previous';
     }
     $newPage
-      .addClass(("page-" + newPagePosition))
+      .removeClass('page-previous page-current page-next')
+      .addClass(("page-" + newPagePosition + (isMaster ? ' page-master' : '') + (isDetail ? ' page-master-detail' : '')))
       .removeClass('stacked')
       .trigger('page:unstack')
       .trigger('page:position', { position: newPagePosition });
+    router.emit('pageUnstack', $newPage[0]);
+    router.emit('pagePosition', $newPage[0], newPagePosition);
+
+    if (isMaster || isDetail) {
+      $newPage.trigger('page:role', { role: isMaster ? 'master' : 'detail' });
+    }
+
 
     if (dynamicNavbar && $newNavbarInner.length) {
       $newNavbarInner
-        .addClass(("navbar-" + newPagePosition))
+        .removeClass('navbar-previous navbar-current navbar-next')
+        .addClass(("navbar-" + newPagePosition + (isMaster ? ' navbar-master' : '') + (isDetail ? ' navbar-master-detail' : '')))
         .removeClass('stacked');
     }
 
     // Find Old Page
-    if (options.reloadCurrent) {
+    if (options.reloadCurrent || reloadDetail) {
       $oldPage = $pagesInView.eq($pagesInView.length - 1);
       if (separateNavbar) {
         // $oldNavbarInner = $navbarsInView.eq($pagesInView.length - 1);
@@ -6004,20 +6571,31 @@
       }
     } else {
       if ($pagesInView.length > 1) {
-        var i = 0;
-        for (i = 0; i < $pagesInView.length - 1; i += 1) {
-          var oldNavbarInnerEl = app.navbar.getElByPage($pagesInView.eq(i));
-          if (router.params.stackPages) {
-            $pagesInView.eq(i).addClass('stacked');
-            $pagesInView.eq(i).trigger('page:stack');
+        var i$2 = 0;
+        for (i$2 = 0; i$2 < $pagesInView.length - 1; i$2 += 1) {
+          if (masterPageEl
+            && $pagesInView[i$2] === masterPageEl
+          ) {
+            $pagesInView.eq(i$2).addClass('page-master-stacked');
+            $pagesInView.eq(i$2).trigger('page:masterstack');
+            router.emit('pageMasterStack', $pagesInView[i$2]);
             if (separateNavbar) {
-              // $navbarsInView.eq(i).addClass('stacked');
+              $(app.navbar.getElByPage(masterPageEl)).addClass('navbar-master-stacked');
+            }
+            continue; // eslint-disable-line
+          }
+          var oldNavbarInnerEl = app.navbar.getElByPage($pagesInView.eq(i$2));
+          if (router.params.stackPages) {
+            $pagesInView.eq(i$2).addClass('stacked');
+            $pagesInView.eq(i$2).trigger('page:stack');
+            router.emit('pageStack', $pagesInView[i$2]);
+            if (separateNavbar) {
               $(oldNavbarInnerEl).addClass('stacked');
             }
           } else {
             // Page remove event
-            router.pageCallback('beforeRemove', $pagesInView[i], $navbarsInView && $navbarsInView[i], 'previous', undefined, options);
-            router.removePage($pagesInView[i]);
+            router.pageCallback('beforeRemove', $pagesInView[i$2], $navbarsInView && $navbarsInView[i$2], 'previous', undefined, options);
+            router.removePage($pagesInView[i$2]);
             if (separateNavbar && oldNavbarInnerEl) {
               router.removeNavbar(oldNavbarInnerEl);
             }
@@ -6033,14 +6611,23 @@
           .filter(function (index, navbarInner) { return navbarInner !== $newNavbarInner[0]; });
       }
     }
+
     if (dynamicNavbar && !separateNavbar) {
       $oldNavbarInner = $oldPage.children('.navbar').children('.navbar-inner');
+    }
+    if (isDetail && !options.reloadAll) {
+      if ($oldPage.length > 1 || reloadDetail) {
+        $oldPage = $oldPage.filter(function (pageIndex, pageEl) { return !pageEl.classList.contains('page-master'); });
+      }
+      if ($oldNavbarInner && ($oldNavbarInner.length > 1 || reloadDetail)) {
+        $oldNavbarInner = $oldNavbarInner.filter(function (navbarIndex, navbarEl) { return !navbarEl.classList.contains('navbar-master'); });
+      }
     }
 
     // Push State
     if (router.params.pushState && (options.pushState || options.replaceState) && !options.reloadPrevious) {
       var pushStateRoot = router.params.pushStateRoot || '';
-      History[options.reloadCurrent || options.reloadAll || options.replaceState ? 'replace' : 'push'](
+      History[options.reloadCurrent || (reloadDetail && otherDetailPageEl) || options.reloadAll || options.replaceState ? 'replace' : 'push'](
         view.id,
         {
           url: options.route.url,
@@ -6066,7 +6653,7 @@
     var url = options.route.url;
 
     if (options.history) {
-      if ((options.reloadCurrent && router.history.length) > 0 || options.replaceState) {
+      if (((options.reloadCurrent || (reloadDetail && otherDetailPageEl)) && router.history.length) > 0 || options.replaceState) {
         router.history[router.history.length - (options.reloadPrevious ? 2 : 1)] = url;
       } else if (options.reloadPrevious) {
         router.history[router.history.length - 2] = url;
@@ -6090,6 +6677,9 @@
         $newPage.insertBefore($oldPage);
       }
       if (separateNavbar && $newNavbarInner.length) {
+        if ($newNavbarInner.children('.title-large').length) {
+          $newNavbarInner.addClass('navbar-inner-large');
+        }
         if ($oldNavbarInner.length) {
           $newNavbarInner.insertBefore($oldNavbarInner);
         } else {
@@ -6110,6 +6700,9 @@
         }
       }
       if (separateNavbar && $newNavbarInner.length) {
+        if ($newNavbarInner.children('.title-large').length) {
+          $newNavbarInner.addClass('navbar-inner-large');
+        }
         if (!router.$navbarEl.parents(doc).length) {
           router.$el.prepend(router.$navbarEl);
         }
@@ -6124,16 +6717,19 @@
     }
 
     // Remove old page
-    if (options.reloadCurrent && $oldPage.length > 0) {
+    if ((options.reloadCurrent || reloadDetail) && $oldPage.length > 0) {
       if (router.params.stackPages && router.initialPages.indexOf($oldPage[0]) >= 0) {
         $oldPage.addClass('stacked');
         $oldPage.trigger('page:stack');
+        router.emit('pageStack', $oldPage[0]);
         if (separateNavbar) {
           $oldNavbarInner.addClass('stacked');
         }
       } else {
         // Page remove event
-        router.pageCallback('beforeRemove', $oldPage, $oldNavbarInner, 'previous', undefined, options);
+        router.pageCallback('beforeOut', $oldPage, $oldNavbarInner, 'current', undefined, options);
+        router.pageCallback('afterOut', $oldPage, $oldNavbarInner, 'current', undefined, options);
+        router.pageCallback('beforeRemove', $oldPage, $oldNavbarInner, 'current', undefined, options);
         router.removePage($oldPage);
         if (separateNavbar && $oldNavbarInner && $oldNavbarInner.length) {
           router.removeNavbar($oldNavbarInner);
@@ -6146,11 +6742,16 @@
         if (router.params.stackPages && router.initialPages.indexOf($oldPageEl[0]) >= 0) {
           $oldPageEl.addClass('stacked');
           $oldPageEl.trigger('page:stack');
+          router.emit('pageStack', $oldPageEl[0]);
           if (separateNavbar) {
             $oldNavbarInnerEl.addClass('stacked');
           }
         } else {
           // Page remove event
+          if ($oldPageEl.hasClass('page-current')) {
+            router.pageCallback('beforeOut', $oldPage, $oldNavbarInner, 'current', undefined, options);
+            router.pageCallback('afterOut', $oldPage, $oldNavbarInner, 'current', undefined, options);
+          }
           router.pageCallback('beforeRemove', $oldPageEl, $oldNavbarInner && $oldNavbarInner.eq(index), 'previous', undefined, options);
           router.removePage($oldPageEl);
           if (separateNavbar && $oldNavbarInnerEl.length) {
@@ -6162,6 +6763,7 @@
       if (router.params.stackPages && router.initialPages.indexOf($oldPage[0]) >= 0) {
         $oldPage.addClass('stacked');
         $oldPage.trigger('page:stack');
+        router.emit('pageStack', $oldPage[0]);
         if (separateNavbar) {
           $oldNavbarInner.addClass('stacked');
         }
@@ -6186,11 +6788,26 @@
     // Page init and before init events
     router.pageCallback('init', $newPage, $newNavbarInner, newPagePosition, reload ? newPagePosition : 'current', options, $oldPage);
 
-    if (options.reloadCurrent || options.reloadAll) {
+    if (options.reloadCurrent || options.reloadAll || reloadDetail) {
       router.allowPageChange = true;
       router.pageCallback('beforeIn', $newPage, $newNavbarInner, newPagePosition, 'current', options);
+      $newPage.removeAttr('aria-hidden');
+      if (dynamicNavbar && $newNavbarInner) {
+        $newNavbarInner.removeAttr('aria-hidden');
+      }
       router.pageCallback('afterIn', $newPage, $newNavbarInner, newPagePosition, 'current', options);
       if (options.reloadCurrent && options.clearPreviousHistory) { router.clearPreviousHistory(); }
+      if (reloadDetail) {
+        masterPageEl.classList.add('page-previous');
+        masterPageEl.classList.remove('page-current');
+        $(masterPageEl).trigger('page:position', { position: 'previous' });
+        router.emit('pagePosition', masterPageEl, 'previous');
+
+        if (masterPageEl.f7Page && masterPageEl.f7Page.navbarEl) {
+          masterPageEl.f7Page.navbarEl.classList.add('navbar-previous');
+          masterPageEl.f7Page.navbarEl.classList.remove('navbar-current');
+        }
+      }
       return router;
     }
     if (options.reloadPrevious) {
@@ -6199,27 +6816,36 @@
     }
 
     // Before animation event
-    router.pageCallback('beforeIn', $newPage, $newNavbarInner, 'next', 'current', options);
     router.pageCallback('beforeOut', $oldPage, $oldNavbarInner, 'current', 'previous', options);
+    router.pageCallback('beforeIn', $newPage, $newNavbarInner, 'next', 'current', options);
 
     // Animation
     function afterAnimation() {
       var pageClasses = 'page-previous page-current page-next';
       var navbarClasses = 'navbar-previous navbar-current navbar-next';
-      $newPage.removeClass(pageClasses).addClass('page-current').removeAttr('aria-hidden');
-      $oldPage.removeClass(pageClasses).addClass('page-previous').attr('aria-hidden', 'true');
+      $newPage.removeClass(pageClasses).addClass('page-current').removeAttr('aria-hidden').trigger('page:position', { position: 'current' });
+      router.emit('pagePosition', $newPage[0], 'current');
+      $oldPage.removeClass(pageClasses).addClass('page-previous').trigger('page:position', { position: 'previous' });
+      router.emit('pagePosition', $oldPage[0], 'previous');
+
+      if (!$oldPage.hasClass('page-master')) {
+        $oldPage.attr('aria-hidden', 'true');
+      }
       if (dynamicNavbar) {
         $newNavbarInner.removeClass(navbarClasses).addClass('navbar-current').removeAttr('aria-hidden');
-        $oldNavbarInner.removeClass(navbarClasses).addClass('navbar-previous').attr('aria-hidden', 'true');
+        $oldNavbarInner.removeClass(navbarClasses).addClass('navbar-previous');
+        if (!$oldNavbarInner.hasClass('navbar-master')) {
+          $oldNavbarInner.attr('aria-hidden', 'true');
+        }
       }
       // After animation event
       router.allowPageChange = true;
-      router.pageCallback('afterIn', $newPage, $newNavbarInner, 'next', 'current', options);
       router.pageCallback('afterOut', $oldPage, $oldNavbarInner, 'current', 'previous', options);
+      router.pageCallback('afterIn', $newPage, $newNavbarInner, 'next', 'current', options);
 
-      var keepOldPage = app.theme === 'ios' ? (router.params.preloadPreviousPage || router.params.iosSwipeBack) : router.params.preloadPreviousPage;
+      var keepOldPage = (router.params.preloadPreviousPage || router.params[((app.theme) + "SwipeBack")]) && !isMaster;
       if (!keepOldPage) {
-        if ($newPage.hasClass('smart-select-page') || $newPage.hasClass('photo-browser-page') || $newPage.hasClass('autocomplete-page')) {
+        if ($newPage.hasClass('smart-select-page') || $newPage.hasClass('photo-browser-page') || $newPage.hasClass('autocomplete-page') || $newPage.hasClass('color-picker-page')) {
           keepOldPage = true;
         }
       }
@@ -6227,6 +6853,7 @@
         if (router.params.stackPages) {
           $oldPage.addClass('stacked');
           $oldPage.trigger('page:stack');
+          router.emit('pageStack', $oldPage[0]);
           if (separateNavbar) {
             $oldNavbarInner.addClass('stacked');
           }
@@ -6249,15 +6876,17 @@
     function setPositionClasses() {
       var pageClasses = 'page-previous page-current page-next';
       var navbarClasses = 'navbar-previous navbar-current navbar-next';
-      $oldPage.removeClass(pageClasses).addClass('page-current').removeAttr('aria-hidden');
-      $newPage.removeClass(pageClasses).addClass('page-next').removeAttr('aria-hidden');
+      $oldPage.removeClass(pageClasses).addClass('page-current').removeAttr('aria-hidden').trigger('page:position', { position: 'current' });
+      router.emit('pagePosition', $oldPage[0], 'current');
+      $newPage.removeClass(pageClasses).addClass('page-next').removeAttr('aria-hidden').trigger('page:position', { position: 'next' });
+      router.emit('pagePosition', $newPage[0], 'next');
       if (dynamicNavbar) {
         $oldNavbarInner.removeClass(navbarClasses).addClass('navbar-current').removeAttr('aria-hidden');
         $newNavbarInner.removeClass(navbarClasses).addClass('navbar-next').removeAttr('aria-hidden');
       }
     }
-    if (options.animate) {
-      var delay = router.app.theme === 'md' ? router.params.materialPageLoadDelay : router.params.iosPageLoadDelay;
+    if (options.animate && !(isMaster && app.width >= router.params.masterDetailBreakpoint)) {
+      var delay = router.params[((router.app.theme) + "PageLoadDelay")];
       if (delay) {
         setTimeout(function () {
           setPositionClasses();
@@ -6322,6 +6951,13 @@
           return router.tabLoad(options.route.route.tab, options);
         }
         return false;
+      }
+      if (!sameParams
+        && options.route.route.tab
+        && router.currentRoute.route.tab
+        && router.currentRoute.parentPath === options.route.parentPath
+      ) {
+        return router.tabLoad(options.route.route.tab, options);
       }
     }
 
@@ -6522,6 +7158,55 @@
     }
     function reject() {
       router.allowPageChange = true;
+    }
+
+    if (router.params.masterDetailBreakpoint > 0 && route.route.masterRoute) {
+      // load detail route
+      var preloadMaster = true;
+      var masterLoaded = false;
+      if (router.currentRoute && router.currentRoute.route) {
+        if (
+          router.currentRoute.route.master
+          && (
+            router.currentRoute.route === route.route.masterRoute
+            || router.currentRoute.route.path === route.route.masterRoute.path
+          )
+        ) {
+          preloadMaster = false;
+        }
+        if (
+          router.currentRoute.route.masterRoute
+          && (router.currentRoute.route.masterRoute === route.route.masterRoute
+            || router.currentRoute.route.masterRoute.path === route.route.masterRoute.path
+          )
+        ) {
+          preloadMaster = false;
+          masterLoaded = true;
+        }
+      }
+      if (preloadMaster || (masterLoaded && navigateOptions.reloadAll)) {
+        router.navigate(route.route.masterRoute.path, {
+          animate: false,
+          reloadAll: navigateOptions.reloadAll,
+          reloadCurrent: navigateOptions.reloadCurrent,
+          reloadPrevious: navigateOptions.reloadPrevious,
+          pushState: !navigateOptions.initial,
+          history: !navigateOptions.initial,
+          once: {
+            pageAfterIn: function pageAfterIn() {
+              router.navigate(navigateParams, Utils.extend({}, navigateOptions, {
+                animate: false,
+                reloadAll: false,
+                reloadCurrent: false,
+                reloadPrevious: false,
+                history: !navigateOptions.initial,
+                pushState: !navigateOptions.initial,
+              }));
+            },
+          },
+        });
+        return router;
+      }
     }
 
     processRouteQueue.call(
@@ -6990,13 +7675,19 @@
     var options = Utils.extend({
       animate: router.params.animate,
       pushState: true,
+      replaceState: false,
     }, backwardOptions);
+
+    var masterDetailEnabled = router.params.masterDetailBreakpoint > 0;
+    var isMaster = masterDetailEnabled && options.route && options.route.route && options.route.route.master === true;
+    var masterPageEl;
 
     var dynamicNavbar = router.dynamicNavbar;
     var separateNavbar = router.separateNavbar;
 
     var $newPage = $el;
     var $oldPage = router.$el.children('.page-current');
+    var currentIsMaster = masterDetailEnabled && $oldPage.hasClass('page-master');
 
     if ($newPage.length) {
       // Remove theme elements
@@ -7040,17 +7731,49 @@
       };
     }
 
+    // Pages In View
+    var isDetail;
+    if (masterDetailEnabled) {
+      var $pagesInView = router.$el
+        .children('.page:not(.stacked)')
+        .filter(function (index, pageInView) { return pageInView !== $newPage[0]; });
+
+      // Find Detail' master page
+      for (var i = 0; i < $pagesInView.length; i += 1) {
+        if (!masterPageEl
+          && $pagesInView[i].classList.contains('page-master')
+        ) {
+          masterPageEl = $pagesInView[i];
+          continue; // eslint-disable-line
+        }
+      }
+
+      isDetail = !isMaster
+        && masterPageEl
+        && (router.history.indexOf(options.route.url) > router.history.indexOf(masterPageEl.f7Page.route.url));
+
+      if (!isDetail && !isMaster && masterPageEl && masterPageEl.f7Page && options.route.route.masterRoute) {
+        isDetail = options.route.route.masterRoute.path === masterPageEl.f7Page.route.route.path;
+      }
+    }
+
+
     // New Page
     $newPage
-      .addClass('page-previous')
+      .addClass(("page-previous" + (isMaster ? ' page-master' : '') + (isDetail ? ' page-master-detail' : '')))
       .removeClass('stacked')
       .removeAttr('aria-hidden')
       .trigger('page:unstack')
       .trigger('page:position', { position: 'previous' });
+    router.emit('pageUnstack', $newPage[0]);
+    router.emit('pagePosition', $newPage[0], 'previous');
+    if (isMaster || isDetail) {
+      $newPage.trigger('page:role', { role: isMaster ? 'master' : 'detail' });
+    }
 
     if (dynamicNavbar && $newNavbarInner.length > 0) {
       $newNavbarInner
-        .addClass('navbar-previous')
+        .addClass(("navbar-previous" + (isMaster ? ' navbar-master' : '') + (isDetail ? ' navbar-master-detail' : '')))
         .removeClass('stacked')
         .removeAttr('aria-hidden');
     }
@@ -7081,6 +7804,7 @@
               if (router.initialPages.indexOf($pageToRemove[0]) >= 0) {
                 $pageToRemove.addClass('stacked');
                 $pageToRemove.trigger('page:stack');
+                router.emit('pageStack', $pageToRemove[0]);
                 if (separateNavbar) {
                   $navbarToRemove.addClass('stacked');
                 }
@@ -7103,6 +7827,7 @@
           if (router.params.stackPages && router.initialPages.indexOf($pageToRemove[0]) >= 0) {
             $pageToRemove.addClass('stacked');
             $pageToRemove.trigger('page:stack');
+            router.emit('pageStack', $pageToRemove[0]);
             $navbarToRemove.addClass('stacked');
           } else if ($pageToRemove.length > 0) {
             router.pageCallback('beforeRemove', $pageToRemove, $navbarToRemove, 'previous', undefined, options);
@@ -7130,6 +7855,9 @@
         }
       }
       if (separateNavbar && $newNavbarInner.length) {
+        if ($newNavbarInner.children('.title-large').length) {
+          $newNavbarInner.addClass('navbar-inner-large');
+        }
         $newNavbarInner.insertBefore($oldNavbarInner);
         if ($oldNavbarInner.length > 0) {
           $newNavbarInner.insertBefore($oldNavbarInner);
@@ -7159,10 +7887,20 @@
           preload: true,
         }));
       }
+      if (isMaster) {
+        $newPage
+          .removeClass('page-master-stacked')
+          .trigger('page:masterunstack');
+        router.emit('pageMasterUnstack', $newPage[0]);
+        if (separateNavbar) {
+          $(app.navbar.getElByPage($newPage)).removeClass('navbar-master-stacked');
+        }
+      }
       // Page init and before init events
       router.pageCallback('init', $newPage, $newNavbarInner, 'previous', 'current', options, $oldPage);
-      if ($newPage.prevAll('.page-previous:not(.stacked)').length > 0) {
-        $newPage.prevAll('.page-previous:not(.stacked)').each(function (index, pageToRemove) {
+      var $previousPages = $newPage.prevAll('.page-previous:not(.stacked):not(.page-master)');
+      if ($previousPages.length > 0) {
+        $previousPages.each(function (index, pageToRemove) {
           var $pageToRemove = $(pageToRemove);
           var $navbarToRemove;
           if (separateNavbar) {
@@ -7172,6 +7910,7 @@
           if (router.params.stackPages && router.initialPages.indexOf(pageToRemove) >= 0) {
             $pageToRemove.addClass('stacked');
             $pageToRemove.trigger('page:stack');
+            router.emit('pageStack', $pageToRemove[0]);
             if (separateNavbar) {
               $navbarToRemove.addClass('stacked');
             }
@@ -7191,16 +7930,32 @@
     // History State
     if (!(Device.ie || Device.edge || (Device.firefox && !Device.ios))) {
       if (router.params.pushState && options.pushState) {
-        if (backIndex) { History.go(-backIndex); }
-        else { History.back(); }
+        if (options.replaceState) {
+          var pushStateRoot = router.params.pushStateRoot || '';
+          History.replace(
+            view.id,
+            {
+              url: options.route.url,
+            },
+            pushStateRoot + router.params.pushStateSeparator + options.route.url
+          );
+        } else if (backIndex) {
+          History.go(-backIndex);
+        } else {
+          History.back();
+        }
       }
     }
 
     // Update History
-    if (router.history.length === 1) {
-      router.history.unshift(router.url);
+    if (options.replaceState) {
+      router.history[router.history.length - 1] = options.route.url;
+    } else {
+      if (router.history.length === 1) {
+        router.history.unshift(router.url);
+      }
+      router.history.pop();
     }
-    router.history.pop();
     router.saveHistory();
 
     // Current Page & Navbar
@@ -7217,8 +7972,20 @@
     // History State
     if (Device.ie || Device.edge || (Device.firefox && !Device.ios)) {
       if (router.params.pushState && options.pushState) {
-        if (backIndex) { History.go(-backIndex); }
-        else { History.back(); }
+        if (options.replaceState) {
+          var pushStateRoot$1 = router.params.pushStateRoot || '';
+          History.replace(
+            view.id,
+            {
+              url: options.route.url,
+            },
+            pushStateRoot$1 + router.params.pushStateSeparator + options.route.url
+          );
+        } else if (backIndex) {
+          History.go(-backIndex);
+        } else {
+          History.back();
+        }
       }
     }
 
@@ -7237,29 +8004,32 @@
     router.pageCallback('init', $newPage, $newNavbarInner, 'previous', 'current', options, $oldPage);
 
     // Before animation callback
-    router.pageCallback('beforeIn', $newPage, $newNavbarInner, 'previous', 'current', options);
     router.pageCallback('beforeOut', $oldPage, $oldNavbarInner, 'current', 'next', options);
+    router.pageCallback('beforeIn', $newPage, $newNavbarInner, 'previous', 'current', options);
 
     // Animation
     function afterAnimation() {
       // Set classes
       var pageClasses = 'page-previous page-current page-next';
       var navbarClasses = 'navbar-previous navbar-current navbar-next';
-      $newPage.removeClass(pageClasses).addClass('page-current').removeAttr('aria-hidden');
-      $oldPage.removeClass(pageClasses).addClass('page-next').attr('aria-hidden', 'true');
+      $newPage.removeClass(pageClasses).addClass('page-current').removeAttr('aria-hidden').trigger('page:position', { position: 'current' });
+      router.emit('pagePosition', $newPage[0], 'current');
+      $oldPage.removeClass(pageClasses).addClass('page-next').attr('aria-hidden', 'true').trigger('page:position', { position: 'next' });
+      router.emit('pagePosition', $oldPage[0], 'next');
       if (dynamicNavbar) {
         $newNavbarInner.removeClass(navbarClasses).addClass('navbar-current').removeAttr('aria-hidden');
         $oldNavbarInner.removeClass(navbarClasses).addClass('navbar-next').attr('aria-hidden', 'true');
       }
 
       // After animation event
-      router.pageCallback('afterIn', $newPage, $newNavbarInner, 'previous', 'current', options);
       router.pageCallback('afterOut', $oldPage, $oldNavbarInner, 'current', 'next', options);
+      router.pageCallback('afterIn', $newPage, $newNavbarInner, 'previous', 'current', options);
 
       // Remove Old Page
       if (router.params.stackPages && router.initialPages.indexOf($oldPage[0]) >= 0) {
         $oldPage.addClass('stacked');
         $oldPage.trigger('page:stack');
+        router.emit('pageStack', $oldPage[0]);
         if (separateNavbar) {
           $oldNavbarInner.addClass('stacked');
         }
@@ -7275,8 +8045,8 @@
       router.emit('routeChanged', router.currentRoute, router.previousRoute, router);
 
       // Preload previous page
-      var preloadPreviousPage = app.theme === 'ios' ? (router.params.preloadPreviousPage || router.params.iosSwipeBack) : router.params.preloadPreviousPage;
-      if (preloadPreviousPage && router.history[router.history.length - 2]) {
+      var preloadPreviousPage = router.params.preloadPreviousPage || router.params[((app.theme) + "SwipeBack")];
+      if (preloadPreviousPage && router.history[router.history.length - 2] && !isMaster) {
         router.back(router.history[router.history.length - 2], { preload: true });
       }
       if (router.params.pushState) {
@@ -7287,15 +8057,17 @@
     function setPositionClasses() {
       var pageClasses = 'page-previous page-current page-next';
       var navbarClasses = 'navbar-previous navbar-current navbar-next';
-      $oldPage.removeClass(pageClasses).addClass('page-current');
-      $newPage.removeClass(pageClasses).addClass('page-previous').removeAttr('aria-hidden');
+      $oldPage.removeClass(pageClasses).addClass('page-current').trigger('page:position', { position: 'current' });
+      router.emit('pagePosition', $oldPage[0], 'current');
+      $newPage.removeClass(pageClasses).addClass('page-previous').removeAttr('aria-hidden').trigger('page:position', { position: 'previous' });
+      router.emit('pagePosition', $newPage[0], 'previous');
       if (dynamicNavbar) {
         $oldNavbarInner.removeClass(navbarClasses).addClass('navbar-current');
         $newNavbarInner.removeClass(navbarClasses).addClass('navbar-previous').removeAttr('aria-hidden');
       }
     }
 
-    if (options.animate) {
+    if (options.animate && !(currentIsMaster && app.width >= router.params.masterDetailBreakpoint)) {
       setPositionClasses();
       router.animate($oldPage, $newPage, $oldNavbarInner, $newNavbarInner, 'backward', function () {
         afterAnimation();
@@ -7490,8 +8262,23 @@
       }
       return router;
     }
-    var $previousPage = router.$el.children('.page-current').prevAll('.page-previous').eq(0);
-    if (!navigateOptions.force && $previousPage.length > 0) {
+    var $previousPage = router.$el.children('.page-current').prevAll('.page-previous:not(.page-master)').eq(0);
+
+    var skipMaster;
+    if (router.params.masterDetailBreakpoint > 0) {
+      var $previousMaster = router.$el.children('.page-current').prevAll('.page-master').eq(0);
+      if ($previousMaster.length) {
+        var expectedPreviousPageUrl = router.history[router.history.length - 2];
+        var expectedPreviousPageRoute = router.findMatchingRoute(expectedPreviousPageUrl);
+        if (expectedPreviousPageRoute && expectedPreviousPageRoute.route === $previousMaster[0].f7Page.route.route) {
+          $previousPage = $previousMaster;
+          if (!navigateOptions.preload) {
+            skipMaster = app.width >= router.params.masterDetailBreakpoint;
+          }
+        }
+      }
+    }
+    if (!navigateOptions.force && $previousPage.length && !skipMaster) {
       if (router.params.pushState
         && $previousPage[0].f7Page
         && router.history[router.history.length - 2] !== $previousPage[0].f7Page.route.url
@@ -7502,8 +8289,8 @@
         );
         return router;
       }
-
       var previousPageRoute = $previousPage[0].f7Page.route;
+
       processRouteQueue.call(
         router,
         previousPageRoute,
@@ -7528,6 +8315,15 @@
     }
     if (!navigateUrl && router.history.length > 1) {
       navigateUrl = router.history[router.history.length - 2];
+    }
+    if (skipMaster && !navigateOptions.force && router.history[router.history.length - 3]) {
+      return router.back(router.history[router.history.length - 3], Utils.extend({}, navigateOptions || {}, {
+        force: true,
+        animate: false,
+      }));
+    }
+    if (skipMaster && !navigateOptions.force) {
+      return router;
     }
 
     // Find route to load
@@ -7691,9 +8487,9 @@
     router.saveHistory();
   }
 
-  var Router = /*@__PURE__*/(function (Framework7Class$$1) {
+  var Router = /*@__PURE__*/(function (Framework7Class) {
     function Router(app, view) {
-      Framework7Class$$1.call(this, {}, [typeof view === 'undefined' ? app : view]);
+      Framework7Class.call(this, {}, [typeof view === 'undefined' ? app : view]);
       var router = this;
 
       // Is App Router
@@ -7771,29 +8567,31 @@
       return router;
     }
 
-    if ( Framework7Class$$1 ) Router.__proto__ = Framework7Class$$1;
-    Router.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) Router.__proto__ = Framework7Class;
+    Router.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     Router.prototype.constructor = Router;
 
-    Router.prototype.animatableNavElements = function animatableNavElements (newNavbarInner, oldNavbarInner) {
+    Router.prototype.animatableNavElements = function animatableNavElements (newNavbarInner, oldNavbarInner, toLarge, fromLarge, direction) {
       var router = this;
       var dynamicNavbar = router.dynamicNavbar;
+      var separateNavbar = router.separateNavbar;
       var animateIcon = router.params.iosAnimateNavbarBackIcon;
 
       var newNavEls;
       var oldNavEls;
-      function animatableNavEl(el, navbarInner) {
-        var $el = $(el);
+      function animatableNavEl($el, navbarInner) {
         var isSliding = $el.hasClass('sliding') || navbarInner.hasClass('sliding');
         var isSubnavbar = $el.hasClass('subnavbar');
         var needsOpacityTransition = isSliding ? !isSubnavbar : true;
-        var hasIcon = isSliding && animateIcon && $el.hasClass('left') && $el.find('.back .icon').length > 0;
-        var $iconEl;
-        if (hasIcon) { $iconEl = $el.find('.back .icon'); }
+        var $iconEl = $el.find('.back .icon');
+        var isIconLabel;
+        if (isSliding && animateIcon && $el.hasClass('left') && $iconEl.length > 0 && $iconEl.next('span').length) {
+          $el = $iconEl.next('span'); // eslint-disable-line
+          isIconLabel = true;
+        }
         return {
           $el: $el,
-          $iconEl: $iconEl,
-          hasIcon: hasIcon,
+          isIconLabel: isIconLabel,
           leftOffset: $el[0].f7NavbarLeftOffset,
           rightOffset: $el[0].f7NavbarRightOffset,
           isSliding: isSliding,
@@ -7805,11 +8603,22 @@
         newNavEls = [];
         oldNavEls = [];
         newNavbarInner.children('.left, .right, .title, .subnavbar').each(function (index, navEl) {
-          newNavEls.push(animatableNavEl(navEl, newNavbarInner));
+          var $navEl = $(navEl);
+          if ($navEl.hasClass('left') && fromLarge && direction === 'forward' && separateNavbar) { return; }
+          if ($navEl.hasClass('title') && toLarge) { return; }
+          newNavEls.push(animatableNavEl($navEl, newNavbarInner));
         });
-        oldNavbarInner.children('.left, .right, .title, .subnavbar').each(function (index, navEl) {
-          oldNavEls.push(animatableNavEl(navEl, oldNavbarInner));
-        });
+        if (!(oldNavbarInner.hasClass('navbar-master') && router.params.masterDetailBreakpoint > 0 && router.app.width >= router.params.masterDetailBreakpoint)) {
+          oldNavbarInner.children('.left, .right, .title, .subnavbar').each(function (index, navEl) {
+            var $navEl = $(navEl);
+            if ($navEl.hasClass('left') && toLarge && !fromLarge && direction === 'forward' && separateNavbar) { return; }
+            if ($navEl.hasClass('left') && toLarge && direction === 'backward' && separateNavbar) { return; }
+            if ($navEl.hasClass('title') && fromLarge) {
+              return;
+            }
+            oldNavEls.push(animatableNavEl($navEl, oldNavbarInner));
+          });
+        }
         [oldNavEls, newNavEls].forEach(function (navEls) {
           navEls.forEach(function (navEl) {
             var n = navEl;
@@ -7818,9 +8627,9 @@
             var otherEls = navEls === oldNavEls ? newNavEls : oldNavEls;
             if (!(isSliding && $el.hasClass('title') && otherEls)) { return; }
             otherEls.forEach(function (otherNavEl) {
-              if (otherNavEl.$el.hasClass('left') && otherNavEl.hasIcon) {
-                var iconTextEl = otherNavEl.$el.find('.back span')[0];
-                n.leftOffset += iconTextEl ? iconTextEl.offsetLeft : 0;
+              if (otherNavEl.isIconLabel) {
+                var iconTextEl = otherNavEl.$el[0];
+                n.leftOffset += iconTextEl ? (iconTextEl.offsetLeft || 0) : 0;
               }
             });
           });
@@ -7830,63 +8639,85 @@
       return { newNavEls: newNavEls, oldNavEls: oldNavEls };
     };
 
-    Router.prototype.animateWithCSS = function animateWithCSS (oldPage, newPage, oldNavbarInner, newNavbarInner, direction, callback) {
+    Router.prototype.animate = function animate (oldPage, newPage, oldNavbarInner, newNavbarInner, direction, callback) {
       var router = this;
+      if (router.params.animateCustom) {
+        router.params.animateCustom.apply(router, [oldPage, newPage, oldNavbarInner, newNavbarInner, direction, callback]);
+        return;
+      }
       var dynamicNavbar = router.dynamicNavbar;
-      var separateNavbar = router.separateNavbar;
       var ios = router.app.theme === 'ios';
       // Router Animation class
-      var routerTransitionClass = "router-transition-" + direction + " router-transition-css-" + direction;
+      var routerTransitionClass = "router-transition-" + direction + " router-transition";
 
       var newNavEls;
       var oldNavEls;
-      var navbarWidth = 0;
+
+      var fromLarge;
+      var toLarge;
+
+      var oldIsLarge;
+      var newIsLarge;
 
       if (ios && dynamicNavbar) {
-        if (!separateNavbar) {
-          navbarWidth = newNavbarInner[0].offsetWidth;
-        }
-        var navEls = router.animatableNavElements(newNavbarInner, oldNavbarInner);
+        oldIsLarge = oldNavbarInner && oldNavbarInner.hasClass('navbar-inner-large');
+        newIsLarge = newNavbarInner && newNavbarInner.hasClass('navbar-inner-large');
+        fromLarge = oldIsLarge && !oldNavbarInner.hasClass('navbar-inner-large-collapsed');
+        toLarge = newIsLarge && !newNavbarInner.hasClass('navbar-inner-large-collapsed');
+        var navEls = router.animatableNavElements(newNavbarInner, oldNavbarInner, toLarge, fromLarge, direction);
         newNavEls = navEls.newNavEls;
         oldNavEls = navEls.oldNavEls;
       }
 
       function animateNavbars(progress) {
-        if (ios && dynamicNavbar) {
-          newNavEls.forEach(function (navEl) {
-            var $el = navEl.$el;
-            var offset = direction === 'forward' ? navEl.rightOffset : navEl.leftOffset;
-            if (navEl.isSliding) {
+        if (!(ios && dynamicNavbar)) { return; }
+        if (progress === 1) {
+          if (toLarge) {
+            newNavbarInner.addClass('router-navbar-transition-to-large');
+            oldNavbarInner.addClass('router-navbar-transition-to-large');
+          }
+          if (fromLarge) {
+            newNavbarInner.addClass('router-navbar-transition-from-large');
+            oldNavbarInner.addClass('router-navbar-transition-from-large');
+          }
+        }
+        newNavEls.forEach(function (navEl) {
+          var $el = navEl.$el;
+          var offset = direction === 'forward' ? navEl.rightOffset : navEl.leftOffset;
+          if (navEl.isSliding) {
+            if (navEl.isSubnavbar && newIsLarge) {
+              $el[0].style.setProperty('transform', ("translate3d(" + (offset * (1 - progress)) + "px, calc(-1 * var(--f7-navbar-large-collapse-progress) * var(--f7-navbar-large-title-height)), 0)"), 'important');
+            } else {
               $el.transform(("translate3d(" + (offset * (1 - progress)) + "px,0,0)"));
             }
-            if (navEl.hasIcon) {
-              if (direction === 'forward') {
-                navEl.$iconEl.transform(("translate3d(" + ((-offset - navbarWidth) * (1 - progress)) + "px,0,0)"));
-              } else {
-                navEl.$iconEl.transform(("translate3d(" + ((-offset + (navbarWidth / 5)) * (1 - progress)) + "px,0,0)"));
-              }
-            }
-          });
-          oldNavEls.forEach(function (navEl) {
-            var $el = navEl.$el;
-            var offset = direction === 'forward' ? navEl.leftOffset : navEl.rightOffset;
-            if (navEl.isSliding) {
+          }
+        });
+        oldNavEls.forEach(function (navEl) {
+          var $el = navEl.$el;
+          var offset = direction === 'forward' ? navEl.leftOffset : navEl.rightOffset;
+          if (navEl.isSliding) {
+            if (navEl.isSubnavbar && oldIsLarge) {
+              $el.transform(("translate3d(" + (offset * (progress)) + "px, calc(-1 * var(--f7-navbar-large-collapse-progress) * var(--f7-navbar-large-title-height)), 0)"));
+            } else {
               $el.transform(("translate3d(" + (offset * (progress)) + "px,0,0)"));
             }
-            if (navEl.hasIcon) {
-              if (direction === 'forward') {
-                navEl.$iconEl.transform(("translate3d(" + ((-offset + (navbarWidth / 5)) * (progress)) + "px,0,0)"));
-              } else {
-                navEl.$iconEl.transform(("translate3d(" + ((-offset - navbarWidth) * (progress)) + "px,0,0)"));
-              }
-            }
-          });
-        }
+          }
+        });
       }
 
       // AnimationEnd Callback
       function onDone() {
         if (router.dynamicNavbar) {
+          if (newNavbarInner) {
+            newNavbarInner.removeClass('router-navbar-transition-to-large router-navbar-transition-from-large');
+            newNavbarInner.addClass('navbar-no-title-large-transition');
+            Utils.nextFrame(function () {
+              newNavbarInner.removeClass('navbar-no-title-large-transition');
+            });
+          }
+          if (oldNavbarInner) {
+            oldNavbarInner.removeClass('router-navbar-transition-to-large router-navbar-transition-from-large');
+          }
           if (newNavbarInner.hasClass('sliding')) {
             newNavbarInner.find('.title, .left, .right, .left .icon, .subnavbar').transform('');
           } else {
@@ -7918,165 +8749,6 @@
       } else {
         // Add class, start animation
         router.$el.addClass(routerTransitionClass);
-      }
-    };
-
-    Router.prototype.animateWithJS = function animateWithJS (oldPage, newPage, oldNavbarInner, newNavbarInner, direction, callback) {
-      var router = this;
-      var dynamicNavbar = router.dynamicNavbar;
-      var separateNavbar = router.separateNavbar;
-      var ios = router.app.theme === 'ios';
-      var duration = ios ? 400 : 250;
-      var routerTransitionClass = "router-transition-" + direction + " router-transition-js-" + direction;
-
-      var startTime = null;
-      var done = false;
-
-      var newNavEls;
-      var oldNavEls;
-      var navbarWidth = 0;
-
-      if (ios && dynamicNavbar) {
-        if (!separateNavbar) {
-          navbarWidth = newNavbarInner[0].offsetWidth;
-        }
-        var navEls = router.animatableNavElements(newNavbarInner, oldNavbarInner);
-        newNavEls = navEls.newNavEls;
-        oldNavEls = navEls.oldNavEls;
-      }
-
-      var $shadowEl;
-      var $opacityEl;
-
-      if (ios) {
-        $shadowEl = $('<div class="page-shadow-effect"></div>');
-        $opacityEl = $('<div class="page-opacity-effect"></div>');
-
-        if (direction === 'forward') {
-          newPage.append($shadowEl);
-          oldPage.append($opacityEl);
-        } else {
-          newPage.append($opacityEl);
-          oldPage.append($shadowEl);
-        }
-      }
-      var easing = Utils.bezier(0.25, 0.1, 0.25, 1);
-
-      function onDone() {
-        newPage.transform('').css('opacity', '');
-        oldPage.transform('').css('opacity', '');
-        if (ios) {
-          $shadowEl.remove();
-          $opacityEl.remove();
-          if (dynamicNavbar) {
-            newNavEls.forEach(function (navEl) {
-              navEl.$el.transform('');
-              navEl.$el.css('opacity', '');
-            });
-            oldNavEls.forEach(function (navEl) {
-              navEl.$el.transform('');
-              navEl.$el.css('opacity', '');
-            });
-            newNavEls = [];
-            oldNavEls = [];
-          }
-        }
-
-        router.$el.removeClass(routerTransitionClass);
-
-        if (callback) { callback(); }
-      }
-
-      function render() {
-        var time = Utils.now();
-        if (!startTime) { startTime = time; }
-        var progress = Math.max(Math.min((time - startTime) / duration, 1), 0);
-        var easeProgress = easing(progress);
-
-        if (progress >= 1) {
-          done = true;
-        }
-        var inverter = router.app.rtl ? -1 : 1;
-        if (ios) {
-          if (direction === 'forward') {
-            newPage.transform(("translate3d(" + ((1 - easeProgress) * 100 * inverter) + "%,0,0)"));
-            oldPage.transform(("translate3d(" + (-easeProgress * 20 * inverter) + "%,0,0)"));
-            $shadowEl[0].style.opacity = easeProgress;
-            $opacityEl[0].style.opacity = easeProgress;
-          } else {
-            newPage.transform(("translate3d(" + (-(1 - easeProgress) * 20 * inverter) + "%,0,0)"));
-            oldPage.transform(("translate3d(" + (easeProgress * 100 * inverter) + "%,0,0)"));
-            $shadowEl[0].style.opacity = 1 - easeProgress;
-            $opacityEl[0].style.opacity = 1 - easeProgress;
-          }
-          if (dynamicNavbar) {
-            newNavEls.forEach(function (navEl) {
-              var $el = navEl.$el;
-              var offset = direction === 'forward' ? navEl.rightOffset : navEl.leftOffset;
-              if (navEl.needsOpacityTransition) {
-                $el[0].style.opacity = easeProgress;
-              }
-              if (navEl.isSliding) {
-                $el.transform(("translate3d(" + (offset * (1 - easeProgress)) + "px,0,0)"));
-              }
-              if (navEl.hasIcon) {
-                if (direction === 'forward') {
-                  navEl.$iconEl.transform(("translate3d(" + ((-offset - navbarWidth) * (1 - easeProgress)) + "px,0,0)"));
-                } else {
-                  navEl.$iconEl.transform(("translate3d(" + ((-offset + (navbarWidth / 5)) * (1 - easeProgress)) + "px,0,0)"));
-                }
-              }
-            });
-            oldNavEls.forEach(function (navEl) {
-              var $el = navEl.$el;
-              var offset = direction === 'forward' ? navEl.leftOffset : navEl.rightOffset;
-              if (navEl.needsOpacityTransition) {
-                $el[0].style.opacity = (1 - easeProgress);
-              }
-              if (navEl.isSliding) {
-                $el.transform(("translate3d(" + (offset * (easeProgress)) + "px,0,0)"));
-              }
-              if (navEl.hasIcon) {
-                if (direction === 'forward') {
-                  navEl.$iconEl.transform(("translate3d(" + ((-offset + (navbarWidth / 5)) * (easeProgress)) + "px,0,0)"));
-                } else {
-                  navEl.$iconEl.transform(("translate3d(" + ((-offset - navbarWidth) * (easeProgress)) + "px,0,0)"));
-                }
-              }
-            });
-          }
-        } else if (direction === 'forward') {
-          newPage.transform(("translate3d(0, " + ((1 - easeProgress) * 56) + "px,0)"));
-          newPage.css('opacity', easeProgress);
-        } else {
-          oldPage.transform(("translate3d(0, " + (easeProgress * 56) + "px,0)"));
-          oldPage.css('opacity', 1 - easeProgress);
-        }
-
-        if (done) {
-          onDone();
-          return;
-        }
-        Utils.requestAnimationFrame(render);
-      }
-
-      router.$el.addClass(routerTransitionClass);
-
-      Utils.requestAnimationFrame(render);
-    };
-
-    Router.prototype.animate = function animate () {
-      var args = [], len = arguments.length;
-      while ( len-- ) args[ len ] = arguments[ len ];
-
-      // Args: oldPage, newPage, oldNavbarInner, newNavbarInner, direction, callback
-      var router = this;
-      if (router.params.animateCustom) {
-        router.params.animateCustom.apply(router, args);
-      } else if (router.params.animateWithJS) {
-        router.animateWithJS.apply(router, args);
-      } else {
-        router.animateWithCSS.apply(router, args);
       }
     };
 
@@ -8185,9 +8857,9 @@
     };
 
     Router.prototype.flattenRoutes = function flattenRoutes (routes) {
-      var this$1 = this;
       if ( routes === void 0 ) routes = this.routes;
 
+      var router = this;
       var flattenedRoutes = [];
       routes.forEach(function (route) {
         var hasTabRoutes = false;
@@ -8203,21 +8875,30 @@
             return tRoute;
           });
           hasTabRoutes = true;
-          flattenedRoutes = flattenedRoutes.concat(this$1.flattenRoutes(mergedPathsRoutes));
+          flattenedRoutes = flattenedRoutes.concat(router.flattenRoutes(mergedPathsRoutes));
+        }
+        if ('detailRoutes' in route) {
+          var mergedPathsRoutes$1 = route.detailRoutes.map(function (detailRoute) {
+            var dRoute = Utils.extend({}, detailRoute);
+            dRoute.masterRoute = route;
+            dRoute.masterRoutePath = route.path;
+            return dRoute;
+          });
+          flattenedRoutes = flattenedRoutes.concat(route, router.flattenRoutes(mergedPathsRoutes$1));
         }
         if ('routes' in route) {
-          var mergedPathsRoutes$1 = route.routes.map(function (childRoute) {
+          var mergedPathsRoutes$2 = route.routes.map(function (childRoute) {
             var cRoute = Utils.extend({}, childRoute);
             cRoute.path = (((route.path) + "/" + (cRoute.path))).replace('///', '/').replace('//', '/');
             return cRoute;
           });
           if (hasTabRoutes) {
-            flattenedRoutes = flattenedRoutes.concat(this$1.flattenRoutes(mergedPathsRoutes$1));
+            flattenedRoutes = flattenedRoutes.concat(router.flattenRoutes(mergedPathsRoutes$2));
           } else {
-            flattenedRoutes = flattenedRoutes.concat(route, this$1.flattenRoutes(mergedPathsRoutes$1));
+            flattenedRoutes = flattenedRoutes.concat(route, router.flattenRoutes(mergedPathsRoutes$2));
           }
         }
-        if (!('routes' in route) && !('tabs' in route && route.tabs)) {
+        if (!('routes' in route) && !('tabs' in route && route.tabs) && !('detailRoutes' in route)) {
           flattenedRoutes.push(route);
         }
       });
@@ -8332,7 +9013,11 @@
           keys.forEach(function (keyObj, index) {
             if (typeof keyObj.name === 'number') { return; }
             var paramValue = matched[index + 1];
-            params[keyObj.name] = paramValue;
+            if (typeof paramValue === 'undefined' || paramValue === null) {
+              params[keyObj.name] = paramValue;
+            } else {
+              params[keyObj.name] = decodeURIComponent(paramValue);
+            }
           });
 
           var parentPath;
@@ -8420,7 +9105,7 @@
       if (params.xhrCacheIgnoreGetParameters && url.indexOf('?') >= 0) {
         url = url.split('?')[0];
       }
-      return Utils.promise(function (resolve, reject) {
+      return new Promise(function (resolve, reject) {
         if (params.xhrCache && !ignoreCache && url.indexOf('nocache') < 0 && params.xhrCacheIgnore.indexOf(url) < 0) {
           for (var i = 0; i < router.cache.xhr.length; i += 1) {
             var cachedUrl = router.cache.xhr[i];
@@ -8470,182 +9155,23 @@
     Router.prototype.removeThemeElements = function removeThemeElements (el) {
       var router = this;
       var theme = router.app.theme;
-      $(el).find(("." + (theme === 'md' ? 'ios' : 'md') + "-only, .if-" + (theme === 'md' ? 'ios' : 'md'))).remove();
-    };
-
-    Router.prototype.templateLoader = function templateLoader (template, templateUrl, options, resolve, reject) {
-      var router = this;
-      function compile(t) {
-        var compiledHtml;
-        var context;
-        try {
-          context = options.context || {};
-          if (typeof context === 'function') { context = context.call(router); }
-          else if (typeof context === 'string') {
-            try {
-              context = JSON.parse(context);
-            } catch (err) {
-              reject();
-              throw (err);
-            }
-          }
-          if (typeof t === 'function') {
-            compiledHtml = t(context);
-          } else {
-            compiledHtml = Template7.compile(t)(Utils.extend({}, context || {}, {
-              $app: router.app,
-              $root: Utils.extend({}, router.app.data, router.app.methods),
-              $route: options.route,
-              $router: router,
-              $theme: {
-                ios: router.app.theme === 'ios',
-                md: router.app.theme === 'md',
-              },
-            }));
-          }
-        } catch (err) {
-          reject();
-          throw (err);
-        }
-        resolve(compiledHtml, { context: context });
+      var toRemove;
+      if (theme === 'ios') {
+        toRemove = '.md-only, .aurora-only, .if-md, .if-aurora, .if-not-ios, .not-ios';
+      } else if (theme === 'md') {
+        toRemove = '.ios-only, .aurora-only, .if-ios, .if-aurora, .if-not-md, .not-md';
+      } else if (theme === 'aurora') {
+        toRemove = '.ios-only, .md-only, .if-ios, .if-md, .if-not-aurora, .not-aurora';
       }
-      if (templateUrl) {
-        // Load via XHR
-        if (router.xhr) {
-          router.xhr.abort();
-          router.xhr = false;
-        }
-        router
-          .xhrRequest(templateUrl, options)
-          .then(function (templateContent) {
-            compile(templateContent);
-          })
-          .catch(function () {
-            reject();
-          });
-      } else {
-        compile(template);
-      }
-    };
-
-    Router.prototype.modalTemplateLoader = function modalTemplateLoader (template, templateUrl, options, resolve, reject) {
-      var router = this;
-      return router.templateLoader(template, templateUrl, options, function (html) {
-        resolve(html);
-      }, reject);
-    };
-
-    Router.prototype.tabTemplateLoader = function tabTemplateLoader (template, templateUrl, options, resolve, reject) {
-      var router = this;
-      return router.templateLoader(template, templateUrl, options, function (html) {
-        resolve(html);
-      }, reject);
-    };
-
-    Router.prototype.pageTemplateLoader = function pageTemplateLoader (template, templateUrl, options, resolve, reject) {
-      var router = this;
-      return router.templateLoader(template, templateUrl, options, function (html, newOptions) {
-        if ( newOptions === void 0 ) newOptions = {};
-
-        resolve(router.getPageEl(html), newOptions);
-      }, reject);
-    };
-
-    Router.prototype.componentLoader = function componentLoader (component, componentUrl, options, resolve, reject) {
-      if ( options === void 0 ) options = {};
-
-      var router = this;
-      var app = router.app;
-      var url = typeof component === 'string' ? component : componentUrl;
-      var compiledUrl = router.replaceRequestUrlParams(url, options);
-      function compile(componentOptions) {
-        var context = options.context || {};
-        if (typeof context === 'function') { context = context.call(router); }
-        else if (typeof context === 'string') {
-          try {
-            context = JSON.parse(context);
-          } catch (err) {
-            reject();
-            throw (err);
-          }
-        }
-        var extendContext = Utils.merge(
-          {},
-          context,
-          {
-            $route: options.route,
-            $router: router,
-            $theme: {
-              ios: app.theme === 'ios',
-              md: app.theme === 'md',
-            },
-          }
-        );
-        var createdComponent = app.component.create(componentOptions, extendContext);
-        resolve(createdComponent.el);
-      }
-      var cachedComponent;
-      if (compiledUrl) {
-        router.cache.components.forEach(function (cached) {
-          if (cached.url === compiledUrl) { cachedComponent = cached.component; }
-        });
-      }
-      if (compiledUrl && cachedComponent) {
-        compile(cachedComponent);
-      } else if (compiledUrl && !cachedComponent) {
-        // Load via XHR
-        if (router.xhr) {
-          router.xhr.abort();
-          router.xhr = false;
-        }
-        router
-          .xhrRequest(url, options)
-          .then(function (loadedComponent) {
-            var parsedComponent = app.component.parse(loadedComponent);
-            router.cache.components.push({
-              url: compiledUrl,
-              component: parsedComponent,
-            });
-            compile(parsedComponent);
-          })
-          .catch(function (err) {
-            reject();
-            throw (err);
-          });
-      } else {
-        compile(component);
-      }
-    };
-
-    Router.prototype.modalComponentLoader = function modalComponentLoader (rootEl, component, componentUrl, options, resolve, reject) {
-      var router = this;
-      router.componentLoader(component, componentUrl, options, function (el) {
-        resolve(el);
-      }, reject);
-    };
-
-    Router.prototype.tabComponentLoader = function tabComponentLoader (tabEl, component, componentUrl, options, resolve, reject) {
-      var router = this;
-      router.componentLoader(component, componentUrl, options, function (el) {
-        resolve(el);
-      }, reject);
-    };
-
-    Router.prototype.pageComponentLoader = function pageComponentLoader (routerEl, component, componentUrl, options, resolve, reject) {
-      var router = this;
-      router.componentLoader(component, componentUrl, options, function (el, newOptions) {
-        if ( newOptions === void 0 ) newOptions = {};
-
-        resolve(el, newOptions);
-      }, reject);
+      $(el).find(toRemove).remove();
     };
 
     Router.prototype.getPageData = function getPageData (pageEl, navbarEl, from, to, route, pageFromEl) {
       if ( route === void 0 ) route = {};
 
       var router = this;
-      var $pageEl = $(pageEl);
-      var $navbarEl = $(navbarEl);
+      var $pageEl = $(pageEl).eq(0);
+      var $navbarEl = $(navbarEl).eq(0);
       var currentPage = $pageEl[0].f7Page || {};
       var direction;
       var pageFrom;
@@ -8692,8 +9218,14 @@
       var router = this;
       var $pageEl = $(pageEl);
       if (!$pageEl.length) { return; }
+      var $navbarEl = $(navbarEl);
       var route = options.route;
-      var restoreScrollTopOnBack = router.params.restoreScrollTopOnBack;
+      var restoreScrollTopOnBack = router.params.restoreScrollTopOnBack
+        && !(
+          router.params.masterDetailBreakpoint > 0
+          && $pageEl.hasClass('page-master')
+          && router.app.width >= router.params.masterDetailBreakpoint
+        );
       var keepAlive = $pageEl[0].f7Page && $pageEl[0].f7Page.route && $pageEl[0].f7Page.route.route && $pageEl[0].f7Page.route.route.keepAlive;
 
       if (callback === 'beforeRemove' && keepAlive) {
@@ -8707,7 +9239,7 @@
       if (callback === 'beforeRemove' && $pageEl[0].f7Page) {
         page = Utils.extend($pageEl[0].f7Page, { from: from, to: to, position: from });
       } else {
-        page = router.getPageData(pageEl, navbarEl, from, to, route, pageFromEl);
+        page = router.getPageData($pageEl[0], $navbarEl[0], from, to, route, pageFromEl);
       }
       page.swipeBack = !!options.swipeBack;
 
@@ -8895,6 +9427,7 @@
         if (
           (view && router.params.iosSwipeBack && app.theme === 'ios')
           || (view && router.params.mdSwipeBack && app.theme === 'md')
+          || (view && router.params.auroraSwipeBack && app.theme === 'aurora')
         ) {
           SwipeBack(router);
         }
@@ -8920,7 +9453,6 @@
         console.warn('Framework7: wrong or not complete pushState configuration, trying to guess pushStateRoot');
         pushStateRoot = doc.location.pathname.split('index.html')[0];
       }
-
       if (!pushState || !pushStateOnLoad) {
         if (!initUrl) {
           initUrl = documentUrl;
@@ -9014,10 +9546,24 @@
               if (!router.$navbarEl.parents(doc).length) {
                 router.$el.prepend(router.$navbarEl);
               }
+              $navbarInnerEl.addClass('navbar-current');
               router.$navbarEl.append($navbarInnerEl);
+              if ($navbarInnerEl.children('.title-large').length) {
+                $navbarInnerEl.addClass('navbar-inner-large');
+              }
               $pageEl.children('.navbar').remove();
             } else {
               router.$navbarEl.addClass('navbar-hidden');
+              if ($navbarInnerEl.children('.title-large').length) {
+                router.$navbarEl.addClass('navbar-hidden navbar-large-hidden');
+              }
+            }
+          }
+          if (router.currentRoute && router.currentRoute.route && router.currentRoute.route.master && router.params.masterDetailBreakpoint > 0) {
+            $pageEl.addClass('page-master');
+            $pageEl.trigger('page:role', { role: 'master' });
+            if ($navbarInnerEl && $navbarInnerEl.length) {
+              $navbarInnerEl.addClass('navbar-master');
             }
           }
           var initOptions = {
@@ -9027,11 +9573,11 @@
             Utils.extend(initOptions, router.currentRoute.route.options);
           }
           router.currentPageEl = $pageEl[0];
-          if (router.dynamicNavbar && $navbarInnerEl.length) {
+          if (router.separateNavbar && $navbarInnerEl.length) {
             router.currentNavbarEl = $navbarInnerEl[0];
           }
           router.removeThemeElements($pageEl);
-          if (router.dynamicNavbar && $navbarInnerEl.length) {
+          if (router.separateNavbar && $navbarInnerEl.length) {
             router.removeThemeElements($navbarInnerEl);
           }
           if (initOptions.route.route.tab) {
@@ -9048,7 +9594,8 @@
             animate: pushStateAnimateOnLoad,
             once: {
               pageAfterIn: function pageAfterIn() {
-                if (router.history.length > 2) {
+                var preloadPreviousPage = router.params.preloadPreviousPage || router.params[((app.theme) + "SwipeBack")];
+                if (preloadPreviousPage && router.history.length > 2) {
                   router.back({ preload: true });
                 }
               },
@@ -9105,7 +9652,7 @@
   // Clear history
   Router.prototype.clearPreviousHistory = clearPreviousHistory;
 
-  var Router$1 = {
+  var RouterModule = {
     name: 'router',
     static: {
       Router: Router,
@@ -9131,11 +9678,11 @@
     },
   };
 
-  var View = /*@__PURE__*/(function (Framework7Class$$1) {
+  var View = /*@__PURE__*/(function (Framework7Class) {
     function View(appInstance, el, viewParams) {
       if ( viewParams === void 0 ) viewParams = {};
 
-      Framework7Class$$1.call(this, viewParams, [appInstance]);
+      Framework7Class.call(this, viewParams, [appInstance]);
 
       var app = appInstance;
       var $el = $(el);
@@ -9228,8 +9775,8 @@
       return view;
     }
 
-    if ( Framework7Class$$1 ) View.__proto__ = Framework7Class$$1;
-    View.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) View.__proto__ = Framework7Class;
+    View.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     View.prototype.constructor = View;
 
     View.prototype.destroy = function destroy () {
@@ -9238,6 +9785,8 @@
 
       view.$el.trigger('view:beforedestroy', view);
       view.emit('local::beforeDestroy viewBeforeDestroy', view);
+
+      app.off('resize', view.checkmasterDetailBreakpoint);
 
       if (view.main) {
         app.views.main = null;
@@ -9267,9 +9816,39 @@
       view = null;
     };
 
+    View.prototype.checkmasterDetailBreakpoint = function checkmasterDetailBreakpoint () {
+      var view = this;
+      var app = view.app;
+      var wasMasterDetail = view.$el.hasClass('view-master-detail');
+      if (app.width >= view.params.masterDetailBreakpoint) {
+        view.$el.addClass('view-master-detail');
+        if (!wasMasterDetail) {
+          view.emit('local::masterDetailBreakpoint viewMasterDetailBreakpoint');
+          view.$el.trigger('view:masterDetailBreakpoint', view);
+        }
+      } else {
+        view.$el.removeClass('view-master-detail');
+        if (wasMasterDetail) {
+          view.emit('local::masterDetailBreakpoint viewMasterDetailBreakpoint');
+          view.$el.trigger('view:masterDetailBreakpoint', view);
+        }
+      }
+    };
+
+    View.prototype.initMasterDetail = function initMasterDetail () {
+      var view = this;
+      var app = view.app;
+      view.checkmasterDetailBreakpoint = view.checkmasterDetailBreakpoint.bind(view);
+      view.checkmasterDetailBreakpoint();
+      app.on('resize', view.checkmasterDetailBreakpoint);
+    };
+
     View.prototype.init = function init () {
       var view = this;
       if (view.params.router) {
+        if (view.params.masterDetailBreakpoint > 0) {
+          view.initMasterDetail();
+        }
         view.router.init();
         view.$el.trigger('view:init', view);
         view.emit('local::init viewInit', view);
@@ -9280,7 +9859,7 @@
   }(Framework7Class));
 
   // Use Router
-  View.use(Router$1);
+  View.use(RouterModule);
 
   function initClicks(app) {
     function handleClicks(e) {
@@ -9288,7 +9867,7 @@
       var $clickedLinkEl = $clickedEl.closest('a');
       var isLink = $clickedLinkEl.length > 0;
       var url = isLink && $clickedLinkEl.attr('href');
-      var isTabLink = isLink && $clickedLinkEl.hasClass('tab-link') && ($clickedLinkEl.attr('data-tab') || (url && url.indexOf('#') === 0));
+      // const isTabLink = isLink && $clickedLinkEl.hasClass('tab-link') && ($clickedLinkEl.attr('data-tab') || (url && url.indexOf('#') === 0));
 
       // Check if link is external
       if (isLink) {
@@ -9312,10 +9891,11 @@
       Object.keys(app.modules).forEach(function (moduleName) {
         var moduleClicks = app.modules[moduleName].clicks;
         if (!moduleClicks) { return; }
+        if (e.preventF7Router) { return; }
         Object.keys(moduleClicks).forEach(function (clickSelector) {
           var matchingClickedElement = $clickedEl.closest(clickSelector).eq(0);
           if (matchingClickedElement.length > 0) {
-            moduleClicks[clickSelector].call(app, matchingClickedElement, matchingClickedElement.dataset());
+            moduleClicks[clickSelector].call(app, matchingClickedElement, matchingClickedElement.dataset(), e);
           }
         });
       });
@@ -9326,7 +9906,12 @@
         e.preventDefault();
         clickedLinkData = $clickedLinkEl.dataset();
       }
-      var validUrl = url && url.length > 0 && url !== '#' && !isTabLink;
+
+      // Prevent Router
+      if (e.preventF7Router) { return; }
+      if ($clickedLinkEl.hasClass('prevent-router') || $clickedLinkEl.hasClass('router-prevent')) { return; }
+
+      var validUrl = url && url.length > 0 && url[0] !== '#';
       if (validUrl || $clickedLinkEl.hasClass('back')) {
         var view;
         if (clickedLinkData.view) {
@@ -9359,14 +9944,15 @@
 
     app.on('click', handleClicks);
 
+    // TODO: check if need this in iOS
     // Prevent scrolling on overlays
-    function preventScrolling(e) {
-      e.preventDefault();
-    }
-    if (Support.touch && !Device.android) {
-      var activeListener = Support.passiveListener ? { passive: false, capture: false } : false;
-      $(doc).on((app.params.touch.fastClicks ? 'touchstart' : 'touchmove'), '.panel-backdrop, .dialog-backdrop, .preloader-backdrop, .popup-backdrop, .searchbar-backdrop', preventScrolling, activeListener);
-    }
+    // function preventScrolling(e) {
+    //   e.preventDefault();
+    // }
+    // if (Support.touch && !Device.android) {
+    //   const activeListener = Support.passiveListener ? { passive: false, capture: false } : false;
+    //   $(document).on((app.params.touch.fastClicks ? 'touchstart' : 'touchmove'), '.panel-backdrop, .dialog-backdrop, .preloader-backdrop, .popup-backdrop, .searchbar-backdrop', preventScrolling, activeListener);
+    // }
   }
   var ClicksModule = {
     name: 'clicks',
@@ -9380,6 +9966,189 @@
       init: function init() {
         var app = this;
         initClicks(app);
+      },
+    },
+  };
+
+  var RouterTemplateLoaderModule = {
+    name: 'routerTemplateLoader',
+    proto: {
+      templateLoader: function templateLoader(template, templateUrl, options, resolve, reject) {
+        var router = this;
+        function compile(t) {
+          var compiledHtml;
+          var context;
+          try {
+            context = options.context || {};
+            if (typeof context === 'function') { context = context.call(router); }
+            else if (typeof context === 'string') {
+              try {
+                context = JSON.parse(context);
+              } catch (err) {
+                reject();
+                throw (err);
+              }
+            }
+            if (typeof t === 'function') {
+              compiledHtml = t(context);
+            } else {
+              compiledHtml = Template7.compile(t)(Utils.extend({}, context || {}, {
+                $app: router.app,
+                $root: Utils.extend({}, router.app.data, router.app.methods),
+                $route: options.route,
+                $f7route: options.route,
+                $router: router,
+                $f7router: router,
+                $theme: {
+                  ios: router.app.theme === 'ios',
+                  md: router.app.theme === 'md',
+                  aurora: router.app.theme === 'aurora',
+                },
+              }));
+            }
+          } catch (err) {
+            reject();
+            throw (err);
+          }
+          resolve(compiledHtml, { context: context });
+        }
+        if (templateUrl) {
+          // Load via XHR
+          if (router.xhr) {
+            router.xhr.abort();
+            router.xhr = false;
+          }
+          router
+            .xhrRequest(templateUrl, options)
+            .then(function (templateContent) {
+              compile(templateContent);
+            })
+            .catch(function () {
+              reject();
+            });
+        } else {
+          compile(template);
+        }
+      },
+
+      modalTemplateLoader: function modalTemplateLoader(template, templateUrl, options, resolve, reject) {
+        var router = this;
+        return router.templateLoader(template, templateUrl, options, function (html) {
+          resolve(html);
+        }, reject);
+      },
+
+      tabTemplateLoader: function tabTemplateLoader(template, templateUrl, options, resolve, reject) {
+        var router = this;
+        return router.templateLoader(template, templateUrl, options, function (html) {
+          resolve(html);
+        }, reject);
+      },
+
+      pageTemplateLoader: function pageTemplateLoader(template, templateUrl, options, resolve, reject) {
+        var router = this;
+        return router.templateLoader(template, templateUrl, options, function (html, newOptions) {
+          if ( newOptions === void 0 ) newOptions = {};
+
+          resolve(router.getPageEl(html), newOptions);
+        }, reject);
+      },
+    },
+  };
+
+  var RouterComponentLoaderModule = {
+    name: 'routerComponentLoader',
+    proto: {
+      componentLoader: function componentLoader(component, componentUrl, options, resolve, reject) {
+        if ( options === void 0 ) options = {};
+
+        var router = this;
+        var app = router.app;
+        var url = typeof component === 'string' ? component : componentUrl;
+        var compiledUrl = router.replaceRequestUrlParams(url, options);
+        function compile(componentOptions) {
+          var context = options.context || {};
+          if (typeof context === 'function') { context = context.call(router); }
+          else if (typeof context === 'string') {
+            try {
+              context = JSON.parse(context);
+            } catch (err) {
+              reject();
+              throw (err);
+            }
+          }
+          var extendContext = Utils.merge(
+            {},
+            context,
+            {
+              $route: options.route,
+              $f7route: options.route,
+              $router: router,
+              $f7router: router,
+              $theme: {
+                ios: app.theme === 'ios',
+                md: app.theme === 'md',
+                aurora: app.theme === 'aurora',
+              },
+            }
+          );
+          var createdComponent = app.component.create(componentOptions, extendContext);
+          resolve(createdComponent.el);
+        }
+        var cachedComponent;
+        if (compiledUrl) {
+          router.cache.components.forEach(function (cached) {
+            if (cached.url === compiledUrl) { cachedComponent = cached.component; }
+          });
+        }
+        if (compiledUrl && cachedComponent) {
+          compile(cachedComponent);
+        } else if (compiledUrl && !cachedComponent) {
+          // Load via XHR
+          if (router.xhr) {
+            router.xhr.abort();
+            router.xhr = false;
+          }
+          router
+            .xhrRequest(url, options)
+            .then(function (loadedComponent) {
+              var parsedComponent = app.component.parse(loadedComponent);
+              router.cache.components.push({
+                url: compiledUrl,
+                component: parsedComponent,
+              });
+              compile(parsedComponent);
+            })
+            .catch(function (err) {
+              reject();
+              throw (err);
+            });
+        } else {
+          compile(component);
+        }
+      },
+
+      modalComponentLoader: function modalComponentLoader(rootEl, component, componentUrl, options, resolve, reject) {
+        var router = this;
+        router.componentLoader(component, componentUrl, options, function (el) {
+          resolve(el);
+        }, reject);
+      },
+
+      tabComponentLoader: function tabComponentLoader(tabEl, component, componentUrl, options, resolve, reject) {
+        var router = this;
+        router.componentLoader(component, componentUrl, options, function (el) {
+          resolve(el);
+        }, reject);
+      },
+
+      pageComponentLoader: function pageComponentLoader(routerEl, component, componentUrl, options, resolve, reject) {
+        var router = this;
+        router.componentLoader(component, componentUrl, options, function (el, newOptions) {
+          if ( newOptions === void 0 ) newOptions = {};
+
+          resolve(el, newOptions);
+        }, reject);
       },
     },
   };
@@ -9399,7 +10168,7 @@
   var keyPrefix = 'f7storage-';
   var Storage = {
     get: function get(key) {
-      return Utils.promise(function (resolve, reject) {
+      return new Promise(function (resolve, reject) {
         try {
           var value = JSON.parse(win.localStorage.getItem(("" + keyPrefix + key)));
           resolve(value);
@@ -9409,7 +10178,7 @@
       });
     },
     set: function set(key, value) {
-      return Utils.promise(function (resolve, reject) {
+      return new Promise(function (resolve, reject) {
         try {
           win.localStorage.setItem(("" + keyPrefix + key), JSON.stringify(value));
           resolve();
@@ -9419,7 +10188,7 @@
       });
     },
     remove: function remove(key) {
-      return Utils.promise(function (resolve, reject) {
+      return new Promise(function (resolve, reject) {
         try {
           win.localStorage.removeItem(("" + keyPrefix + key));
           resolve();
@@ -9435,7 +10204,7 @@
 
     },
     keys: function keys() {
-      return Utils.promise(function (resolve, reject) {
+      return new Promise(function (resolve, reject) {
         try {
           var keys = Object.keys(win.localStorage)
             .filter(function (keyName) { return keyName.indexOf(keyPrefix) === 0; })
@@ -9447,7 +10216,7 @@
       });
     },
     forEach: function forEach(callback) {
-      return Utils.promise(function (resolve, reject) {
+      return new Promise(function (resolve, reject) {
         try {
           Object.keys(win.localStorage)
             .filter(function (keyName) { return keyName.indexOf(keyPrefix) === 0; })
@@ -9539,8 +10308,8 @@
   /* eslint no-use-before-define: "off" */
 
   var selfClosing = 'area base br col command embed hr img input keygen link menuitem meta param source track wbr'.split(' ');
-  var propsAttrs = 'hidden checked disabled readonly selected autocomplete autofocus autoplay required multiple value'.split(' ');
-  var booleanProps = 'hidden checked disabled readonly selected autocomplete autofocus autoplay required multiple readOnly'.split(' ');
+  var propsAttrs = 'hidden checked disabled readonly selected autocomplete autofocus autoplay required multiple value indeterminate'.split(' ');
+  var booleanProps = 'hidden checked disabled readonly selected autocomplete autofocus autoplay required multiple readOnly indeterminate'.split(' ');
   var tempDom = doc.createElement('div');
 
   function getHooks(data, app, initial, isRoot) {
@@ -9602,7 +10371,6 @@
     var once = ref.once;
 
     var fired = false;
-
     var methodName;
     var method;
     var customArgs = [];
@@ -9651,7 +10419,13 @@
       if (handlerString.indexOf('(') < 0) {
         customArgs = args;
       } else {
-        handlerString.split('(')[1].split(')')[0].split(',').forEach(function (argument) {
+        var handlerArguments = handlerString
+          .split('(')[1]
+          .split(')')[0]
+          .replace(/'[^']*'|"[^"]*"/g, function (a) { return a.replace(/,/g, '<_comma_>'); })
+          .split(',')
+          .map(function (a) { return a.replace(/<_comma_>/g, ','); });
+        handlerArguments.forEach(function (argument) {
           var arg = argument.trim();
           // eslint-disable-next-line
           if (!isNaN(arg)) { arg = parseFloat(arg); }
@@ -9781,8 +10555,8 @@
 
   function elementToVNode(el, context, app, initial, isRoot) {
     if (el.nodeType === 1) {
-      // element
-      var tagName = el.nodeName.toLowerCase();
+      // element (statement adds inline SVG compatibility)
+      var tagName = (el instanceof win.SVGElement) ? el.nodeName : el.nodeName.toLowerCase();
       return h(
         tagName,
         getData(el, context, app, initial, isRoot),
@@ -9887,8 +10661,8 @@
   function sameVnode(vnode1, vnode2) {
       return vnode1.key === vnode2.key && vnode1.sel === vnode2.sel;
   }
-  function isVnode(vnode$$1) {
-      return vnode$$1.sel !== undefined;
+  function isVnode(vnode) {
+      return vnode.sel !== undefined;
   }
   function createKeyToOldIdx(children, beginIdx, endIdx) {
       var i, map = {}, key, ch;
@@ -9903,7 +10677,7 @@
       return map;
   }
   var hooks = ['create', 'update', 'remove', 'destroy', 'pre', 'post'];
-  function init$1(modules, domApi) {
+  function init(modules, domApi) {
       var i, j, cbs = {};
       var api = domApi !== undefined ? domApi : htmlDomApi;
       for (i = 0; i < hooks.length; ++i) {
@@ -9928,20 +10702,20 @@
               }
           };
       }
-      function createElm(vnode$$1, insertedVnodeQueue) {
-          var i, data = vnode$$1.data;
+      function createElm(vnode, insertedVnodeQueue) {
+          var i, data = vnode.data;
           if (data !== undefined) {
               if (isDef(i = data.hook) && isDef(i = i.init)) {
-                  i(vnode$$1);
-                  data = vnode$$1.data;
+                  i(vnode);
+                  data = vnode.data;
               }
           }
-          var children = vnode$$1.children, sel = vnode$$1.sel;
+          var children = vnode.children, sel = vnode.sel;
           if (sel === '!') {
-              if (isUndef(vnode$$1.text)) {
-                  vnode$$1.text = '';
+              if (isUndef(vnode.text)) {
+                  vnode.text = '';
               }
-              vnode$$1.elm = api.createComment(vnode$$1.text);
+              vnode.elm = api.createComment(vnode.text);
           }
           else if (sel !== undefined) {
               // Parse selector
@@ -9950,14 +10724,14 @@
               var hash = hashIdx > 0 ? hashIdx : sel.length;
               var dot = dotIdx > 0 ? dotIdx : sel.length;
               var tag = hashIdx !== -1 || dotIdx !== -1 ? sel.slice(0, Math.min(hash, dot)) : sel;
-              var elm = vnode$$1.elm = isDef(data) && isDef(i = data.ns) ? api.createElementNS(i, tag)
+              var elm = vnode.elm = isDef(data) && isDef(i = data.ns) ? api.createElementNS(i, tag)
                   : api.createElement(tag);
               if (hash < dot)
                   { elm.setAttribute('id', sel.slice(hash + 1, dot)); }
               if (dotIdx > 0)
                   { elm.setAttribute('class', sel.slice(dot + 1).replace(/\./g, ' ')); }
               for (i = 0; i < cbs.create.length; ++i)
-                  { cbs.create[i](emptyNode, vnode$$1); }
+                  { cbs.create[i](emptyNode, vnode); }
               if (array(children)) {
                   for (i = 0; i < children.length; ++i) {
                       var ch = children[i];
@@ -9966,21 +10740,21 @@
                       }
                   }
               }
-              else if (primitive(vnode$$1.text)) {
-                  api.appendChild(elm, api.createTextNode(vnode$$1.text));
+              else if (primitive(vnode.text)) {
+                  api.appendChild(elm, api.createTextNode(vnode.text));
               }
-              i = vnode$$1.data.hook; // Reuse variable
+              i = vnode.data.hook; // Reuse variable
               if (isDef(i)) {
                   if (i.create)
-                      { i.create(emptyNode, vnode$$1); }
+                      { i.create(emptyNode, vnode); }
                   if (i.insert)
-                      { insertedVnodeQueue.push(vnode$$1); }
+                      { insertedVnodeQueue.push(vnode); }
               }
           }
           else {
-              vnode$$1.elm = api.createTextNode(vnode$$1.text);
+              vnode.elm = api.createTextNode(vnode.text);
           }
-          return vnode$$1.elm;
+          return vnode.elm;
       }
       function addVnodes(parentElm, before, vnodes, startIdx, endIdx, insertedVnodeQueue) {
           for (; startIdx <= endIdx; ++startIdx) {
@@ -9990,16 +10764,16 @@
               }
           }
       }
-      function invokeDestroyHook(vnode$$1) {
-          var i, j, data = vnode$$1.data;
+      function invokeDestroyHook(vnode) {
+          var i, j, data = vnode.data;
           if (data !== undefined) {
               if (isDef(i = data.hook) && isDef(i = i.destroy))
-                  { i(vnode$$1); }
+                  { i(vnode); }
               for (i = 0; i < cbs.destroy.length; ++i)
-                  { cbs.destroy[i](vnode$$1); }
-              if (vnode$$1.children !== undefined) {
-                  for (j = 0; j < vnode$$1.children.length; ++j) {
-                      i = vnode$$1.children[j];
+                  { cbs.destroy[i](vnode); }
+              if (vnode.children !== undefined) {
+                  for (j = 0; j < vnode.children.length; ++j) {
+                      i = vnode.children[j];
                       if (i != null && typeof i !== "string") {
                           invokeDestroyHook(i);
                       }
@@ -10110,24 +10884,24 @@
               }
           }
       }
-      function patchVnode(oldVnode, vnode$$1, insertedVnodeQueue) {
+      function patchVnode(oldVnode, vnode, insertedVnodeQueue) {
           var i, hook;
-          if (isDef(i = vnode$$1.data) && isDef(hook = i.hook) && isDef(i = hook.prepatch)) {
-              i(oldVnode, vnode$$1);
+          if (isDef(i = vnode.data) && isDef(hook = i.hook) && isDef(i = hook.prepatch)) {
+              i(oldVnode, vnode);
           }
-          var elm = vnode$$1.elm = oldVnode.elm;
+          var elm = vnode.elm = oldVnode.elm;
           var oldCh = oldVnode.children;
-          var ch = vnode$$1.children;
-          if (oldVnode === vnode$$1)
+          var ch = vnode.children;
+          if (oldVnode === vnode)
               { return; }
-          if (vnode$$1.data !== undefined) {
+          if (vnode.data !== undefined) {
               for (i = 0; i < cbs.update.length; ++i)
-                  { cbs.update[i](oldVnode, vnode$$1); }
-              i = vnode$$1.data.hook;
+                  { cbs.update[i](oldVnode, vnode); }
+              i = vnode.data.hook;
               if (isDef(i) && isDef(i = i.update))
-                  { i(oldVnode, vnode$$1); }
+                  { i(oldVnode, vnode); }
           }
-          if (isUndef(vnode$$1.text)) {
+          if (isUndef(vnode.text)) {
               if (isDef(oldCh) && isDef(ch)) {
                   if (oldCh !== ch)
                       { updateChildren(elm, oldCh, ch, insertedVnodeQueue); }
@@ -10144,14 +10918,14 @@
                   api.setTextContent(elm, '');
               }
           }
-          else if (oldVnode.text !== vnode$$1.text) {
-              api.setTextContent(elm, vnode$$1.text);
+          else if (oldVnode.text !== vnode.text) {
+              api.setTextContent(elm, vnode.text);
           }
           if (isDef(hook) && isDef(i = hook.postpatch)) {
-              i(oldVnode, vnode$$1);
+              i(oldVnode, vnode);
           }
       }
-      return function patch(oldVnode, vnode$$1) {
+      return function patch(oldVnode, vnode) {
           var i, elm, parent;
           var insertedVnodeQueue = [];
           for (i = 0; i < cbs.pre.length; ++i)
@@ -10159,15 +10933,15 @@
           if (!isVnode(oldVnode)) {
               oldVnode = emptyNodeAt(oldVnode);
           }
-          if (sameVnode(oldVnode, vnode$$1)) {
-              patchVnode(oldVnode, vnode$$1, insertedVnodeQueue);
+          if (sameVnode(oldVnode, vnode)) {
+              patchVnode(oldVnode, vnode, insertedVnodeQueue);
           }
           else {
               elm = oldVnode.elm;
               parent = api.parentNode(elm);
-              createElm(vnode$$1, insertedVnodeQueue);
+              createElm(vnode, insertedVnodeQueue);
               if (parent !== null) {
-                  api.insertBefore(parent, vnode$$1.elm, api.nextSibling(elm));
+                  api.insertBefore(parent, vnode.elm, api.nextSibling(elm));
                   removeVnodes(parent, [oldVnode], 0, 0);
               }
           }
@@ -10176,7 +10950,7 @@
           }
           for (i = 0; i < cbs.post.length; ++i)
               { cbs.post[i](); }
-          return vnode$$1;
+          return vnode;
       };
   }
 
@@ -10349,7 +11123,7 @@
     var on = vnode.data.on;
     // call event handler(s) if exists
     if (on && on[name]) {
-      invokeHandler(on[name], event, args, vnode);
+      invokeHandler(on[name], event, args);
     }
   }
   function createListener() {
@@ -10415,7 +11189,7 @@
 
   /* eslint import/no-named-as-default: off */
 
-  var patch = init$1([
+  var patch = init([
     attributesModule,
     propsModule,
     styleModule,
@@ -10433,7 +11207,9 @@
         $$: $,
         $dom7: $,
         $app: app,
+        $f7: app,
         $options: Utils.extend({ id: id }, options),
+        $id: options.id || id,
       }
     );
     var $options = self.$options;
@@ -10502,7 +11278,7 @@
     if (html && typeof html === 'string') {
       html = html.trim();
       self.$vnode = vdom(html, self, app, true);
-      self.el = doc.createElement('div');
+      self.el = doc.createElement(self.$vnode.sel || 'div');
       patch(self.el, self.$vnode);
     } else if (html) {
       self.el = html;
@@ -10658,17 +11434,20 @@
     } else if (componentString.indexOf('<style scoped>') >= 0) {
       styleScoped = true;
       style = componentString.split('<style scoped>')[1].split('</style>')[0];
-      style = style.split('\n').map(function (line) {
-        var trimmedLine = line.trim();
-        if (trimmedLine.indexOf('@') === 0) { return line; }
-        if (line.indexOf('{') >= 0) {
-          if (line.indexOf('{{this}}') >= 0) {
-            return line.replace('{{this}}', ("[data-f7-" + id + "]"));
-          }
-          return ("[data-f7-" + id + "] " + (line.trim()));
-        }
-        return line;
-      }).join('\n');
+      style = style
+        .replace(/{{this}}/g, ("[data-f7-" + id + "]"))
+        .replace(/[\n]?([^{^}]*){/ig, function (string, rules) {
+          // eslint-disable-next-line
+          rules = rules
+            .split(',')
+            .map(function (rule) {
+              if (rule.indexOf(("[data-f7-" + id + "]")) >= 0) { return rule; }
+              return ("[data-f7-" + id + "] " + (rule.trim()));
+            })
+            .join(', ');
+
+          return ("\n" + rules + " {");
+        });
     }
 
     // Parse Script
@@ -10743,6 +11522,90 @@
           return new Framework7Component(app, options, extendContext);
         },
       };
+    },
+  };
+
+  var SW = {
+    registrations: [],
+    register: function register(path, scope) {
+      var app = this;
+      if (!('serviceWorker' in window.navigator) || !app.serviceWorker.container) {
+        return new Promise(function (resolve, reject) {
+          reject(new Error('Service worker is not supported'));
+        });
+      }
+      return new Promise(function (resolve, reject) {
+        app.serviceWorker.container.register(path, (scope ? { scope: scope } : {}))
+          .then(function (reg) {
+            SW.registrations.push(reg);
+            app.emit('serviceWorkerRegisterSuccess', reg);
+            resolve(reg);
+          }).catch(function (error) {
+            app.emit('serviceWorkerRegisterError', error);
+            reject(error);
+          });
+      });
+    },
+    unregister: function unregister(registration) {
+      var app = this;
+      if (!('serviceWorker' in window.navigator) || !app.serviceWorker.container) {
+        return new Promise(function (resolve, reject) {
+          reject(new Error('Service worker is not supported'));
+        });
+      }
+      var registrations;
+      if (!registration) { registrations = SW.registrations; }
+      else if (Array.isArray(registration)) { registrations = registration; }
+      else { registrations = [registration]; }
+      return Promise.all(registrations.map(function (reg) { return new Promise(function (resolve, reject) {
+        reg.unregister()
+          .then(function () {
+            if (SW.registrations.indexOf(reg) >= 0) {
+              SW.registrations.splice(SW.registrations.indexOf(reg), 1);
+            }
+            app.emit('serviceWorkerUnregisterSuccess', reg);
+            resolve();
+          })
+          .catch(function (error) {
+            app.emit('serviceWorkerUnregisterError', reg, error);
+            reject(error);
+          });
+      }); }));
+    },
+  };
+
+  var ServiceWorkerModule = {
+    name: 'sw',
+    params: {
+      serviceWorker: {
+        path: undefined,
+        scope: undefined,
+      },
+    },
+    create: function create() {
+      var app = this;
+      Utils.extend(app, {
+        serviceWorker: {
+          container: ('serviceWorker' in window.navigator) ? window.navigator.serviceWorker : undefined,
+          registrations: SW.registrations,
+          register: SW.register.bind(app),
+          unregister: SW.unregister.bind(app),
+        },
+      });
+    },
+    on: {
+      init: function init() {
+        if (!('serviceWorker' in window.navigator)) { return; }
+        var app = this;
+        if (!app.serviceWorker.container) { return; }
+        var paths = app.params.serviceWorker.path;
+        var scope = app.params.serviceWorker.scope;
+        if (!paths || (Array.isArray(paths) && !paths.length)) { return; }
+        var toRegister = Array.isArray(paths) ? paths : [paths];
+        toRegister.forEach(function (path) {
+          app.serviceWorker.register(path, scope);
+        });
+      },
     },
   };
 
@@ -10827,10 +11690,6 @@
           $('html').removeClass('with-statusbar');
         }
       }
-    },
-    iosOverlaysWebView: function iosOverlaysWebView(overlays) {
-      if (!Device.ios) { return; }
-      Statusbar.overlaysWebView(overlays);
     },
     checkOverlay: function checkOverlay() {
       if (Device.needsStatusbarOverlay()) {
@@ -10939,9 +11798,6 @@
           setBackgroundColor: Statusbar.setBackgroundColor,
           isVisible: Statusbar.isVisible,
           init: Statusbar.init.bind(app),
-
-          iosOverlaysWebView: Statusbar.iosOverlaysWebView,
-          setIosTextColor: Statusbar.iosSetTextColor,
         },
       });
     },
@@ -10962,26 +11818,26 @@
   };
 
   function getCurrentView(app) {
-    var popoverView = $('.popover.modal-in .view');
-    var popupView = $('.popup.modal-in .view');
-    var panelView = $('.panel.panel-active .view');
-    var appViews = $('.views');
-    if (appViews.length === 0) { appViews = app.root; }
+    var $popoverView = $('.popover.modal-in .view');
+    var $popupView = $('.popup.modal-in .view');
+    var $panelView = $('.panel.panel-active .view');
+    var $viewsEl = $('.views');
+    if ($viewsEl.length === 0) { $viewsEl = app.root; }
     // Find active view as tab
-    var appView = appViews.children('.view');
+    var $viewEl = $viewsEl.children('.view');
     // Propably in tabs or split view
-    if (appView.length > 1) {
-      if (appView.hasClass('tab')) {
+    if ($viewEl.length > 1) {
+      if ($viewEl.hasClass('tab')) {
         // Tabs
-        appView = appViews.children('.view.tab-active');
+        $viewEl = $viewsEl.children('.view.tab-active');
       }
     }
-    if (popoverView.length > 0 && popoverView[0].f7View) { return popoverView[0].f7View; }
-    if (popupView.length > 0 && popupView[0].f7View) { return popupView[0].f7View; }
-    if (panelView.length > 0 && panelView[0].f7View) { return panelView[0].f7View; }
-    if (appView.length > 0) {
-      if (appView.length === 1 && appView[0].f7View) { return appView[0].f7View; }
-      if (appView.length > 1) {
+    if ($popoverView.length > 0 && $popoverView[0].f7View) { return $popoverView[0].f7View; }
+    if ($popupView.length > 0 && $popupView[0].f7View) { return $popupView[0].f7View; }
+    if ($panelView.length > 0 && $panelView[0].f7View) { return $panelView[0].f7View; }
+    if ($viewEl.length > 0) {
+      if ($viewEl.length === 1 && $viewEl[0].f7View) { return $viewEl[0].f7View; }
+      if ($viewEl.length > 1) {
         return app.views.main;
       }
     }
@@ -11004,6 +11860,8 @@
         preloadPreviousPage: true,
         allowDuplicateUrls: false,
         reloadPages: false,
+        reloadDetail: false,
+        masterDetailBreakpoint: 0,
         removeElements: true,
         removeElementsWithTimeout: false,
         removeElementsTimeout: 0,
@@ -11022,6 +11880,11 @@
         mdSwipeBackAnimateOpacity: false,
         mdSwipeBackActiveArea: 30,
         mdSwipeBackThreshold: 0,
+        auroraSwipeBack: false,
+        auroraSwipeBackAnimateShadow: false,
+        auroraSwipeBackAnimateOpacity: true,
+        auroraSwipeBackActiveArea: 30,
+        auroraSwipeBackThreshold: 0,
         // Push State
         pushState: false,
         pushStateRoot: undefined,
@@ -11031,7 +11894,6 @@
         pushStateOnLoad: true,
         // Animate Pages
         animate: true,
-        animateWithJS: false,
         // iOS Dynamic Navbar
         iosDynamicNavbar: true,
         iosSeparateDynamicNavbar: true,
@@ -11039,7 +11901,8 @@
         iosAnimateNavbarBackIcon: true,
         // Delays
         iosPageLoadDelay: 0,
-        materialPageLoadDelay: 0,
+        mdPageLoadDelay: 0,
+        auroraPageLoadDelay: 0,
         // Routes hooks
         routesBeforeEnter: null,
         routesBeforeLeave: null,
@@ -11103,7 +11966,9 @@
   var Navbar = {
     size: function size(el) {
       var app = this;
-      if (app.theme !== 'ios') { return; }
+      if (app.theme !== 'ios' && !app.params.navbar[((app.theme) + "CenterTitle")]) {
+        return;
+      }
       var $el = $(el);
       if ($el.hasClass('navbar')) {
         $el = $el.children('.navbar-inner').each(function (index, navbarEl) {
@@ -11111,6 +11976,7 @@
         });
         return;
       }
+
       if (
         $el.hasClass('stacked')
         || $el.parents('.stacked').length > 0
@@ -11119,6 +11985,14 @@
       ) {
         return;
       }
+
+      if (app.theme !== 'ios' && app.params.navbar[((app.theme) + "CenterTitle")]) {
+        $el.addClass('navbar-inner-centered-title');
+      }
+      if (app.theme === 'ios' && !app.params.navbar.iosCenterTitle) {
+        $el.addClass('navbar-inner-left-title');
+      }
+
       var $viewEl = $el.parents('.view').eq(0);
       var left = app.rtl ? $el.children('.right') : $el.children('.left');
       var right = app.rtl ? $el.children('.left') : $el.children('.right');
@@ -11178,7 +12052,7 @@
       // RTL inverter
       var inverter = app.rtl ? -1 : 1;
 
-      if (dynamicNavbar) {
+      if (dynamicNavbar && app.theme === 'ios') {
         if (title.hasClass('sliding') || (title.length > 0 && sliding)) {
           var titleLeftOffset = (-(currLeft + diff) * inverter) + separateNavbarLeftOffset;
           var titleRightOffset = ((navbarInnerWidth - currLeft - diff - titleWidth) * inverter) - separateNavbarRightOffset;
@@ -11202,7 +12076,14 @@
             left[0].f7NavbarLeftOffset = -leftWidth + separateNavbarLeftOffset;
             left[0].f7NavbarRightOffset = ((navbarInnerWidth - left[0].offsetWidth) / 2) - separateNavbarRightOffset;
             if (router && router.params.iosAnimateNavbarBackIcon && left.find('.back .icon').length > 0) {
-              left[0].f7NavbarRightOffset -= left.find('.back .icon')[0].offsetWidth;
+              if (left.find('.back .icon ~ span').length) {
+                var leftOffset = left[0].f7NavbarLeftOffset;
+                var rightOffset = left[0].f7NavbarRightOffset;
+                left[0].f7NavbarLeftOffset = 0;
+                left[0].f7NavbarRightOffset = 0;
+                left.find('.back .icon ~ span')[0].f7NavbarLeftOffset = leftOffset;
+                left.find('.back .icon ~ span')[0].f7NavbarRightOffset = rightOffset - left.find('.back .icon')[0].offsetWidth;
+              }
             }
           }
         }
@@ -11221,8 +12102,8 @@
         }
       }
 
-      // Title left
-      if (app.params.navbar.iosCenterTitle) {
+      // Center title
+      if (app.params.navbar[((app.theme) + "CenterTitle")]) {
         var titleLeft = diff;
         if (app.rtl && noLeft && noRight && title.length > 0) { titleLeft = -titleLeft; }
         title.css({ left: (titleLeft + "px") });
@@ -11231,20 +12112,30 @@
     hide: function hide(el, animate) {
       if ( animate === void 0 ) animate = true;
 
+      var app = this;
       var $el = $(el);
       if ($el.hasClass('navbar-inner')) { $el = $el.parents('.navbar'); }
       if (!$el.length) { return; }
       if ($el.hasClass('navbar-hidden')) { return; }
       var className = "navbar-hidden" + (animate ? ' navbar-transitioning' : '');
+      var currentIsLarge = app.theme === 'ios'
+        ? $el.find('.navbar-current .title-large').length
+        : $el.find('.title-large').length;
+      if (currentIsLarge) {
+        className += ' navbar-large-hidden';
+      }
       $el.transitionEnd(function () {
         $el.removeClass('navbar-transitioning');
       });
       $el.addClass(className);
+      $el.trigger('navbar:hide');
+      app.emit('navbarHide', $el[0]);
     },
     show: function show(el, animate) {
       if ( el === void 0 ) el = '.navbar-hidden';
       if ( animate === void 0 ) animate = true;
 
+      var app = this;
       var $el = $(el);
       if ($el.hasClass('navbar-inner')) { $el = $el.parents('.navbar'); }
       if (!$el.length) { return; }
@@ -11255,11 +12146,13 @@
           $el.removeClass('navbar-transitioning');
         });
       }
-      $el.removeClass('navbar-hidden');
+      $el.removeClass('navbar-hidden navbar-large-hidden');
+      $el.trigger('navbar:show');
+      app.emit('navbarShow', $el[0]);
     },
     getElByPage: function getElByPage(page) {
       var $pageEl;
-      var $navbarEl;
+      var $navbarInnerEl;
       var pageData;
       if (page.$navbarEl || page.$el) {
         pageData = page;
@@ -11269,12 +12162,12 @@
         if ($pageEl.length > 0) { pageData = $pageEl[0].f7Page; }
       }
       if (pageData && pageData.$navbarEl && pageData.$navbarEl.length > 0) {
-        $navbarEl = pageData.$navbarEl;
+        $navbarInnerEl = pageData.$navbarEl;
       } else if ($pageEl) {
-        $navbarEl = $pageEl.children('.navbar').children('.navbar-inner');
+        $navbarInnerEl = $pageEl.children('.navbar').children('.navbar-inner');
       }
-      if (!$navbarEl || ($navbarEl && $navbarEl.length === 0)) { return undefined; }
-      return $navbarEl[0];
+      if (!$navbarInnerEl || ($navbarInnerEl && $navbarInnerEl.length === 0)) { return undefined; }
+      return $navbarInnerEl[0];
     },
     getPageByEl: function getPageByEl(navbarInnerEl) {
       var $navbarInnerEl = $(navbarInnerEl);
@@ -11293,10 +12186,81 @@
       });
       return pageEl;
     },
-    initHideNavbarOnScroll: function initHideNavbarOnScroll(pageEl, navbarInnerEl) {
+
+    collapseLargeTitle: function collapseLargeTitle(navbarInnerEl) {
+      var app = this;
+      var $navbarInnerEl = $(navbarInnerEl);
+      if ($navbarInnerEl.hasClass('navbar')) {
+        $navbarInnerEl = $navbarInnerEl.find('.navbar-inner-large');
+        if ($navbarInnerEl.length > 1) {
+          $navbarInnerEl = $(navbarInnerEl).find('.navbar-inner-large.navbar-current');
+        }
+        if ($navbarInnerEl.length > 1 || !$navbarInnerEl.length) {
+          return;
+        }
+      }
+      var $pageEl = $(app.navbar.getPageByEl($navbarInnerEl));
+      $navbarInnerEl.addClass('navbar-inner-large-collapsed');
+      $pageEl.eq(0).addClass('page-with-navbar-large-collapsed').trigger('page:navbarlargecollapsed');
+      app.emit('pageNavbarLargeCollapsed', $pageEl[0]);
+      var $navbarEl = $navbarInnerEl.parents('.navbar');
+      if (app.theme === 'md' || app.theme === 'aurora') {
+        $navbarEl.addClass('navbar-large-collapsed');
+      }
+      $navbarEl.trigger('navbar:collapse');
+      app.emit('navbarCollapse', $navbarEl[0]);
+    },
+    expandLargeTitle: function expandLargeTitle(navbarInnerEl) {
+      var app = this;
+      var $navbarInnerEl = $(navbarInnerEl);
+      if ($navbarInnerEl.hasClass('navbar')) {
+        $navbarInnerEl = $navbarInnerEl.find('.navbar-inner-large');
+        if ($navbarInnerEl.length > 1) {
+          $navbarInnerEl = $(navbarInnerEl).find('.navbar-inner-large.navbar-current');
+        }
+        if ($navbarInnerEl.length > 1 || !$navbarInnerEl.length) {
+          return;
+        }
+      }
+      var $pageEl = $(app.navbar.getPageByEl($navbarInnerEl));
+      $navbarInnerEl.removeClass('navbar-inner-large-collapsed');
+      $pageEl.eq(0).removeClass('page-with-navbar-large-collapsed').trigger('page:navbarlargeexpanded');
+      app.emit('pageNavbarLargeExpanded', $pageEl[0]);
+      var $navbarEl = $navbarInnerEl.parents('.navbar');
+      if (app.theme === 'md' || app.theme === 'aurora') {
+        $navbarEl.removeClass('navbar-large-collapsed');
+      }
+      $navbarEl.trigger('navbar:expand');
+      app.emit('navbarExpand', $navbarEl[0]);
+    },
+    toggleLargeTitle: function toggleLargeTitle(navbarInnerEl) {
+      var app = this;
+      var $navbarInnerEl = $(navbarInnerEl);
+      if ($navbarInnerEl.hasClass('navbar')) {
+        $navbarInnerEl = $navbarInnerEl.find('.navbar-inner-large');
+        if ($navbarInnerEl.length > 1) {
+          $navbarInnerEl = $(navbarInnerEl).find('.navbar-inner-large.navbar-current');
+        }
+        if ($navbarInnerEl.length > 1 || !$navbarInnerEl.length) {
+          return;
+        }
+      }
+      if ($navbarInnerEl.hasClass('navbar-inner-large-collapsed')) {
+        app.navbar.expandLargeTitle($navbarInnerEl);
+      } else {
+        app.navbar.collapseLargeTitle($navbarInnerEl);
+      }
+    },
+    initNavbarOnScroll: function initNavbarOnScroll(pageEl, navbarInnerEl, needHide, needCollapse) {
       var app = this;
       var $pageEl = $(pageEl);
-      var $navbarEl = $(navbarInnerEl || app.navbar.getElByPage(pageEl)).closest('.navbar');
+      var $navbarInnerEl = $(navbarInnerEl);
+      var $navbarEl = app.theme === 'md' || app.theme === 'aurora'
+        ? $navbarInnerEl.parents('.navbar')
+        : $(navbarInnerEl || app.navbar.getElByPage(pageEl)).closest('.navbar');
+      var isLarge = $navbarInnerEl.find('.title-large').length || $navbarInnerEl.hasClass('.navbar-inner-large');
+      var navbarHideHeight = 44;
+      var snapPageScrollToLargeTitle = app.params.navbar.snapPageScrollToLargeTitle;
 
       var previousScrollTop;
       var currentScrollTop;
@@ -11306,10 +12270,102 @@
       var reachEnd;
       var action;
       var navbarHidden;
-      function handleScroll() {
-        var scrollContent = this;
-        if ($pageEl.hasClass('page-previous')) { return; }
-        currentScrollTop = scrollContent.scrollTop;
+
+      var navbarCollapsed;
+      var navbarTitleLargeHeight;
+      if (needCollapse || (needHide && isLarge)) {
+        navbarTitleLargeHeight = $navbarInnerEl.css('--f7-navbar-large-title-height');
+        if (navbarTitleLargeHeight && navbarTitleLargeHeight.indexOf('px') >= 0) {
+          navbarTitleLargeHeight = parseInt(navbarTitleLargeHeight, 10);
+          if (Number.isNaN(navbarTitleLargeHeight)) {
+            if (app.theme === 'ios') { navbarTitleLargeHeight = 52; }
+            else if (app.theme === 'md') { navbarTitleLargeHeight = 48; }
+            else if (app.theme === 'aurora') { navbarTitleLargeHeight = 38; }
+          }
+        } else { // eslint-disable-next-line
+          if (app.theme === 'ios') { navbarTitleLargeHeight = 52; }
+          else if (app.theme === 'md') { navbarTitleLargeHeight = 48; }
+          else if (app.theme === 'aurora') { navbarTitleLargeHeight = 38; }
+        }
+      }
+      if (needHide && isLarge) {
+        navbarHideHeight += navbarTitleLargeHeight;
+      }
+
+      var scrollChanged;
+      var scrollContent;
+      var scrollTimeoutId;
+      var touchEndTimeoutId;
+      var touchSnapTimeout = 70;
+      var desktopSnapTimeout = 300;
+
+      function snapLargeNavbar() {
+        var inSearchbarExpanded = $navbarInnerEl.hasClass('with-searchbar-expandable-enabled');
+        if (inSearchbarExpanded) { return; }
+        if (!scrollContent || currentScrollTop < 0) { return; }
+        if (currentScrollTop >= navbarTitleLargeHeight / 2 && currentScrollTop < navbarTitleLargeHeight) {
+          $(scrollContent).scrollTop(navbarTitleLargeHeight, 100);
+        } else if (currentScrollTop < navbarTitleLargeHeight) {
+          $(scrollContent).scrollTop(0, 200);
+        }
+      }
+
+      function handleLargeNavbarCollapse() {
+        var collapseProgress = Math.min(Math.max((currentScrollTop / navbarTitleLargeHeight), 0), 1);
+        var inSearchbarExpanded = $navbarInnerEl.hasClass('with-searchbar-expandable-enabled');
+        if (inSearchbarExpanded) { return; }
+        navbarCollapsed = $navbarInnerEl.hasClass('navbar-inner-large-collapsed');
+        if (collapseProgress === 0 && navbarCollapsed) {
+          app.navbar.expandLargeTitle($navbarInnerEl[0]);
+          $navbarInnerEl[0].style.removeProperty('--f7-navbar-large-collapse-progress');
+          $pageEl[0].style.removeProperty('--f7-navbar-large-collapse-progress');
+          $navbarInnerEl[0].style.overflow = '';
+          if (app.theme === 'md' || app.theme === 'aurora') {
+            $navbarEl[0].style.removeProperty('--f7-navbar-large-collapse-progress');
+          }
+        } else if (collapseProgress === 1 && !navbarCollapsed) {
+          app.navbar.collapseLargeTitle($navbarInnerEl[0]);
+          $navbarInnerEl[0].style.removeProperty('--f7-navbar-large-collapse-progress');
+          $navbarInnerEl[0].style.overflow = '';
+          $pageEl[0].style.removeProperty('--f7-navbar-large-collapse-progress');
+          if (app.theme === 'md' || app.theme === 'aurora') {
+            $navbarEl[0].style.removeProperty('--f7-navbar-large-collapse-progress');
+          }
+        } else if ((collapseProgress === 1 && navbarCollapsed) || (collapseProgress === 0 && !navbarCollapsed)) {
+          $navbarInnerEl[0].style.removeProperty('--f7-navbar-large-collapse-progress');
+          $navbarInnerEl[0].style.overflow = '';
+          $pageEl[0].style.removeProperty('--f7-navbar-large-collapse-progress');
+          if (app.theme === 'md' || app.theme === 'aurora') {
+            $navbarEl[0].style.removeProperty('--f7-navbar-large-collapse-progress');
+          }
+        } else {
+          $navbarInnerEl[0].style.setProperty('--f7-navbar-large-collapse-progress', collapseProgress);
+          $navbarInnerEl[0].style.overflow = 'visible';
+          $pageEl[0].style.setProperty('--f7-navbar-large-collapse-progress', collapseProgress);
+          if (app.theme === 'md' || app.theme === 'aurora') {
+            $navbarEl[0].style.setProperty('--f7-navbar-large-collapse-progress', collapseProgress);
+          }
+        }
+
+        if (snapPageScrollToLargeTitle) {
+          if (!Support.touch) {
+            clearTimeout(scrollTimeoutId);
+            scrollTimeoutId = setTimeout(function () {
+              snapLargeNavbar();
+            }, desktopSnapTimeout);
+          } else if (touchEndTimeoutId) {
+            clearTimeout(touchEndTimeoutId);
+            touchEndTimeoutId = null;
+            touchEndTimeoutId = setTimeout(function () {
+              snapLargeNavbar();
+              clearTimeout(touchEndTimeoutId);
+              touchEndTimeoutId = null;
+            }, touchSnapTimeout);
+          }
+        }
+      }
+
+      function handleTitleHideShow() {
         scrollHeight = scrollContent.scrollHeight;
         offsetHeight = scrollContent.offsetHeight;
         reachEnd = currentScrollTop + offsetHeight >= scrollHeight;
@@ -11320,12 +12376,12 @@
             action = 'show';
           }
         } else if (previousScrollTop > currentScrollTop) {
-          if (app.params.navbar.showOnPageScrollTop || currentScrollTop <= 44) {
+          if (app.params.navbar.showOnPageScrollTop || currentScrollTop <= navbarHideHeight) {
             action = 'show';
           } else {
             action = 'hide';
           }
-        } else if (currentScrollTop > 44) {
+        } else if (currentScrollTop > navbarHideHeight) {
           action = 'hide';
         } else {
           action = 'show';
@@ -11338,11 +12394,57 @@
           app.navbar.hide($navbarEl);
           navbarHidden = true;
         }
-
         previousScrollTop = currentScrollTop;
       }
+
+      function handleScroll(e) {
+        scrollContent = this;
+        if (e && e.target && e.target !== scrollContent) {
+          return;
+        }
+        currentScrollTop = scrollContent.scrollTop;
+        scrollChanged = currentScrollTop;
+
+        if (needCollapse) {
+          handleLargeNavbarCollapse();
+        }
+        if ($pageEl.hasClass('page-previous')) { return; }
+        if (needHide) {
+          handleTitleHideShow();
+        }
+      }
+      function handeTouchStart() {
+        scrollChanged = false;
+      }
+      function handleTouchEnd() {
+        clearTimeout(touchEndTimeoutId);
+        touchEndTimeoutId = null;
+        touchEndTimeoutId = setTimeout(function () {
+          if (scrollChanged !== false) {
+            snapLargeNavbar();
+            clearTimeout(touchEndTimeoutId);
+            touchEndTimeoutId = null;
+          }
+        }, touchSnapTimeout);
+      }
       $pageEl.on('scroll', '.page-content', handleScroll, true);
-      $pageEl[0].f7ScrollNavbarHandler = handleScroll;
+      if (Support.touch && needCollapse && snapPageScrollToLargeTitle) {
+        app.on('touchstart:passive', handeTouchStart);
+        app.on('touchend:passive', handleTouchEnd);
+      }
+      if (needCollapse) {
+        $pageEl.find('.page-content').each(function (pageContentIndex, pageContentEl) {
+          if (pageContentEl.scrollTop > 0) { handleScroll.call(pageContentEl); }
+        });
+      }
+      $pageEl[0].f7DetachNavbarScrollHandlers = function f7DetachNavbarScrollHandlers() {
+        delete $pageEl[0].f7DetachNavbarScrollHandlers;
+        $pageEl.off('scroll', '.page-content', handleScroll, true);
+        if (Support.touch && needCollapse && snapPageScrollToLargeTitle) {
+          app.off('touchstart:passive', handeTouchStart);
+          app.off('touchend:passive', handleTouchEnd);
+        }
+      };
     },
   };
   var Navbar$1 = {
@@ -11356,7 +12458,10 @@
           show: Navbar.show.bind(app),
           getElByPage: Navbar.getElByPage.bind(app),
           getPageByEl: Navbar.getPageByEl.bind(app),
-          initHideNavbarOnScroll: Navbar.initHideNavbarOnScroll.bind(app),
+          collapseLargeTitle: Navbar.collapseLargeTitle.bind(app),
+          expandLargeTitle: Navbar.expandLargeTitle.bind(app),
+          toggleLargeTitle: Navbar.toggleLargeTitle.bind(app),
+          initNavbarOnScroll: Navbar.initNavbarOnScroll.bind(app),
         },
       });
     },
@@ -11364,22 +12469,25 @@
       navbar: {
         scrollTopOnTitleClick: true,
         iosCenterTitle: true,
+        mdCenterTitle: false,
+        auroraCenterTitle: true,
         hideOnPageScroll: false,
         showOnPageScrollEnd: true,
         showOnPageScrollTop: true,
+        collapseLargeTitleOnScroll: true,
+        snapPageScrollToLargeTitle: true,
       },
     },
     on: {
-      'panelBreakpoint resize': function onResize() {
+      'panelBreakpoint panelResize resize viewMasterDetailBreakpoint': function onResize() {
         var app = this;
-        if (app.theme !== 'ios') { return; }
         $('.navbar').each(function (index, navbarEl) {
           app.navbar.size(navbarEl);
         });
       },
       pageBeforeRemove: function pageBeforeRemove(page) {
-        if (page.$el[0].f7ScrollNavbarHandler) {
-          page.$el.off('scroll', '.page-content', page.$el[0].f7ScrollNavbarHandler, true);
+        if (page.$el[0].f7DetachNavbarScrollHandlers) {
+          page.$el[0].f7DetachNavbarScrollHandlers();
         }
       },
       pageBeforeIn: function pageBeforeIn(page) {
@@ -11402,18 +12510,33 @@
       },
       pageReinit: function pageReinit(page) {
         var app = this;
-        if (app.theme !== 'ios') { return; }
-        var $navbarEl = $(app.navbar.getElByPage(page));
-        if (!$navbarEl || $navbarEl.length === 0) { return; }
-        app.navbar.size($navbarEl);
+        var $navbarInnerEl = $(app.navbar.getElByPage(page));
+        if (!$navbarInnerEl || $navbarInnerEl.length === 0) { return; }
+        app.navbar.size($navbarInnerEl);
       },
       pageInit: function pageInit(page) {
         var app = this;
-        var $navbarEl = $(app.navbar.getElByPage(page));
-        if (!$navbarEl || $navbarEl.length === 0) { return; }
-        if (app.theme === 'ios') {
-          app.navbar.size($navbarEl);
+        var $navbarInnerEl = $(app.navbar.getElByPage(page));
+        if (!$navbarInnerEl || $navbarInnerEl.length === 0) { return; }
+
+        // Size
+        app.navbar.size($navbarInnerEl);
+
+        // Need Collapse On Scroll
+        var needCollapseOnScrollHandler;
+        if ($navbarInnerEl.children('.title-large').length > 0) {
+          $navbarInnerEl.addClass('navbar-inner-large');
         }
+        if ($navbarInnerEl.hasClass('navbar-inner-large')) {
+          if (app.params.navbar.collapseLargeTitleOnScroll) { needCollapseOnScrollHandler = true; }
+          if (app.theme === 'md' || app.theme === 'aurora') {
+            $navbarInnerEl.parents('.navbar').addClass('navbar-large');
+          }
+          page.$el.addClass('page-with-navbar-large');
+        }
+
+        // Need Hide On Scroll
+        var needHideOnScrollHandler;
         if (
           app.params.navbar.hideOnPageScroll
           || page.$el.find('.hide-navbar-on-scroll').length
@@ -11427,34 +12550,48 @@
             || page.$el.find('.keep-bars-on-scroll').length
             || page.$el.hasClass('keep-bars-on-scroll')
           ) {
-            return;
+            needHideOnScrollHandler = false;
+          } else {
+            needHideOnScrollHandler = true;
           }
-          app.navbar.initHideNavbarOnScroll(page.el, $navbarEl[0]);
+        }
+
+        if (needCollapseOnScrollHandler || needHideOnScrollHandler) {
+          app.navbar.initNavbarOnScroll(page.el, $navbarInnerEl[0], needHideOnScrollHandler, needCollapseOnScrollHandler);
         }
       },
       modalOpen: function modalOpen(modal) {
         var app = this;
-        if (app.theme !== 'ios') { return; }
+        if (!app.params.navbar[((app.theme) + "CenterTitle")]) {
+          return;
+        }
         modal.$el.find('.navbar:not(.navbar-previous):not(.stacked)').each(function (index, navbarEl) {
           app.navbar.size(navbarEl);
         });
       },
       panelOpen: function panelOpen(panel) {
         var app = this;
-        if (app.theme !== 'ios') { return; }
+        if (!app.params.navbar[((app.theme) + "CenterTitle")]) {
+          return;
+        }
         panel.$el.find('.navbar:not(.navbar-previous):not(.stacked)').each(function (index, navbarEl) {
           app.navbar.size(navbarEl);
         });
       },
       panelSwipeOpen: function panelSwipeOpen(panel) {
         var app = this;
-        if (app.theme !== 'ios') { return; }
+        if (!app.params.navbar[((app.theme) + "CenterTitle")]) {
+          return;
+        }
         panel.$el.find('.navbar:not(.navbar-previous):not(.stacked)').each(function (index, navbarEl) {
           app.navbar.size(navbarEl);
         });
       },
       tabShow: function tabShow(tabEl) {
         var app = this;
+        if (!app.params.navbar[((app.theme) + "CenterTitle")]) {
+          return;
+        }
         $(tabEl).find('.navbar:not(.navbar-previous):not(.stacked)').each(function (index, navbarEl) {
           app.navbar.size(navbarEl);
         });
@@ -11499,7 +12636,9 @@
       'navbar-inner': {
         postpatch: function postpatch(vnode) {
           var app = this;
-          if (app.theme !== 'ios') { return; }
+          if (!app.params.navbar[((app.theme) + "CenterTitle")]) {
+            return;
+          }
           app.navbar.size(vnode.elm);
         },
       },
@@ -11598,8 +12737,11 @@
       var reachEnd;
       var action;
       var toolbarHidden;
-      function handleScroll() {
+      function handleScroll(e) {
         var scrollContent = this;
+        if (e && e.target && e.target !== scrollContent) {
+          return;
+        }
         if ($pageEl.hasClass('page-previous')) { return; }
         currentScrollTop = scrollContent.scrollTop;
         scrollHeight = scrollContent.scrollHeight;
@@ -11744,8 +12886,6 @@
 
     $el.prepend(ripple.$rippleWaveEl);
 
-    /* eslint no-underscore-dangle: ["error", { "allow": ["_clientLeft"] }] */
-    // ripple._clientLeft = ripple.$rippleWaveEl[0].clientLeft;
     ripple.rippleTransform = "translate3d(" + (-center.x + (width / 2)) + "px, " + (-center.y + (height / 2)) + "px, 0) scale(1)";
 
     Utils.nextFrame(function () {
@@ -11756,7 +12896,7 @@
     return ripple;
   };
 
-  TouchRipple.prototype.onRemove = function onRemove () {
+  TouchRipple.prototype.destroy = function destroy () {
     var ripple = this;
     if (ripple.$rippleWaveEl) {
       ripple.$rippleWaveEl.remove();
@@ -11774,7 +12914,7 @@
     var $rippleWaveEl = this.$rippleWaveEl;
     var rippleTransform = this.rippleTransform;
     var removeTimeout = Utils.nextTick(function () {
-      ripple.onRemove();
+      ripple.destroy();
     }, 400);
     ripple.removing = true;
     $rippleWaveEl
@@ -11788,12 +12928,12 @@
             .transform(rippleTransform.replace('scale(1)', 'scale(1.01)'));
 
           removeTimeout = Utils.nextTick(function () {
-            ripple.onRemove();
+            ripple.destroy();
           }, 700);
 
           $rippleWaveEl.transitionEnd(function () {
             clearTimeout(removeTimeout);
-            ripple.onRemove();
+            ripple.destroy();
           });
         });
       });
@@ -11824,9 +12964,9 @@
     var dialog = dialogsQueue.shift();
     dialog.open();
   }
-  var Modal = /*@__PURE__*/(function (Framework7Class$$1) {
+  var Modal = /*@__PURE__*/(function (Framework7Class) {
     function Modal(app, params) {
-      Framework7Class$$1.call(this, params, [app]);
+      Framework7Class.call(this, params, [app]);
 
       var modal = this;
 
@@ -11844,8 +12984,8 @@
       return this;
     }
 
-    if ( Framework7Class$$1 ) Modal.__proto__ = Framework7Class$$1;
-    Modal.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) Modal.__proto__ = Framework7Class;
+    Modal.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     Modal.prototype.constructor = Modal;
 
     Modal.prototype.onOpen = function onOpen () {
@@ -11928,14 +13068,6 @@
       // Show Modal
       $el.show();
 
-      // Set Dialog offset
-      if (type === 'dialog') {
-        $el.css({
-          marginTop: ((-Math.round($el.outerHeight() / 2)) + "px"),
-        });
-      }
-
-
       /* eslint no-underscore-dangle: ["error", { "allow": ["_clientLeft"] }] */
       modal._clientLeft = $el[0].clientLeft;
 
@@ -11988,6 +13120,9 @@
       }
 
       if (!$el || !$el.hasClass('modal-in')) {
+        if (dialogsQueue.indexOf(modal) >= 0) {
+          dialogsQueue.splice(dialogsQueue.indexOf(modal), 1);
+        }
         return modal;
       }
 
@@ -12070,7 +13205,7 @@
     return Modal;
   }(Framework7Class));
 
-  var CustomModal = /*@__PURE__*/(function (Modal$$1) {
+  var CustomModal = /*@__PURE__*/(function (Modal) {
     function CustomModal(app, params) {
       var extendedParams = Utils.extend({
         backdrop: true,
@@ -12079,7 +13214,7 @@
       }, params);
 
       // Extends with open/close Modal methods;
-      Modal$$1.call(this, app, extendedParams);
+      Modal.call(this, app, extendedParams);
 
       var customModal = this;
 
@@ -12141,8 +13276,8 @@
       return customModal;
     }
 
-    if ( Modal$$1 ) CustomModal.__proto__ = Modal$$1;
-    CustomModal.prototype = Object.create( Modal$$1 && Modal$$1.prototype );
+    if ( Modal ) CustomModal.__proto__ = Modal;
+    CustomModal.prototype = Object.create( Modal && Modal.prototype );
     CustomModal.prototype.constructor = CustomModal;
 
     return CustomModal;
@@ -12170,7 +13305,11 @@
     },
   };
 
-  var Dialog = /*@__PURE__*/(function (Modal$$1) {
+  var Appbar = {
+    name: 'appbar',
+  };
+
+  var Dialog = /*@__PURE__*/(function (Modal) {
     function Dialog(app, params) {
       var extendedParams = Utils.extend({
         title: app.params.dialog.title,
@@ -12188,7 +13327,7 @@
       }
 
       // Extends with open/close Modal methods;
-      Modal$$1.call(this, app, extendedParams);
+      Modal.call(this, app, extendedParams);
 
       var dialog = this;
 
@@ -12245,7 +13384,7 @@
         if (button.close !== false) { dialog.close(); }
       }
       var addKeyboardHander;
-      function onKeyPress(e) {
+      function onKeyDown(e) {
         var keyCode = e.keyCode;
         buttons.forEach(function (button, index) {
           if (button.keyCodes && button.keyCodes.indexOf(keyCode) >= 0) {
@@ -12269,7 +13408,7 @@
             && !app.device.android
             && !app.device.cordova
           ) {
-            $(doc).on('keydown', onKeyPress);
+            $(doc).on('keydown', onKeyDown);
           }
         });
         dialog.on('close', function () {
@@ -12282,7 +13421,7 @@
             && !app.device.android
             && !app.device.cordova
           ) {
-            $(doc).off('keydown', onKeyPress);
+            $(doc).off('keydown', onKeyDown);
           }
           addKeyboardHander = false;
         });
@@ -12362,8 +13501,8 @@
       return dialog;
     }
 
-    if ( Modal$$1 ) Dialog.__proto__ = Modal$$1;
-    Dialog.prototype = Object.create( Modal$$1 && Modal$$1.prototype );
+    if ( Modal ) Dialog.__proto__ = Modal;
+    Dialog.prototype = Object.create( Modal && Modal.prototype );
     Dialog.prototype.constructor = Dialog;
 
     return Dialog;
@@ -12439,15 +13578,16 @@
             if (typeof args[1] === 'function') {
               (assign = args, text = assign[0], callbackOk = assign[1], callbackCancel = assign[2], defaultValue = assign[3], title = assign[4]);
             }
-            defaultValue = typeof defaultValue === 'undefined' ? '' : defaultValue;
+            defaultValue = typeof defaultValue === 'undefined' || defaultValue === null ? '' : defaultValue;
             return new Dialog(app, {
               title: typeof title === 'undefined' ? defaultDialogTitle() : title,
               text: text,
-              content: ("<div class=\"dialog-input-field item-input\"><div class=\"item-input-wrap\"><input type=\"text\" value=\"" + defaultValue + "\" class=\"dialog-input\"></div></div>"),
+              content: ("<div class=\"dialog-input-field input\"><input type=\"text\" class=\"dialog-input\" value=\"" + defaultValue + "\"></div>"),
               buttons: [
                 {
                   text: app.params.dialog.buttonCancel,
                   keyCodes: keyboardActions ? [27] : null,
+                  color: app.theme === 'aurora' ? 'gray' : null,
                 },
                 {
                   text: app.params.dialog.buttonOk,
@@ -12482,6 +13622,7 @@
                   text: app.params.dialog.buttonCancel,
                   onClick: callbackCancel,
                   keyCodes: keyboardActions ? [27] : null,
+                  color: app.theme === 'aurora' ? 'gray' : null,
                 },
                 {
                   text: app.params.dialog.buttonOk,
@@ -12507,11 +13648,12 @@
             return new Dialog(app, {
               title: typeof title === 'undefined' ? defaultDialogTitle() : title,
               text: text,
-              content: ("\n              <div class=\"dialog-input-field dialog-input-double item-input\">\n                <div class=\"item-input-wrap\">\n                  <input type=\"text\" name=\"dialog-username\" placeholder=\"" + (app.params.dialog.usernamePlaceholder) + "\" class=\"dialog-input\">\n                </div>\n              </div>\n              <div class=\"dialog-input-field dialog-input-double item-input\">\n                <div class=\"item-input-wrap\">\n                  <input type=\"password\" name=\"dialog-password\" placeholder=\"" + (app.params.dialog.passwordPlaceholder) + "\" class=\"dialog-input\">\n                </div>\n              </div>"),
+              content: ("\n              <div class=\"dialog-input-field dialog-input-double input\">\n                <input type=\"text\" name=\"dialog-username\" placeholder=\"" + (app.params.dialog.usernamePlaceholder) + "\" class=\"dialog-input\">\n              </div>\n              <div class=\"dialog-input-field dialog-input-double input\">\n                <input type=\"password\" name=\"dialog-password\" placeholder=\"" + (app.params.dialog.passwordPlaceholder) + "\" class=\"dialog-input\">\n              </div>"),
               buttons: [
                 {
                   text: app.params.dialog.buttonCancel,
                   keyCodes: keyboardActions ? [27] : null,
+                  color: app.theme === 'aurora' ? 'gray' : null,
                 },
                 {
                   text: app.params.dialog.buttonOk,
@@ -12542,11 +13684,12 @@
             return new Dialog(app, {
               title: typeof title === 'undefined' ? defaultDialogTitle() : title,
               text: text,
-              content: ("\n              <div class=\"dialog-input-field item-input\">\n                <div class=\"item-input-wrap\">\n                  <input type=\"password\" name=\"dialog-password\" placeholder=\"" + (app.params.dialog.passwordPlaceholder) + "\" class=\"dialog-input\">\n                </div>\n              </div>"),
+              content: ("\n              <div class=\"dialog-input-field input\">\n                <input type=\"password\" name=\"dialog-password\" placeholder=\"" + (app.params.dialog.passwordPlaceholder) + "\" class=\"dialog-input\">\n              </div>"),
               buttons: [
                 {
                   text: app.params.dialog.buttonCancel,
                   keyCodes: keyboardActions ? [27] : null,
+                  color: app.theme === 'aurora' ? 'gray' : null,
                 },
                 {
                   text: app.params.dialog.buttonOk,
@@ -12562,7 +13705,7 @@
             }).open();
           },
           preloader: function preloader(title, color) {
-            var preloaderInner = app.theme !== 'md' ? '' : Utils.mdPreloaderContent;
+            var preloaderInner = Utils[((app.theme) + "PreloaderContent")] || '';
             return new Dialog(app, {
               title: typeof title === 'undefined' || title === null ? app.params.dialog.preloaderTitle : title,
               content: ("<div class=\"preloader" + (color ? (" color-" + color) : '') + "\">" + preloaderInner + "</div>"),
@@ -12604,7 +13747,7 @@
     },
   };
 
-  var Popup = /*@__PURE__*/(function (Modal$$1) {
+  var Popup = /*@__PURE__*/(function (Modal) {
     function Popup(app, params) {
       var extendedParams = Utils.extend(
         { on: {} },
@@ -12613,7 +13756,7 @@
       );
 
       // Extends with open/close Modal methods;
-      Modal$$1.call(this, app, extendedParams);
+      Modal.call(this, app, extendedParams);
 
       var popup = this;
 
@@ -12622,9 +13765,9 @@
       // Find Element
       var $el;
       if (!popup.params.el) {
-        $el = $(popup.params.content);
+        $el = $(popup.params.content).filter(function (elIndex, node) { return node.nodeType === 1; }).eq(0);
       } else {
-        $el = $(popup.params.el);
+        $el = $(popup.params.el).eq(0);
       }
 
       if ($el && $el.length > 0 && $el[0].f7Modal) {
@@ -12636,7 +13779,9 @@
       }
 
       var $backdropEl;
-      if (popup.params.backdrop) {
+      if (popup.params.backdrop && popup.params.backdropEl) {
+        $backdropEl = $(popup.params.backdropEl);
+      } else if (popup.params.backdrop) {
         $backdropEl = app.root.children('.popup-backdrop');
         if ($backdropEl.length === 0) {
           $backdropEl = $('<div class="popup-backdrop"></div>');
@@ -12656,6 +13801,8 @@
       function handleClick(e) {
         var target = e.target;
         var $target = $(target);
+        var keyboardOpened = !app.device.desktop && app.device.cordova && ((window.Keyboard && window.Keyboard.isVisible) || (window.cordova.plugins && window.cordova.plugins.Keyboard && window.cordova.plugins.Keyboard.isVisible));
+        if (keyboardOpened) { return; }
         if ($target.closest(popup.el).length === 0) {
           if (
             popup.params
@@ -12683,7 +13830,23 @@
         }
       }
 
+      function onKeyDown(e) {
+        var keyCode = e.keyCode;
+        if (keyCode === 27 && popup.params.closeOnEscape) {
+          popup.close();
+        }
+      }
+      if (popup.params.closeOnEscape) {
+        popup.on('popupOpen', function () {
+          $(document).on('keydown', onKeyDown);
+        });
+        popup.on('popupClose', function () {
+          $(document).off('keydown', onKeyDown);
+        });
+      }
+
       popup.on('popupOpened', function () {
+        $el.removeClass('swipe-close-to-bottom swipe-close-to-top');
         if (popup.params.closeByBackdropClick) {
           app.on('click', handleClick);
         }
@@ -12694,13 +13857,134 @@
         }
       });
 
+      var allowSwipeToClose = true;
+      var isTouched = false;
+      var startTouch;
+      var currentTouch;
+      var isScrolling;
+      var touchStartTime;
+      var touchesDiff;
+      var isMoved = false;
+      var pageContentEl;
+      var pageContentScrollTop;
+      var pageContentOffsetHeight;
+      var pageContentScrollHeight;
+
+      function handleTouchStart(e) {
+        if (isTouched || !allowSwipeToClose || !popup.params.swipeToClose) { return; }
+        if (popup.params.swipeHandler && $(e.target).closest(popup.params.swipeHandler).length === 0) {
+          return;
+        }
+        isTouched = true;
+        isMoved = false;
+        startTouch = {
+          x: e.type === 'touchstart' ? e.targetTouches[0].pageX : e.pageX,
+          y: e.type === 'touchstart' ? e.targetTouches[0].pageY : e.pageY,
+        };
+        touchStartTime = Utils.now();
+        isScrolling = undefined;
+        if (!popup.params.swipeHandler && e.type === 'touchstart') {
+          pageContentEl = $(e.target).closest('.page-content')[0];
+        }
+      }
+      function handleTouchMove(e) {
+        if (!isTouched) { return; }
+        currentTouch = {
+          x: e.type === 'touchmove' ? e.targetTouches[0].pageX : e.pageX,
+          y: e.type === 'touchmove' ? e.targetTouches[0].pageY : e.pageY,
+        };
+
+        if (typeof isScrolling === 'undefined') {
+          isScrolling = !!(isScrolling || Math.abs(currentTouch.x - startTouch.x) > Math.abs(currentTouch.y - startTouch.y));
+        }
+        if (isScrolling) {
+          isTouched = false;
+          isMoved = false;
+          return;
+        }
+
+        touchesDiff = startTouch.y - currentTouch.y;
+        var direction = touchesDiff < 0 ? 'to-bottom' : 'to-top';
+        $el.transition(0);
+
+        if (typeof popup.params.swipeToClose === 'string' && direction !== popup.params.swipeToClose) {
+          $el.transform('');
+          return;
+        }
+
+        if (!isMoved) {
+          if (pageContentEl) {
+            pageContentScrollTop = pageContentEl.scrollTop;
+            pageContentScrollHeight = pageContentEl.scrollHeight;
+            pageContentOffsetHeight = pageContentEl.offsetHeight;
+            if (
+              !(pageContentScrollHeight === pageContentOffsetHeight)
+              && !(direction === 'to-bottom' && pageContentScrollTop === 0)
+              && !(direction === 'to-top' && pageContentScrollTop === (pageContentScrollHeight - pageContentOffsetHeight))
+            ) {
+              $el.transform('');
+              isTouched = false;
+              isMoved = false;
+              return;
+            }
+          }
+          isMoved = true;
+        }
+        e.preventDefault();
+        $el.transition(0).transform(("translate3d(0," + (-touchesDiff) + "px,0)"));
+      }
+      function handleTouchEnd() {
+        isTouched = false;
+        if (!isMoved) {
+          return;
+        }
+        isMoved = false;
+        allowSwipeToClose = false;
+        $el.transition('');
+        var direction = touchesDiff < 0 ? 'to-bottom' : 'to-top';
+        if ((typeof popup.params.swipeToClose === 'string' && direction !== popup.params.swipeToClose)) {
+          $el.transform('');
+          allowSwipeToClose = true;
+          return;
+        }
+        var diff = Math.abs(touchesDiff);
+        var timeDiff = (new Date()).getTime() - touchStartTime;
+        if ((timeDiff < 300 && diff > 20) || (timeDiff >= 300 && diff > 100)) {
+          Utils.nextTick(function () {
+            if (direction === 'to-bottom') {
+              $el.addClass('swipe-close-to-bottom');
+            } else {
+              $el.addClass('swipe-close-to-top');
+            }
+            $el.transform('');
+            popup.close();
+            allowSwipeToClose = true;
+          });
+          return;
+        }
+        allowSwipeToClose = true;
+        $el.transform('');
+      }
+
+      var passive = Support.passiveListener ? { passive: true } : false;
+      if (popup.params.swipeToClose) {
+        $el.on(app.touchEvents.start, handleTouchStart, passive);
+        app.on('touchmove', handleTouchMove);
+        app.on('touchend:passive', handleTouchEnd);
+        popup.once('popupDestroy', function () {
+          $el.off(app.touchEvents.start, handleTouchStart, passive);
+          app.off('touchmove', handleTouchMove);
+          app.off('touchend:passive', handleTouchEnd);
+        });
+      }
+
       $el[0].f7Modal = popup;
 
       return popup;
     }
 
-    if ( Modal$$1 ) Popup.__proto__ = Modal$$1;
-    Popup.prototype = Object.create( Modal$$1 && Modal$$1.prototype );
+    if ( Modal ) Popup.__proto__ = Modal;
+    Popup.prototype = Object.create( Modal && Modal.prototype );
     Popup.prototype.constructor = Popup;
 
     return Popup;
@@ -12711,7 +13995,11 @@
     params: {
       popup: {
         backdrop: true,
+        backdropEl: undefined,
         closeByBackdropClick: true,
+        closeOnEscape: false,
+        swipeToClose: false,
+        swipeHandler: null,
       },
     },
     static: {
@@ -12741,14 +14029,14 @@
     },
   };
 
-  var LoginScreen = /*@__PURE__*/(function (Modal$$1) {
+  var LoginScreen = /*@__PURE__*/(function (Modal) {
     function LoginScreen(app, params) {
       var extendedParams = Utils.extend({
         on: {},
       }, params);
 
       // Extends with open/close Modal methods;
-      Modal$$1.call(this, app, extendedParams);
+      Modal.call(this, app, extendedParams);
 
       var loginScreen = this;
 
@@ -12757,9 +14045,9 @@
       // Find Element
       var $el;
       if (!loginScreen.params.el) {
-        $el = $(loginScreen.params.content);
+        $el = $(loginScreen.params.content).filter(function (elIndex, node) { return node.nodeType === 1; }).eq(0);
       } else {
-        $el = $(loginScreen.params.el);
+        $el = $(loginScreen.params.el).eq(0);
       }
 
       if ($el && $el.length > 0 && $el[0].f7Modal) {
@@ -12782,8 +14070,8 @@
       return loginScreen;
     }
 
-    if ( Modal$$1 ) LoginScreen.__proto__ = Modal$$1;
-    LoginScreen.prototype = Object.create( Modal$$1 && Modal$$1.prototype );
+    if ( Modal ) LoginScreen.__proto__ = Modal;
+    LoginScreen.prototype = Object.create( Modal && Modal.prototype );
     LoginScreen.prototype.constructor = LoginScreen;
 
     return LoginScreen;
@@ -12818,7 +14106,7 @@
     },
   };
 
-  var Popover = /*@__PURE__*/(function (Modal$$1) {
+  var Popover = /*@__PURE__*/(function (Modal) {
     function Popover(app, params) {
       var extendedParams = Utils.extend(
         { on: {} },
@@ -12827,7 +14115,7 @@
       );
 
       // Extends with open/close Modal methods;
-      Modal$$1.call(this, app, extendedParams);
+      Modal.call(this, app, extendedParams);
 
       var popover = this;
 
@@ -12836,9 +14124,9 @@
       // Find Element
       var $el;
       if (!popover.params.el) {
-        $el = $(popover.params.content);
+        $el = $(popover.params.content).filter(function (elIndex, node) { return node.nodeType === 1; }).eq(0);
       } else {
-        $el = $(popover.params.el);
+        $el = $(popover.params.el).eq(0);
       }
 
       if ($el && $el.length > 0 && $el[0].f7Modal) {
@@ -12854,7 +14142,9 @@
 
       // Backdrop
       var $backdropEl;
-      if (popover.params.backdrop) {
+      if (popover.params.backdrop && popover.params.backdropEl) {
+        $backdropEl = $(popover.params.backdropEl);
+      } else if (popover.params.backdrop) {
         $backdropEl = app.root.children('.popover-backdrop');
         if ($backdropEl.length === 0) {
           $backdropEl = $('<div class="popover-backdrop"></div>');
@@ -12907,14 +14197,18 @@
       popover.on('popoverOpen', function () {
         popover.resize();
         app.on('resize', handleResize);
+        $(window).on('keyboardDidShow keyboardDidHide', handleResize);
         popover.on('popoverClose popoverBeforeDestroy', function () {
           app.off('resize', handleResize);
+          $(window).off('keyboardDidShow keyboardDidHide', handleResize);
         });
       });
 
       function handleClick(e) {
         var target = e.target;
         var $target = $(target);
+        var keyboardOpened = !app.device.desktop && app.device.cordova && ((window.Keyboard && window.Keyboard.isVisible) || (window.cordova.plugins && window.cordova.plugins.Keyboard && window.cordova.plugins.Keyboard.isVisible));
+        if (keyboardOpened) { return; }
         if ($target.closest(popover.el).length === 0) {
           if (
             popover.params.closeByBackdropClick
@@ -12927,6 +14221,22 @@
             popover.close();
           }
         }
+      }
+
+      function onKeyDown(e) {
+        var keyCode = e.keyCode;
+        if (keyCode === 27 && popover.params.closeOnEscape) {
+          popover.close();
+        }
+      }
+
+      if (popover.params.closeOnEscape) {
+        popover.on('popoverOpen', function () {
+          $(document).on('keydown', onKeyDown);
+        });
+        popover.on('popoverClose', function () {
+          $(document).off('keydown', onKeyDown);
+        });
       }
 
       popover.on('popoverOpened', function () {
@@ -12945,8 +14255,8 @@
       return popover;
     }
 
-    if ( Modal$$1 ) Popover.__proto__ = Modal$$1;
-    Popover.prototype = Object.create( Modal$$1 && Modal$$1.prototype );
+    if ( Modal ) Popover.__proto__ = Modal;
+    Popover.prototype = Object.create( Modal && Modal.prototype );
     Popover.prototype.constructor = Popover;
 
     Popover.prototype.resize = function resize () {
@@ -12965,17 +14275,19 @@
       var angleSize = 0;
       var angleLeft;
       var angleTop;
-      if (app.theme === 'ios') {
+      if (app.theme === 'ios' || app.theme === 'aurora') {
         $angleEl.removeClass('on-left on-right on-top on-bottom').css({ left: '', top: '' });
         angleSize = $angleEl.width() / 2;
       } else {
-        $el.removeClass('popover-on-left popover-on-right popover-on-top popover-on-bottom').css({ left: '', top: '' });
+        $el.removeClass('popover-on-left popover-on-right popover-on-top popover-on-bottom popover-on-middle').css({ left: '', top: '' });
       }
 
       var targetWidth;
       var targetHeight;
       var targetOffsetLeft;
       var targetOffsetTop;
+      var safeAreaTop = parseInt($('html').css('--f7-safe-area-top'), 10);
+      if (Number.isNaN(safeAreaTop)) { safeAreaTop = 0; }
       if ($targetEl && $targetEl.length > 0) {
         targetWidth = $targetEl.outerWidth();
         targetHeight = $targetEl.outerHeight();
@@ -13005,39 +14317,36 @@
         if (height < app.height - targetOffsetTop - targetHeight) {
           // On bottom
           position = 'bottom';
-          top = targetOffsetTop;
-        } else if (height < targetOffsetTop) {
+          top = targetOffsetTop + targetHeight;
+        } else if (height < targetOffsetTop - safeAreaTop) {
           // On top
-          top = (targetOffsetTop - height) + targetHeight;
+          top = targetOffsetTop - height;
           position = 'top';
         } else {
           // On middle
-          position = 'bottom';
-          top = targetOffsetTop;
+          position = 'middle';
+          top = ((targetHeight / 2) + targetOffsetTop) - (height / 2);
         }
-
-        if (top <= 0) {
-          top = 8;
-        } else if (top + height >= app.height) {
-          top = app.height - height - 8;
-        }
+        top = Math.max(8, Math.min(top, app.height - height - 8));
 
         // Horizontal Position
-        left = (targetOffsetLeft + targetWidth) - width - 8;
-        if (left + width >= app.width - 8) {
-          left = (targetOffsetLeft + targetWidth) - width - 8;
+        var hPosition;
+        if (targetOffsetLeft < app.width / 2) {
+          hPosition = 'right';
+          left = position === 'middle'
+            ? targetOffsetLeft + targetWidth
+            : targetOffsetLeft;
+        } else {
+          hPosition = 'left';
+          left = position === 'middle'
+            ? targetOffsetLeft - width
+            : (targetOffsetLeft + targetWidth) - width;
         }
-        if (left < 8) {
-          left = 8;
-        }
-        if (position === 'top') {
-          $el.addClass('popover-on-top');
-        }
-        if (position === 'bottom') {
-          $el.addClass('popover-on-bottom');
-        }
+        left = Math.max(8, Math.min(left, app.width - width - 8));
+        $el.addClass(("popover-on-" + position + " popover-on-" + hPosition));
       } else {
-        if ((height + angleSize) < targetOffsetTop) {
+        // ios and aurora
+        if ((height + angleSize) < targetOffsetTop - safeAreaTop) {
           // On top
           top = targetOffsetTop - height - angleSize;
         } else if ((height + angleSize) < app.height - targetOffsetTop - targetHeight) {
@@ -13049,11 +14358,7 @@
           position = 'middle';
           top = ((targetHeight / 2) + targetOffsetTop) - (height / 2);
           diff = top;
-          if (top <= 0) {
-            top = 5;
-          } else if (top + height >= app.height) {
-            top = app.height - height - 5;
-          }
+          top = Math.max(5, Math.min(top, app.height - height - 5));
           diff -= top;
         }
 
@@ -13061,9 +14366,7 @@
         if (position === 'top' || position === 'bottom') {
           left = ((targetWidth / 2) + targetOffsetLeft) - (width / 2);
           diff = left;
-          if (left < 5) { left = 5; }
-          if (left + width > app.width) { left = app.width - width - 5; }
-          if (left < 0) { left = 0; }
+          left = Math.max(5, Math.min(left, app.width - width - 5));
           if (position === 'top') {
             $angleEl.addClass('on-bottom');
           }
@@ -13099,9 +14402,11 @@
     name: 'popover',
     params: {
       popover: {
+        backdrop: true,
+        backdropEl: undefined,
         closeByBackdropClick: true,
         closeByOutsideClick: true,
-        backdrop: true,
+        closeOnEscape: false,
       },
     },
     static: {
@@ -13143,7 +14448,7 @@
 
   /* eslint indent: ["off"] */
 
-  var Actions = /*@__PURE__*/(function (Modal$$1) {
+  var Actions = /*@__PURE__*/(function (Modal) {
     function Actions(app, params) {
       var extendedParams = Utils.extend(
         { on: {} },
@@ -13152,7 +14457,7 @@
       );
 
       // Extends with open/close Modal methods;
-      Modal$$1.call(this, app, extendedParams);
+      Modal.call(this, app, extendedParams);
 
       var actions = this;
 
@@ -13169,9 +14474,9 @@
       // Find Element
       var $el;
       if (actions.params.el) {
-        $el = $(actions.params.el);
+        $el = $(actions.params.el).eq(0);
       } else if (actions.params.content) {
-        $el = $(actions.params.content);
+        $el = $(actions.params.content).filter(function (elIndex, node) { return node.nodeType === 1; }).eq(0);
       } else if (actions.params.buttons) {
         if (actions.params.convertToPopover) {
           actions.popoverHtml = actions.renderPopover();
@@ -13189,7 +14494,9 @@
 
       // Backdrop
       var $backdropEl;
-      if (actions.params.backdrop) {
+      if (actions.params.backdrop && actions.params.backdropEl) {
+        $backdropEl = $(actions.params.backdropEl);
+      } else if (actions.params.backdrop) {
         $backdropEl = app.root.children('.actions-backdrop');
         if ($backdropEl.length === 0) {
           $backdropEl = $('<div class="actions-backdrop"></div>');
@@ -13202,15 +14509,15 @@
 
       var popover;
       function buttonOnClick(e) {
-        var buttonEl = this;
+        var $buttonEl = $(this);
         var buttonIndex;
         var groupIndex;
-        if ($(buttonEl).hasClass('item-link')) {
-          buttonIndex = $(buttonEl).parents('li').index();
-          groupIndex = $(buttonEl).parents('.list').index();
+        if ($buttonEl.hasClass('list-button') || $buttonEl.hasClass('item-link')) {
+          buttonIndex = $buttonEl.parents('li').index();
+          groupIndex = $buttonEl.parents('.list').index();
         } else {
-          buttonIndex = $(buttonEl).index();
-          groupIndex = $(buttonEl).parents('.actions-group').index();
+          buttonIndex = $buttonEl.index();
+          groupIndex = $buttonEl.parents('.actions-group').index();
         }
         if (typeof groups !== 'undefined') {
           var button = groups[groupIndex][buttonIndex];
@@ -13233,6 +14540,7 @@
             actions.params.forceToPopover
             || (app.device.ios && app.device.ipad)
             || app.width >= 768
+            || (app.device.desktop && app.theme === 'aurora')
           ) {
             convertToPopover = true;
           }
@@ -13249,12 +14557,12 @@
           });
           popover.open(animate);
           popover.once('popoverOpened', function () {
-            popover.$el.find('.item-link').each(function (groupIndex, buttonEl) {
+            popover.$el.find('.list-button, .item-link').each(function (groupIndex, buttonEl) {
               $(buttonEl).on('click', buttonOnClick);
             });
           });
           popover.once('popoverClosed', function () {
-            popover.$el.find('.item-link').each(function (groupIndex, buttonEl) {
+            popover.$el.find('.list-button, .item-link').each(function (groupIndex, buttonEl) {
               $(buttonEl).off('click', buttonOnClick);
             });
             Utils.nextTick(function () {
@@ -13302,6 +14610,8 @@
       function handleClick(e) {
         var target = e.target;
         var $target = $(target);
+        var keyboardOpened = !app.device.desktop && app.device.cordova && ((window.Keyboard && window.Keyboard.isVisible) || (window.cordova.plugins && window.cordova.plugins.Keyboard && window.cordova.plugins.Keyboard.isVisible));
+        if (keyboardOpened) { return; }
         if ($target.closest(actions.el).length === 0) {
           if (
             actions.params.closeByBackdropClick
@@ -13314,6 +14624,22 @@
             actions.close();
           }
         }
+      }
+
+      function onKeyDown(e) {
+        var keyCode = e.keyCode;
+        if (keyCode === 27 && actions.params.closeOnEscape) {
+          actions.close();
+        }
+      }
+
+      if (actions.params.closeOnEscape) {
+        actions.on('open', function () {
+          $(document).on('keydown', onKeyDown);
+        });
+        actions.on('close', function () {
+          $(document).off('keydown', onKeyDown);
+        });
       }
 
       actions.on('opened', function () {
@@ -13334,8 +14660,8 @@
       return actions;
     }
 
-    if ( Modal$$1 ) Actions.__proto__ = Modal$$1;
-    Actions.prototype = Object.create( Modal$$1 && Modal$$1.prototype );
+    if ( Modal ) Actions.__proto__ = Modal;
+    Actions.prototype = Object.create( Modal && Modal.prototype );
     Actions.prototype.constructor = Actions;
 
     Actions.prototype.render = function render () {
@@ -13383,13 +14709,12 @@
                       itemClasses.push('popover-from-actions-label');
                       return ("<li class=\"" + (itemClasses.join(' ')) + "\">" + text + "</li>");
                     }
-                    itemClasses.push('item-link');
                     if (icon) {
-                      itemClasses.push('item-content');
+                      itemClasses.push('item-link item-content');
                       return ("\n                      <li>\n                        <a class=\"" + (itemClasses.join(' ')) + "\">\n                          <div class=\"item-media\">\n                            " + icon + "\n                          </div>\n                          <div class=\"item-inner\">\n                            <div class=\"item-title\">\n                              " + text + "\n                            </div>\n                          </div>\n                        </a>\n                      </li>\n                    ");
                     }
                     itemClasses.push('list-button');
-                    return ("\n                    <li>\n                      <a href=\"#\" class=\"list-button " + (itemClasses.join(' ')) + "\">" + text + "</a>\n                    </li>\n                  ");
+                    return ("\n                    <li>\n                      <a class=\"" + (itemClasses.join(' ')) + "\">" + text + "</a>\n                    </li>\n                  ");
                   }).join('')) + "\n              </ul>\n            </div>\n          "); }).join('')) + "\n        </div>\n      </div>\n    ").trim();
     };
 
@@ -13402,10 +14727,12 @@
       actions: {
         convertToPopover: true,
         forceToPopover: false,
+        backdrop: true,
+        backdropEl: undefined,
         closeByBackdropClick: true,
+        closeOnEscape: false,
         render: null,
         renderPopover: null,
-        backdrop: true,
       },
     },
     static: {
@@ -13435,7 +14762,7 @@
     },
   };
 
-  var Sheet = /*@__PURE__*/(function (Modal$$1) {
+  var Sheet = /*@__PURE__*/(function (Modal) {
     function Sheet(app, params) {
       var extendedParams = Utils.extend(
         { on: {} },
@@ -13444,18 +14771,21 @@
       );
 
       // Extends with open/close Modal methods;
-      Modal$$1.call(this, app, extendedParams);
+      Modal.call(this, app, extendedParams);
 
       var sheet = this;
 
       sheet.params = extendedParams;
+      if (typeof sheet.params.backdrop === 'undefined') {
+        sheet.params.backdrop = app.theme !== 'ios';
+      }
 
       // Find Element
       var $el;
       if (!sheet.params.el) {
-        $el = $(sheet.params.content);
+        $el = $(sheet.params.content).filter(function (elIndex, node) { return node.nodeType === 1; }).eq(0);
       } else {
-        $el = $(sheet.params.el);
+        $el = $(sheet.params.el).eq(0);
       }
 
       if ($el && $el.length > 0 && $el[0].f7Modal) {
@@ -13466,7 +14796,10 @@
         return sheet.destroy();
       }
       var $backdropEl;
-      if (sheet.params.backdrop) {
+
+      if (sheet.params.backdrop && sheet.params.backdropEl) {
+        $backdropEl = $(sheet.params.backdropEl);
+      } else if (sheet.params.backdrop) {
         $backdropEl = app.root.children('.sheet-backdrop');
         if ($backdropEl.length === 0) {
           $backdropEl = $('<div class="sheet-backdrop"></div>');
@@ -13474,8 +14807,17 @@
         }
       }
 
+      Utils.extend(sheet, {
+        app: app,
+        $el: $el,
+        el: $el[0],
+        $backdropEl: $backdropEl,
+        backdropEl: $backdropEl && $backdropEl[0],
+        type: 'sheet',
+      });
+
       var $pageContentEl;
-      function scrollToOpen() {
+      function scrollToElementOnOpen() {
         var $scrollEl = $(sheet.params.scrollToEl).eq(0);
         if ($scrollEl.length === 0) { return; }
         $pageContentEl = $scrollEl.parents('.page-content');
@@ -13505,7 +14847,7 @@
         }
       }
 
-      function scrollToClose() {
+      function scrollToElementOnClose() {
         if ($pageContentEl && $pageContentEl.length > 0) {
           $pageContentEl.css({
             'padding-bottom': '',
@@ -13515,6 +14857,8 @@
       function handleClick(e) {
         var target = e.target;
         var $target = $(target);
+        var keyboardOpened = !app.device.desktop && app.device.cordova && ((window.Keyboard && window.Keyboard.isVisible) || (window.cordova.plugins && window.cordova.plugins.Keyboard && window.cordova.plugins.Keyboard.isVisible));
+        if (keyboardOpened) { return; }
         if ($target.closest(sheet.el).length === 0) {
           if (
             sheet.params.closeByBackdropClick
@@ -13529,9 +14873,223 @@
         }
       }
 
+      function onKeyDown(e) {
+        var keyCode = e.keyCode;
+        if (keyCode === 27 && sheet.params.closeOnEscape) {
+          sheet.close();
+        }
+      }
+
+
+      var isTouched = false;
+      var startTouch;
+      var currentTouch;
+      var isScrolling;
+      var touchStartTime;
+      var touchesDiff;
+      var isMoved = false;
+      var isTopSheetModal;
+      var swipeStepTranslate;
+      var startTranslate;
+      var currentTranslate;
+      var sheetElOffsetHeight;
+      var minTranslate;
+      var maxTranslate;
+
+      function handleTouchStart(e) {
+        if (isTouched || !(sheet.params.swipeToClose || sheet.params.swipeToStep)) { return; }
+        if (sheet.params.swipeHandler && $(e.target).closest(sheet.params.swipeHandler).length === 0) {
+          return;
+        }
+        isTouched = true;
+        isMoved = false;
+        startTouch = {
+          x: e.type === 'touchstart' ? e.targetTouches[0].pageX : e.pageX,
+          y: e.type === 'touchstart' ? e.targetTouches[0].pageY : e.pageY,
+        };
+        touchStartTime = Utils.now();
+        isScrolling = undefined;
+        isTopSheetModal = $el.hasClass('sheet-modal-top');
+      }
+      function handleTouchMove(e) {
+        if (!isTouched) { return; }
+        currentTouch = {
+          x: e.type === 'touchmove' ? e.targetTouches[0].pageX : e.pageX,
+          y: e.type === 'touchmove' ? e.targetTouches[0].pageY : e.pageY,
+        };
+
+        if (typeof isScrolling === 'undefined') {
+          isScrolling = !!(isScrolling || Math.abs(currentTouch.x - startTouch.x) > Math.abs(currentTouch.y - startTouch.y));
+        }
+        if (isScrolling) {
+          isTouched = false;
+          isMoved = false;
+          return;
+        }
+
+        touchesDiff = startTouch.y - currentTouch.y;
+        if (!isMoved) {
+          sheetElOffsetHeight = $el[0].offsetHeight;
+          startTranslate = Utils.getTranslate($el[0], 'y');
+          if (isTopSheetModal) {
+            minTranslate = sheet.params.swipeToClose ? -sheetElOffsetHeight : -swipeStepTranslate;
+            maxTranslate = 0;
+          } else {
+            minTranslate = 0;
+            maxTranslate = sheet.params.swipeToClose ? sheetElOffsetHeight : swipeStepTranslate;
+          }
+          isMoved = true;
+        }
+        currentTranslate = startTranslate - touchesDiff;
+        currentTranslate = Math.min(Math.max(currentTranslate, minTranslate), maxTranslate);
+        e.preventDefault();
+        $el
+          .transition(0)
+          .transform(("translate3d(0," + currentTranslate + "px,0)"));
+        if (sheet.params.swipeToStep) {
+          var progress;
+          if (isTopSheetModal) {
+            progress = 1 - (currentTranslate / swipeStepTranslate);
+          } else {
+            progress = (swipeStepTranslate - currentTranslate) / swipeStepTranslate;
+          }
+          progress = Math.min(Math.max(progress, 0), 1);
+          $el.trigger('sheet:stepprogress', progress);
+          sheet.emit('local::stepProgress sheetStepProgress', sheet, progress);
+        }
+      }
+      function handleTouchEnd() {
+        isTouched = false;
+        if (!isMoved) {
+          return;
+        }
+        isMoved = false;
+        $el.transform('').transition('');
+
+        var direction = touchesDiff < 0 ? 'to-bottom' : 'to-top';
+
+        var diff = Math.abs(touchesDiff);
+        if (diff === 0 || currentTranslate === startTranslate) { return; }
+
+        var timeDiff = (new Date()).getTime() - touchStartTime;
+
+        if (!sheet.params.swipeToStep) {
+          if (direction !== (isTopSheetModal ? 'to-top' : 'to-bottom')) {
+            return;
+          }
+          if ((timeDiff < 300 && diff > 20) || (timeDiff >= 300 && diff > (sheetElOffsetHeight / 2))) {
+            sheet.close();
+          }
+          return;
+        }
+
+        var openDirection = isTopSheetModal ? 'to-bottom' : 'to-top';
+        var closeDirection = isTopSheetModal ? 'to-top' : 'to-bottom';
+        var absCurrentTranslate = Math.abs(currentTranslate);
+        var absSwipeStepTranslate = Math.abs(swipeStepTranslate);
+
+        if (timeDiff < 300 && diff > 10) {
+          if (direction === openDirection && absCurrentTranslate < absSwipeStepTranslate) {
+            // open step
+            $el.removeClass('modal-in-swipe-step');
+            $el.trigger('sheet:stepprogress', 1);
+            sheet.emit('local::stepProgress sheetStepProgress', sheet, 1);
+            $el.trigger('sheet:stepopen');
+            sheet.emit('local::stepOpen sheetStepOpen', sheet);
+          }
+          if (direction === closeDirection && absCurrentTranslate > absSwipeStepTranslate) {
+            // close sheet
+            if (sheet.params.swipeToClose) {
+              sheet.close();
+            } else {
+              // close step
+              $el.addClass('modal-in-swipe-step');
+              $el.trigger('sheet:stepprogress', 0);
+              sheet.emit('local::stepProgress sheetStepProgress', sheet, 0);
+              $el.trigger('sheet:stepclose');
+              sheet.emit('local::stepClose sheetStepClose', sheet);
+            }
+          }
+          if (direction === closeDirection && absCurrentTranslate <= absSwipeStepTranslate) {
+            // close step
+            $el.addClass('modal-in-swipe-step');
+            $el.trigger('sheet:stepprogress', 0);
+            sheet.emit('local::stepProgress sheetStepProgress', sheet, 0);
+            $el.trigger('sheet:stepclose');
+            sheet.emit('local::stepClose sheetStepClose', sheet);
+          }
+          return;
+        }
+        if (timeDiff >= 300) {
+          var stepOpened = !$el.hasClass('modal-in-swipe-step');
+          if (!stepOpened) {
+            if (absCurrentTranslate < (absSwipeStepTranslate / 2)) {
+              // open step
+              $el.removeClass('modal-in-swipe-step');
+              $el.trigger('sheet:stepprogress', 1);
+              sheet.emit('local::stepProgress sheetStepProgress', sheet, 1);
+              $el.trigger('sheet:stepopen');
+              sheet.emit('local::stepOpen sheetStepOpen', sheet);
+            } else if ((absCurrentTranslate - absSwipeStepTranslate) > (sheetElOffsetHeight - absSwipeStepTranslate) / 2) {
+              // close sheet
+              if (sheet.params.swipeToClose) { sheet.close(); }
+            }
+          } else if (stepOpened) {
+            if (absCurrentTranslate > absSwipeStepTranslate + (sheetElOffsetHeight - absSwipeStepTranslate) / 2) {
+              // close sheet
+              if (sheet.params.swipeToClose) { sheet.close(); }
+            } else if (absCurrentTranslate > absSwipeStepTranslate / 2) {
+              // close step
+              $el.addClass('modal-in-swipe-step');
+              $el.trigger('sheet:stepprogress', 0);
+              sheet.emit('local::stepProgress sheetStepProgress', sheet, 0);
+              $el.trigger('sheet:stepclose');
+              sheet.emit('local::stepClose sheetStepClose', sheet);
+            }
+          }
+        }
+      }
+
+      function setSwipeStep(byResize) {
+        var $swipeStepEl = $el.find('.sheet-modal-swipe-step').eq(0);
+        if (!$swipeStepEl.length) { return; }
+        if ($el.hasClass('sheet-modal-top')) {
+          swipeStepTranslate = -($swipeStepEl.offset().top - $el.offset().top + $swipeStepEl[0].offsetHeight);
+        } else {
+          swipeStepTranslate = $el[0].offsetHeight - ($swipeStepEl.offset().top - $el.offset().top + $swipeStepEl[0].offsetHeight);
+        }
+        $el[0].style.setProperty('--f7-sheet-swipe-step', (swipeStepTranslate + "px"));
+        if (!byResize) {
+          $el.addClass('modal-in-swipe-step');
+        }
+      }
+
+      function onResize() {
+        setSwipeStep(true);
+      }
+
+      var passive = Support.passiveListener ? { passive: true } : false;
+      if (sheet.params.swipeToClose || sheet.params.swipeToStep) {
+        $el.on(app.touchEvents.start, handleTouchStart, passive);
+        app.on('touchmove', handleTouchMove);
+        app.on('touchend:passive', handleTouchEnd);
+        sheet.once('sheetDestroy', function () {
+          $el.off(app.touchEvents.start, handleTouchStart, passive);
+          app.off('touchmove', handleTouchMove);
+          app.off('touchend:passive', handleTouchEnd);
+        });
+      }
+
       sheet.on('sheetOpen', function () {
+        if (sheet.params.closeOnEscape) {
+          $(document).on('keydown', onKeyDown);
+        }
+        if (sheet.params.swipeToStep) {
+          setSwipeStep();
+          app.on('resize', onResize);
+        }
         if (sheet.params.scrollToEl) {
-          scrollToOpen();
+          scrollToElementOnOpen();
         }
       });
       sheet.on('sheetOpened', function () {
@@ -13540,30 +15098,38 @@
         }
       });
       sheet.on('sheetClose', function () {
+        if (sheet.params.swipeToStep) {
+          $el.removeClass('modal-in-swipe-step');
+          app.off('resize', onResize);
+        }
+        if (sheet.params.closeOnEscape) {
+          $(document).off('keydown', onKeyDown);
+        }
         if (sheet.params.scrollToEl) {
-          scrollToClose();
+          scrollToElementOnClose();
         }
         if (sheet.params.closeByOutsideClick || sheet.params.closeByBackdropClick) {
           app.off('click', handleClick);
         }
       });
 
-      Utils.extend(sheet, {
-        app: app,
-        $el: $el,
-        el: $el[0],
-        $backdropEl: $backdropEl,
-        backdropEl: $backdropEl && $backdropEl[0],
-        type: 'sheet',
-      });
+      sheet.stepOpen = function stepOpen() {
+        $el.removeClass('modal-in-swipe-step');
+      };
+      sheet.stepClose = function stepClose() {
+        $el.addClass('modal-in-swipe-step');
+      };
+      sheet.stepToggle = function stepToggle() {
+        $el.toggleClass('modal-in-swipe-step');
+      };
 
       $el[0].f7Modal = sheet;
 
       return sheet;
     }
 
-    if ( Modal$$1 ) Sheet.__proto__ = Modal$$1;
-    Sheet.prototype = Object.create( Modal$$1 && Modal$$1.prototype );
+    if ( Modal ) Sheet.__proto__ = Modal;
+    Sheet.prototype = Object.create( Modal && Modal.prototype );
     Sheet.prototype.constructor = Sheet;
 
     return Sheet;
@@ -13573,8 +15139,14 @@
     name: 'sheet',
     params: {
       sheet: {
+        backdrop: undefined,
+        backdropEl: undefined,
         closeByBackdropClick: true,
         closeByOutsideClick: false,
+        closeOnEscape: false,
+        swipeToClose: false,
+        swipeToStep: false,
+        swipeHandler: null,
       },
     },
     static: {
@@ -13582,16 +15154,30 @@
     },
     create: function create() {
       var app = this;
-      if (!app.passedParams.sheet || app.passedParams.sheet.backdrop === undefined) {
-        app.params.sheet.backdrop = app.theme === 'md';
-      }
       app.sheet = Utils.extend(
         {},
         ModalMethods({
           app: app,
           constructor: Sheet,
           defaultSelector: '.sheet-modal.modal-in',
-        })
+        }),
+        {
+          stepOpen: function stepOpen(sheet) {
+            var sheetInstance = app.sheet.get(sheet);
+            if (sheetInstance && sheetInstance.stepOpen) { return sheetInstance.stepOpen(); }
+            return undefined;
+          },
+          stepClose: function stepClose(sheet) {
+            var sheetInstance = app.sheet.get(sheet);
+            if (sheetInstance && sheetInstance.stepClose) { return sheetInstance.stepClose(); }
+            return undefined;
+          },
+          stepToggle: function stepToggle(sheet) {
+            var sheetInstance = app.sheet.get(sheet);
+            if (sheetInstance && sheetInstance.stepToggle) { return sheetInstance.stepToggle(); }
+            return undefined;
+          },
+        }
       );
     },
     clicks: {
@@ -13613,14 +15199,14 @@
     },
   };
 
-  var Toast = /*@__PURE__*/(function (Modal$$1) {
+  var Toast = /*@__PURE__*/(function (Modal) {
     function Toast(app, params) {
       var extendedParams = Utils.extend({
         on: {},
       }, app.params.toast, params);
 
       // Extends with open/close Modal methods;
-      Modal$$1.call(this, app, extendedParams);
+      Modal.call(this, app, extendedParams);
 
       var toast = this;
 
@@ -13698,13 +15284,12 @@
       return toast;
     }
 
-    if ( Modal$$1 ) Toast.__proto__ = Modal$$1;
-    Toast.prototype = Object.create( Modal$$1 && Modal$$1.prototype );
+    if ( Modal ) Toast.__proto__ = Modal;
+    Toast.prototype = Object.create( Modal && Modal.prototype );
     Toast.prototype.constructor = Toast;
 
     Toast.prototype.render = function render () {
       var toast = this;
-      var app = toast.app;
       if (toast.params.render) { return toast.params.render.call(toast, toast); }
       var ref = toast.params;
       var position = ref.position;
@@ -13714,7 +15299,7 @@
       var closeButton = ref.closeButton;
       var closeButtonColor = ref.closeButtonColor;
       var closeButtonText = ref.closeButtonText;
-      return ("\n      <div class=\"toast toast-" + position + " " + (cssClass || '') + " " + (icon ? 'toast-with-icon' : '') + "\">\n        <div class=\"toast-content\">\n          " + (icon ? ("<div class=\"toast-icon\">" + icon + "</div>") : '') + "\n          <div class=\"toast-text\">" + text + "</div>\n          " + (closeButton && !icon ? ("\n          <a class=\"toast-button " + (app.theme === 'md' ? 'button' : 'link') + " " + (closeButtonColor ? ("color-" + closeButtonColor) : '') + "\">" + closeButtonText + "</a>\n          ").trim() : '') + "\n        </div>\n      </div>\n    ").trim();
+      return ("\n      <div class=\"toast toast-" + position + " " + (cssClass || '') + " " + (icon ? 'toast-with-icon' : '') + "\">\n        <div class=\"toast-content\">\n          " + (icon ? ("<div class=\"toast-icon\">" + icon + "</div>") : '') + "\n          <div class=\"toast-text\">" + text + "</div>\n          " + (closeButton && !icon ? ("\n          <a class=\"toast-button button " + (closeButtonColor ? ("color-" + closeButtonColor) : '') + "\">" + closeButtonText + "</a>\n          ").trim() : '') + "\n        </div>\n      </div>\n    ").trim();
     };
 
     return Toast;
@@ -13763,10 +15348,9 @@
   var Preloader = {
     init: function init(el) {
       var app = this;
-      if (app.theme !== 'md') { return; }
       var $el = $(el);
-      if ($el.length === 0 || $el.children('.preloader-inner').length > 0) { return; }
-      $el.append(Utils.mdPreloaderContent);
+      if ($el.length === 0 || $el.children('.preloader-inner').length > 0 || $el.children('.preloader-inner-line').length > 0) { return; }
+      $el.append(Utils[((app.theme) + "PreloaderContent")]);
     },
     // Modal
     visible: false,
@@ -13775,7 +15359,7 @@
 
       var app = this;
       if (Preloader.visible) { return; }
-      var preloaderInner = app.theme !== 'md' ? '' : Utils.mdPreloaderContent;
+      var preloaderInner = Utils[((app.theme) + "PreloaderContent")] || '';
       $('html').addClass('with-modal-preloader');
       app.root.append(("\n      <div class=\"preloader-backdrop\"></div>\n      <div class=\"preloader-modal\">\n        <div class=\"preloader color-" + color + "\">" + preloaderInner + "</div>\n      </div>\n    "));
       Preloader.visible = true;
@@ -13803,14 +15387,18 @@
     on: {
       photoBrowserOpen: function photoBrowserOpen(pb) {
         var app = this;
-        if (app.theme !== 'md') { return; }
         pb.$el.find('.preloader').each(function (index, preloaderEl) {
+          app.preloader.init(preloaderEl);
+        });
+      },
+      tabMounted: function tabMounted(tabEl) {
+        var app = this;
+        $(tabEl).find('.preloader').each(function (index, preloaderEl) {
           app.preloader.init(preloaderEl);
         });
       },
       pageInit: function pageInit(page) {
         var app = this;
-        if (app.theme !== 'md') { return; }
         page.$el.find('.preloader').each(function (index, preloaderEl) {
           app.preloader.init(preloaderEl);
         });
@@ -13821,7 +15409,6 @@
         insert: function insert(vnode) {
           var app = this;
           var preloaderEl = vnode.elm;
-          if (app.theme !== 'md') { return; }
           app.preloader.init(preloaderEl);
         },
       },
@@ -13966,12 +15553,33 @@
       });
     },
     on: {
+      tabMounted: function tabMounted(tabEl) {
+        var app = this;
+        $(tabEl).find('.progressbar').each(function (index, progressbarEl) {
+          var $progressbarEl = $(progressbarEl);
+          app.progressbar.set($progressbarEl, $progressbarEl.attr('data-progress'));
+        });
+      },
       pageInit: function pageInit(page) {
         var app = this;
         page.$el.find('.progressbar').each(function (index, progressbarEl) {
           var $progressbarEl = $(progressbarEl);
           app.progressbar.set($progressbarEl, $progressbarEl.attr('data-progress'));
         });
+      },
+    },
+    vnode: {
+      progressbar: {
+        insert: function insert(vnode) {
+          var app = this;
+          var el = vnode.elm;
+          app.progressbar.set(el, el.getAttribute('data-progress'));
+        },
+        update: function update(vnode) {
+          var app = this;
+          var el = vnode.elm;
+          app.progressbar.set(el, el.getAttribute('data-progress'));
+        },
       },
     },
   };
@@ -14011,7 +15619,7 @@
         if ($listGroup.length && $listGroup.parents($sortableContainer).length) {
           $sortableContainer = $listGroup;
         }
-        $sortingItems = $sortableContainer.children('ul').children('li');
+        $sortingItems = $sortableContainer.children('ul').children('li:not(.disallow-sorting):not(.no-sorting)');
         if (app.panel) { app.panel.allowOpen = false; }
         if (app.swipeout) { app.swipeout.allow = false; }
       }
@@ -14113,7 +15721,12 @@
         if ($insertAfterEl) { indexTo = $insertAfterEl.index(); }
         else if ($insertBeforeEl) { indexTo = $insertBeforeEl.index(); }
 
-        if (app.params.sortable.moveElements) {
+        var moveElements = $sortableContainer.dataset().sortableMoveElements;
+        if (typeof moveElements === 'undefined') {
+          moveElements = app.params.sortable.moveElements;
+        }
+
+        if (moveElements) {
           if ($insertAfterEl) {
             $sortingEl.insertAfter($insertAfterEl);
           }
@@ -14796,8 +16409,6 @@
     },
   };
 
-  /* eslint no-underscore-dangle: ["error", { "allow": ["_clientLeft"] }] */
-
   var Accordion = {
     toggleClicked: function toggleClicked($clickedEl) {
       var app = this;
@@ -14923,16 +16534,25 @@
     name: 'contactsList',
   };
 
-  var VirtualList = /*@__PURE__*/(function (Framework7Class$$1) {
+  var VirtualList = /*@__PURE__*/(function (Framework7Class) {
     function VirtualList(app, params) {
       if ( params === void 0 ) params = {};
 
-      Framework7Class$$1.call(this, params, [app]);
+      Framework7Class.call(this, params, [app]);
       var vl = this;
+
+      var defaultHeight;
+      if (app.theme === 'md') {
+        defaultHeight = 48;
+      } else if (app.theme === 'ios') {
+        defaultHeight = 44;
+      } else if (app.theme === 'aurora') {
+        defaultHeight = 38;
+      }
 
       var defaults = {
         cols: 1,
-        height: app.theme === 'md' ? 48 : 44,
+        height: defaultHeight,
         cache: true,
         dynamicHeightBufferSize: 1,
         showFilteredItemsOnly: false,
@@ -14943,6 +16563,7 @@
         itemTemplate: undefined,
         ul: null,
         createUl: true,
+        scrollableParentEl: undefined,
         renderItem: function renderItem(item) {
           return ("\n          <li>\n            <div class=\"item-content\">\n              <div class=\"item-inner\">\n                <div class=\"item-title\">" + item + "</div>\n              </div>\n            </div>\n          </li>\n        ").trim();
         },
@@ -14954,7 +16575,7 @@
 
       vl.params = Utils.extend(defaults, params);
       if (vl.params.height === undefined || !vl.params.height) {
-        vl.params.height = app.theme === 'md' ? 48 : 44;
+        vl.params.height = defaultHeight;
       }
 
       vl.$el = $(params.el);
@@ -14968,13 +16589,19 @@
         vl.filteredItems = [];
       }
       if (vl.params.itemTemplate) {
-        if (typeof vl.params.itemTemplate === 'string') { vl.renderItem = Template7.compile(vl.params.itemTemplate); }
+        if (typeof vl.params.itemTemplate === 'string') { vl.renderItem = app.t7.compile(vl.params.itemTemplate); }
         else if (typeof vl.params.itemTemplate === 'function') { vl.renderItem = vl.params.itemTemplate; }
       } else if (vl.params.renderItem) {
         vl.renderItem = vl.params.renderItem;
       }
       vl.$pageContentEl = vl.$el.parents('.page-content');
       vl.pageContentEl = vl.$pageContentEl[0];
+
+      vl.$scrollableParentEl = vl.params.scrollableParentEl ? $(vl.params.scrollableParentEl).eq(0) : vl.$pageContentEl;
+      if (!vl.$scrollableParentEl.length && vl.$pageContentEl.length) {
+        vl.$scrollableParentEl = vl.$pageContentEl;
+      }
+      vl.scrollableParentEl = vl.$scrollableParentEl[0];
 
       // Bad scroll
       if (typeof vl.params.updatableScroll !== 'undefined') {
@@ -15038,7 +16665,7 @@
         $panelEl = vl.$el.parents('.panel').eq(0);
         $popupEl = vl.$el.parents('.popup').eq(0);
 
-        vl.$pageContentEl.on('scroll', handleScrollBound);
+        vl.$scrollableParentEl.on('scroll', handleScrollBound);
         if ($pageEl) { $pageEl.on('page:reinit', handleResizeBound); }
         if ($tabEl) { $tabEl.on('tab:show', handleResizeBound); }
         if ($panelEl) { $panelEl.on('panel:open', handleResizeBound); }
@@ -15046,7 +16673,7 @@
         app.on('resize', handleResizeBound);
       };
       vl.detachEvents = function attachEvents() {
-        vl.$pageContentEl.off('scroll', handleScrollBound);
+        vl.$scrollableParentEl.off('scroll', handleScrollBound);
         if ($pageEl) { $pageEl.off('page:reinit', handleResizeBound); }
         if ($tabEl) { $tabEl.off('tab:show', handleResizeBound); }
         if ($panelEl) { $panelEl.off('panel:open', handleResizeBound); }
@@ -15059,14 +16686,14 @@
       return vl;
     }
 
-    if ( Framework7Class$$1 ) VirtualList.__proto__ = Framework7Class$$1;
-    VirtualList.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) VirtualList.__proto__ = Framework7Class;
+    VirtualList.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     VirtualList.prototype.constructor = VirtualList;
 
     VirtualList.prototype.setListSize = function setListSize () {
       var vl = this;
       var items = vl.filteredItems || vl.items;
-      vl.pageHeight = vl.$pageContentEl[0].offsetHeight;
+      vl.pageHeight = vl.$scrollableParentEl[0].offsetHeight;
       if (vl.dynamicHeight) {
         vl.listHeight = 0;
         vl.heights = [];
@@ -15093,10 +16720,10 @@
       var vl = this;
       if (force) { vl.lastRepaintY = null; }
 
-      var scrollTop = -(vl.$el[0].getBoundingClientRect().top - vl.$pageContentEl[0].getBoundingClientRect().top);
+      var scrollTop = -(vl.$el[0].getBoundingClientRect().top - vl.$scrollableParentEl[0].getBoundingClientRect().top);
 
       if (typeof forceScrollTop !== 'undefined') { scrollTop = forceScrollTop; }
-      if (vl.lastRepaintY === null || Math.abs(scrollTop - vl.lastRepaintY) > vl.maxBufferHeight || (!vl.updatableScroll && (vl.$pageContentEl[0].scrollTop + vl.pageHeight >= vl.$pageContentEl[0].scrollHeight))) {
+      if (vl.lastRepaintY === null || Math.abs(scrollTop - vl.lastRepaintY) > vl.maxBufferHeight || (!vl.updatableScroll && (vl.$scrollableParentEl[0].scrollTop + vl.pageHeight >= vl.$scrollableParentEl[0].scrollHeight))) {
         vl.lastRepaintY = scrollTop;
       } else {
         return;
@@ -15216,7 +16843,7 @@
       }
 
       if (typeof forceScrollTop !== 'undefined' && force) {
-        vl.$pageContentEl.scrollTop(forceScrollTop, 0);
+        vl.$scrollableParentEl.scrollTop(forceScrollTop, 0);
       }
       if (vl.params.renderExternal) {
         vl.params.renderExternal(vl, {
@@ -15239,7 +16866,7 @@
         vl.filteredItems.push(vl.items[indexes[i]]);
       }
       if (resetScrollTop) {
-        vl.$pageContentEl[0].scrollTop = 0;
+        vl.$scrollableParentEl[0].scrollTop = 0;
       }
       vl.update();
     };
@@ -15267,7 +16894,7 @@
         itemTop = index * vl.params.height;
       }
       var listTop = vl.$el[0].offsetTop;
-      vl.render(true, (listTop + itemTop) - parseInt(vl.$pageContentEl.css('padding-top'), 10));
+      vl.render(true, (listTop + itemTop) - parseInt(vl.$scrollableParentEl.css('padding-top'), 10));
       return true;
     };
 
@@ -15506,11 +17133,11 @@
     },
   };
 
-  var ListIndex = /*@__PURE__*/(function (Framework7Class$$1) {
+  var ListIndex = /*@__PURE__*/(function (Framework7Class) {
     function ListIndex(app, params) {
       if ( params === void 0 ) params = {};
 
-      Framework7Class$$1.call(this, params, [app]);
+      Framework7Class.call(this, params, [app]);
       var index = this;
 
       var defaults = {
@@ -15519,6 +17146,7 @@
         indexes: 'auto', // or array of indexes
         iosItemHeight: 14,
         mdItemHeight: 14,
+        auroraItemHeight: 14,
         scrollList: true,
         label: false,
         // eslint-disable-next-line
@@ -15722,14 +17350,15 @@
       return index;
     }
 
-    if ( Framework7Class$$1 ) ListIndex.__proto__ = Framework7Class$$1;
-    ListIndex.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) ListIndex.__proto__ = Framework7Class;
+    ListIndex.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     ListIndex.prototype.constructor = ListIndex;
     // eslint-disable-next-line
     ListIndex.prototype.scrollListToIndex = function scrollListToIndex (itemContent, itemIndex) {
       var index = this;
       var $listEl = index.$listEl;
       var $pageContentEl = index.$pageContentEl;
+      var app = index.app;
       if (!$listEl || !$pageContentEl || $pageContentEl.length === 0) { return index; }
 
       var $scrollToEl;
@@ -15746,6 +17375,13 @@
       var paddingTop = parseInt($pageContentEl.css('padding-top'), 10);
       var scrollTop = $pageContentEl[0].scrollTop;
       var scrollToElTop = $scrollToEl.offset().top;
+      if ($pageContentEl.parents('.page-with-navbar-large').length) {
+        var navbarInnerEl = app.navbar.getElByPage($pageContentEl.parents('.page-with-navbar-large').eq(0));
+        var $titleLargeEl = $(navbarInnerEl).find('.title-large');
+        if ($titleLargeEl.length) {
+          paddingTop -= $titleLargeEl[0].offsetHeight || 0;
+        }
+      }
 
       if (parentTop <= paddingTop) {
         $pageContentEl.scrollTop((parentTop + scrollTop) - paddingTop);
@@ -15797,7 +17433,7 @@
       var el = index.el;
       var indexes = index.indexes;
       var height = el.offsetHeight;
-      var itemHeight = app.theme === 'ios' ? params.iosItemHeight : params.mdItemHeight;
+      var itemHeight = params[((app.theme) + "ItemHeight")];
       var maxItems = Math.floor(height / itemHeight);
       var items = indexes.length;
       var skipRate = 0;
@@ -16189,7 +17825,7 @@
         if (otherPanel.opened) { return; }
       }
       if (e.target && e.target.nodeName.toLowerCase() === 'input' && e.target.type === 'range') { return; }
-      if ($(e.target).closest('.range-slider, .tabs-swipeable-wrap, .calendar-months, .no-swipe-panel').length > 0) { return; }
+      if ($(e.target).closest('.range-slider, .tabs-swipeable-wrap, .calendar-months, .no-swipe-panel, .card-opened').length > 0) { return; }
       touchesStart.x = e.type === 'touchstart' ? e.targetTouches[0].pageX : e.pageX;
       touchesStart.y = e.type === 'touchstart' ? e.targetTouches[0].pageY : e.pageY;
       if (params.swipeOnlyClose && !panel.opened) {
@@ -16320,8 +17956,8 @@
 
       if (!isMoved) {
         if (!panel.opened) {
-          $el.show();
-          $backdropEl.show();
+          $el.css('display', 'block');
+          $backdropEl.css('display', 'block');
           $el.trigger('panel:swipeopen', panel);
           panel.emit('local::swipeOpen panelSwipeOpen', panel);
         }
@@ -16475,12 +18111,180 @@
     });
   }
 
-  var Panel = /*@__PURE__*/(function (Framework7Class$$1) {
-    function Panel(app, params) {
-      var obj;
+  function resizablePanel(panel) {
+    var app = panel.app;
+    Utils.extend(panel, {
+      resizable: true,
+      resizableWidth: null,
+      resizableInitialized: true,
+    });
+    var $htmlEl = $('html');
+    var $el = panel.$el;
+    var $backdropEl = panel.$backdropEl;
+    var side = panel.side;
+    var effect = panel.effect;
+    if (!$el) { return; }
 
+    var isTouched;
+    var isMoved;
+    var touchesStart = {};
+    var touchesDiff;
+    var panelWidth;
+
+    var $viewEl;
+
+    var panelMinWidth;
+    var panelMaxWidth;
+    var visibleByBreakpoint;
+
+    function transformCSSWidth(v) {
+      if (!v) { return null; }
+      if (v.indexOf('%') >= 0 || v.indexOf('vw') >= 0) {
+        return parseInt(v, 10) / 100 * app.width;
+      }
+      var newV = parseInt(v, 10);
+      if (Number.isNaN(newV)) { return null; }
+      return newV;
+    }
+
+    function isResizable() {
+      return panel.resizable && $el.hasClass('panel-resizable');
+    }
+
+    function handleTouchStart(e) {
+      if (!isResizable()) { return; }
+      touchesStart.x = e.type === 'touchstart' ? e.targetTouches[0].pageX : e.pageX;
+      touchesStart.y = e.type === 'touchstart' ? e.targetTouches[0].pageY : e.pageY;
+      isMoved = false;
+      isTouched = true;
+      panelMinWidth = transformCSSWidth($el.css('min-width'));
+      panelMaxWidth = transformCSSWidth($el.css('max-width'));
+      visibleByBreakpoint = $el.hasClass('panel-visible-by-breakpoint');
+    }
+    function handleTouchMove(e) {
+      if (!isTouched) { return; }
+      var pageX = e.type === 'touchmove' ? e.targetTouches[0].pageX : e.pageX;
+
+      if (!isMoved) {
+        panelWidth = $el[0].offsetWidth;
+        $el.transition(0);
+        $el.addClass('panel-resizing');
+        $htmlEl.css('cursor', 'col-resize');
+        if (effect === 'reveal' || visibleByBreakpoint) {
+          $viewEl = $(panel.getViewEl());
+        }
+        if (effect === 'reveal' && !visibleByBreakpoint) {
+          $backdropEl.transition(0);
+          $viewEl.transition(0);
+        }
+      }
+
+      isMoved = true;
+
+      e.preventDefault();
+
+      touchesDiff = (pageX - touchesStart.x);
+
+      var newPanelWidth = side === 'left' ? panelWidth + touchesDiff : panelWidth - touchesDiff;
+      if (panelMinWidth && !Number.isNaN(panelMinWidth)) {
+        newPanelWidth = Math.max(newPanelWidth, panelMinWidth);
+      }
+      if (panelMaxWidth && !Number.isNaN(panelMaxWidth)) {
+        newPanelWidth = Math.min(newPanelWidth, panelMaxWidth);
+      }
+      newPanelWidth = Math.min(Math.max(newPanelWidth, 0), app.width);
+
+      panel.resizableWidth = newPanelWidth;
+      $el[0].style.width = newPanelWidth + "px";
+      if (effect === 'reveal' && !visibleByBreakpoint) {
+        if ($viewEl) {
+          $viewEl.transform(("translate3d(" + (side === 'left' ? newPanelWidth : -newPanelWidth) + "px, 0, 0)"));
+        }
+        if ($backdropEl) {
+          $backdropEl.transform(("translate3d(" + (side === 'left' ? newPanelWidth : -newPanelWidth) + "px, 0, 0)"));
+        }
+      } else if (visibleByBreakpoint && $viewEl) {
+        $viewEl.css(("margin-" + side), (newPanelWidth + "px"));
+      }
+
+      $el.trigger('panel:resize', panel, newPanelWidth);
+      panel.emit('local::resize panelResize', panel, newPanelWidth);
+    }
+    function handleTouchEnd() {
+      $('html').css('cursor', '');
+      if (!isTouched || !isMoved) {
+        isTouched = false;
+        isMoved = false;
+        return;
+      }
+      isTouched = false;
+      isMoved = false;
+
+      $htmlEl[0].style.setProperty(("--f7-panel-" + side + "-width"), ((panel.resizableWidth) + "px"));
+      $el[0].style.width = '';
+      if (effect === 'reveal' && !visibleByBreakpoint) {
+        $viewEl.transform('');
+        $backdropEl.transform('');
+      }
+      $el.removeClass('panel-resizing');
+      Utils.nextFrame(function () {
+        if (visibleByBreakpoint) { return; }
+        $el.transition('');
+        if (effect === 'reveal') {
+          $backdropEl.transition('');
+          if ($viewEl) { $viewEl.transition(''); }
+        }
+      });
+    }
+
+    function handleResize() {
+      if (!panel.opened || !panel.resizableWidth) { return; }
+      panelMinWidth = transformCSSWidth($el.css('min-width'));
+      panelMaxWidth = transformCSSWidth($el.css('max-width'));
+
+      if (panelMinWidth && !Number.isNaN(panelMinWidth) && panel.resizableWidth < panelMinWidth) {
+        panel.resizableWidth = Math.max(panel.resizableWidth, panelMinWidth);
+      }
+      if (panelMaxWidth && !Number.isNaN(panelMaxWidth) && panel.resizableWidth > panelMaxWidth) {
+        panel.resizableWidth = Math.min(panel.resizableWidth, panelMaxWidth);
+      }
+      panel.resizableWidth = Math.min(Math.max(panel.resizableWidth, 0), app.width);
+
+      $htmlEl[0].style.setProperty(("--f7-panel-" + side + "-width"), ((panel.resizableWidth) + "px"));
+    }
+
+    if (panel.$el.find('.panel-resize-handler').length === 0) {
+      panel.$el.append('<div class="panel-resize-handler"></div>');
+    }
+    panel.$resizeHandlerEl = panel.$el.children('.panel-resize-handler');
+
+    $el.addClass('panel-resizable');
+
+    // Add Events
+    var passive = Support.passiveListener ? { passive: true } : false;
+
+    panel.$el.on(app.touchEvents.start, '.panel-resize-handler', handleTouchStart, passive);
+    app.on('touchmove:active', handleTouchMove);
+    app.on('touchend:passive', handleTouchEnd);
+    app.on('resize', handleResize);
+    panel.on('beforeOpen', handleResize);
+
+    panel.once('panelDestroy', function () {
+      $el.removeClass('panel-resizable');
+      panel.$resizeHandlerEl.remove();
+      panel.$el.off(app.touchEvents.start, '.panel-resize-handler', handleTouchStart, passive);
+      app.off('touchmove:active', handleTouchMove);
+      app.off('touchend:passive', handleTouchEnd);
+      app.off('resize', handleResize);
+      panel.off('beforeOpen', handleResize);
+    });
+  }
+
+  var Panel = /*@__PURE__*/(function (Framework7Class) {
+    function Panel(app, params) {
       if ( params === void 0 ) params = {};
-      Framework7Class$$1.call(this, params, [app]);
+
+      Framework7Class.call(this, params, [app]);
       var panel = this;
 
       var el = params.el;
@@ -16503,7 +18307,7 @@
       if (typeof effect === 'undefined') { effect = $el.hasClass('panel-cover') ? 'cover' : 'reveal'; }
 
       if (!app.panel[side]) {
-        Utils.extend(app.panel, ( obj = {}, obj[side] = panel, obj ));
+        app.panel[side] = panel;
       } else {
         throw new Error(("Framework7: Can't create panel; app already has a " + side + " panel!"));
       }
@@ -16524,6 +18328,7 @@
         opened: opened,
         $backdropEl: $backdropEl,
         backdropEl: $backdropEl[0],
+        params: params,
       });
 
       // Install Modules
@@ -16535,26 +18340,9 @@
       return panel;
     }
 
-    if ( Framework7Class$$1 ) Panel.__proto__ = Framework7Class$$1;
-    Panel.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) Panel.__proto__ = Framework7Class;
+    Panel.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     Panel.prototype.constructor = Panel;
-
-    Panel.prototype.init = function init () {
-      var panel = this;
-      var app = panel.app;
-      if (app.params.panel[((panel.side) + "Breakpoint")]) {
-        panel.initBreakpoints();
-      }
-      {
-        if (
-          (app.params.panel.swipe === panel.side)
-          || (app.params.panel.swipe === 'both')
-          || (app.params.panel.swipe && app.params.panel.swipe !== panel.side && app.params.panel.swipeCloseOpposite)
-        ) {
-          panel.initSwipePanel();
-        }
-      }
-    };
 
     Panel.prototype.getViewEl = function getViewEl () {
       var panel = this;
@@ -16568,9 +18356,10 @@
       return viewEl;
     };
 
-    Panel.prototype.setBreakpoint = function setBreakpoint () {
-      var obj, obj$1;
+    Panel.prototype.setBreakpoint = function setBreakpoint (emitEvents) {
+      var obj, obj$1, obj$2;
 
+      if ( emitEvents === void 0 ) emitEvents = true;
       var panel = this;
       var app = panel.app;
       var side = panel.side;
@@ -16587,16 +18376,22 @@
           panel.onOpened();
           $viewEl.css(( obj = {}, obj[("margin-" + side)] = (($el.width()) + "px"), obj ));
           app.allowPanelOpen = true;
-          app.emit('local::breakpoint panelBreakpoint');
-          panel.$el.trigger('panel:breakpoint', panel);
+          if (emitEvents) {
+            panel.emit('local::breakpoint panelBreakpoint');
+            panel.$el.trigger('panel:breakpoint', panel);
+          }
+        } else {
+          $viewEl.css(( obj$1 = {}, obj$1[("margin-" + side)] = (($el.width()) + "px"), obj$1 ));
         }
       } else if (wasVisible) {
         $el.css('display', '').removeClass('panel-visible-by-breakpoint panel-active');
         panel.onClose();
         panel.onClosed();
-        $viewEl.css(( obj$1 = {}, obj$1[("margin-" + side)] = '', obj$1 ));
-        app.emit('local::breakpoint panelBreakpoint');
-        panel.$el.trigger('panel:breakpoint', panel);
+        $viewEl.css(( obj$2 = {}, obj$2[("margin-" + side)] = '', obj$2 ));
+        if (emitEvents) {
+          panel.emit('local::breakpoint panelBreakpoint');
+          panel.$el.trigger('panel:breakpoint', panel);
+        }
       }
     };
 
@@ -16619,30 +18414,57 @@
       }
     };
 
-    Panel.prototype.destroy = function destroy () {
+    Panel.prototype.initResizablePanel = function initResizablePanel () {
+      resizablePanel(this);
+    };
+
+    Panel.prototype.toggle = function toggle (animate) {
+      if ( animate === void 0 ) animate = true;
+
+      var panel = this;
+      if (panel.opened) { panel.close(animate); }
+      else { panel.open(animate); }
+    };
+
+    Panel.prototype.onOpen = function onOpen () {
+      var panel = this;
+      panel.opened = true;
+
+      panel.$el.trigger('panel:beforeopen', panel);
+      panel.emit('local::beforeOpen panelBeforeOpen', panel);
+
+      panel.$el.trigger('panel:open', panel);
+      panel.emit('local::open panelOpen', panel);
+    };
+
+    Panel.prototype.onOpened = function onOpened () {
       var panel = this;
       var app = panel.app;
+      app.panel.allowOpen = true;
 
-      if (!panel.$el) {
-        // Panel already destroyed
-        return;
-      }
+      panel.$el.trigger('panel:opened', panel);
+      panel.emit('local::opened panelOpened', panel);
+    };
 
-      panel.emit('local::beforeDestroy panelBeforeDestroy', panel);
-      panel.$el.trigger('panel:beforedestroy', panel);
+    Panel.prototype.onClose = function onClose () {
+      var panel = this;
+      panel.opened = false;
+      panel.$el.addClass('panel-closing');
 
-      if (panel.resizeHandler) {
-        app.off('resize', panel.resizeHandler);
-      }
-      panel.$el.trigger('panel:destroy', panel);
-      panel.emit('local::destroy panelDestroy');
-      delete app.panel[panel.side];
-      if (panel.el) {
-        panel.el.f7Panel = null;
-        delete panel.el.f7Panel;
-      }
-      Utils.deleteProps(panel);
-      panel = null;
+      panel.$el.trigger('panel:beforeclose', panel);
+      panel.emit('local::beforeClose panelBeforeClose', panel);
+
+      panel.$el.trigger('panel:close', panel);
+      panel.emit('local::close panelClose', panel);
+    };
+
+    Panel.prototype.onClosed = function onClosed () {
+      var panel = this;
+      var app = panel.app;
+      app.panel.allowOpen = true;
+      panel.$el.removeClass('panel-closing');
+      panel.$el.trigger('panel:closed', panel);
+      panel.emit('local::closed panelClosed', panel);
     };
 
     Panel.prototype.open = function open (animate) {
@@ -16712,13 +18534,10 @@
         .addClass('panel-active');
 
       $backdropEl[animate ? 'removeClass' : 'addClass']('not-animated');
-      $backdropEl.show();
+      $backdropEl.css({ display: 'block' });
 
       /* eslint no-underscore-dangle: ["error", { "allow": ["_clientLeft"] }] */
-      panel._clientLeft = $el[0].clientLeft;
-
-      $('html').addClass(("with-panel with-panel-" + side + "-" + effect));
-      panel.onOpen();
+      // panel._clientLeft = $el[0].clientLeft;
 
       // Transition End;
       var transitionEndTarget = effect === 'reveal' ? $el.nextAll('.view, .views').eq(0) : $el;
@@ -16736,9 +18555,16 @@
           } else { panelTransitionEnd(); }
         });
       }
+
       if (animate) {
-        panelTransitionEnd();
+        Utils.nextFrame(function () {
+          $('html').addClass(("with-panel with-panel-" + side + "-" + effect));
+          panel.onOpen();
+          panelTransitionEnd();
+        });
       } else {
+        $('html').addClass(("with-panel with-panel-" + side + "-" + effect));
+        panel.onOpen();
         panel.onOpened();
         $backdropEl.css({ display: '' });
       }
@@ -16757,7 +18583,6 @@
       var $el = panel.$el;
       var $backdropEl = panel.$backdropEl;
       var opened = panel.opened;
-
       if (!opened || $el.hasClass('panel-visible-by-breakpoint') || !$el.hasClass('panel-active')) { return false; }
 
       $el[animate ? 'removeClass' : 'addClass']('not-animated');
@@ -16789,37 +18614,62 @@
       return true;
     };
 
-    Panel.prototype.onOpen = function onOpen () {
-      var panel = this;
-      panel.opened = true;
-      panel.$el.trigger('panel:open', panel);
-      panel.emit('local::open panelOpen', panel);
-    };
-
-    Panel.prototype.onOpened = function onOpened () {
+    Panel.prototype.init = function init () {
       var panel = this;
       var app = panel.app;
-      app.panel.allowOpen = true;
-
-      panel.$el.trigger('panel:opened', panel);
-      panel.emit('local::opened panelOpened', panel);
+      if (app.params.panel[((panel.side) + "Breakpoint")]) {
+        panel.initBreakpoints();
+      }
+      {
+        if (
+          (app.params.panel.swipe === panel.side)
+          || (app.params.panel.swipe === 'both')
+          || (app.params.panel.swipe && app.params.panel.swipe !== panel.side && app.params.panel.swipeCloseOpposite)
+        ) {
+          panel.initSwipePanel();
+        }
+      }
+      if (panel.params.resizable || panel.$el.hasClass('panel-resizable')) {
+        panel.initResizablePanel();
+      }
     };
 
-    Panel.prototype.onClose = function onClose () {
-      var panel = this;
-      panel.opened = false;
-      panel.$el.addClass('panel-closing');
-      panel.$el.trigger('panel:close', panel);
-      panel.emit('local::close panelClose', panel);
-    };
+    Panel.prototype.destroy = function destroy () {
+      var obj;
 
-    Panel.prototype.onClosed = function onClosed () {
       var panel = this;
       var app = panel.app;
-      app.panel.allowOpen = true;
-      panel.$el.removeClass('panel-closing');
-      panel.$el.trigger('panel:closed', panel);
-      panel.emit('local::closed panelClosed', panel);
+
+      if (!panel.$el) {
+        // Panel already destroyed
+        return;
+      }
+
+      panel.emit('local::beforeDestroy panelBeforeDestroy', panel);
+      panel.$el.trigger('panel:beforedestroy', panel);
+
+      if (panel.resizeHandler) {
+        app.off('resize', panel.resizeHandler);
+      }
+
+      if (panel.$el.hasClass('panel-visible-by-breakpoint')) {
+        var $viewEl = $(panel.getViewEl());
+        panel.$el.css('display', '').removeClass('panel-visible-by-breakpoint panel-active');
+        $viewEl.css(( obj = {}, obj[("margin-" + (panel.side))] = '', obj ));
+        panel.emit('local::breakpoint panelBreakpoint');
+        panel.$el.trigger('panel:breakpoint', panel);
+      }
+
+      panel.$el.trigger('panel:destroy', panel);
+      panel.emit('local::destroy panelDestroy');
+      delete app.panel[panel.side];
+      if (panel.el) {
+        panel.el.f7Panel = null;
+        delete panel.el.f7Panel;
+      }
+      Utils.deleteProps(panel);
+
+      panel = null;
     };
 
     return Panel;
@@ -16852,6 +18702,53 @@
     create: function create() {
       var app = this;
       Utils.extend(app.panel, {
+        disableResizable: function disableResizable(panel) {
+          if ( panel === void 0 ) panel = 'both';
+
+          var side;
+          var panels = [];
+          if (typeof panel === 'string') {
+            if (panel === 'both') {
+              side = 'both';
+              panels = [app.panel.left, app.panel.right];
+            } else {
+              side = panel;
+              panels.push(app.panel[side]);
+            }
+          } else {
+            panels = [panel];
+          }
+          panels.forEach(function (panelInstance) {
+            panelInstance.resizable = false;
+            panelInstance.$el.removeClass('panel-resizable');
+          });
+        },
+        enableResizable: function enableResizable(panel) {
+          if ( panel === void 0 ) panel = 'both';
+
+          var side;
+          var panels = [];
+          if (typeof panel === 'string') {
+            if (panel === 'both') {
+              side = 'both';
+              panels = [app.panel.left, app.panel.right];
+            } else {
+              side = panel;
+              panels.push(app.panel[side]);
+            }
+          } else {
+            panels = [panel];
+          }
+          panels.forEach(function (panelInstance) {
+            if (!panelInstance) { return; }
+            if (!panelInstance.resizableInitialized) {
+              panelInstance.initResizablePanel();
+            } else {
+              panelInstance.resizable = true;
+              panelInstance.$el.addClass('panel-resizable');
+            }
+          });
+        },
         disableSwipe: function disableSwipe(panel) {
           if ( panel === void 0 ) panel = 'both';
 
@@ -16869,7 +18766,7 @@
             panels = [panel];
           }
           panels.forEach(function (panelInstance) {
-            if (panelInstance) { Utils.extend(panelInstance, { swipeable: false }); }
+            panelInstance.swipeable = false;
           });
         },
         enableSwipe: function enableSwipe(panel) {
@@ -16894,16 +18791,14 @@
           } else if (panel) {
             panels.push(panel);
           }
-          if (panels.length) {
-            panels.forEach(function (panelInstance) {
-              if (!panelInstance) { return; }
-              if (!panelInstance.swipeInitialized) {
-                panelInstance.initSwipePanel();
-              } else {
-                Utils.extend(panelInstance, { swipeable: true });
-              }
-            });
-          }
+          panels.forEach(function (panelInstance) {
+            if (!panelInstance) { return; }
+            if (!panelInstance.swipeInitialized) {
+              panelInstance.initSwipePanel();
+            } else {
+              panelInstance.swipeable = true;
+            }
+          });
         },
         create: function create(params) {
           return new Panel(app, params);
@@ -16942,6 +18837,31 @@
           }
           if ($panelEl.length > 0) {
             return app.panel.create({ el: $panelEl }).close(animate);
+          }
+          return false;
+        },
+        toggle: function toggle(side, animate) {
+          var $panelEl;
+          var panelSide = side;
+          if (side) {
+            panelSide = side;
+            $panelEl = $((".panel-" + panelSide));
+          } else if ($('.panel.panel-active').length) {
+            $panelEl = $('.panel.panel-active');
+            panelSide = $panelEl.hasClass('panel-left') ? 'left' : 'right';
+          } else {
+            if ($('.panel').length > 1) {
+              return false;
+            }
+            panelSide = $('.panel').hasClass('panel-left') ? 'left' : 'right';
+            $panelEl = $((".panel-" + panelSide));
+          }
+          if (!panelSide) { return false; }
+          if (app.panel[panelSide]) {
+            return app.panel[panelSide].toggle(animate);
+          }
+          if ($panelEl.length > 0) {
+            return app.panel.create({ el: $panelEl }).toggle(animate);
           }
           return false;
         },
@@ -16994,6 +18914,13 @@
         var side = data.panel;
         app.panel.close(side, data.animate);
       },
+      '.panel-toggle': function close(clickedEl, data) {
+        if ( data === void 0 ) data = {};
+
+        var app = this;
+        var side = data.panel;
+        app.panel.toggle(side, data.animate);
+      },
       '.panel-backdrop': function close() {
         var app = this;
         var $panelEl = $('.panel-active');
@@ -17008,8 +18935,495 @@
     },
   };
 
+  /* eslint no-param-reassign: "off" */
+
+  var CardExpandable = {
+    open: function open(cardEl, animate) {
+      var assign;
+
+      if ( cardEl === void 0 ) cardEl = '.card-expandable';
+      if ( animate === void 0 ) animate = true;
+      var app = this;
+
+      if ($('.card-opened').length) { return; }
+      var $cardEl = $(cardEl).eq(0);
+
+      if (!$cardEl || !$cardEl.length) { return; }
+      if ($cardEl.hasClass('card-opened') || $cardEl.hasClass('card-opening') || $cardEl.hasClass('card-closing')) { return; }
+
+      var $pageEl = $cardEl.parents('.page').eq(0);
+      if (!$pageEl.length) { return; }
+
+      var prevented;
+
+      function prevent() {
+        prevented = true;
+      }
+
+      $cardEl.trigger('card:beforeopen', { prevent: prevent });
+      app.emit('cardBeforeOpen', $cardEl[0], prevent);
+
+      if (prevented) { return; }
+
+      var cardParams = Object.assign({ animate: animate }, app.params.card, $cardEl.dataset());
+
+      var $pageContentEl = $cardEl.parents('.page-content');
+
+      var $backdropEl;
+      if ($cardEl.attr('data-backdrop-el')) {
+        $backdropEl = $($cardEl.attr('data-backdrop-el'));
+      }
+      if (!$backdropEl && cardParams.backdrop) {
+        $backdropEl = $pageContentEl.find('.card-backdrop');
+        if (!$backdropEl.length) {
+          $backdropEl = $('<div class="card-backdrop"></div>');
+          $pageContentEl.append($backdropEl);
+        }
+      }
+
+      var $navbarEl;
+      var $toolbarEl;
+      if (cardParams.hideNavbarOnOpen) {
+        $navbarEl = $pageEl.children('.navbar');
+        if (!$navbarEl.length) {
+          if ($pageEl[0].f7Page) { $navbarEl = $pageEl[0].f7Page.$navbarEl; }
+        }
+      }
+      if (cardParams.hideToolbarOnOpen) {
+        $toolbarEl = $pageEl.children('.toolbar');
+        if (!$toolbarEl.length) {
+          $toolbarEl = $pageEl.parents('.view').children('.toolbar');
+        }
+        if (!$toolbarEl.length) {
+          $toolbarEl = $pageEl.parents('.views').children('.toolbar');
+        }
+      }
+
+      var currTransform = $cardEl.css('transform');
+      var hasTransform;
+      if (currTransform && currTransform.match(/[2-9]/)) {
+        hasTransform = true;
+      }
+      var $cardContentEl = $cardEl.children('.card-content');
+
+      var $cardSizeEl = $(document.createElement('div')).addClass('card-expandable-size');
+      $cardEl.append($cardSizeEl);
+
+      var cardWidth = $cardEl[0].offsetWidth;
+      var cardHeight = $cardEl[0].offsetHeight;
+      var pageWidth = $pageEl[0].offsetWidth;
+      var pageHeight = $pageEl[0].offsetHeight;
+
+      var maxWidth = $cardSizeEl[0].offsetWidth || pageWidth;
+      var maxHeight = $cardSizeEl[0].offsetHeight || pageHeight;
+
+      var scaleX = maxWidth / cardWidth;
+      var scaleY = maxHeight / cardHeight;
+
+      var offset = $cardEl.offset();
+      var pageOffset = $pageEl.offset();
+      offset.left -= pageOffset.left;
+
+      var cardLeftOffset;
+      var cardTopOffset;
+
+      if (hasTransform) {
+        var transformValues = currTransform
+          .replace(/matrix\(|\)/g, '')
+          .split(',')
+          .map(function (el) { return el.trim(); });
+        if (transformValues && transformValues.length > 1) {
+          var scale = parseFloat(transformValues[0]);
+          cardLeftOffset = offset.left - cardWidth * (1 - scale) / 2;
+          cardTopOffset = offset.top - pageOffset.top - cardHeight * (1 - scale) / 2;
+          if (app.rtl) { cardLeftOffset -= $cardEl[0].scrollLeft; }
+        } else {
+          cardLeftOffset = $cardEl[0].offsetLeft;
+          cardTopOffset = $cardEl[0].offsetTop - ($pageContentEl.length ? $pageContentEl[0].scrollTop : 0);
+        }
+      } else {
+        cardLeftOffset = offset.left;
+        cardTopOffset = offset.top - pageOffset.top;
+        if (app.rtl) { cardLeftOffset -= $cardEl[0].scrollLeft; }
+      }
+
+      cardLeftOffset -= (pageWidth - maxWidth) / 2;
+      cardTopOffset -= (pageHeight - maxHeight) / 2;
+
+      var cardRightOffset = maxWidth - cardWidth - cardLeftOffset;
+      if (app.rtl) {
+        (assign = [cardRightOffset, cardLeftOffset], cardLeftOffset = assign[0], cardRightOffset = assign[1]);
+      }
+      var cardBottomOffset = maxHeight - cardHeight - cardTopOffset;
+      var translateX = (cardRightOffset - cardLeftOffset) / 2;
+      var translateY = (cardBottomOffset - cardTopOffset) / 2;
+      if (cardParams.hideNavbarOnOpen && $navbarEl && $navbarEl.length) {
+        app.navbar.hide($navbarEl, cardParams.animate);
+      }
+      if (cardParams.hideToolbarOnOpen && $toolbarEl && $toolbarEl.length) {
+        app.toolbar.hide($toolbarEl, cardParams.animate);
+      }
+      if ($backdropEl) {
+        $backdropEl.removeClass('card-backdrop-out').addClass('card-backdrop-in');
+      }
+      $cardEl.removeClass('card-transitioning');
+      if (cardParams.animate) {
+        $cardEl.addClass('card-opening');
+      }
+      $cardEl.trigger('card:open');
+      app.emit('cardOpen', $cardEl[0]);
+      function transitionEnd() {
+        $pageEl.addClass('page-with-card-opened');
+        if (app.device.ios && $pageContentEl.length) {
+          $pageContentEl.css('height', (($pageContentEl[0].offsetHeight + 1) + "px"));
+          setTimeout(function () {
+            $pageContentEl.css('height', '');
+          });
+        }
+        $cardEl.addClass('card-opened');
+        $cardEl.removeClass('card-opening');
+        $cardEl.trigger('card:opened');
+        app.emit('cardOpened', $cardEl[0], $pageEl[0]);
+      }
+      $cardContentEl
+        .css({
+          width: (maxWidth + "px"),
+          height: (maxHeight + "px"),
+        })
+        .transform(("translate3d(" + (app.rtl ? (cardLeftOffset + translateX) : (-cardLeftOffset - translateX)) + "px, 0px, 0) scale(" + (1 / scaleX) + ", " + (1 / scaleY) + ")"));
+
+      $cardEl
+        .transform(("translate3d(" + translateX + "px, " + translateY + "px, 0) scale(" + scaleX + ", " + scaleY + ")"));
+      if (cardParams.animate) {
+        $cardEl.transitionEnd(function () {
+          transitionEnd();
+        });
+      } else {
+        transitionEnd();
+      }
+
+      function onResize() {
+        var assign;
+
+        $cardEl.removeClass('card-transitioning');
+        cardWidth = $cardEl[0].offsetWidth;
+        cardHeight = $cardEl[0].offsetHeight;
+        pageWidth = $pageEl[0].offsetWidth;
+        pageHeight = $pageEl[0].offsetHeight;
+        maxWidth = $cardSizeEl[0].offsetWidth || pageWidth;
+        maxHeight = $cardSizeEl[0].offsetHeight || pageHeight;
+
+        scaleX = maxWidth / cardWidth;
+        scaleY = maxHeight / cardHeight;
+
+        $cardEl.transform('translate3d(0px, 0px, 0) scale(1)');
+        offset = $cardEl.offset();
+        pageOffset = $pageEl.offset();
+        offset.left -= pageOffset.left;
+        offset.top -= pageOffset.top;
+
+        cardLeftOffset = offset.left - (pageWidth - maxWidth) / 2;
+        if (app.rtl) { cardLeftOffset -= $cardEl[0].scrollLeft; }
+        cardTopOffset = offset.top - (pageHeight - maxHeight) / 2;
+
+        cardRightOffset = maxWidth - cardWidth - cardLeftOffset;
+        cardBottomOffset = maxHeight - cardHeight - cardTopOffset;
+        if (app.rtl) {
+          (assign = [cardRightOffset, cardLeftOffset], cardLeftOffset = assign[0], cardRightOffset = assign[1]);
+        }
+        translateX = (cardRightOffset - cardLeftOffset) / 2;
+        translateY = (cardBottomOffset - cardTopOffset) / 2;
+
+        $cardEl.transform(("translate3d(" + translateX + "px, " + translateY + "px, 0) scale(" + scaleX + ", " + scaleY + ")"));
+        $cardContentEl
+          .css({
+            width: (maxWidth + "px"),
+            height: (maxHeight + "px"),
+          })
+          .transform(("translate3d(" + (app.rtl ? (cardLeftOffset + translateX) : (-cardLeftOffset - translateX)) + "px, 0px, 0) scale(" + (1 / scaleX) + ", " + (1 / scaleY) + ")"));
+      }
+
+      var cardScrollTop;
+      var isTouched;
+      var isMoved;
+      var touchStartX;
+      var touchStartY;
+      var touchEndX;
+      var touchEndY;
+      var isScrolling;
+      var progress;
+      var isV;
+      var isH;
+      function onTouchStart(e) {
+        if (!$(e.target).closest($cardEl).length) { return; }
+        if (!$cardEl.hasClass('card-opened')) { return; }
+        cardScrollTop = $cardContentEl.scrollTop();
+        isTouched = true;
+        touchStartX = e.targetTouches[0].pageX;
+        touchStartY = e.targetTouches[0].pageY;
+        isScrolling = undefined;
+        isV = false;
+        isH = false;
+      }
+      function onTouchMove(e) {
+        if (!isTouched) { return; }
+        touchEndX = e.targetTouches[0].pageX;
+        touchEndY = e.targetTouches[0].pageY;
+        if (typeof isScrolling === 'undefined') {
+          isScrolling = !!(isScrolling || Math.abs(touchEndY - touchStartY) > Math.abs(touchEndX - touchStartX));
+        }
+        if (!isH && !isV) {
+          if (!isScrolling && e.targetTouches[0].clientX <= 50) {
+            isH = true;
+          } else {
+            isV = true;
+          }
+        }
+
+        if (!(isH || isV) || (isV && cardScrollTop !== 0)) {
+          isTouched = true;
+          isMoved = true;
+          return;
+        }
+        if (!isMoved) {
+          $cardEl.removeClass('card-transitioning');
+        }
+
+        isMoved = true;
+        progress = isV ? Math.max((touchEndY - touchStartY) / 150, 0) : Math.max((touchEndX - touchStartX) / (cardWidth / 2), 0);
+        if ((progress > 0 && isV) || isH) {
+          if (isV && app.device.ios) {
+            $cardContentEl.css('-webkit-overflow-scrolling', 'auto');
+            $cardContentEl.scrollTop(0);
+          }
+          e.preventDefault();
+        }
+
+        if (progress > 1) { progress = Math.pow( progress, 0.3 ); }
+        if (progress > (isV ? 1.3 : 1.1)) {
+          isTouched = false;
+          isMoved = false;
+          app.card.close($cardEl);
+        } else {
+          $cardEl.transform(("translate3d(" + translateX + "px, " + translateY + "px, 0) scale(" + (scaleX * (1 - progress * 0.2)) + ", " + (scaleY * (1 - progress * 0.2)) + ")"));
+        }
+      }
+      function onTouchEnd() {
+        if (!isTouched || !isMoved) { return; }
+        isTouched = false;
+        isMoved = false;
+        if (app.device.ios) {
+          $cardContentEl.css('-webkit-overflow-scrolling', '');
+        }
+        if (progress >= 0.8) {
+          app.card.close($cardEl);
+        } else {
+          $cardEl
+            .addClass('card-transitioning')
+            .transform(("translate3d(" + translateX + "px, " + translateY + "px, 0) scale(" + scaleX + ", " + scaleY + ")"));
+        }
+      }
+
+      $cardEl[0].detachEventHandlers = function detachEventHandlers() {
+        app.off('resize', onResize);
+        if (Support.touch && cardParams.swipeToClose) {
+          app.off('touchstart:passive', onTouchStart);
+          app.off('touchmove:active', onTouchMove);
+          app.off('touchend:passive', onTouchEnd);
+        }
+      };
+
+      app.on('resize', onResize);
+      if (Support.touch && cardParams.swipeToClose) {
+        app.on('touchstart:passive', onTouchStart);
+        app.on('touchmove:active', onTouchMove);
+        app.on('touchend:passive', onTouchEnd);
+      }
+    },
+    close: function close(cardEl, animate) {
+      if ( cardEl === void 0 ) cardEl = '.card-expandable.card-opened';
+      if ( animate === void 0 ) animate = true;
+
+      var app = this;
+      var $cardEl = $(cardEl).eq(0);
+      if (!$cardEl || !$cardEl.length) { return; }
+      if (!$cardEl.hasClass('card-opened') || $cardEl.hasClass('card-opening') || $cardEl.hasClass('card-closing')) { return; }
+
+      var $cardContentEl = $cardEl.children('.card-content');
+      var $pageContentEl = $cardEl.parents('.page-content');
+
+      var $pageEl = $cardEl.parents('.page').eq(0);
+      if (!$pageEl.length) { return; }
+
+      var cardParams = Object.assign({ animate: animate }, app.params.card, $cardEl.dataset());
+
+      var $navbarEl;
+      var $toolbarEl;
+
+      var $backdropEl;
+      if ($cardEl.attr('data-backdrop-el')) {
+        $backdropEl = $($cardEl.attr('data-backdrop-el'));
+      }
+      if (cardParams.backdrop) {
+        $backdropEl = $cardEl.parents('.page-content').find('.card-backdrop');
+      }
+
+      if (cardParams.hideNavbarOnOpen) {
+        $navbarEl = $pageEl.children('.navbar');
+        if (!$navbarEl.length) {
+          if ($pageEl[0].f7Page) { $navbarEl = $pageEl[0].f7Page.$navbarEl; }
+        }
+        if ($navbarEl && $navbarEl.length) {
+          app.navbar.show($navbarEl, cardParams.animate);
+        }
+      }
+      if (cardParams.hideToolbarOnOpen) {
+        $toolbarEl = $pageEl.children('.toolbar');
+        if (!$toolbarEl.length) {
+          $toolbarEl = $pageEl.parents('.view').children('.toolbar');
+        }
+        if (!$toolbarEl.length) {
+          $toolbarEl = $pageEl.parents('.views').children('.toolbar');
+        }
+        if ($toolbarEl && $toolbarEl.length) {
+          app.toolbar.show($toolbarEl, cardParams.animate);
+        }
+      }
+
+      $pageEl.removeClass('page-with-card-opened');
+
+      if (app.device.ios && $pageContentEl.length) {
+        $pageContentEl.css('height', (($pageContentEl[0].offsetHeight + 1) + "px"));
+        setTimeout(function () {
+          $pageContentEl.css('height', '');
+        });
+      }
+
+      if ($backdropEl && $backdropEl.length) {
+        $backdropEl.removeClass('card-backdrop-in').addClass('card-backdrop-out');
+      }
+
+      $cardEl.removeClass('card-opened card-transitioning');
+      if (cardParams.animate) {
+        $cardEl.addClass('card-closing');
+      } else {
+        $cardEl.addClass('card-no-transition');
+      }
+      $cardEl.transform('');
+      $cardEl.trigger('card:close');
+      app.emit('cardClose', $cardEl[0]);
+
+      function transitionEnd() {
+        $cardEl.removeClass('card-closing card-no-transition');
+        $cardEl.trigger('card:closed');
+        $cardEl.find('.card-expandable-size').remove();
+        app.emit('cardClosed', $cardEl[0], $pageEl[0]);
+      }
+      $cardContentEl
+        .css({
+          width: '',
+          height: '',
+        })
+        .transform('')
+        .scrollTop(0, animate ? 300 : 0);
+      if (animate) {
+        $cardContentEl.transitionEnd(function () {
+          transitionEnd();
+        });
+      } else {
+        transitionEnd();
+      }
+
+      if ($cardEl[0].detachEventHandlers) {
+        $cardEl[0].detachEventHandlers();
+        delete $cardEl[0].detachEventHandlers;
+      }
+    },
+    toggle: function toggle(cardEl, animate) {
+      if ( cardEl === void 0 ) cardEl = '.card-expandable';
+
+      var app = this;
+      var $cardEl = $(cardEl).eq(0);
+      if (!$cardEl.length) { return; }
+      if ($cardEl.hasClass('card-opened')) {
+        app.card.close($cardEl, animate);
+      } else {
+        app.card.open($cardEl, animate);
+      }
+    },
+  };
+
   var Card = {
     name: 'card',
+    params: {
+      card: {
+        hideNavbarOnOpen: true,
+        hideToolbarOnOpen: true,
+        swipeToClose: true,
+        closeByBackdropClick: true,
+        backdrop: true,
+      },
+    },
+    create: function create() {
+      var app = this;
+      Utils.extend(app, {
+        card: {
+          open: CardExpandable.open.bind(app),
+          close: CardExpandable.close.bind(app),
+          toggle: CardExpandable.toggle.bind(app),
+        },
+      });
+    },
+    on: {
+      pageBeforeIn: function pageBeforeIn(page) {
+        var app = this;
+        if (app.params.card.hideNavbarOnOpen && page.navbarEl && page.$el.find('.card-opened.card-expandable').length) {
+          app.navbar.hide(page.navbarEl);
+        }
+
+        if (app.params.card.hideToolbarOnOpen && page.$el.find('.card-opened.card-expandable').length) {
+          var $toolbarEl = page.$el.children('.toolbar');
+          if (!$toolbarEl.length) {
+            $toolbarEl = page.$el.parents('.view').children('.toolbar');
+          }
+          if (!$toolbarEl.length) {
+            $toolbarEl = page.$el.parents('.views').children('.toolbar');
+          }
+          if ($toolbarEl && $toolbarEl.length) {
+            app.toolbar.hide($toolbarEl);
+          }
+        }
+      },
+    },
+    clicks: {
+      '.card-close': function closeCard($clickedEl, data) {
+        var app = this;
+        app.card.close(data.card, data.animate);
+      },
+      '.card-open': function closeCard($clickedEl, data) {
+        var app = this;
+        app.card.open(data.card, data.animate);
+      },
+      '.card-expandable': function toggleExpandableCard($clickedEl, data, e) {
+        var app = this;
+        if ($clickedEl.hasClass('card-opened') || $clickedEl.hasClass('card-opening') || $clickedEl.hasClass('card-closing')) { return; }
+        if ($(e.target).closest('.card-prevent-open, .card-close').length) { return; }
+        app.card.open($clickedEl);
+      },
+      '.card-backdrop-in': function onBackdropClick() {
+        var app = this;
+        var needToClose = false;
+        if (app.params.card.closeByBackdropClick) { needToClose = true; }
+        var $openedCardEl = $('.card-opened');
+        if (!$openedCardEl.length) { return; }
+        if ($openedCardEl.attr('data-close-by-backdrop-click') === 'true') {
+          needToClose = true;
+        } else if ($openedCardEl.attr('data-close-by-backdrop-click') === 'false') {
+          needToClose = false;
+        }
+        if (needToClose) { app.card.close($openedCardEl); }
+      },
+    },
   };
 
   var Chip = {
@@ -17264,19 +19678,19 @@
         contentType: contentType,
         data: data,
         beforeSend: function beforeSend(xhr) {
-          $formEl.trigger('formajax:beforesend', data, xhr);
+          $formEl.trigger('formajax:beforesend', { data: data, xhr: xhr });
           app.emit('formAjaxBeforeSend', $formEl[0], data, xhr);
         },
         error: function error(xhr) {
-          $formEl.trigger('formajax:error', data, xhr);
+          $formEl.trigger('formajax:error', { data: data, xhr: xhr });
           app.emit('formAjaxError', $formEl[0], data, xhr);
         },
         complete: function complete(xhr) {
-          $formEl.trigger('formajax:complete', data, xhr);
+          $formEl.trigger('formajax:complete', { data: data, xhr: xhr });
           app.emit('formAjaxComplete', $formEl[0], data, xhr);
         },
         success: function success(response, status, xhr) {
-          $formEl.trigger('formajax:success', data, xhr);
+          $formEl.trigger('formajax:success', { data: data, xhr: xhr });
           app.emit('formAjaxSuccess', $formEl[0], data, xhr);
         },
       });
@@ -17406,7 +19820,7 @@
         }
         if ($errorEl.length > 0) {
           $itemInputEl.addClass('item-input-with-error-message');
-          $inputWrapEl.addClass('input-with-eror-message');
+          $inputWrapEl.addClass('input-with-error-message');
         }
         $itemInputEl.addClass('item-input-invalid');
         $inputWrapEl.addClass('input-invalid');
@@ -17515,7 +19929,7 @@
         var $inputEl = $(this);
         var tag = $inputEl[0].nodeName.toLowerCase();
         app.input.blur($inputEl);
-        if ($inputEl.dataset().validate || $inputEl.attr('validate') !== null) {
+        if ($inputEl.dataset().validate || $inputEl.attr('validate') !== null || $inputEl.attr('data-validate-on-blur') !== null) {
           app.input.validate($inputEl);
         }
         // Resize textarea
@@ -17533,7 +19947,7 @@
         app.input.checkEmptyState($inputEl);
 
         // Check validation
-        if ($inputEl.dataset().validate || $inputEl.attr('validate') !== null) {
+        if ($inputEl.attr('data-validate-on-blur') === null && ($inputEl.dataset().validate || $inputEl.attr('validate') !== null)) {
           app.input.validate($inputEl);
         }
 
@@ -17544,7 +19958,7 @@
       }
       function onInvalid(e) {
         var $inputEl = $(this);
-        if ($inputEl.dataset().validate || $inputEl.attr('validate') !== null) {
+        if ($inputEl.attr('data-validate-on-blur') === null && ($inputEl.dataset().validate || $inputEl.attr('validate') !== null)) {
           e.preventDefault();
           app.input.validate($inputEl);
         }
@@ -17638,11 +20052,11 @@
     name: 'radio',
   };
 
-  var Toggle = /*@__PURE__*/(function (Framework7Class$$1) {
+  var Toggle = /*@__PURE__*/(function (Framework7Class) {
     function Toggle(app, params) {
       if ( params === void 0 ) params = {};
 
-      Framework7Class$$1.call(this, params, [app]);
+      Framework7Class.call(this, params, [app]);
       var toggle = this;
 
       var defaults = {};
@@ -17772,7 +20186,7 @@
         toggle.emit('local::change toggleChange', toggle);
       }
       toggle.attachEvents = function attachEvents() {
-        if (Support.touch) {
+        if ( Support.touch) {
           var passive = Support.passiveListener ? { passive: true } : false;
           $el.on(app.touchEvents.start, handleTouchStart, passive);
           app.on('touchmove', handleTouchMove);
@@ -17781,7 +20195,7 @@
         toggle.$inputEl.on('change', handleInputChange);
       };
       toggle.detachEvents = function detachEvents() {
-        if (Support.touch) {
+        if ( Support.touch) {
           var passive = Support.passiveListener ? { passive: true } : false;
           $el.off(app.touchEvents.start, handleTouchStart, passive);
           app.off('touchmove', handleTouchMove);
@@ -17797,8 +20211,8 @@
       toggle.init();
     }
 
-    if ( Framework7Class$$1 ) Toggle.__proto__ = Framework7Class$$1;
-    Toggle.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) Toggle.__proto__ = Framework7Class;
+    Toggle.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     Toggle.prototype.constructor = Toggle;
 
     Toggle.prototype.toggle = function toggle () {
@@ -17873,9 +20287,9 @@
     },
   };
 
-  var Range = /*@__PURE__*/(function (Framework7Class$$1) {
+  var Range = /*@__PURE__*/(function (Framework7Class) {
     function Range(app, params) {
-      Framework7Class$$1.call(this, params, [app]);
+      Framework7Class.call(this, params, [app]);
 
       var range = this;
 
@@ -17889,7 +20303,14 @@
         max: 100,
         value: 0,
         draggableBar: true,
+        vertical: false,
+        verticalReversed: false,
         formatLabel: null,
+        scale: false,
+        scaleSteps: 5,
+        scaleSubSteps: 0,
+        formatScaleLabel: null,
+        limitKnobPosition: app.theme === 'ios',
       };
 
       // Extend defaults with modules params
@@ -17907,12 +20328,12 @@
 
       var dataset = $el.dataset();
 
-      ('step min max value').split(' ').forEach(function (paramName) {
+      ('step min max value scaleSteps scaleSubSteps').split(' ').forEach(function (paramName) {
         if (typeof params[paramName] === 'undefined' && typeof dataset[paramName] !== 'undefined') {
           range.params[paramName] = parseFloat(dataset[paramName]);
         }
       });
-      ('dual label').split(' ').forEach(function (paramName) {
+      ('dual label vertical verticalReversed scale').split(' ').forEach(function (paramName) {
         if (typeof params[paramName] === 'undefined' && typeof dataset[paramName] !== 'undefined') {
           range.params[paramName] = dataset[paramName];
         }
@@ -17941,7 +20362,15 @@
       var min = ref.min;
       var max = ref.max;
       var value = ref.value;
+      var vertical = ref.vertical;
+      var verticalReversed = ref.verticalReversed;
+      var scale = ref.scale;
+      var scaleSteps = ref.scaleSteps;
+      var scaleSubSteps = ref.scaleSubSteps;
+      var limitKnobPosition = ref.limitKnobPosition;
+
       Utils.extend(range, {
+        app: app,
         $el: $el,
         el: $el[0],
         $inputEl: $inputEl,
@@ -17953,6 +20382,12 @@
         max: max,
         value: value,
         previousValue: value,
+        vertical: vertical,
+        verticalReversed: verticalReversed,
+        scale: scale,
+        scaleSteps: scaleSteps,
+        scaleSubSteps: scaleSubSteps,
+        limitKnobPosition: limitKnobPosition,
       });
 
       if ($inputEl) {
@@ -17976,6 +20411,16 @@
         $el.addClass('range-slider-label');
       }
 
+      // Vertical
+      if (range.vertical) {
+        $el.addClass('range-slider-vertical');
+        if (range.verticalReversed) {
+          $el.addClass('range-slider-vertical-reversed');
+        }
+      } else {
+        $el.addClass('range-slider-horizontal');
+      }
+
       // Check for layout
       var $barEl = $('<div class="range-bar"></div>');
       var $barActiveEl = $('<div class="range-bar-active"></div>');
@@ -17984,7 +20429,6 @@
       // Create Knobs
       var knobHTML = "\n      <div class=\"range-knob-wrap\">\n        <div class=\"range-knob\"></div>\n        " + (range.label ? '<div class="range-knob-label"></div>' : '') + "\n      </div>\n    ";
       var knobs = [$(knobHTML)];
-      var labels = [];
 
       if (range.dual) {
         knobs.push($(knobHTML));
@@ -17996,6 +20440,7 @@
       });
 
       // Labels
+      var labels = [];
       if (range.label) {
         labels.push(knobs[0].find('.range-knob-label'));
         if (range.dual) {
@@ -18003,12 +20448,19 @@
         }
       }
 
+      // Scale
+      var $scaleEl;
+      if (range.scale && range.scaleSteps > 1) {
+        $scaleEl = $(("\n        <div class=\"range-scale\">\n          " + (range.renderScale()) + "\n        </div>\n      "));
+        $el.append($scaleEl);
+      }
+
       Utils.extend(range, {
-        app: app,
         knobs: knobs,
         labels: labels,
         $barEl: $barEl,
         $barActiveEl: $barActiveEl,
+        $scaleEl: $scaleEl,
       });
 
       $el[0].f7Range = range;
@@ -18017,10 +20469,13 @@
       var isTouched;
       var touchesStart = {};
       var isScrolling;
+      var rangeOffset;
       var rangeOffsetLeft;
+      var rangeOffsetTop;
       var $touchedKnobEl;
       var dualValueIndex;
       var valueChangedByTouch;
+      var targetTouchIdentifier;
       function onTouchChange() {
         valueChangedByTouch = true;
       }
@@ -18034,13 +20489,21 @@
         valueChangedByTouch = false;
         touchesStart.x = e.type === 'touchstart' ? e.targetTouches[0].pageX : e.pageX;
         touchesStart.y = e.type === 'touchstart' ? e.targetTouches[0].pageY : e.pageY;
+        if (e.type === 'touchstart') {
+          targetTouchIdentifier = e.targetTouches[0].identifier;
+        }
 
         isTouched = true;
         isScrolling = undefined;
-        rangeOffsetLeft = $el.offset().left;
+        rangeOffset = $el.offset();
+        rangeOffsetLeft = rangeOffset.left;
+        rangeOffsetTop = rangeOffset.top;
 
         var progress;
-        if (range.app.rtl) {
+        if (range.vertical) {
+          progress = (touchesStart.y - rangeOffsetTop) / range.rangeHeight;
+          if (!range.verticalReversed) { progress = 1 - progress; }
+        } else if (range.app.rtl) {
           progress = ((rangeOffsetLeft + range.rangeWidth) - touchesStart.x) / range.rangeWidth;
         } else {
           progress = (touchesStart.x - rangeOffsetLeft) / range.rangeWidth;
@@ -18069,10 +20532,22 @@
       }
       function handleTouchMove(e) {
         if (!isTouched) { return; }
-        var pageX = e.type === 'touchmove' ? e.targetTouches[0].pageX : e.pageX;
-        var pageY = e.type === 'touchmove' ? e.targetTouches[0].pageY : e.pageY;
+        var pageX;
+        var pageY;
+        if (e.type === 'touchmove') {
+          for (var i = 0; i < e.targetTouches.length; i += 1) {
+            if (e.targetTouches[i].identifier === targetTouchIdentifier) {
+              pageX = e.targetTouches[i].pageX;
+              pageY = e.targetTouches[i].pageY;
+            }
+          }
+        } else {
+          pageX = e.pageX;
+          pageY = e.pageY;
+        }
+        if (typeof pageX === 'undefined' && typeof pageY === 'undefined') { return; }
 
-        if (typeof isScrolling === 'undefined') {
+        if (typeof isScrolling === 'undefined' && !range.vertical) {
           isScrolling = !!(isScrolling || Math.abs(pageY - touchesStart.y) > Math.abs(pageX - touchesStart.x));
         }
         if (isScrolling) {
@@ -18082,7 +20557,10 @@
         e.preventDefault();
 
         var progress;
-        if (range.app.rtl) {
+        if (range.vertical) {
+          progress = (pageY - rangeOffsetTop) / range.rangeHeight;
+          if (!range.verticalReversed) { progress = 1 - progress; }
+        } else if (range.app.rtl) {
           progress = ((rangeOffsetLeft + range.rangeWidth) - pageX) / range.rangeWidth;
         } else {
           progress = (pageX - rangeOffsetLeft) / range.rangeWidth;
@@ -18109,7 +20587,14 @@
         }
         range.setValue(newValue, true);
       }
-      function handleTouchEnd() {
+      function handleTouchEnd(e) {
+        if (e.type === 'touchend') {
+          var touchEnded;
+          for (var i = 0; i < e.changedTouches.length; i += 1) {
+            if (e.changedTouches[i].identifier === targetTouchIdentifier) { touchEnded = true; }
+          }
+          if (!touchEnded) { return; }
+        }
         if (!isTouched) {
           if (isScrolling) { $touchedKnobEl.removeClass('range-knob-active-state'); }
           isTouched = false;
@@ -18193,16 +20678,23 @@
       return range;
     }
 
-    if ( Framework7Class$$1 ) Range.__proto__ = Framework7Class$$1;
-    Range.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) Range.__proto__ = Framework7Class;
+    Range.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     Range.prototype.constructor = Range;
 
     Range.prototype.calcSize = function calcSize () {
       var range = this;
-      var width = range.$el.outerWidth();
-      if (width === 0) { return; }
-      range.rangeWidth = width;
-      range.knobWidth = range.knobs[0].outerWidth();
+      if (range.vertical) {
+        var height = range.$el.outerHeight();
+        if (height === 0) { return; }
+        range.rangeHeight = height;
+        range.knobHeight = range.knobs[0].outerHeight();
+      } else {
+        var width = range.$el.outerWidth();
+        if (width === 0) { return; }
+        range.rangeWidth = width;
+        range.knobWidth = range.knobs[0].outerWidth();
+      }
     };
 
     Range.prototype.layout = function layout () {
@@ -18211,7 +20703,9 @@
       var range = this;
       var app = range.app;
       var knobWidth = range.knobWidth;
+      var knobHeight = range.knobHeight;
       var rangeWidth = range.rangeWidth;
+      var rangeHeight = range.rangeHeight;
       var min = range.min;
       var max = range.max;
       var knobs = range.knobs;
@@ -18219,27 +20713,39 @@
       var value = range.value;
       var label = range.label;
       var labels = range.labels;
-      var positionProperty = app.rtl ? 'right' : 'left';
+      var vertical = range.vertical;
+      var verticalReversed = range.verticalReversed;
+      var limitKnobPosition = range.limitKnobPosition;
+      var knobSize = vertical ? knobHeight : knobWidth;
+      var rangeSize = vertical ? rangeHeight : rangeWidth;
+      // eslint-disable-next-line
+      var positionProperty = vertical
+        ? (verticalReversed ? 'top' : 'bottom')
+        : (app.rtl ? 'right' : 'left');
       if (range.dual) {
         var progress = [((value[0] - min) / (max - min)), ((value[1] - min) / (max - min))];
-        $barActiveEl.css(( obj = {}, obj[positionProperty] = ((progress[0] * 100) + "%"), obj.width = (((progress[1] - progress[0]) * 100) + "%"), obj ));
+        $barActiveEl.css(( obj = {}, obj[positionProperty] = ((progress[0] * 100) + "%"), obj[vertical ? 'height' : 'width'] = (((progress[1] - progress[0]) * 100) + "%"), obj ));
         knobs.forEach(function ($knobEl, knobIndex) {
-          var leftPos = rangeWidth * progress[knobIndex];
-          var realLeft = (rangeWidth * progress[knobIndex]) - (knobWidth / 2);
-          if (realLeft < 0) { leftPos = knobWidth / 2; }
-          if ((realLeft + knobWidth) > rangeWidth) { leftPos = rangeWidth - (knobWidth / 2); }
-          $knobEl.css(positionProperty, (leftPos + "px"));
+          var startPos = rangeSize * progress[knobIndex];
+          if (limitKnobPosition) {
+            var realStartPos = (rangeSize * progress[knobIndex]) - (knobSize / 2);
+            if (realStartPos < 0) { startPos = knobSize / 2; }
+            if ((realStartPos + knobSize) > rangeSize) { startPos = rangeSize - (knobSize / 2); }
+          }
+          $knobEl.css(positionProperty, (startPos + "px"));
           if (label) { labels[knobIndex].text(range.formatLabel(value[knobIndex], labels[knobIndex][0])); }
         });
       } else {
         var progress$1 = ((value - min) / (max - min));
-        $barActiveEl.css('width', ((progress$1 * 100) + "%"));
+        $barActiveEl.css(vertical ? 'height' : 'width', ((progress$1 * 100) + "%"));
 
-        var leftPos = rangeWidth * progress$1;
-        var realLeft = (rangeWidth * progress$1) - (knobWidth / 2);
-        if (realLeft < 0) { leftPos = knobWidth / 2; }
-        if ((realLeft + knobWidth) > rangeWidth) { leftPos = rangeWidth - (knobWidth / 2); }
-        knobs[0].css(positionProperty, (leftPos + "px"));
+        var startPos = rangeSize * progress$1;
+        if (limitKnobPosition) {
+          var realStartPos = (rangeSize * progress$1) - (knobSize / 2);
+          if (realStartPos < 0) { startPos = knobSize / 2; }
+          if ((realStartPos + knobSize) > rangeSize) { startPos = rangeSize - (knobSize / 2); }
+        }
+        knobs[0].css(positionProperty, (startPos + "px"));
         if (label) { labels[0].text(range.formatLabel(value, labels[0][0])); }
       }
       if ((range.dual && value.indexOf(min) >= 0) || (!range.dual && value === min)) {
@@ -18315,6 +20821,63 @@
       var range = this;
       if (range.params.formatLabel) { return range.params.formatLabel.call(range, value, labelEl); }
       return value;
+    };
+
+    Range.prototype.formatScaleLabel = function formatScaleLabel (value) {
+      var range = this;
+      if (range.params.formatScaleLabel) { return range.params.formatScaleLabel.call(range, value); }
+      return value;
+    };
+
+    Range.prototype.renderScale = function renderScale () {
+      var range = this;
+      var app = range.app;
+      var verticalReversed = range.verticalReversed;
+      var vertical = range.vertical;
+
+      // eslint-disable-next-line
+      var positionProperty = vertical
+        ? (verticalReversed ? 'top' : 'bottom')
+        : (app.rtl ? 'right' : 'left');
+
+      var html = '';
+
+      Array
+        .from({ length: range.scaleSteps + 1 })
+        .forEach(function (scaleEl, index) {
+          var scaleStepValue = (range.max - range.min) / range.scaleSteps;
+          var scaleValue = range.min + scaleStepValue * index;
+          var progress = ((scaleValue - range.min) / (range.max - range.min));
+          html += "<div class=\"range-scale-step\" style=\"" + positionProperty + ": " + (progress * 100) + "%\">" + (range.formatScaleLabel(scaleValue)) + "</div>";
+
+          if (range.scaleSubSteps && range.scaleSubSteps > 1 && index < range.scaleSteps) {
+            Array
+              .from({ length: range.scaleSubSteps - 1 })
+              .forEach(function (subStepEl, subIndex) {
+                var subStep = scaleStepValue / range.scaleSubSteps;
+                var scaleSubValue = scaleValue + subStep * (subIndex + 1);
+                var subProgress = ((scaleSubValue - range.min) / (range.max - range.min));
+                html += "<div class=\"range-scale-step range-scale-substep\" style=\"" + positionProperty + ": " + (subProgress * 100) + "%\"></div>";
+              });
+          }
+        });
+
+      return html;
+    };
+
+    Range.prototype.updateScale = function updateScale () {
+      var range = this;
+      if (!range.scale || range.scaleSteps < 2) {
+        if (range.$scaleEl) { range.$scaleEl.remove(); }
+        delete range.$scaleEl;
+        return;
+      }
+      if (!range.$scaleEl) {
+        range.$scaleEl = $('<div class="range-scale"></div>');
+        range.$el.append(range.$scaleEl);
+      }
+
+      range.$scaleEl.html(range.renderScale());
     };
 
     Range.prototype.init = function init () {
@@ -18409,9 +20972,9 @@
     },
   };
 
-  var Stepper = /*@__PURE__*/(function (Framework7Class$$1) {
+  var Stepper = /*@__PURE__*/(function (Framework7Class) {
     function Stepper(app, params) {
-      Framework7Class$$1.call(this, params, [app]);
+      Framework7Class.call(this, params, [app]);
       var stepper = this;
 
       var defaults = {
@@ -18682,8 +21245,8 @@
       return stepper;
     }
 
-    if ( Framework7Class$$1 ) Stepper.__proto__ = Framework7Class$$1;
-    Stepper.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) Stepper.__proto__ = Framework7Class;
+    Stepper.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     Stepper.prototype.constructor = Stepper;
 
     Stepper.prototype.minus = function minus () {
@@ -18917,16 +21480,20 @@
     },
   };
 
-  var SmartSelect = /*@__PURE__*/(function (Framework7Class$$1) {
+  var SmartSelect = /*@__PURE__*/(function (Framework7Class) {
     function SmartSelect(app, params) {
       if ( params === void 0 ) params = {};
 
-      Framework7Class$$1.call(this, params, [app]);
+      Framework7Class.call(this, params, [app]);
       var ss = this;
 
       var defaults = Utils.extend({
         on: {},
       }, app.params.smartSelect);
+
+      if (typeof defaults.searchbarDisableButton === 'undefined') {
+        defaults.searchbarDisableButton = app.theme !== 'aurora';
+      }
 
       // Extend defaults with modules params
       ss.useModulesParams(defaults);
@@ -18943,13 +21510,16 @@
       var $selectEl = $el.find('select').eq(0);
       if ($selectEl.length === 0) { return ss; }
 
-      var $valueEl = $(ss.params.valueEl);
-      if ($valueEl.length === 0) {
-        $valueEl = $el.find('.item-after');
-      }
-      if ($valueEl.length === 0) {
-        $valueEl = $('<div class="item-after"></div>');
-        $valueEl.insertAfter($el.find('.item-title'));
+      var $valueEl;
+      if (ss.params.setValueText) {
+        $valueEl = $(ss.params.valueEl);
+        if ($valueEl.length === 0) {
+          $valueEl = $el.find('.item-after');
+        }
+        if ($valueEl.length === 0) {
+          $valueEl = $('<div class="item-after"></div>');
+          $valueEl.insertAfter($el.find('.item-title'));
+        }
       }
 
       // View
@@ -18973,7 +21543,7 @@
         $selectEl: $selectEl,
         selectEl: $selectEl[0],
         $valueEl: $valueEl,
-        valueEl: $valueEl[0],
+        valueEl: $valueEl && $valueEl[0],
         url: url,
         multiple: multiple,
         inputType: inputType,
@@ -18994,7 +21564,7 @@
         var value = ss.$selectEl.val();
         ss.$el.trigger('smartselect:change', ss, value);
         ss.emit('local::change smartSelectChange', ss, value);
-        ss.setValue();
+        ss.setValueText();
       }
       ss.attachEvents = function attachEvents() {
         $el.on('click', onClick);
@@ -19036,7 +21606,9 @@
         }
 
         ss.$selectEl.trigger('change');
-        ss.$valueEl.text(optionText.join(', '));
+        if (ss.params.setValueText) {
+          ss.$valueEl.text(ss.formatValueText(optionText));
+        }
         if (ss.params.closeOnSelect && ss.inputType === 'radio') {
           ss.close();
         }
@@ -19058,9 +21630,51 @@
       return ss;
     }
 
-    if ( Framework7Class$$1 ) SmartSelect.__proto__ = Framework7Class$$1;
-    SmartSelect.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) SmartSelect.__proto__ = Framework7Class;
+    SmartSelect.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     SmartSelect.prototype.constructor = SmartSelect;
+
+    SmartSelect.prototype.setValue = function setValue (value) {
+      var ss = this;
+      var newValue = value;
+      var optionText = [];
+      var optionEl;
+      var displayAs;
+      var text;
+      if (ss.multiple) {
+        if (!Array.isArray(newValue)) { newValue = [newValue]; }
+        for (var i = 0; i < ss.selectEl.options.length; i += 1) {
+          optionEl = ss.selectEl.options[i];
+          if (newValue.indexOf(optionEl.value) >= 0) {
+            optionEl.selected = true;
+          } else {
+            optionEl.selected = false;
+          }
+          if (optionEl.selected) {
+            displayAs = optionEl.dataset ? optionEl.dataset.displayAs : $(optionEl).data('display-value-as');
+            text = displayAs && typeof displayAs !== 'undefined' ? displayAs : optionEl.textContent;
+            optionText.push(text.trim());
+          }
+        }
+      } else {
+        optionEl = ss.$selectEl.find(("option[value=\"" + newValue + "\"]"))[0];
+        if (optionEl) {
+          displayAs = optionEl.dataset ? optionEl.dataset.displayAs : $(optionEl).data('display-as');
+          text = displayAs && typeof displayAs !== 'undefined' ? displayAs : optionEl.textContent;
+          optionText = [text];
+        }
+        ss.selectEl.value = newValue;
+      }
+      if (ss.params.setValueText) {
+        ss.$valueEl.text(ss.formatValueText(optionText));
+      }
+      return ss;
+    };
+
+    SmartSelect.prototype.getValue = function getValue () {
+      var ss = this;
+      return ss.$selectEl.val();
+    };
 
     SmartSelect.prototype.getView = function getView () {
       var ss = this;
@@ -19091,7 +21705,18 @@
       }
     };
 
-    SmartSelect.prototype.setValue = function setValue (value) {
+    SmartSelect.prototype.formatValueText = function formatValueText (values) {
+      var ss = this;
+      var textValue;
+      if (ss.params.formatValueText) {
+        textValue = ss.params.formatValueText.call(ss, values, ss);
+      } else {
+        textValue = values.join(', ');
+      }
+      return textValue;
+    };
+
+    SmartSelect.prototype.setValueText = function setValueText (value) {
       var ss = this;
       var valueArray = [];
       if (typeof value !== 'undefined') {
@@ -19113,7 +21738,9 @@
           }
         });
       }
-      ss.$valueEl.text(valueArray.join(', '));
+      if (ss.params.setValueText) {
+        ss.$valueEl.text(ss.formatValueText(valueArray));
+      }
     };
 
     SmartSelect.prototype.getItemsData = function getItemsData () {
@@ -19169,7 +21796,7 @@
     SmartSelect.prototype.renderSearchbar = function renderSearchbar () {
       var ss = this;
       if (ss.params.renderSearchbar) { return ss.params.renderSearchbar.call(ss); }
-      var searchbarHTML = "\n      <form class=\"searchbar\">\n        <div class=\"searchbar-inner\">\n          <div class=\"searchbar-input-wrap\">\n            <input type=\"search\" placeholder=\"" + (ss.params.searchbarPlaceholder) + "\"/>\n            <i class=\"searchbar-icon\"></i>\n            <span class=\"input-clear-button\"></span>\n          </div>\n          <span class=\"searchbar-disable-button\">" + (ss.params.searchbarDisableText) + "</span>\n        </div>\n      </form>\n    ";
+      var searchbarHTML = "\n      <form class=\"searchbar\">\n        <div class=\"searchbar-inner\">\n          <div class=\"searchbar-input-wrap\">\n            <input type=\"search\" placeholder=\"" + (ss.params.searchbarPlaceholder) + "\"/>\n            <i class=\"searchbar-icon\"></i>\n            <span class=\"input-clear-button\"></span>\n          </div>\n          " + (ss.params.searchbarDisableButton ? ("\n          <span class=\"searchbar-disable-button\">" + (ss.params.searchbarDisableText) + "</span>\n          ") : '') + "\n        </div>\n      </form>\n    ";
       return searchbarHTML;
     };
 
@@ -19201,7 +21828,7 @@
         pageTitle = $itemTitleEl.length ? $itemTitleEl.text().trim() : '';
       }
       var cssClass = ss.params.cssClass;
-      var pageHtml = "\n      <div class=\"page smart-select-page " + cssClass + "\" data-name=\"smart-select-page\" data-select-name=\"" + (ss.selectName) + "\">\n        <div class=\"navbar " + (ss.params.navbarColorTheme ? ("color-theme-" + (ss.params.navbarColorTheme)) : '') + "\">\n          <div class=\"navbar-inner sliding " + (ss.params.navbarColorTheme ? ("color-theme-" + (ss.params.navbarColorTheme)) : '') + "\">\n            <div class=\"left\">\n              <a href=\"#\" class=\"link back\">\n                <i class=\"icon icon-back\"></i>\n                <span class=\"ios-only\">" + (ss.params.pageBackLinkText) + "</span>\n              </a>\n            </div>\n            " + (pageTitle ? ("<div class=\"title\">" + pageTitle + "</div>") : '') + "\n            " + (ss.params.searchbar ? ("<div class=\"subnavbar\">" + (ss.renderSearchbar()) + "</div>") : '') + "\n          </div>\n        </div>\n        " + (ss.params.searchbar ? '<div class="searchbar-backdrop"></div>' : '') + "\n        <div class=\"page-content\">\n          <div class=\"list smart-select-list-" + (ss.id) + " " + (ss.params.virtualList ? ' virtual-list' : '') + " " + (ss.params.formColorTheme ? ("color-theme-" + (ss.params.formColorTheme)) : '') + "\">\n            <ul>" + (!ss.params.virtualList && ss.renderItems(ss.items)) + "</ul>\n          </div>\n        </div>\n      </div>\n    ";
+      var pageHtml = "\n      <div class=\"page smart-select-page " + cssClass + "\" data-name=\"smart-select-page\" data-select-name=\"" + (ss.selectName) + "\">\n        <div class=\"navbar " + (ss.params.navbarColorTheme ? ("color-" + (ss.params.navbarColorTheme)) : '') + "\">\n          <div class=\"navbar-inner sliding " + (ss.params.navbarColorTheme ? ("color-" + (ss.params.navbarColorTheme)) : '') + "\">\n            <div class=\"left\">\n              <a class=\"link back\">\n                <i class=\"icon icon-back\"></i>\n                <span class=\"if-not-md\">" + (ss.params.pageBackLinkText) + "</span>\n              </a>\n            </div>\n            " + (pageTitle ? ("<div class=\"title\">" + pageTitle + "</div>") : '') + "\n            " + (ss.params.searchbar ? ("<div class=\"subnavbar\">" + (ss.renderSearchbar()) + "</div>") : '') + "\n          </div>\n        </div>\n        " + (ss.params.searchbar ? '<div class="searchbar-backdrop"></div>' : '') + "\n        <div class=\"page-content\">\n          <div class=\"list smart-select-list-" + (ss.id) + " " + (ss.params.virtualList ? ' virtual-list' : '') + " " + (ss.params.formColorTheme ? ("color-" + (ss.params.formColorTheme)) : '') + "\">\n            <ul>" + (!ss.params.virtualList && ss.renderItems(ss.items)) + "</ul>\n          </div>\n        </div>\n      </div>\n    ";
       return pageHtml;
     };
 
@@ -19214,7 +21841,7 @@
         pageTitle = $itemTitleEl.length ? $itemTitleEl.text().trim() : '';
       }
       var cssClass = ss.params.cssClass || '';
-      var popupHtml = "\n      <div class=\"popup smart-select-popup " + cssClass + " " + (ss.params.popupTabletFullscreen ? 'popup-tablet-fullscreen' : '') + "\" data-select-name=\"" + (ss.selectName) + "\">\n        <div class=\"view\">\n          <div class=\"page smart-select-page " + (ss.params.searchbar ? 'page-with-subnavbar' : '') + "\" data-name=\"smart-select-page\">\n            <div class=\"navbar " + (ss.params.navbarColorTheme ? ("color-theme-" + (ss.params.navbarColorTheme)) : '') + "\">\n              <div class=\"navbar-inner sliding\">\n                <div class=\"left\">\n                  <a href=\"#\" class=\"link popup-close\" data-popup=\".smart-select-popup[data-select-name='" + (ss.selectName) + "']\">\n                    <i class=\"icon icon-back\"></i>\n                    <span class=\"ios-only\">" + (ss.params.popupCloseLinkText) + "</span>\n                  </a>\n                </div>\n                " + (pageTitle ? ("<div class=\"title\">" + pageTitle + "</div>") : '') + "\n                " + (ss.params.searchbar ? ("<div class=\"subnavbar\">" + (ss.renderSearchbar()) + "</div>") : '') + "\n              </div>\n            </div>\n            " + (ss.params.searchbar ? '<div class="searchbar-backdrop"></div>' : '') + "\n            <div class=\"page-content\">\n              <div class=\"list smart-select-list-" + (ss.id) + " " + (ss.params.virtualList ? ' virtual-list' : '') + " " + (ss.params.formColorTheme ? ("color-theme-" + (ss.params.formColorTheme)) : '') + "\">\n                <ul>" + (!ss.params.virtualList && ss.renderItems(ss.items)) + "</ul>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    ";
+      var popupHtml = "\n      <div class=\"popup smart-select-popup " + cssClass + " " + (ss.params.popupTabletFullscreen ? 'popup-tablet-fullscreen' : '') + "\" data-select-name=\"" + (ss.selectName) + "\">\n        <div class=\"view\">\n          <div class=\"page smart-select-page " + (ss.params.searchbar ? 'page-with-subnavbar' : '') + "\" data-name=\"smart-select-page\">\n            <div class=\"navbar " + (ss.params.navbarColorTheme ? ("color-" + (ss.params.navbarColorTheme)) : '') + "\">\n              <div class=\"navbar-inner sliding\">\n                " + (pageTitle ? ("<div class=\"title\">" + pageTitle + "</div>") : '') + "\n                <div class=\"right\">\n                  <a class=\"link popup-close\" data-popup=\".smart-select-popup[data-select-name='" + (ss.selectName) + "']\">" + (ss.params.popupCloseLinkText) + "</span></a>\n                </div>\n                " + (ss.params.searchbar ? ("<div class=\"subnavbar\">" + (ss.renderSearchbar()) + "</div>") : '') + "\n              </div>\n            </div>\n            " + (ss.params.searchbar ? '<div class="searchbar-backdrop"></div>' : '') + "\n            <div class=\"page-content\">\n              <div class=\"list smart-select-list-" + (ss.id) + " " + (ss.params.virtualList ? ' virtual-list' : '') + " " + (ss.params.formColorTheme ? ("color-" + (ss.params.formColorTheme)) : '') + "\">\n                <ul>" + (!ss.params.virtualList && ss.renderItems(ss.items)) + "</ul>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    ";
       return popupHtml;
     };
 
@@ -19222,7 +21849,7 @@
       var ss = this;
       if (ss.params.renderSheet) { return ss.params.renderSheet.call(ss, ss.items); }
       var cssClass = ss.params.cssClass;
-      var sheetHtml = "\n      <div class=\"sheet-modal smart-select-sheet " + cssClass + "\" data-select-name=\"" + (ss.selectName) + "\">\n        <div class=\"toolbar " + (ss.params.toolbarColorTheme ? ("theme-" + (ss.params.toolbarColorTheme)) : '') + "\">\n          <div class=\"toolbar-inner\">\n            <div class=\"left\"></div>\n            <div class=\"right\">\n              <a class=\"link sheet-close\">" + (ss.params.sheetCloseLinkText) + "</a>\n            </div>\n          </div>\n        </div>\n        <div class=\"sheet-modal-inner\">\n          <div class=\"page-content\">\n            <div class=\"list smart-select-list-" + (ss.id) + " " + (ss.params.virtualList ? ' virtual-list' : '') + " " + (ss.params.formColorTheme ? ("color-theme-" + (ss.params.formColorTheme)) : '') + "\">\n              <ul>" + (!ss.params.virtualList && ss.renderItems(ss.items)) + "</ul>\n            </div>\n          </div>\n        </div>\n      </div>\n    ";
+      var sheetHtml = "\n      <div class=\"sheet-modal smart-select-sheet " + cssClass + "\" data-select-name=\"" + (ss.selectName) + "\">\n        <div class=\"toolbar toolbar-top " + (ss.params.toolbarColorTheme ? ("color-" + (ss.params.toolbarColorTheme)) : '') + "\">\n          <div class=\"toolbar-inner\">\n            <div class=\"left\"></div>\n            <div class=\"right\">\n              <a class=\"link sheet-close\">" + (ss.params.sheetCloseLinkText) + "</a>\n            </div>\n          </div>\n        </div>\n        <div class=\"sheet-modal-inner\">\n          <div class=\"page-content\">\n            <div class=\"list smart-select-list-" + (ss.id) + " " + (ss.params.virtualList ? ' virtual-list' : '') + " " + (ss.params.formColorTheme ? ("color-" + (ss.params.formColorTheme)) : '') + "\">\n              <ul>" + (!ss.params.virtualList && ss.renderItems(ss.items)) + "</ul>\n            </div>\n          </div>\n        </div>\n      </div>\n    ";
       return sheetHtml;
     };
 
@@ -19230,8 +21857,31 @@
       var ss = this;
       if (ss.params.renderPopover) { return ss.params.renderPopover.call(ss, ss.items); }
       var cssClass = ss.params.cssClass;
-      var popoverHtml = "\n      <div class=\"popover smart-select-popover " + cssClass + "\" data-select-name=\"" + (ss.selectName) + "\">\n        <div class=\"popover-inner\">\n          <div class=\"list smart-select-list-" + (ss.id) + " " + (ss.params.virtualList ? ' virtual-list' : '') + " " + (ss.params.formColorTheme ? ("color-theme-" + (ss.params.formColorTheme)) : '') + "\">\n            <ul>" + (!ss.params.virtualList && ss.renderItems(ss.items)) + "</ul>\n          </div>\n        </div>\n      </div>\n    ";
+      var popoverHtml = "\n      <div class=\"popover smart-select-popover " + cssClass + "\" data-select-name=\"" + (ss.selectName) + "\">\n        <div class=\"popover-inner\">\n          <div class=\"list smart-select-list-" + (ss.id) + " " + (ss.params.virtualList ? ' virtual-list' : '') + " " + (ss.params.formColorTheme ? ("color-" + (ss.params.formColorTheme)) : '') + "\">\n            <ul>" + (!ss.params.virtualList && ss.renderItems(ss.items)) + "</ul>\n          </div>\n        </div>\n      </div>\n    ";
       return popoverHtml;
+    };
+
+    SmartSelect.prototype.scrollToSelectedItem = function scrollToSelectedItem () {
+      var ss = this;
+      var params = ss.params;
+      var $containerEl = ss.$containerEl;
+      if (!ss.opened) { return ss; }
+      if (params.virtualList) {
+        var selectedIndex;
+        ss.vl.items.forEach(function (item, index) {
+          if (typeof selectedIndex === 'undefined' && item.selected) {
+            selectedIndex = index;
+          }
+        });
+        if (typeof selectedIndex !== 'undefined') {
+          ss.vl.scrollToItem(selectedIndex);
+        }
+      } else {
+        var $selectedItemEl = $containerEl.find('input:checked').parents('li');
+        var $pageContentEl = $containerEl.find('.page-content');
+        $pageContentEl.scrollTop($selectedItemEl.offset().top - $pageContentEl.offset().top - parseInt($pageContentEl.css('padding-top'), 10));
+      }
+      return ss;
     };
 
     SmartSelect.prototype.onOpen = function onOpen (type, containerEl) {
@@ -19254,6 +21904,9 @@
             return false;
           },
         });
+      }
+      if (ss.params.scrollToSelectedItem) {
+        ss.scrollToSelectedItem();
       }
 
       // Init SB
@@ -19503,6 +22156,15 @@
     SmartSelect.prototype.open = function open (type) {
       var ss = this;
       if (ss.opened) { return ss; }
+      var prevented = false;
+      function prevent() {
+        prevented = true;
+      }
+      if (ss.$el) {
+        ss.$el.trigger('smartselect:beforeopen', { prevent: prevent });
+      }
+      ss.emit('local::beforeOpen smartSelectBeforeOpen', ss, prevent);
+      if (prevented) { return ss; }
       var openIn = type || ss.params.openIn;
       ss[("open" + (openIn.split('').map(function (el, index) {
         if (index === 0) { return el.toUpperCase(); }
@@ -19532,7 +22194,7 @@
     SmartSelect.prototype.init = function init () {
       var ss = this;
       ss.attachEvents();
-      ss.setValue();
+      ss.setValueText();
     };
 
     SmartSelect.prototype.destroy = function destroy () {
@@ -19554,6 +22216,8 @@
       smartSelect: {
         el: undefined,
         valueEl: undefined,
+        setValueText: true,
+        formatValueText: null,
         openIn: 'page', // or 'popup' or 'sheet' or 'popover'
         pageTitle: undefined,
         pageBackLinkText: 'Back',
@@ -19563,9 +22227,11 @@
         searchbar: false,
         searchbarPlaceholder: 'Search',
         searchbarDisableText: 'Cancel',
+        searchbarDisableButton: undefined,
         closeOnSelect: false,
         virtualList: false,
         virtualListHeight: undefined,
+        scrollToSelectedItem: false,
         formColorTheme: undefined,
         navbarColorTheme: undefined,
         routableModals: true,
@@ -19970,10 +22636,12 @@
 
   var IDate = /*@__PURE__*/(function (Date) {
     function IDate () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
       Date.call(this);
 
       var date;
-      var args = Array.from(arguments);
       if (args.length === 0) {
         date = Date.now();
       } else if (args.length === 1) {
@@ -20066,11 +22734,11 @@
     return IDate;
   }(Date));
 
-  var Calendar = /*@__PURE__*/(function (Framework7Class$$1) {
+  var Calendar = /*@__PURE__*/(function (Framework7Class) {
     function Calendar(app, params) {
       if ( params === void 0 ) params = {};
 
-      Framework7Class$$1.call(this, params, [app]);
+      Framework7Class.call(this, params, [app]);
       var calendar = this;
 
       calendar.params = Utils.extend({}, app.params.calendar, params);
@@ -20137,6 +22805,7 @@
       }
       function onHtmlClick(e) {
         var $targetEl = $(e.target);
+        if (calendar.destroyed || !calendar.params) { return; }
         if (calendar.isPopover()) { return; }
         if (!calendar.opened || calendar.closing) { return; }
         if ($targetEl.closest('[class*="backdrop"]').length) { return; }
@@ -20361,8 +23030,8 @@
       return calendar;
     }
 
-    if ( Framework7Class$$1 ) Calendar.__proto__ = Framework7Class$$1;
-    Calendar.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) Calendar.__proto__ = Framework7Class;
+    Calendar.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     Calendar.prototype.constructor = Calendar;
     // eslint-disable-next-line
     Calendar.prototype.normalizeDate = function normalizeDate (date) {
@@ -20400,6 +23069,9 @@
           return !!app.device.ipad;
         }
         if (app.width >= 768) {
+          return true;
+        }
+        if (app.device.desktop && app.theme === 'aurora') {
           return true;
         }
       }
@@ -20486,6 +23158,14 @@
 
     Calendar.prototype.setValue = function setValue (values) {
       var calendar = this;
+      var currentValue = calendar.value;
+      if (Array.isArray(currentValue) && Array.isArray(values) && currentValue.length === values.length) {
+        var equal = true;
+        currentValue.forEach(function (v, index) {
+          if (v !== values[index]) { equal = false; }
+        });
+        if (equal) { return; }
+      }
       calendar.value = values;
       calendar.updateValue();
     };
@@ -21102,43 +23782,24 @@
         var dayName = params.dayNamesShort[dayIndex];
         weekDaysHtml += "<div class=\"calendar-week-day\">" + dayName + "</div>";
       }
-      return ("\n    <div class=\"calendar-week-header\">\n    " + weekDaysHtml + "\n    </div>\n  ").trim();
+      return ("\n    <div class=\"calendar-week-header\">\n      " + weekDaysHtml + "\n    </div>\n  ").trim();
     };
 
     Calendar.prototype.renderMonthSelector = function renderMonthSelector () {
       var calendar = this;
-      var app = calendar.app;
       if (calendar.params.renderMonthSelector) {
         return calendar.params.renderMonthSelector.call(calendar);
       }
 
-      var needsBlackIcon;
-      if (calendar.inline && calendar.$containerEl.closest('.theme-dark').length === 0) {
-        needsBlackIcon = true;
-      } else if (app.root.closest('.theme-dark').length === 0) {
-        needsBlackIcon = true;
-      }
-
-      var iconColor = app.theme === 'md' && needsBlackIcon ? 'color-black' : '';
-      return ("\n    <div class=\"calendar-month-selector\">\n    <a href=\"#\" class=\"link icon-only calendar-prev-month-button\">\n      <i class=\"icon icon-prev " + iconColor + "\"></i>\n    </a>\n    <span class=\"current-month-value\"></span>\n    <a href=\"#\" class=\"link icon-only calendar-next-month-button\">\n      <i class=\"icon icon-next " + iconColor + "\"></i>\n    </a>\n    </div>\n  ").trim();
+      return "\n    <div class=\"calendar-month-selector\">\n      <a class=\"link icon-only calendar-prev-month-button\">\n        <i class=\"icon icon-prev\"></i>\n      </a>\n      <span class=\"current-month-value\"></span>\n      <a class=\"link icon-only calendar-next-month-button\">\n        <i class=\"icon icon-next\"></i>\n      </a>\n    </div>\n  ".trim();
     };
 
     Calendar.prototype.renderYearSelector = function renderYearSelector () {
       var calendar = this;
-      var app = calendar.app;
       if (calendar.params.renderYearSelector) {
         return calendar.params.renderYearSelector.call(calendar);
       }
-
-      var needsBlackIcon;
-      if (calendar.inline && calendar.$containerEl.closest('.theme-dark').length === 0) {
-        needsBlackIcon = true;
-      } else if (app.root.closest('.theme-dark').length === 0) {
-        needsBlackIcon = true;
-      }
-
-      var iconColor = app.theme === 'md' && needsBlackIcon ? 'color-black' : '';
-      return ("\n    <div class=\"calendar-year-selector\">\n    <a href=\"#\" class=\"link icon-only calendar-prev-year-button\">\n      <i class=\"icon icon-prev " + iconColor + "\"></i>\n    </a>\n    <span class=\"current-year-value\"></span>\n    <a href=\"#\" class=\"link icon-only calendar-next-year-button\">\n      <i class=\"icon icon-next " + iconColor + "\"></i>\n    </a>\n    </div>\n  ").trim();
+      return "\n    <div class=\"calendar-year-selector\">\n      <a class=\"link icon-only calendar-prev-year-button\">\n        <i class=\"icon icon-prev\"></i>\n      </a>\n      <span class=\"current-year-value\"></span>\n      <a class=\"link icon-only calendar-next-year-button\">\n        <i class=\"icon icon-next\"></i>\n      </a>\n    </div>\n  ".trim();
     };
 
     Calendar.prototype.renderHeader = function renderHeader () {
@@ -21146,7 +23807,7 @@
       if (calendar.params.renderHeader) {
         return calendar.params.renderHeader.call(calendar);
       }
-      return ("\n    <div class=\"calendar-header\">\n    <div class=\"calendar-selected-date\">" + (calendar.params.headerPlaceholder) + "</div>\n    </div>\n  ").trim();
+      return ("\n    <div class=\"calendar-header\">\n      <div class=\"calendar-selected-date\">" + (calendar.params.headerPlaceholder) + "</div>\n    </div>\n  ").trim();
     };
 
     Calendar.prototype.renderFooter = function renderFooter () {
@@ -21155,7 +23816,7 @@
       if (calendar.params.renderFooter) {
         return calendar.params.renderFooter.call(calendar);
       }
-      return ("\n    <div class=\"calendar-footer\">\n    <a href=\"#\" class=\"" + (app.theme === 'md' ? 'button' : 'link') + " calendar-close sheet-close popover-close\">" + (calendar.params.toolbarCloseText) + "</a>\n    </div>\n  ").trim();
+      return ("\n    <div class=\"calendar-footer\">\n      <a class=\"" + (app.theme === 'md' ? 'button' : 'link') + " calendar-close sheet-close popover-close\">" + (calendar.params.toolbarCloseText) + "</a>\n    </div>\n  ").trim();
     };
 
     Calendar.prototype.renderToolbar = function renderToolbar () {
@@ -21163,7 +23824,7 @@
       if (calendar.params.renderToolbar) {
         return calendar.params.renderToolbar.call(calendar, calendar);
       }
-      return ("\n    <div class=\"toolbar no-shadow\">\n    <div class=\"toolbar-inner\">\n      " + (calendar.renderMonthSelector()) + "\n      " + (calendar.renderYearSelector()) + "\n    </div>\n    </div>\n  ").trim();
+      return ("\n    <div class=\"toolbar toolbar-top no-shadow\">\n      <div class=\"toolbar-inner\">\n        " + (calendar.params.monthSelector ? calendar.renderMonthSelector() : '') + "\n        " + (calendar.params.yearSelector ? calendar.renderYearSelector() : '') + "\n      </div>\n    </div>\n  ").trim();
     };
     // eslint-disable-next-line
     Calendar.prototype.renderInline = function renderInline () {
@@ -21177,7 +23838,7 @@
       var weekHeader = ref.weekHeader;
       var value = calendar.value;
       var date = value && value.length ? value[0] : new calendar.DateHandleClass().setHours(0, 0, 0);
-      var inlineHtml = ("\n    <div class=\"calendar calendar-inline " + (rangePicker ? 'calendar-range' : '') + " " + (cssClass || '') + "\">\n    " + (header ? calendar.renderHeader() : '') + "\n    " + (toolbar ? calendar.renderToolbar() : '') + "\n    " + (weekHeader ? calendar.renderWeekHeader() : '') + "\n    <div class=\"calendar-months\">\n      " + (calendar.renderMonths(date)) + "\n    </div>\n    " + (footer ? calendar.renderFooter() : '') + "\n    </div>\n  ").trim();
+      var inlineHtml = ("\n    <div class=\"calendar calendar-inline " + (rangePicker ? 'calendar-range' : '') + " " + (cssClass || '') + "\">\n      " + (header ? calendar.renderHeader() : '') + "\n      " + (toolbar ? calendar.renderToolbar() : '') + "\n      " + (weekHeader ? calendar.renderWeekHeader() : '') + "\n      <div class=\"calendar-months\">\n        " + (calendar.renderMonths(date)) + "\n      </div>\n      " + (footer ? calendar.renderFooter() : '') + "\n    </div>\n  ").trim();
 
       return inlineHtml;
     };
@@ -21193,7 +23854,7 @@
       var weekHeader = ref.weekHeader;
       var value = calendar.value;
       var date = value && value.length ? value[0] : new calendar.DateHandleClass().setHours(0, 0, 0);
-      var sheetHtml = ("\n    <div class=\"calendar calendar-modal " + (rangePicker ? 'calendar-range' : '') + " " + (cssClass || '') + "\">\n    " + (header ? calendar.renderHeader() : '') + "\n    " + (toolbar ? calendar.renderToolbar() : '') + "\n    " + (weekHeader ? calendar.renderWeekHeader() : '') + "\n    <div class=\"calendar-months\">\n      " + (calendar.renderMonths(date)) + "\n    </div>\n    " + (footer ? calendar.renderFooter() : '') + "\n    </div>\n  ").trim();
+      var sheetHtml = ("\n    <div class=\"calendar calendar-modal " + (rangePicker ? 'calendar-range' : '') + " " + (cssClass || '') + "\">\n      " + (header ? calendar.renderHeader() : '') + "\n      " + (toolbar ? calendar.renderToolbar() : '') + "\n      " + (weekHeader ? calendar.renderWeekHeader() : '') + "\n      <div class=\"calendar-months\">\n        " + (calendar.renderMonths(date)) + "\n      </div>\n      " + (footer ? calendar.renderFooter() : '') + "\n    </div>\n  ").trim();
 
       return sheetHtml;
     };
@@ -21209,7 +23870,7 @@
       var weekHeader = ref.weekHeader;
       var value = calendar.value;
       var date = value && value.length ? value[0] : new calendar.DateHandleClass().setHours(0, 0, 0);
-      var sheetHtml = ("\n    <div class=\"sheet-modal calendar calendar-sheet " + (rangePicker ? 'calendar-range' : '') + " " + (cssClass || '') + "\">\n    " + (header ? calendar.renderHeader() : '') + "\n    " + (toolbar ? calendar.renderToolbar() : '') + "\n    " + (weekHeader ? calendar.renderWeekHeader() : '') + "\n    <div class=\"sheet-modal-inner calendar-months\">\n      " + (calendar.renderMonths(date)) + "\n    </div>\n    " + (footer ? calendar.renderFooter() : '') + "\n    </div>\n  ").trim();
+      var sheetHtml = ("\n    <div class=\"sheet-modal calendar calendar-sheet " + (rangePicker ? 'calendar-range' : '') + " " + (cssClass || '') + "\">\n      " + (header ? calendar.renderHeader() : '') + "\n      " + (toolbar ? calendar.renderToolbar() : '') + "\n      " + (weekHeader ? calendar.renderWeekHeader() : '') + "\n      <div class=\"sheet-modal-inner calendar-months\">\n        " + (calendar.renderMonths(date)) + "\n      </div>\n      " + (footer ? calendar.renderFooter() : '') + "\n    </div>\n  ").trim();
 
       return sheetHtml;
     };
@@ -21225,7 +23886,7 @@
       var weekHeader = ref.weekHeader;
       var value = calendar.value;
       var date = value && value.length ? value[0] : new calendar.DateHandleClass().setHours(0, 0, 0);
-      var popoverHtml = ("\n    <div class=\"popover calendar-popover\">\n    <div class=\"popover-inner\">\n      <div class=\"calendar " + (rangePicker ? 'calendar-range' : '') + " " + (cssClass || '') + "\">\n      " + (header ? calendar.renderHeader() : '') + "\n      " + (toolbar ? calendar.renderToolbar() : '') + "\n      " + (weekHeader ? calendar.renderWeekHeader() : '') + "\n      <div class=\"calendar-months\">\n        " + (calendar.renderMonths(date)) + "\n      </div>\n      " + (footer ? calendar.renderFooter() : '') + "\n      </div>\n    </div>\n    </div>\n  ").trim();
+      var popoverHtml = ("\n    <div class=\"popover calendar-popover\">\n      <div class=\"popover-inner\">\n        <div class=\"calendar " + (rangePicker ? 'calendar-range' : '') + " " + (cssClass || '') + "\">\n        " + (header ? calendar.renderHeader() : '') + "\n        " + (toolbar ? calendar.renderToolbar() : '') + "\n        " + (weekHeader ? calendar.renderWeekHeader() : '') + "\n        <div class=\"calendar-months\">\n          " + (calendar.renderMonths(date)) + "\n        </div>\n        " + (footer ? calendar.renderFooter() : '') + "\n        </div>\n      </div>\n    </div>\n  ").trim();
 
       return popoverHtml;
     };
@@ -21810,7 +24471,9 @@
       if (returnTo) {
         if (returnTo === 'min') {
           col.$itemsEl.transform(("translate3d(0," + minTranslate + "px,0)"));
-        } else { col.$itemsEl.transform(("translate3d(0," + maxTranslate + "px,0)")); }
+        } else {
+          col.$itemsEl.transform(("translate3d(0," + maxTranslate + "px,0)"));
+        }
       }
       touchEndTime = new Date().getTime();
       var newTranslate;
@@ -21823,7 +24486,7 @@
       newTranslate = Math.max(Math.min(newTranslate, maxTranslate), minTranslate);
 
       // Active Index
-      var activeIndex = -Math.floor((newTranslate - maxTranslate) / itemHeight);
+      var activeIndex = Math.round(Math.abs(((newTranslate - maxTranslate) / itemHeight)));
 
       // Normalize translate
       if (!picker.params.freeMode) { newTranslate = (-activeIndex * itemHeight) + maxTranslate; }
@@ -21848,6 +24511,65 @@
       }, 100);
     }
 
+    var mousewheelTimeout;
+    function handleMouseWheel(e) {
+      var deltaX = e.deltaX;
+      var deltaY = e.deltaY;
+      if (Math.abs(deltaX) > Math.abs(deltaY)) { return; }
+      clearTimeout(mousewheelTimeout);
+
+      e.preventDefault();
+
+      Utils.cancelAnimationFrame(animationFrameId);
+      startTranslate = Utils.getTranslate(col.$itemsEl[0], 'y');
+      col.$itemsEl.transition(0);
+
+      currentTranslate = startTranslate - deltaY;
+      returnTo = undefined;
+
+      // Normalize translate
+      if (currentTranslate < minTranslate) {
+        currentTranslate = minTranslate;
+        returnTo = 'min';
+      }
+      if (currentTranslate > maxTranslate) {
+        currentTranslate = maxTranslate;
+        returnTo = 'max';
+      }
+      // Transform wrapper
+      col.$itemsEl.transform(("translate3d(0," + currentTranslate + "px,0)"));
+
+      // Update items
+      col.updateItems(undefined, currentTranslate, 0, picker.params.updateValuesOnMousewheel);
+
+      // On end
+      mousewheelTimeout = setTimeout(function () {
+        col.$itemsEl.transition('');
+        if (returnTo) {
+          if (returnTo === 'min') {
+            col.$itemsEl.transform(("translate3d(0," + minTranslate + "px,0)"));
+          } else {
+            col.$itemsEl.transform(("translate3d(0," + maxTranslate + "px,0)"));
+          }
+        }
+        touchEndTime = new Date().getTime();
+        var newTranslate = currentTranslate;
+        newTranslate = Math.max(Math.min(newTranslate, maxTranslate), minTranslate);
+
+        // Active Index
+        var activeIndex = Math.round(Math.abs(((newTranslate - maxTranslate) / itemHeight)));
+
+        // Normalize translate
+        if (!picker.params.freeMode) { newTranslate = (-activeIndex * itemHeight) + maxTranslate; }
+
+        // Transform wrapper
+        col.$itemsEl.transform(("translate3d(0," + (parseInt(newTranslate, 10)) + "px,0)"));
+
+        // Update items
+        col.updateItems(activeIndex, newTranslate, '', true);
+      }, 200);
+    }
+
     function handleClick() {
       if (!allowItemClick) { return; }
       Utils.cancelAnimationFrame(animationFrameId);
@@ -21860,12 +24582,18 @@
       col.$el.on(app.touchEvents.start, handleTouchStart, activeListener);
       app.on('touchmove:active', handleTouchMove);
       app.on('touchend:passive', handleTouchEnd);
+      if (picker.params.mousewheel) {
+        col.$el.on('wheel', handleMouseWheel);
+      }
       col.items.on('click', handleClick);
     };
     col.detachEvents = function detachColEvents() {
       col.$el.off(app.touchEvents.start, handleTouchStart, activeListener);
       app.off('touchmove:active', handleTouchMove);
       app.off('touchend:passive', handleTouchEnd);
+      if (picker.params.mousewheel) {
+        col.$el.off('wheel', handleMouseWheel);
+      }
       col.items.off('click', handleClick);
     };
 
@@ -21887,11 +24615,11 @@
     col.init();
   }
 
-  var Picker = /*@__PURE__*/(function (Framework7Class$$1) {
+  var Picker = /*@__PURE__*/(function (Framework7Class) {
     function Picker(app, params) {
       if ( params === void 0 ) params = {};
 
-      Framework7Class$$1.call(this, params, [app]);
+      Framework7Class.call(this, params, [app]);
       var picker = this;
       picker.params = Utils.extend({}, app.params.picker, params);
 
@@ -21937,6 +24665,7 @@
         e.preventDefault();
       }
       function onHtmlClick(e) {
+        if (picker.destroyed || !picker.params) { return; }
         var $targetEl = $(e.target);
         if (picker.isPopover()) { return; }
         if (!picker.opened || picker.closing) { return; }
@@ -21983,8 +24712,8 @@
       return picker;
     }
 
-    if ( Framework7Class$$1 ) Picker.__proto__ = Framework7Class$$1;
-    Picker.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) Picker.__proto__ = Framework7Class;
+    Picker.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     Picker.prototype.constructor = Picker;
 
     Picker.prototype.initInput = function initInput () {
@@ -22016,7 +24745,11 @@
         if (params.openIn === 'popover') { return true; }
         if (app.device.ios) {
           return !!app.device.ipad;
-        } if (app.width >= 768) {
+        }
+        if (app.width >= 768) {
+          return true;
+        }
+        if (app.device.desktop && app.theme === 'aurora') {
           return true;
         }
       }
@@ -22107,7 +24840,7 @@
     Picker.prototype.renderToolbar = function renderToolbar () {
       var picker = this;
       if (picker.params.renderToolbar) { return picker.params.renderToolbar.call(picker, picker); }
-      return ("\n      <div class=\"toolbar no-shadow\">\n        <div class=\"toolbar-inner\">\n          <div class=\"left\"></div>\n          <div class=\"right\">\n            <a href=\"#\" class=\"link sheet-close popover-close\">" + (picker.params.toolbarCloseText) + "</a>\n          </div>\n        </div>\n      </div>\n    ").trim();
+      return ("\n      <div class=\"toolbar toolbar-top no-shadow\">\n        <div class=\"toolbar-inner\">\n          <div class=\"left\"></div>\n          <div class=\"right\">\n            <a class=\"link sheet-close popover-close\">" + (picker.params.toolbarCloseText) + "</a>\n          </div>\n        </div>\n      </div>\n    ").trim();
     };
     // eslint-disable-next-line
     Picker.prototype.renderColumn = function renderColumn (col, onlyItems) {
@@ -22436,6 +25169,8 @@
         // Picker settings
         updateValuesOnMomentum: false,
         updateValuesOnTouchmove: true,
+        updateValuesOnMousewheel: true,
+        mousewheel: true,
         rotateEffect: false,
         momentumRatio: 7,
         freeMode: false,
@@ -22498,13 +25233,20 @@
     create: function create(el) {
       var $el = $(el);
       var app = this;
-      $el.on('scroll', function handle(e) {
+      function scrollHandler(e) {
         app.infiniteScroll.handle(this, e);
+      }
+      $el.each(function (index, element) {
+        element.f7InfiniteScrollHandler = scrollHandler;
+        element.addEventListener('scroll', element.f7InfiniteScrollHandler);
       });
     },
     destroy: function destroy(el) {
       var $el = $(el);
-      $el.off('scroll');
+      $el.each(function (index, element) {
+        element.removeEventListener('scroll', element.f7InfiniteScrollHandler);
+        delete element.f7InfiniteScrollHandler;
+      });
     },
   };
   var InfiniteScroll$1 = {
@@ -22523,14 +25265,18 @@
       tabMounted: function tabMounted(tabEl) {
         var app = this;
         var $tabEl = $(tabEl);
-        $tabEl.find('.infinite-scroll-content').each(function (index, el) {
+        var $isEls = $tabEl.find('.infinite-scroll-content');
+        if ($tabEl.is('.infinite-scroll-content')) { $isEls.add($tabEl); }
+        $isEls.each(function (index, el) {
           app.infiniteScroll.create(el);
         });
       },
       tabBeforeRemove: function tabBeforeRemove(tabEl) {
         var $tabEl = $(tabEl);
         var app = this;
-        $tabEl.find('.infinite-scroll-content').each(function (index, el) {
+        var $isEls = $tabEl.find('.infinite-scroll-content');
+        if ($tabEl.is('.infinite-scroll-content')) { $isEls.add($tabEl); }
+        $isEls.each(function (index, el) {
           app.infiniteScroll.destroy(el);
         });
       },
@@ -22549,9 +25295,9 @@
     },
   };
 
-  var PullToRefresh = /*@__PURE__*/(function (Framework7Class$$1) {
+  var PullToRefresh = /*@__PURE__*/(function (Framework7Class) {
     function PullToRefresh(app, el) {
-      Framework7Class$$1.call(this, {}, [app]);
+      Framework7Class.call(this, {}, [app]);
       var ptr = this;
       var $el = $(el);
       var $preloaderEl = $el.find('.ptr-preloader');
@@ -22560,10 +25306,14 @@
       ptr.el = $el[0];
       ptr.app = app;
 
+      ptr.bottom = ptr.$el.hasClass('ptr-bottom');
+
       // Extend defaults with modules params
       ptr.useModulesParams({});
 
       var isMaterial = app.theme === 'md';
+      var isIos = app.theme === 'ios';
+      var isAurora = app.theme === 'aurora';
 
       // Done
       ptr.done = function done() {
@@ -22585,6 +25335,9 @@
         return ptr;
       };
 
+      // Mousewheel
+      ptr.mousewheel = $el.attr('data-ptr-mousewheel') === 'true';
+
       // Events handling
       var touchId;
       var isTouched;
@@ -22594,6 +25347,7 @@
       var touchesDiff;
       var refresh = false;
       var useTranslate = false;
+      var forceUseTranslate = false;
       var startTranslate = 0;
       var translate;
       var scrollTop;
@@ -22602,17 +25356,24 @@
       var dynamicTriggerDistance;
       var pullStarted;
       var hasNavbar = false;
+      var scrollHeight;
+      var offsetHeight;
+      var maxScrollTop;
       var $pageEl = $el.parents('.page');
 
       if ($pageEl.find('.navbar').length > 0 || $pageEl.parents('.view').children('.navbar').length > 0) { hasNavbar = true; }
       if ($pageEl.hasClass('no-navbar')) { hasNavbar = false; }
-      if (!hasNavbar) { $el.addClass('ptr-no-navbar'); }
+      if (!hasNavbar && !ptr.bottom) { $el.addClass('ptr-no-navbar'); }
 
       // Define trigger distance
       if ($el.attr('data-ptr-distance')) {
         dynamicTriggerDistance = true;
-      } else {
-        triggerDistance = isMaterial ? 66 : 44;
+      } else if (isMaterial) {
+        triggerDistance = 66;
+      } else if (isIos) {
+        triggerDistance = 44;
+      } else if (isAurora) {
+        triggerDistance = 38;
       }
 
       function handleTouchStart(e) {
@@ -22625,7 +25386,7 @@
         if ($el.hasClass('ptr-refreshing')) {
           return;
         }
-        if ($(e.target).closest('.sortable-handler').length) { return; }
+        if ($(e.target).closest('.sortable-handler, .ptr-ignore, .card-expandable.card-opened').length) { return; }
 
         isMoved = false;
         pullStarted = false;
@@ -22669,12 +25430,16 @@
         }
 
         scrollTop = $el[0].scrollTop;
-        if (typeof wasScrolled === 'undefined' && scrollTop !== 0) { wasScrolled = true; }
 
         if (!isMoved) {
           $el.removeClass('ptr-transitioning');
           var targetIsScrollable;
-          if (scrollTop > $el[0].offsetHeight) {
+          scrollHeight = $el[0].scrollHeight;
+          offsetHeight = $el[0].offsetHeight;
+          if (ptr.bottom) {
+            maxScrollTop = scrollHeight - offsetHeight;
+          }
+          if (scrollTop > scrollHeight) {
             isTouched = false;
             return;
           }
@@ -22685,7 +25450,10 @@
               if (
                 (ptrScrollableEl.scrollHeight > ptrScrollableEl.offsetHeight)
                 && $(ptrScrollableEl).css('overflow') === 'auto'
-                && ptrScrollableEl.scrollTop > 0
+                && (
+                  (!ptr.bottom && ptrScrollableEl.scrollTop > 0)
+                  || (ptr.bottom && ptrScrollableEl.scrollTop < ptrScrollableEl.scrollHeight - ptrScrollableEl.offsetHeight)
+                )
               ) {
                 targetIsScrollable = true;
               }
@@ -22697,33 +25465,57 @@
           }
           if (dynamicTriggerDistance) {
             triggerDistance = $el.attr('data-ptr-distance');
-            if (triggerDistance.indexOf('%') >= 0) { triggerDistance = ($el[0].offsetHeight * parseInt(triggerDistance, 10)) / 100; }
+            if (triggerDistance.indexOf('%') >= 0) { triggerDistance = (scrollHeight * parseInt(triggerDistance, 10)) / 100; }
           }
           startTranslate = $el.hasClass('ptr-refreshing') ? triggerDistance : 0;
-          if ($el[0].scrollHeight === $el[0].offsetHeight || Device.os !== 'ios' || isMaterial) {
+          if (scrollHeight === offsetHeight || Device.os !== 'ios' || isMaterial) {
             useTranslate = true;
           } else {
             useTranslate = false;
           }
+          forceUseTranslate = false;
         }
         isMoved = true;
         touchesDiff = pageY - touchesStart.y;
 
-        if ((touchesDiff > 0 && scrollTop <= 0) || scrollTop < 0) {
-          // iOS 8 fix
-          if (Device.os === 'ios' && parseInt(Device.osVersion.split('.')[0], 10) > 7 && scrollTop === 0 && !wasScrolled) { useTranslate = true; }
+        if (typeof wasScrolled === 'undefined' && (ptr.bottom ? scrollTop !== maxScrollTop : scrollTop !== 0)) { wasScrolled = true; }
 
-          if (useTranslate) {
-            e.preventDefault();
-            translate = (Math.pow( touchesDiff, 0.85 )) + startTranslate;
+        var ptrStarted = ptr.bottom
+          ? (touchesDiff < 0 && scrollTop >= maxScrollTop) || scrollTop > maxScrollTop
+          : (touchesDiff > 0 && scrollTop <= 0) || scrollTop < 0;
+
+        if (ptrStarted) {
+          // iOS 8 fix
+          if (Device.os === 'ios' && parseInt(Device.osVersion.split('.')[0], 10) > 7) {
+            if (!ptr.bottom && scrollTop === 0 && !wasScrolled) { useTranslate = true; }
+            if (ptr.bottom && scrollTop === maxScrollTop && !wasScrolled) { useTranslate = true; }
+          }
+
+          if (!useTranslate && ptr.bottom && !isMaterial) {
+            $el.css('-webkit-overflow-scrolling', 'auto');
+            $el.scrollTop(maxScrollTop);
+            forceUseTranslate = true;
+          }
+
+          if (useTranslate || forceUseTranslate) {
+            if (e.cancelable) {
+              e.preventDefault();
+            }
+            translate = (ptr.bottom ? -1 * (Math.pow( Math.abs(touchesDiff), 0.85 )) : Math.pow( touchesDiff, 0.85 )) + startTranslate;
             if (isMaterial) {
               $preloaderEl.transform(("translate3d(0," + translate + "px,0)"))
-                .find('.ptr-arrow').transform(("rotate(" + ((180 * (touchesDiff / 66)) + 100) + "deg)"));
+                .find('.ptr-arrow').transform(("rotate(" + ((180 * (Math.abs(touchesDiff) / 66)) + 100) + "deg)"));
             } else {
-              $el.transform(("translate3d(0," + translate + "px,0)"));
+              // eslint-disable-next-line
+              if (ptr.bottom) {
+                $el.children().transform(("translate3d(0," + translate + "px,0)"));
+              } else {
+                $el.transform(("translate3d(0," + translate + "px,0)"));
+              }
             }
           }
-          if ((useTranslate && (Math.pow( touchesDiff, 0.85 )) > triggerDistance) || (!useTranslate && touchesDiff >= triggerDistance * 2)) {
+
+          if (((useTranslate || forceUseTranslate) && (Math.pow( Math.abs(touchesDiff), 0.85 )) > triggerDistance) || (!useTranslate && Math.abs(touchesDiff) >= triggerDistance * 2)) {
             refresh = true;
             $el.addClass('ptr-pull-up').removeClass('ptr-pull-down');
           } else {
@@ -22776,7 +25568,16 @@
           $preloaderEl.transform('')
             .find('.ptr-arrow').transform('');
         } else {
-          $el.transform('');
+          // eslint-disable-next-line
+          if (ptr.bottom) {
+            $el.children().transform('');
+          } else {
+            $el.transform('');
+          }
+        }
+
+        if (!useTranslate && ptr.bottom && !isMaterial) {
+          $el.css('-webkit-overflow-scrolling', '');
         }
 
         if (refresh) {
@@ -22794,6 +25595,160 @@
         }
       }
 
+      var mousewheelTimeout;
+      var mousewheelMoved;
+      var mousewheelAllow = true;
+      var mousewheelTranslate = 0;
+
+      function handleMouseWheelRelease() {
+        mousewheelAllow = true;
+        mousewheelMoved = false;
+        mousewheelTranslate = 0;
+        if (translate) {
+          $el.addClass('ptr-transitioning');
+          translate = 0;
+        }
+        if (isMaterial) {
+          $preloaderEl.transform('')
+            .find('.ptr-arrow').transform('');
+        } else {
+          // eslint-disable-next-line
+          if (ptr.bottom) {
+            $el.children().transform('');
+          } else {
+            $el.transform('');
+          }
+        }
+
+        if (refresh) {
+          $el.addClass('ptr-refreshing');
+          $el.trigger('ptr:refresh', ptr.done);
+          ptr.emit('local::refresh ptrRefresh', $el[0], ptr.done);
+        } else {
+          $el.removeClass('ptr-pull-down');
+        }
+        if (pullStarted) {
+          $el.trigger('ptr:pullend');
+          ptr.emit('local::pullEnd ptrPullEnd', $el[0]);
+        }
+      }
+      function handleMouseWheel(e) {
+        if (!mousewheelAllow) { return; }
+        var deltaX = e.deltaX;
+        var deltaY = e.deltaY;
+        if (Math.abs(deltaX) > Math.abs(deltaY)) { return; }
+        if ($el.hasClass('ptr-refreshing')) {
+          return;
+        }
+        if ($(e.target).closest('.sortable-handler, .ptr-ignore, .card-expandable.card-opened').length) { return; }
+
+        clearTimeout(mousewheelTimeout);
+
+        scrollTop = $el[0].scrollTop;
+
+        if (!mousewheelMoved) {
+          $el.removeClass('ptr-transitioning');
+          var targetIsScrollable;
+          scrollHeight = $el[0].scrollHeight;
+          offsetHeight = $el[0].offsetHeight;
+          if (ptr.bottom) {
+            maxScrollTop = scrollHeight - offsetHeight;
+          }
+          if (scrollTop > scrollHeight) {
+            mousewheelAllow = false;
+            return;
+          }
+          var $ptrWatchScrollable = $(e.target).closest('.ptr-watch-scroll');
+          if ($ptrWatchScrollable.length) {
+            $ptrWatchScrollable.each(function (ptrScrollableIndex, ptrScrollableEl) {
+              if (ptrScrollableEl === el) { return; }
+              if (
+                (ptrScrollableEl.scrollHeight > ptrScrollableEl.offsetHeight)
+                && $(ptrScrollableEl).css('overflow') === 'auto'
+                && (
+                  (!ptr.bottom && ptrScrollableEl.scrollTop > 0)
+                  || (ptr.bottom && ptrScrollableEl.scrollTop < ptrScrollableEl.scrollHeight - ptrScrollableEl.offsetHeight)
+                )
+              ) {
+                targetIsScrollable = true;
+              }
+            });
+          }
+          if (targetIsScrollable) {
+            mousewheelAllow = false;
+            return;
+          }
+          if (dynamicTriggerDistance) {
+            triggerDistance = $el.attr('data-ptr-distance');
+            if (triggerDistance.indexOf('%') >= 0) { triggerDistance = (scrollHeight * parseInt(triggerDistance, 10)) / 100; }
+          }
+        }
+        isMoved = true;
+        mousewheelTranslate -= deltaY;
+        touchesDiff = mousewheelTranslate; // pageY - touchesStart.y;
+
+        if (typeof wasScrolled === 'undefined' && (ptr.bottom ? scrollTop !== maxScrollTop : scrollTop !== 0)) { wasScrolled = true; }
+
+        var ptrStarted = ptr.bottom
+          ? (touchesDiff < 0 && scrollTop >= maxScrollTop) || scrollTop > maxScrollTop
+          : (touchesDiff > 0 && scrollTop <= 0) || scrollTop < 0;
+
+        if (ptrStarted) {
+          if (e.cancelable) {
+            e.preventDefault();
+          }
+
+          translate = touchesDiff;
+          if (Math.abs(translate) > triggerDistance) {
+            translate = triggerDistance + (Math.pow( (Math.abs(translate) - triggerDistance), 0.7 ));
+            if (ptr.bottom) { translate = -translate; }
+          }
+
+          if (isMaterial) {
+            $preloaderEl.transform(("translate3d(0," + translate + "px,0)"))
+              .find('.ptr-arrow').transform(("rotate(" + ((180 * (Math.abs(touchesDiff) / 66)) + 100) + "deg)"));
+          } else {
+            // eslint-disable-next-line
+            if (ptr.bottom) {
+              $el.children().transform(("translate3d(0," + translate + "px,0)"));
+            } else {
+              $el.transform(("translate3d(0," + translate + "px,0)"));
+            }
+          }
+
+          if (Math.abs(translate) > triggerDistance) {
+            refresh = true;
+            $el.addClass('ptr-pull-up').removeClass('ptr-pull-down');
+          } else {
+            refresh = false;
+            $el.removeClass('ptr-pull-up').addClass('ptr-pull-down');
+          }
+          if (!pullStarted) {
+            $el.trigger('ptr:pullstart');
+            ptr.emit('local::pullStart ptrPullStart', $el[0]);
+            pullStarted = true;
+          }
+          $el.trigger('ptr:pullmove', {
+            event: e,
+            scrollTop: scrollTop,
+            translate: translate,
+            touchesDiff: touchesDiff,
+          });
+          ptr.emit('local::pullMove ptrPullMove', $el[0], {
+            event: e,
+            scrollTop: scrollTop,
+            translate: translate,
+            touchesDiff: touchesDiff,
+          });
+        } else {
+          pullStarted = false;
+          $el.removeClass('ptr-pull-up ptr-pull-down');
+          refresh = false;
+        }
+
+        mousewheelTimeout = setTimeout(handleMouseWheelRelease, 300);
+      }
+
       if (!$pageEl.length || !$el.length) { return ptr; }
 
       $el[0].f7PullToRefresh = ptr;
@@ -22802,14 +25757,20 @@
       ptr.attachEvents = function attachEvents() {
         var passive = Support.passiveListener ? { passive: true } : false;
         $el.on(app.touchEvents.start, handleTouchStart, passive);
-        app.on('touchmove', handleTouchMove);
+        app.on('touchmove:active', handleTouchMove);
         app.on('touchend:passive', handleTouchEnd);
+        if (ptr.mousewheel && !ptr.bottom) {
+          $el.on('wheel', handleMouseWheel);
+        }
       };
       ptr.detachEvents = function detachEvents() {
         var passive = Support.passiveListener ? { passive: true } : false;
         $el.off(app.touchEvents.start, handleTouchStart, passive);
-        app.off('touchmove', handleTouchMove);
+        app.off('touchmove:active', handleTouchMove);
         app.off('touchend:passive', handleTouchEnd);
+        if (ptr.mousewheel && !ptr.bottom) {
+          $el.off('wheel', handleMouseWheel);
+        }
       };
 
       // Install Modules
@@ -22821,8 +25782,8 @@
       return ptr;
     }
 
-    if ( Framework7Class$$1 ) PullToRefresh.__proto__ = Framework7Class$$1;
-    PullToRefresh.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) PullToRefresh.__proto__ = Framework7Class;
+    PullToRefresh.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     PullToRefresh.prototype.constructor = PullToRefresh;
 
     PullToRefresh.prototype.init = function init () {
@@ -22875,14 +25836,18 @@
       tabMounted: function tabMounted(tabEl) {
         var app = this;
         var $tabEl = $(tabEl);
-        $tabEl.find('.ptr-content').each(function (index, el) {
+        var $ptrEls = $tabEl.find('.ptr-content');
+        if ($tabEl.is('.ptr-content')) { $ptrEls.add($tabEl); }
+        $ptrEls.each(function (index, el) {
           app.ptr.create(el);
         });
       },
       tabBeforeRemove: function tabBeforeRemove(tabEl) {
         var $tabEl = $(tabEl);
         var app = this;
-        $tabEl.find('.ptr-content').each(function (index, el) {
+        var $ptrEls = $tabEl.find('.ptr-content');
+        if ($tabEl.is('.ptr-content')) { $ptrEls.add($tabEl); }
+        $ptrEls.each(function (index, el) {
           app.ptr.destroy(el);
         });
       },
@@ -22914,14 +25879,14 @@
       var $pageEl = $(pageEl).closest('.page').eq(0);
 
       // Lazy images
-      var lazyLoadImages = $pageEl.find('.lazy');
-      if (lazyLoadImages.length === 0 && !$pageEl.hasClass('lazy')) { return; }
+      var $lazyLoadImages = $pageEl.find('.lazy');
+      if ($lazyLoadImages.length === 0 && !$pageEl.hasClass('lazy')) { return; }
 
       // Placeholder
       var placeholderSrc = app.params.lazy.placeholder;
 
       if (placeholderSrc !== false) {
-        lazyLoadImages.each(function (index, lazyEl) {
+        $lazyLoadImages.each(function (index, lazyEl) {
           if ($(lazyEl).attr('data-src') && !$(lazyEl).attr('src')) { $(lazyEl).attr('src', placeholderSrc); }
         });
       }
@@ -22939,6 +25904,43 @@
           imageIsLoading = true;
           app.lazy.loadImage(imagesSequence[0], onImageComplete);
         }
+      }
+
+      function observerCallback(entries, observer) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            if (app.params.lazy.sequential && imageIsLoading) {
+              if (imagesSequence.indexOf(entry.target) < 0) { imagesSequence.push(entry.target); }
+              return;
+            }
+            // Load image
+            imageIsLoading = true;
+            app.lazy.loadImage(entry.target, onImageComplete);
+            // Detach
+            observer.unobserve(entry.target);
+          }
+        });
+      }
+      if (app.params.lazy.observer && Support.intersectionObserver) {
+        var observer = $pageEl[0].f7LazyObserver;
+        if (!observer) {
+          observer = new win.IntersectionObserver(observerCallback, {
+            root: $pageEl[0],
+          });
+        }
+        $lazyLoadImages.each(function (index, el) {
+          if (el.f7LazyObserverAdded) { return; }
+          el.f7LazyObserverAdded = true;
+          observer.observe(el);
+        });
+        if (!$pageEl[0].f7LazyDestroy) {
+          $pageEl[0].f7LazyDestroy = function () {
+            observer.disconnect();
+            delete $pageEl[0].f7LazyDestroy;
+            delete $pageEl[0].f7LazyObserver;
+          };
+        }
+        return;
       }
 
       function lazyHandler() {
@@ -23061,6 +26063,7 @@
         placeholder: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEXCwsK592mkAAAACklEQVQI12NgAAAAAgAB4iG8MwAAAABJRU5ErkJggg==',
         threshold: 0,
         sequential: true,
+        observer: true,
       },
     },
     create: function create() {
@@ -23084,6 +26087,7 @@
       },
       pageAfterIn: function pageAfterIn(page) {
         var app = this;
+        if (app.params.lazy.observer && Support.intersectionObserver) { return; }
         if (page.$el.find('.lazy').length > 0 || page.$el.hasClass('lazy')) {
           app.lazy.create(page.$el);
         }
@@ -23103,6 +26107,7 @@
       },
       tabBeforeRemove: function tabBeforeRemove(tabEl) {
         var app = this;
+        if (app.params.lazy.observer && Support.intersectionObserver) { return; }
         var $tabEl = $(tabEl);
         if ($tabEl.find('.lazy').length > 0 || $tabEl.hasClass('lazy')) {
           app.lazy.destroy($tabEl);
@@ -23111,11 +26116,11 @@
     },
   };
 
-  var DataTable = /*@__PURE__*/(function (Framework7Class$$1) {
+  var DataTable = /*@__PURE__*/(function (Framework7Class) {
     function DataTable(app, params) {
       if ( params === void 0 ) params = {};
 
-      Framework7Class$$1.call(this, params, [app]);
+      Framework7Class.call(this, params, [app]);
 
       var table = this;
 
@@ -23169,16 +26174,20 @@
             .find(("tbody tr td:nth-child(" + (columnIndex + 1) + ") input"))
             .prop('checked', checked)
             .trigger('change', { sentByF7DataTable: true });
+          $inputEl.prop('indeterminate', false);
         } else {
           if (columnIndex === 0) {
             $inputEl.parents('tr')[checked ? 'addClass' : 'removeClass']('data-table-row-selected');
           }
-
+          var checkedRows = $el.find(("tbody .checkbox-cell:nth-child(" + (columnIndex + 1) + ") input[type=\"checkbox\"]:checked")).length;
+          var totalRows = $el.find('tbody tr').length;
+          var $headCheckboxEl = $el.find(("thead .checkbox-cell:nth-child(" + (columnIndex + 1) + ") input[type=\"checkbox\"]"));
           if (!checked) {
-            $el.find(("thead .checkbox-cell:nth-child(" + (columnIndex + 1) + ") input[type=\"checkbox\"]")).prop('checked', false);
-          } else if ($el.find(("tbody .checkbox-cell:nth-child(" + (columnIndex + 1) + ") input[type=\"checkbox\"]:checked")).length === $el.find('tbody tr').length) {
-            $el.find(("thead .checkbox-cell:nth-child(" + (columnIndex + 1) + ") input[type=\"checkbox\"]")).prop('checked', true).trigger('change', { sentByF7DataTable: true });
+            $headCheckboxEl.prop('checked', false);
+          } else if (checkedRows === totalRows) {
+            $headCheckboxEl.prop('checked', true).trigger('change', { sentByF7DataTable: true });
           }
+          $headCheckboxEl.prop('indeterminate', checkedRows > 0 && checkedRows < totalRows);
         }
         table.checkSelectedHeader();
       }
@@ -23216,8 +26225,8 @@
       return table;
     }
 
-    if ( Framework7Class$$1 ) DataTable.__proto__ = Framework7Class$$1;
-    DataTable.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) DataTable.__proto__ = Framework7Class;
+    DataTable.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     DataTable.prototype.constructor = DataTable;
 
     DataTable.prototype.setCollapsibleLabels = function setCollapsibleLabels () {
@@ -23560,13 +26569,14 @@
         notFoundEl: '.searchbar-not-found',
         hideOnEnableEl: '.searchbar-hide-on-enable',
         hideOnSearchEl: '.searchbar-hide-on-search',
-        backdrop: true,
+        backdrop: undefined,
         removeDiacritics: true,
         customSearch: false,
         hideDividers: true,
         hideGroups: true,
         disableOnBackdropClick: true,
         expandable: false,
+        inline: false,
       };
 
       // Extend defaults with modules params
@@ -23582,18 +26592,15 @@
       $el[0].f7Searchbar = sb;
 
       var $pageEl;
-      var $navbarEl;
+      var $navbarEl = $el.parents('.navbar-inner');
       if ($el.parents('.page').length > 0) {
         $pageEl = $el.parents('.page');
-      } else {
-        $navbarEl = $el.parents('.navbar-inner');
-        if ($navbarEl.length > 0) {
-          $pageEl = $(app.navbar.getPageByEl($navbarEl[0]));
-          if (!$pageEl.length) {
-            var $currentPageEl = $el.parents('.view').find('.page-current');
-            if ($currentPageEl[0] && $currentPageEl[0].f7Page && $currentPageEl[0].f7Page.navbarEl === $navbarEl[0]) {
-              $pageEl = $currentPageEl;
-            }
+      } else if ($navbarEl.length > 0) {
+        $pageEl = $(app.navbar.getPageByEl($navbarEl[0]));
+        if (!$pageEl.length) {
+          var $currentPageEl = $el.parents('.view').find('.page-current');
+          if ($currentPageEl[0] && $currentPageEl[0].f7Page && $currentPageEl[0].f7Page.navbarEl === $navbarEl[0]) {
+            $pageEl = $currentPageEl;
           }
         }
       }
@@ -23624,6 +26631,15 @@
         $hideOnSearchEl = $(params.hideOnSearchEl);
       } else if (typeof sb.params.hideOnSearchEl === 'string' && $pageEl) {
         $hideOnSearchEl = $pageEl.find(sb.params.hideOnSearchEl);
+      }
+
+
+      var expandable = sb.params.expandable || $el.hasClass('searchbar-expandable');
+      var inline = sb.params.inline || $el.hasClass('searchbar-inline');
+
+      if (typeof sb.params.backdrop === 'undefined') {
+        if (!inline) { sb.params.backdrop = app.theme !== 'aurora'; }
+        else { sb.params.backdrop = false; }
       }
 
       var $backdropEl;
@@ -23701,7 +26717,8 @@
         isVirtualList: $searchContainer && $searchContainer.hasClass('virtual-list'),
         virtualList: undefined,
         enabled: false,
-        expandable: sb.params.expandable || $el.hasClass('searchbar-expandable'),
+        expandable: expandable,
+        inline: inline,
       });
 
       // Events
@@ -23714,6 +26731,9 @@
       }
       function onInputBlur() {
         sb.$el.removeClass('searchbar-focused');
+        if (app.theme === 'aurora' && (!$disableButtonEl || !$disableButtonEl.length || !sb.params.disableButton) && !sb.query) {
+          sb.disable();
+        }
       }
       function onInputChange() {
         var value = sb.$inputEl.val().trim();
@@ -23738,12 +26758,18 @@
         if (!sb || (sb && !sb.$el)) { return; }
         if (sb.enabled) {
           sb.$el.removeClass('searchbar-enabled');
+          if (sb.expandable) {
+            sb.$el.parents('.navbar-inner').removeClass('with-searchbar-expandable-enabled');
+          }
         }
       }
       function onPageBeforeIn() {
         if (!sb || (sb && !sb.$el)) { return; }
         if (sb.enabled) {
           sb.$el.addClass('searchbar-enabled');
+          if (sb.expandable) {
+            sb.$el.parents('.navbar-inner').addClass('with-searchbar-expandable-enabled');
+          }
         }
       }
       sb.attachEvents = function attachEvents() {
@@ -23754,7 +26780,7 @@
         if (sb.params.disableOnBackdropClick && sb.$backdropEl) {
           sb.$backdropEl.on('click', disableOnClick);
         }
-        if (sb.expandable && app.theme === 'ios' && sb.view && $navbarEl && sb.$pageEl) {
+        if (sb.expandable && app.theme === 'ios' && sb.view && $navbarEl.length && sb.$pageEl) {
           sb.$pageEl.on('page:beforeout', onPageBeforeOut);
           sb.$pageEl.on('page:beforein', onPageBeforeIn);
         }
@@ -23771,7 +26797,7 @@
         if (sb.params.disableOnBackdropClick && sb.$backdropEl) {
           sb.$backdropEl.off('click', disableOnClick);
         }
-        if (sb.expandable && app.theme === 'ios' && sb.view && $navbarEl && sb.$pageEl) {
+        if (sb.expandable && app.theme === 'ios' && sb.view && $navbarEl.length && sb.$pageEl) {
           sb.$pageEl.off('page:beforeout', onPageBeforeOut);
           sb.$pageEl.off('page:beforein', onPageBeforeIn);
         }
@@ -23832,11 +26858,22 @@
         if (!sb.$disableButtonEl || (sb.$disableButtonEl && sb.$disableButtonEl.length === 0)) {
           sb.$el.addClass('searchbar-enabled-no-disable-button');
         }
-        if (!sb.expandable && sb.$disableButtonEl && sb.$disableButtonEl.length > 0 && app.theme === 'ios') {
+        if (!sb.expandable && sb.$disableButtonEl && sb.$disableButtonEl.length > 0 && app.theme !== 'md') {
           if (!sb.disableButtonHasMargin) {
             sb.setDisableButtonMargin();
           }
           sb.$disableButtonEl.css(("margin-" + (app.rtl ? 'left' : 'right')), '0px');
+        }
+        if (sb.expandable) {
+          if (sb.$el.parents('.navbar-inner').hasClass('navbar-inner-large') && sb.$pageEl) {
+            sb.$pageEl.find('.page-content').addClass('with-searchbar-expandable-enabled');
+          }
+          if (app.theme === 'md' && sb.$el.parent('.navbar-inner').parent('.navbar').length) {
+            sb.$el.parent('.navbar-inner').parent('.navbar').addClass('with-searchbar-expandable-enabled');
+          } else {
+            sb.$el.parent('.navbar-inner').addClass('with-searchbar-expandable-enabled');
+            sb.$el.parent('.navbar-inner-large').addClass('navbar-inner-large-collapsed');
+          }
         }
         if (sb.$hideOnEnableEl) { sb.$hideOnEnableEl.addClass('hidden-by-searchbar'); }
         sb.$el.trigger('searchbar:enable');
@@ -23866,7 +26903,7 @@
       } else {
         if (needsFocus) { sb.$inputEl.focus(); }
         if (app.theme === 'md' && sb.expandable) {
-          sb.$el.parents('.page, .view, .navbar-inner').scrollLeft(0);
+          sb.$el.parents('.page, .view, .navbar-inner').scrollLeft(app.rtl ? 100 : 0);
         }
         enable();
       }
@@ -23879,10 +26916,22 @@
       var app = sb.app;
       sb.$inputEl.val('').trigger('change');
       sb.$el.removeClass('searchbar-enabled searchbar-focused searchbar-enabled-no-disable-button');
-      if (!sb.expandable && sb.$disableButtonEl && sb.$disableButtonEl.length > 0 && app.theme === 'ios') {
+      if (sb.expandable) {
+        if (sb.$el.parents('.navbar-inner').hasClass('navbar-inner-large') && sb.$pageEl) {
+          sb.$pageEl.find('.page-content').removeClass('with-searchbar-expandable-enabled');
+        }
+        if (app.theme === 'md' && sb.$el.parent('.navbar-inner').parent('.navbar').length) {
+          sb.$el.parent('.navbar-inner').parent('.navbar').removeClass('with-searchbar-expandable-enabled');
+        } else {
+          sb.$el.parent('.navbar-inner').removeClass('with-searchbar-expandable-enabled');
+          if (sb.$pageEl) {
+            sb.$pageEl.find('.page-content').trigger('scroll');
+          }
+        }
+      }
+      if (!sb.expandable && sb.$disableButtonEl && sb.$disableButtonEl.length > 0 && app.theme !== 'md') {
         sb.$disableButtonEl.css(("margin-" + (app.rtl ? 'left' : 'right')), ((-sb.disableButtonEl.offsetWidth) + "px"));
       }
-
       if (sb.$backdropEl && ((sb.$searchContainer && sb.$searchContainer.length) || sb.params.customSearch)) {
         sb.backdropHide();
       }
@@ -24072,6 +27121,8 @@
 
     Searchbar.prototype.init = function init () {
       var sb = this;
+      if (sb.expandable && sb.$el) { sb.$el.addClass('searchbar-expandable'); }
+      if (sb.inline && sb.$el) { sb.$el.addClass('searchbar-inline'); }
       sb.attachEvents();
     };
 
@@ -24197,11 +27248,11 @@
     },
   };
 
-  var Messages = /*@__PURE__*/(function (Framework7Class$$1) {
+  var Messages = /*@__PURE__*/(function (Framework7Class) {
     function Messages(app, params) {
       if ( params === void 0 ) params = {};
 
-      Framework7Class$$1.call(this, params, [app]);
+      Framework7Class.call(this, params, [app]);
 
       var m = this;
 
@@ -24253,8 +27304,8 @@
       return m;
     }
 
-    if ( Framework7Class$$1 ) Messages.__proto__ = Framework7Class$$1;
-    Messages.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) Messages.__proto__ = Framework7Class;
+    Messages.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     Messages.prototype.constructor = Messages;
     // eslint-disable-next-line
     Messages.prototype.getMessageData = function getMessageData (messageEl) {
@@ -24306,6 +27357,7 @@
       var m = this;
       var message = Utils.extend({
         type: 'sent',
+        attrs: {},
       }, messageToRender);
       if (m.params.renderMessage) {
         return m.params.renderMessage.call(m, message);
@@ -24313,7 +27365,8 @@
       if (message.isTitle) {
         return ("<div class=\"messages-title\">" + (message.text) + "</div>");
       }
-      return ("\n      <div class=\"message message-" + (message.type) + " " + (message.isTyping ? 'message-typing' : '') + "\">\n        " + (message.avatar ? ("\n        <div class=\"message-avatar\" style=\"background-image:url(" + (message.avatar) + ")\"></div>\n        ") : '') + "\n        <div class=\"message-content\">\n          " + (message.name ? ("<div class=\"message-name\">" + (message.name) + "</div>") : '') + "\n          " + (message.header ? ("<div class=\"message-header\">" + (message.header) + "</div>") : '') + "\n          <div class=\"message-bubble\">\n            " + (message.textHeader ? ("<div class=\"message-text-header\">" + (message.textHeader) + "</div>") : '') + "\n            " + (message.image ? ("<div class=\"message-image\">" + (message.image) + "</div>") : '') + "\n            " + (message.imageSrc && !message.image ? ("<div class=\"message-image\"><img src=\"" + (message.imageSrc) + "\"></div>") : '') + "\n            " + (message.text || message.isTyping ? ("<div class=\"message-text\">" + (message.text || '') + (message.isTyping ? '<div class="message-typing-indicator"><div></div><div></div><div></div></div>' : '') + "</div>") : '') + "\n            " + (message.textFooter ? ("<div class=\"message-text-footer\">" + (message.textFooter) + "</div>") : '') + "\n          </div>\n          " + (message.footer ? ("<div class=\"message-footer\">" + (message.footer) + "</div>") : '') + "\n        </div>\n      </div>\n    ");
+      var attrs = Object.keys(message.attrs).map(function (attr) { return (attr + "=\"" + (message.attrs[attr]) + "\""); }).join(' ');
+      return ("\n      <div class=\"message message-" + (message.type) + " " + (message.isTyping ? 'message-typing' : '') + " " + (message.cssClass || '') + "\" " + attrs + ">\n        " + (message.avatar ? ("\n        <div class=\"message-avatar\" style=\"background-image:url(" + (message.avatar) + ")\"></div>\n        ") : '') + "\n        <div class=\"message-content\">\n          " + (message.name ? ("<div class=\"message-name\">" + (message.name) + "</div>") : '') + "\n          " + (message.header ? ("<div class=\"message-header\">" + (message.header) + "</div>") : '') + "\n          <div class=\"message-bubble\">\n            " + (message.textHeader ? ("<div class=\"message-text-header\">" + (message.textHeader) + "</div>") : '') + "\n            " + (message.image ? ("<div class=\"message-image\">" + (message.image) + "</div>") : '') + "\n            " + (message.imageSrc && !message.image ? ("<div class=\"message-image\"><img src=\"" + (message.imageSrc) + "\"></div>") : '') + "\n            " + (message.text || message.isTyping ? ("<div class=\"message-text\">" + (message.text || '') + (message.isTyping ? '<div class="message-typing-indicator"><div></div><div></div><div></div></div>' : '') + "</div>") : '') + "\n            " + (message.textFooter ? ("<div class=\"message-text-footer\">" + (message.textFooter) + "</div>") : '') + "\n          </div>\n          " + (message.footer ? ("<div class=\"message-footer\">" + (message.footer) + "</div>") : '') + "\n        </div>\n      </div>\n    ");
     };
 
     Messages.prototype.renderMessages = function renderMessages (messagesToRender, method) {
@@ -24750,11 +27803,11 @@
     },
   };
 
-  var Messagebar = /*@__PURE__*/(function (Framework7Class$$1) {
+  var Messagebar = /*@__PURE__*/(function (Framework7Class) {
     function Messagebar(app, params) {
       if ( params === void 0 ) params = {};
 
-      Framework7Class$$1.call(this, params, [app]);
+      Framework7Class.call(this, params, [app]);
 
       var messagebar = this;
 
@@ -24891,8 +27944,8 @@
       return messagebar;
     }
 
-    if ( Framework7Class$$1 ) Messagebar.__proto__ = Framework7Class$$1;
-    Messagebar.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) Messagebar.__proto__ = Framework7Class;
+    Messagebar.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     Messagebar.prototype.constructor = Messagebar;
 
     Messagebar.prototype.focus = function focus () {
@@ -25177,6 +28230,18 @@
       },
     },
   };
+
+  var Browser = (function Browser() {
+    function isSafari() {
+      var ua = win.navigator.userAgent.toLowerCase();
+      return (ua.indexOf('safari') >= 0 && ua.indexOf('chrome') < 0 && ua.indexOf('android') < 0);
+    }
+    return {
+      isIE: !!win.navigator.userAgent.match(/Trident/g) || !!win.navigator.userAgent.match(/MSIE/g),
+      isSafari: isSafari(),
+      isUiWebView: /(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(win.navigator.userAgent),
+    };
+  }());
 
   function updateSize () {
     var swiper = this;
@@ -27224,7 +30289,12 @@
       }
 
       var breakpointParams = breakpointOnlyParams || swiper.originalParams;
-      var needsReLoop = params.loop && (breakpointParams.slidesPerView !== params.slidesPerView);
+      var directionChanged = breakpointParams.direction && breakpointParams.direction !== params.direction;
+      var needsReLoop = params.loop && (breakpointParams.slidesPerView !== params.slidesPerView || directionChanged);
+
+      if (directionChanged && initialized) {
+        swiper.changeDirection();
+      }
 
       Utils.extend(swiper.params, breakpointParams);
 
@@ -27242,6 +30312,7 @@
         swiper.updateSlides();
         swiper.slideTo((activeIndex - loopedSlides) + swiper.loopedSlides, 0, false);
       }
+
       swiper.emit('breakpoint', breakpointParams);
     }
   }
@@ -27271,18 +30342,6 @@
 
   var breakpoints = { setBreakpoint: setBreakpoint, getBreakpoint: getBreakpoint };
 
-  var Browser = (function Browser() {
-    function isSafari() {
-      var ua = win.navigator.userAgent.toLowerCase();
-      return (ua.indexOf('safari') >= 0 && ua.indexOf('chrome') < 0 && ua.indexOf('android') < 0);
-    }
-    return {
-      isIE: !!win.navigator.userAgent.match(/Trident/g) || !!win.navigator.userAgent.match(/MSIE/g),
-      isSafari: isSafari(),
-      isUiWebView: /(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(win.navigator.userAgent),
-    };
-  }());
-
   function addClasses () {
     var swiper = this;
     var classNames = swiper.classNames;
@@ -27291,6 +30350,7 @@
     var $el = swiper.$el;
     var suffixes = [];
 
+    suffixes.push('initialized');
     suffixes.push(params.direction);
 
     if (params.freeMode) {
@@ -27542,6 +30602,8 @@
     // Callbacks
     runCallbacksOnInit: true,
   };
+
+  /* eslint no-param-reassign: "off" */
 
   var prototypes = {
     update: update,
@@ -27810,7 +30872,7 @@
       return spv;
     };
 
-    Swiper.prototype.update = function update$$1 () {
+    Swiper.prototype.update = function update () {
       var swiper = this;
       if (!swiper || swiper.destroyed) { return; }
       var snapGrid = swiper.snapGrid;
@@ -27851,6 +30913,54 @@
         swiper.checkOverflow();
       }
       swiper.emit('update');
+    };
+
+    Swiper.prototype.changeDirection = function changeDirection (newDirection, needUpdate) {
+      if ( needUpdate === void 0 ) needUpdate = true;
+
+      var swiper = this;
+      var currentDirection = swiper.params.direction;
+      if (!newDirection) {
+        // eslint-disable-next-line
+        newDirection = currentDirection === 'horizontal' ? 'vertical' : 'horizontal';
+      }
+      if ((newDirection === currentDirection) || (newDirection !== 'horizontal' && newDirection !== 'vertical')) {
+        return swiper;
+      }
+
+      if (currentDirection === 'vertical') {
+        swiper.$el
+          .removeClass(((swiper.params.containerModifierClass) + "vertical wp8-vertical"))
+          .addClass(("" + (swiper.params.containerModifierClass) + newDirection));
+
+        if ((Browser.isIE || Browser.isEdge) && (Support.pointerEvents || Support.prefixedPointerEvents)) {
+          swiper.$el.addClass(((swiper.params.containerModifierClass) + "wp8-" + newDirection));
+        }
+      }
+      if (currentDirection === 'horizontal') {
+        swiper.$el
+          .removeClass(((swiper.params.containerModifierClass) + "horizontal wp8-horizontal"))
+          .addClass(("" + (swiper.params.containerModifierClass) + newDirection));
+
+        if ((Browser.isIE || Browser.isEdge) && (Support.pointerEvents || Support.prefixedPointerEvents)) {
+          swiper.$el.addClass(((swiper.params.containerModifierClass) + "wp8-" + newDirection));
+        }
+      }
+
+      swiper.params.direction = newDirection;
+
+      swiper.slides.each(function (slideIndex, slideEl) {
+        if (newDirection === 'vertical') {
+          slideEl.style.width = '';
+        } else {
+          slideEl.style.height = '';
+        }
+      });
+
+      swiper.emit('changeDirection');
+      if (needUpdate) { swiper.update(); }
+
+      return swiper;
     };
 
     Swiper.prototype.init = function init () {
@@ -28269,24 +31379,75 @@
       if (params.cache) { swiper.virtual.cache[index] = $slideEl; }
       return $slideEl;
     },
-    appendSlide: function appendSlide(slide) {
+    appendSlide: function appendSlide(slides) {
       var swiper = this;
-      swiper.virtual.slides.push(slide);
+      if (typeof slides === 'object' && 'length' in slides) {
+        for (var i = 0; i < slides.length; i += 1) {
+          if (slides[i]) { swiper.virtual.slides.push(slides[i]); }
+        }
+      } else {
+        swiper.virtual.slides.push(slides);
+      }
       swiper.virtual.update(true);
     },
-    prependSlide: function prependSlide(slide) {
+    prependSlide: function prependSlide(slides) {
       var swiper = this;
-      swiper.virtual.slides.unshift(slide);
+      var activeIndex = swiper.activeIndex;
+      var newActiveIndex = activeIndex + 1;
+      var numberOfNewSlides = 1;
+
+      if (Array.isArray(slides)) {
+        for (var i = 0; i < slides.length; i += 1) {
+          if (slides[i]) { swiper.virtual.slides.unshift(slides[i]); }
+        }
+        newActiveIndex = activeIndex + slides.length;
+        numberOfNewSlides = slides.length;
+      } else {
+        swiper.virtual.slides.unshift(slides);
+      }
       if (swiper.params.virtual.cache) {
         var cache = swiper.virtual.cache;
         var newCache = {};
         Object.keys(cache).forEach(function (cachedIndex) {
-          newCache[cachedIndex + 1] = cache[cachedIndex];
+          newCache[parseInt(cachedIndex, 10) + numberOfNewSlides] = cache[cachedIndex];
         });
         swiper.virtual.cache = newCache;
       }
       swiper.virtual.update(true);
-      swiper.slideNext(0);
+      swiper.slideTo(newActiveIndex, 0);
+    },
+    removeSlide: function removeSlide(slidesIndexes) {
+      var swiper = this;
+      if (typeof slidesIndexes === 'undefined' || slidesIndexes === null) { return; }
+      var activeIndex = swiper.activeIndex;
+      if (Array.isArray(slidesIndexes)) {
+        for (var i = slidesIndexes.length - 1; i >= 0; i -= 1) {
+          swiper.virtual.slides.splice(slidesIndexes[i], 1);
+          if (swiper.params.virtual.cache) {
+            delete swiper.virtual.cache[slidesIndexes[i]];
+          }
+          if (slidesIndexes[i] < activeIndex) { activeIndex -= 1; }
+          activeIndex = Math.max(activeIndex, 0);
+        }
+      } else {
+        swiper.virtual.slides.splice(slidesIndexes, 1);
+        if (swiper.params.virtual.cache) {
+          delete swiper.virtual.cache[slidesIndexes];
+        }
+        if (slidesIndexes < activeIndex) { activeIndex -= 1; }
+        activeIndex = Math.max(activeIndex, 0);
+      }
+      swiper.virtual.update(true);
+      swiper.slideTo(activeIndex, 0);
+    },
+    removeAllSlides: function removeAllSlides() {
+      var swiper = this;
+      swiper.virtual.slides = [];
+      if (swiper.params.virtual.cache) {
+        swiper.virtual.cache = {};
+      }
+      swiper.virtual.update(true);
+      swiper.slideTo(0, 0);
     },
   };
 
@@ -28310,6 +31471,8 @@
           update: Virtual.update.bind(swiper),
           appendSlide: Virtual.appendSlide.bind(swiper),
           prependSlide: Virtual.prependSlide.bind(swiper),
+          removeSlide: Virtual.removeSlide.bind(swiper),
+          removeAllSlides: Virtual.removeAllSlides.bind(swiper),
           renderSlide: Virtual.renderSlide.bind(swiper),
           slides: swiper.params.virtual.slides,
           cache: {},
@@ -28492,8 +31655,23 @@
           && !$(e.target).is($prevEl)
           && !$(e.target).is($nextEl)
         ) {
-          if ($nextEl) { $nextEl.toggleClass(swiper.params.navigation.hiddenClass); }
-          if ($prevEl) { $prevEl.toggleClass(swiper.params.navigation.hiddenClass); }
+          var isHidden;
+          if ($nextEl) {
+            isHidden = $nextEl.hasClass(swiper.params.navigation.hiddenClass);
+          } else if ($prevEl) {
+            isHidden = $prevEl.hasClass(swiper.params.navigation.hiddenClass);
+          }
+          if (isHidden === true) {
+            swiper.emit('navigationShow', swiper);
+          } else {
+            swiper.emit('navigationHide', swiper);
+          }
+          if ($nextEl) {
+            $nextEl.toggleClass(swiper.params.navigation.hiddenClass);
+          }
+          if ($prevEl) {
+            $prevEl.toggleClass(swiper.params.navigation.hiddenClass);
+          }
         }
       },
     },
@@ -28824,6 +32002,12 @@
           && swiper.pagination.$el.length > 0
           && !$(e.target).hasClass(swiper.params.pagination.bulletClass)
         ) {
+          var isHidden = swiper.pagination.$el.hasClass(swiper.params.pagination.hiddenClass);
+          if (isHidden === true) {
+            swiper.emit('paginationShow', swiper);
+          } else {
+            swiper.emit('paginationHide', swiper);
+          }
           swiper.pagination.$el.toggleClass(swiper.params.pagination.hiddenClass);
         }
       },
@@ -28920,7 +32104,7 @@
       } else {
         $el[0].style.display = '';
       }
-      if (swiper.params.scrollbarHide) {
+      if (swiper.params.scrollbar.hide) {
         $el[0].style.opacity = 0;
       }
       Utils.extend(scrollbar, {
@@ -29274,17 +32458,17 @@
       },
       init: function init() {
         var swiper = this;
-        if (!swiper.params.parallax) { return; }
+        if (!swiper.params.parallax.enabled) { return; }
         swiper.parallax.setTranslate();
       },
       setTranslate: function setTranslate() {
         var swiper = this;
-        if (!swiper.params.parallax) { return; }
+        if (!swiper.params.parallax.enabled) { return; }
         swiper.parallax.setTranslate();
       },
       setTransition: function setTransition(duration) {
         var swiper = this;
-        if (!swiper.params.parallax) { return; }
+        if (!swiper.params.parallax.enabled) { return; }
         swiper.parallax.setTransition(duration);
       },
     },
@@ -31443,11 +34627,11 @@
 
   /* eslint indent: ["off"] */
 
-  var PhotoBrowser = /*@__PURE__*/(function (Framework7Class$$1) {
+  var PhotoBrowser = /*@__PURE__*/(function (Framework7Class) {
     function PhotoBrowser(app, params) {
       if ( params === void 0 ) params = {};
 
-      Framework7Class$$1.call(this, params, [app]);
+      Framework7Class.call(this, params, [app]);
 
       var pb = this;
       pb.app = app;
@@ -31486,8 +34670,8 @@
       pb.init();
     }
 
-    if ( Framework7Class$$1 ) PhotoBrowser.__proto__ = Framework7Class$$1;
-    PhotoBrowser.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) PhotoBrowser.__proto__ = Framework7Class;
+    PhotoBrowser.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     PhotoBrowser.prototype.constructor = PhotoBrowser;
 
     PhotoBrowser.prototype.onSlideChange = function onSlideChange (swiper) {
@@ -31611,10 +34795,10 @@
       var iconsColor = pb.params.iconsColor;
       if (!pb.params.iconsColor && pb.params.theme === 'dark') { iconsColor = 'white'; }
 
-      var backLinkText = pb.app.theme === 'ios' && pb.params.backLinkText ? pb.params.backLinkText : '';
+      var backLinkText = (pb.app.theme === 'ios' || pb.app.theme === 'aurora') && pb.params.backLinkText ? pb.params.backLinkText : '';
 
       var isPopup = pb.params.type !== 'page';
-      var navbarHtml = ("\n      <div class=\"navbar\">\n        <div class=\"navbar-inner sliding\">\n          <div class=\"left\">\n            <a href=\"#\" class=\"link " + (isPopup ? 'popup-close' : '') + " " + (!backLinkText ? 'icon-only' : '') + " " + (!isPopup ? 'back' : '') + "\" " + (isPopup ? 'data-popup=".photo-browser-popup"' : '') + ">\n              <i class=\"icon icon-back " + (iconsColor ? ("color-" + iconsColor) : '') + "\"></i>\n              " + (backLinkText ? ("<span>" + backLinkText + "</span>") : '') + "\n            </a>\n          </div>\n          <div class=\"title\">\n            <span class=\"photo-browser-current\"></span>\n            <span class=\"photo-browser-of\">" + (pb.params.navbarOfText) + "</span>\n            <span class=\"photo-browser-total\"></span>\n          </div>\n          <div class=\"right\"></div>\n        </div>\n      </div>\n    ").trim();
+      var navbarHtml = ("\n      <div class=\"navbar\">\n        <div class=\"navbar-inner sliding\">\n          <div class=\"left\">\n            <a class=\"link " + (isPopup ? 'popup-close' : '') + " " + (!backLinkText ? 'icon-only' : '') + " " + (!isPopup ? 'back' : '') + "\" " + (isPopup ? 'data-popup=".photo-browser-popup"' : '') + ">\n              <i class=\"icon icon-back " + (iconsColor ? ("color-" + iconsColor) : '') + "\"></i>\n              " + (backLinkText ? ("<span>" + backLinkText + "</span>") : '') + "\n            </a>\n          </div>\n          <div class=\"title\">\n            <span class=\"photo-browser-current\"></span>\n            <span class=\"photo-browser-of\">" + (pb.params.navbarOfText) + "</span>\n            <span class=\"photo-browser-total\"></span>\n          </div>\n          <div class=\"right\"></div>\n        </div>\n      </div>\n    ").trim();
       return navbarHtml;
     };
 
@@ -31625,7 +34809,7 @@
       var iconsColor = pb.params.iconsColor;
       if (!pb.params.iconsColor && pb.params.theme === 'dark') { iconsColor = 'white'; }
 
-      var toolbarHtml = ("\n      <div class=\"toolbar tabbar toolbar-bottom-md\">\n        <div class=\"toolbar-inner\">\n          <a href=\"#\" class=\"link photo-browser-prev\">\n            <i class=\"icon icon-back " + (iconsColor ? ("color-" + iconsColor) : '') + "\"></i>\n          </a>\n          <a href=\"#\" class=\"link photo-browser-next\">\n            <i class=\"icon icon-forward " + (iconsColor ? ("color-" + iconsColor) : '') + "\"></i>\n          </a>\n        </div>\n      </div>\n    ").trim();
+      var toolbarHtml = ("\n      <div class=\"toolbar toolbar-bottom tabbar\">\n        <div class=\"toolbar-inner\">\n          <a class=\"link photo-browser-prev\">\n            <i class=\"icon icon-back " + (iconsColor ? ("color-" + iconsColor) : '') + "\"></i>\n          </a>\n          <a class=\"link photo-browser-next\">\n            <i class=\"icon icon-forward " + (iconsColor ? ("color-" + iconsColor) : '') + "\"></i>\n          </a>\n        </div>\n      </div>\n    ").trim();
       return toolbarHtml;
     };
 
@@ -31646,7 +34830,7 @@
     PhotoBrowser.prototype.renderLazyPhoto = function renderLazyPhoto (photo, index) {
       var pb = this;
       if (pb.params.renderLazyPhoto) { return pb.params.renderLazyPhoto.call(pb, photo, index); }
-      var photoHtml = ("\n      <div class=\"photo-browser-slide photo-browser-slide-lazy swiper-slide\" data-swiper-slide-index=\"" + index + "\">\n          <div class=\"preloader swiper-lazy-preloader " + (pb.params.theme === 'dark' ? 'color-white' : '') + "\">" + (pb.app.theme === 'md' ? Utils.mdPreloaderContent : '') + "</div>\n          <span class=\"swiper-zoom-container\">\n              <img data-src=\"" + (photo.url ? photo.url : photo) + "\" class=\"swiper-lazy\">\n          </span>\n      </div>\n    ").trim();
+      var photoHtml = ("\n      <div class=\"photo-browser-slide photo-browser-slide-lazy swiper-slide\" data-swiper-slide-index=\"" + index + "\">\n          <div class=\"preloader swiper-lazy-preloader " + (pb.params.theme === 'dark' ? 'color-white' : '') + "\">" + (Utils[((pb.app.theme) + "PreloaderContent")] || '') + "</div>\n          <span class=\"swiper-zoom-container\">\n              <img data-src=\"" + (photo.url ? photo.url : photo) + "\" class=\"swiper-lazy\">\n          </span>\n      </div>\n    ").trim();
       return photoHtml;
     };
 
@@ -32132,14 +35316,14 @@
     },
   };
 
-  var Notification = /*@__PURE__*/(function (Modal$$1) {
+  var Notification = /*@__PURE__*/(function (Modal) {
     function Notification(app, params) {
       var extendedParams = Utils.extend({
         on: {},
       }, app.params.notification, params);
 
       // Extends with open/close Modal methods;
-      Modal$$1.call(this, app, extendedParams);
+      Modal.call(this, app, extendedParams);
 
       var notification = this;
 
@@ -32325,8 +35509,8 @@
       return notification;
     }
 
-    if ( Modal$$1 ) Notification.__proto__ = Modal$$1;
-    Notification.prototype = Object.create( Modal$$1 && Modal$$1.prototype );
+    if ( Modal ) Notification.__proto__ = Modal;
+    Notification.prototype = Object.create( Modal && Modal.prototype );
     Notification.prototype.constructor = Notification;
 
     Notification.prototype.render = function render () {
@@ -32381,11 +35565,11 @@
 
   /* eslint "no-useless-escape": "off" */
 
-  var Autocomplete = /*@__PURE__*/(function (Framework7Class$$1) {
+  var Autocomplete = /*@__PURE__*/(function (Framework7Class) {
     function Autocomplete(app, params) {
       if ( params === void 0 ) params = {};
 
-      Framework7Class$$1.call(this, params, [app]);
+      Framework7Class.call(this, params, [app]);
 
       var ac = this;
       ac.app = app;
@@ -32394,6 +35578,9 @@
         on: {},
       }, app.params.autocomplete);
 
+      if (typeof defaults.searchbarDisableButton === 'undefined') {
+        defaults.searchbarDisableButton = app.theme !== 'aurora';
+      }
 
       // Extend defaults with modules params
       ac.useModulesParams(defaults);
@@ -32416,7 +35603,8 @@
       if (ac.params.view) {
         view = ac.params.view;
       } else if ($openerEl || $inputEl) {
-        view = app.views.get($openerEl || $inputEl);
+        var $el = $openerEl || $inputEl;
+        view = $el.closest('.view').length && $el.closest('.view')[0].f7View;
       }
       if (!view) { view = app.views.main; }
 
@@ -32574,19 +35762,54 @@
       }
       function onInputBlur() {
         if (ac.$dropdownEl.find('label.active-state').length > 0) { return; }
-        ac.close();
+        setTimeout(function () {
+          ac.close();
+        }, 0);
       }
       function onResize() {
         ac.positionDropdown();
       }
 
       function onKeyDown(e) {
-        if (ac.opened && e.keyCode === 13) {
+        if (!ac.opened) { return; }
+        if (e.keyCode === 27) {
+          // ESC
           e.preventDefault();
           ac.$inputEl.blur();
+          return;
         }
+        if (e.keyCode === 13) {
+          // Enter
+          var $selectedItemLabel = ac.$dropdownEl.find('.autocomplete-dropdown-selected label');
+          if ($selectedItemLabel.length) {
+            e.preventDefault();
+            $selectedItemLabel.trigger('click');
+            ac.$inputEl.blur();
+            return;
+          }
+          if (ac.params.typeahead) {
+            e.preventDefault();
+            ac.$inputEl.blur();
+          }
+          return;
+        }
+        if (e.keyCode !== 40 && e.keyCode !== 38) { return; }
+        e.preventDefault();
+        var $selectedItem = ac.$dropdownEl.find('.autocomplete-dropdown-selected');
+        var $newItem;
+        if ($selectedItem.length) {
+          $newItem = $selectedItem[e.keyCode === 40 ? 'next' : 'prev']('li');
+          if (!$newItem.length) {
+            $newItem = ac.$dropdownEl.find('li').eq(e.keyCode === 40 ? 0 : ac.$dropdownEl.find('li').length - 1);
+          }
+        } else {
+          $newItem = ac.$dropdownEl.find('li').eq(e.keyCode === 40 ? 0 : ac.$dropdownEl.find('li').length - 1);
+        }
+        if ($newItem.hasClass('autocomplete-dropdown-placeholder')) { return; }
+        $selectedItem.removeClass('autocomplete-dropdown-selected');
+        $newItem.addClass('autocomplete-dropdown-selected');
       }
-      function onDropdownclick() {
+      function onDropdownClick() {
         var $clickedEl = $(this);
         var clickedItem;
         for (var i = 0; i < ac.items.length; i += 1) {
@@ -32602,7 +35825,6 @@
         }
         ac.value = [clickedItem];
         ac.emit('local::change autocompleteChange', [clickedItem]);
-
         ac.close();
       }
 
@@ -32618,9 +35840,7 @@
           } else {
             ac.$inputEl.on('blur', onInputBlur);
           }
-          if (ac.params.typeahead) {
-            ac.$inputEl.on('keydown', onKeyDown);
-          }
+          ac.$inputEl.on('keydown', onKeyDown);
         }
       };
       ac.detachEvents = function attachEvents() {
@@ -32635,17 +35855,15 @@
           } else {
             ac.$inputEl.off('blur', onInputBlur);
           }
-          if (ac.params.typeahead) {
-            ac.$inputEl.off('keydown', onKeyDown);
-          }
+          ac.$inputEl.off('keydown', onKeyDown);
         }
       };
       ac.attachDropdownEvents = function attachDropdownEvents() {
-        ac.$dropdownEl.on('click', 'label', onDropdownclick);
+        ac.$dropdownEl.on('click', 'label', onDropdownClick);
         app.on('resize', onResize);
       };
       ac.detachDropdownEvents = function detachDropdownEvents() {
-        ac.$dropdownEl.off('click', 'label', onDropdownclick);
+        ac.$dropdownEl.off('click', 'label', onDropdownClick);
         app.off('resize', onResize);
       };
 
@@ -32672,8 +35890,8 @@
       return ac;
     }
 
-    if ( Framework7Class$$1 ) Autocomplete.__proto__ = Framework7Class$$1;
-    Autocomplete.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) Autocomplete.__proto__ = Framework7Class;
+    Autocomplete.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     Autocomplete.prototype.constructor = Autocomplete;
 
     Autocomplete.prototype.positionDropdown = function positionDropdown () {
@@ -32805,13 +36023,13 @@
 
     Autocomplete.prototype.renderPreloader = function renderPreloader () {
       var ac = this;
-      return ("\n      <div class=\"autocomplete-preloader preloader " + (ac.params.preloaderColor ? ("color-" + (ac.params.preloaderColor)) : '') + "\">" + (ac.app.theme === 'md' ? Utils.mdPreloaderContent : '') + "</div>\n    ").trim();
+      return ("\n      <div class=\"autocomplete-preloader preloader " + (ac.params.preloaderColor ? ("color-" + (ac.params.preloaderColor)) : '') + "\">" + (Utils[((ac.app.theme) + "PreloaderContent")] || '') + "</div>\n    ").trim();
     };
 
     Autocomplete.prototype.renderSearchbar = function renderSearchbar () {
       var ac = this;
       if (ac.params.renderSearchbar) { return ac.params.renderSearchbar.call(ac); }
-      var searchbarHTML = ("\n      <form class=\"searchbar\">\n        <div class=\"searchbar-inner\">\n          <div class=\"searchbar-input-wrap\">\n            <input type=\"search\" placeholder=\"" + (ac.params.searchbarPlaceholder) + "\"/>\n            <i class=\"searchbar-icon\"></i>\n            <span class=\"input-clear-button\"></span>\n          </div>\n          <span class=\"searchbar-disable-button\">" + (ac.params.searchbarDisableText) + "</span>\n        </div>\n      </form>\n    ").trim();
+      var searchbarHTML = ("\n      <form class=\"searchbar\">\n        <div class=\"searchbar-inner\">\n          <div class=\"searchbar-input-wrap\">\n            <input type=\"search\" placeholder=\"" + (ac.params.searchbarPlaceholder) + "\"/>\n            <i class=\"searchbar-icon\"></i>\n            <span class=\"input-clear-button\"></span>\n          </div>\n          " + (ac.params.searchbarDisableButton ? ("\n          <span class=\"searchbar-disable-button\">" + (ac.params.searchbarDisableText) + "</span>\n          ") : '') + "\n        </div>\n      </form>\n    ").trim();
       return searchbarHTML;
     };
 
@@ -32839,29 +36057,36 @@
       if (typeof pageTitle === 'undefined' && ac.$openerEl && ac.$openerEl.length) {
         pageTitle = ac.$openerEl.find('.item-title').text().trim();
       }
-      var navbarHtml = ("\n      <div class=\"navbar " + (ac.params.navbarColorTheme ? ("color-theme-" + (ac.params.navbarColorTheme)) : '') + "\">\n        <div class=\"navbar-inner " + (ac.params.navbarColorTheme ? ("color-theme-" + (ac.params.navbarColorTheme)) : '') + "\">\n          <div class=\"left sliding\">\n            <a href=\"#\" class=\"link " + (ac.params.openIn === 'page' ? 'back' : 'popup-close') + "\" " + (ac.params.openIn === 'popup' ? 'data-popup=".autocomplete-popup"' : '') + ">\n              <i class=\"icon icon-back\"></i>\n              <span class=\"ios-only\">" + (ac.params.openIn === 'page' ? ac.params.pageBackLinkText : ac.params.popupCloseLinkText) + "</span>\n            </a>\n          </div>\n          " + (pageTitle ? ("<div class=\"title sliding\">" + pageTitle + "</div>") : '') + "\n          " + (ac.params.preloader ? ("\n          <div class=\"right\">\n            " + (ac.renderPreloader()) + "\n          </div>\n          ") : '') + "\n          <div class=\"subnavbar sliding\">" + (ac.renderSearchbar()) + "</div>\n        </div>\n      </div>\n    ").trim();
+      var inPopup = ac.params.openIn === 'popup';
+      var navbarLeft = inPopup
+        ? ("\n        " + (ac.params.preloader ? ("\n        <div class=\"left\">\n          " + (ac.renderPreloader()) + "\n        </div>\n        ") : '') + "\n      ")
+        : ("\n        <div class=\"left sliding\">\n          <a class=\"link back\">\n            <i class=\"icon icon-back\"></i>\n            <span class=\"if-not-md\">" + (ac.params.pageBackLinkText) + "</span>\n          </a>\n        </div>\n      ");
+      var navbarRight = inPopup
+        ? ("\n        <div class=\"right\">\n          <a class=\"link popup-close\" data-popup=\".autocomplete-popup\">\n            " + (ac.params.popupCloseLinkText) + "\n          </a>\n        </div>\n      ")
+        : ("\n        " + (ac.params.preloader ? ("\n        <div class=\"right\">\n          " + (ac.renderPreloader()) + "\n        </div>\n        ") : '') + "\n      ");
+      var navbarHtml = ("\n      <div class=\"navbar " + (ac.params.navbarColorTheme ? ("color-" + (ac.params.navbarColorTheme)) : '') + "\">\n        <div class=\"navbar-inner " + (ac.params.navbarColorTheme ? ("color-" + (ac.params.navbarColorTheme)) : '') + "\">\n          " + navbarLeft + "\n          " + (pageTitle ? ("<div class=\"title sliding\">" + pageTitle + "</div>") : '') + "\n          " + navbarRight + "\n          <div class=\"subnavbar sliding\">" + (ac.renderSearchbar()) + "</div>\n        </div>\n      </div>\n    ").trim();
       return navbarHtml;
     };
 
     Autocomplete.prototype.renderDropdown = function renderDropdown () {
       var ac = this;
       if (ac.params.renderDropdown) { return ac.params.renderDropdown.call(ac, ac.items); }
-      var dropdownHtml = ("\n      <div class=\"autocomplete-dropdown\">\n        <div class=\"autocomplete-dropdown-inner\">\n          <div class=\"list " + (!ac.params.expandInput ? 'no-ios-edge' : '') + "\">\n            <ul></ul>\n          </div>\n        </div>\n        " + (ac.params.preloader ? ac.renderPreloader() : '') + "\n      </div>\n    ").trim();
+      var dropdownHtml = ("\n      <div class=\"autocomplete-dropdown\">\n        <div class=\"autocomplete-dropdown-inner\">\n          <div class=\"list " + (!ac.params.expandInput ? 'no-safe-areas' : '') + "\">\n            <ul></ul>\n          </div>\n        </div>\n        " + (ac.params.preloader ? ac.renderPreloader() : '') + "\n      </div>\n    ").trim();
       return dropdownHtml;
     };
 
-    Autocomplete.prototype.renderPage = function renderPage () {
+    Autocomplete.prototype.renderPage = function renderPage (inPopup) {
       var ac = this;
       if (ac.params.renderPage) { return ac.params.renderPage.call(ac, ac.items); }
 
-      var pageHtml = ("\n      <div class=\"page page-with-subnavbar autocomplete-page\" data-name=\"autocomplete-page\">\n        " + (ac.renderNavbar()) + "\n        <div class=\"searchbar-backdrop\"></div>\n        <div class=\"page-content\">\n          <div class=\"list autocomplete-list autocomplete-found autocomplete-list-" + (ac.id) + " " + (ac.params.formColorTheme ? ("color-theme-" + (ac.params.formColorTheme)) : '') + "\">\n            <ul></ul>\n          </div>\n          <div class=\"list autocomplete-not-found\">\n            <ul>\n              <li class=\"item-content\"><div class=\"item-inner\"><div class=\"item-title\">" + (ac.params.notFoundText) + "</div></div></li>\n            </ul>\n          </div>\n          <div class=\"list autocomplete-values\">\n            <ul></ul>\n          </div>\n        </div>\n      </div>\n    ").trim();
+      var pageHtml = ("\n      <div class=\"page page-with-subnavbar autocomplete-page\" data-name=\"autocomplete-page\">\n        " + (ac.renderNavbar(inPopup)) + "\n        <div class=\"searchbar-backdrop\"></div>\n        <div class=\"page-content\">\n          <div class=\"list autocomplete-list autocomplete-found autocomplete-list-" + (ac.id) + " " + (ac.params.formColorTheme ? ("color-" + (ac.params.formColorTheme)) : '') + "\">\n            <ul></ul>\n          </div>\n          <div class=\"list autocomplete-not-found\">\n            <ul>\n              <li class=\"item-content\"><div class=\"item-inner\"><div class=\"item-title\">" + (ac.params.notFoundText) + "</div></div></li>\n            </ul>\n          </div>\n          <div class=\"list autocomplete-values\">\n            <ul></ul>\n          </div>\n        </div>\n      </div>\n    ").trim();
       return pageHtml;
     };
 
     Autocomplete.prototype.renderPopup = function renderPopup () {
       var ac = this;
       if (ac.params.renderPopup) { return ac.params.renderPopup.call(ac, ac.items); }
-      var popupHtml = ("\n      <div class=\"popup autocomplete-popup\">\n        <div class=\"view\">\n          " + (ac.renderPage()) + ";\n        </div>\n      </div>\n    ").trim();
+      var popupHtml = ("\n      <div class=\"popup autocomplete-popup\">\n        <div class=\"view\">\n          " + (ac.renderPage(true)) + ";\n        </div>\n      </div>\n    ").trim();
       return popupHtml;
     };
 
@@ -33141,6 +36366,7 @@
         pageTitle: undefined,
         searchbarPlaceholder: 'Search...',
         searchbarDisableText: 'Cancel',
+        searchbarDisableButton: undefined,
 
         animate: true,
 
@@ -33199,11 +36425,11 @@
     },
   };
 
-  var Tooltip = /*@__PURE__*/(function (Framework7Class$$1) {
+  var Tooltip = /*@__PURE__*/(function (Framework7Class) {
     function Tooltip(app, params) {
       if ( params === void 0 ) params = {};
 
-      Framework7Class$$1.call(this, app, params);
+      Framework7Class.call(this, params, [app]);
 
       var tooltip = this;
 
@@ -33278,7 +36504,7 @@
       }
 
       tooltip.attachEvents = function attachEvents() {
-        $el.on('transitionend webkitTransitionEnd', handleTransitionEnd);
+        $el.on('transitionend', handleTransitionEnd);
         if (Support.touch) {
           var passive = Support.passiveListener ? { passive: true } : false;
           $targetEl.on(app.touchEvents.start, handleTouchStart, passive);
@@ -33290,7 +36516,7 @@
         }
       };
       tooltip.detachEvents = function detachEvents() {
-        $el.off('transitionend webkitTransitionEnd', handleTransitionEnd);
+        $el.off('transitionend', handleTransitionEnd);
         if (Support.touch) {
           var passive = Support.passiveListener ? { passive: true } : false;
           $targetEl.off(app.touchEvents.start, handleTouchStart, passive);
@@ -33310,8 +36536,8 @@
       return tooltip;
     }
 
-    if ( Framework7Class$$1 ) Tooltip.__proto__ = Framework7Class$$1;
-    Tooltip.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) Tooltip.__proto__ = Framework7Class;
+    Tooltip.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     Tooltip.prototype.constructor = Tooltip;
 
     Tooltip.prototype.position = function position (targetEl) {
@@ -33531,11 +36757,24 @@
           if (!text) { return; }
           app.tooltip.create({ targetEl: el, text: text });
         });
+        if (app.theme === 'ios' && page.view && page.view.router.separateNavbar && page.$navbarEl && page.$navbarEl.length > 0) {
+          page.$navbarEl.find('.tooltip-init').each(function (index, el) {
+            var text = $(el).attr('data-tooltip');
+            if (!text) { return; }
+            app.tooltip.create({ targetEl: el, text: text });
+          });
+        }
       },
       pageBeforeRemove: function pageBeforeRemove(page) {
+        var app = this;
         page.$el.find('.tooltip-init').each(function (index, el) {
           if (el.f7Tooltip) { el.f7Tooltip.destroy(); }
         });
+        if (app.theme === 'ios' && page.view && page.view.router.separateNavbar && page.$navbarEl && page.$navbarEl.length > 0) {
+          page.$navbarEl.find('.tooltip-init').each(function (index, el) {
+            if (el.f7Tooltip) { el.f7Tooltip.destroy(); }
+          });
+        }
       },
     },
     vnode: {
@@ -33547,6 +36786,13 @@
           if (!text) { return; }
           app.tooltip.create({ targetEl: el, text: text });
         },
+        update: function update(vnode) {
+          var el = vnode.elm;
+          if (!el.f7Tooltip) { return; }
+          if (vnode && vnode.data && vnode.data.attrs && vnode.data.attrs['data-tooltip']) {
+            el.f7Tooltip.setText(vnode.data.attrs['data-tooltip']);
+          }
+        },
         destroy: function destroy(vnode) {
           var el = vnode.elm;
           if (el.f7Tooltip) { el.f7Tooltip.destroy(); }
@@ -33557,12 +36803,12 @@
 
   /* eslint no-nested-ternary: off */
 
-  var Gauge = /*@__PURE__*/(function (Framework7Class$$1) {
+  var Gauge = /*@__PURE__*/(function (Framework7Class) {
     function Gauge(app, params) {
       if ( params === void 0 ) params = {};
 
       // Extends with open/close Modal methods;
-      Framework7Class$$1.call(this, app, params);
+      Framework7Class.call(this, params, [app]);
 
       var gauge = this;
 
@@ -33598,8 +36844,8 @@
       return gauge;
     }
 
-    if ( Framework7Class$$1 ) Gauge.__proto__ = Framework7Class$$1;
-    Gauge.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) Gauge.__proto__ = Framework7Class;
+    Gauge.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     Gauge.prototype.constructor = Gauge;
 
     Gauge.prototype.calcRadius = function calcRadius () {
@@ -33887,11 +37133,2157 @@
     },
   };
 
-  var ViAd = /*@__PURE__*/(function (Framework7Class$$1) {
+  var Skeleton = {
+    name: 'skeleton',
+  };
+
+  var Menu = {
+    open: function open(el) {
+      if ( el === void 0 ) el = '.menu-item-dropdown';
+
+      var app = this;
+      if (!el) { return; }
+      var $el = $(el).closest('.menu-item-dropdown');
+      if (!$el.length) { return; }
+      var $menuEl = $el.closest('.menu').eq(0);
+      if ($menuEl.length) {
+        var zIndex = $menuEl.css('z-index');
+        var originalZIndex = $menuEl[0].style.zIndex;
+        $menuEl.css('z-index', parseInt(zIndex || 0, 0) + 1);
+        $menuEl[0].f7MenuZIndex = originalZIndex;
+      }
+      $el.eq(0).addClass('menu-item-dropdown-opened').trigger('menu:opened');
+      app.emit('menuOpened', $el.eq(0)[0]);
+    },
+    close: function close(el) {
+      if ( el === void 0 ) el = '.menu-item-dropdown-opened';
+
+      var app = this;
+      if (!el) { return; }
+      var $el = $(el).closest('.menu-item-dropdown-opened');
+      if (!$el.length) { return; }
+      var $menuEl = $el.closest('.menu').eq(0);
+      if ($menuEl.length) {
+        var zIndex = $menuEl[0].f7MenuZIndex;
+        $menuEl.css('z-index', zIndex);
+        delete $menuEl[0].f7MenuZIndex;
+      }
+      $el.eq(0).removeClass('menu-item-dropdown-opened').trigger('menu:closed');
+      app.emit('menuClosed', $el.eq(0)[0]);
+    },
+  };
+
+  var Menu$1 = {
+    name: 'menu',
+    create: function create() {
+      var app = this;
+      app.menu = {
+        open: Menu.open.bind(app),
+        close: Menu.close.bind(app),
+      };
+    },
+    on: {
+      click: function click(e) {
+        var app = this;
+        var openedMenus = $('.menu-item-dropdown-opened');
+        if (!openedMenus.length) { return; }
+        openedMenus.each(function (index, el) {
+          if (!$(e.target).closest('.menu-item-dropdown-opened').length) {
+            app.menu.close(el);
+          }
+        });
+      },
+    },
+    clicks: {
+      '.menu-item-dropdown': function onClick($clickedEl, dataset, e) {
+        var app = this;
+        if ($clickedEl.hasClass('menu-item-dropdown-opened')) {
+          if ($(e.target).closest('.menu-dropdown').length) { return; }
+          app.menu.close($clickedEl);
+        } else {
+          app.menu.open($clickedEl);
+        }
+      },
+      '.menu-close': function onClick() {
+        var app = this;
+        app.menu.close();
+      },
+    },
+  };
+
+  var moduleAlphaSlider = {
+    render: function render(self) {
+      var ref = self.params;
+      var sliderLabel = ref.sliderLabel;
+      var sliderValue = ref.sliderValue;
+      var sliderValueEditable = ref.sliderValueEditable;
+      var alphaLabelText = ref.alphaLabelText;
+      return ("\n      <div class=\"color-picker-module color-picker-module-alpha-slider\">\n        <div class=\"color-picker-slider-wrap\">\n          " + (sliderLabel ? ("\n            <div class=\"color-picker-slider-label\">" + alphaLabelText + "</div>\n          ") : '') + "\n          <div class=\"range-slider color-picker-slider color-picker-slider-alpha\"></div>\n          " + (sliderValue ? ("\n            <div class=\"color-picker-slider-value\">\n              " + (sliderValueEditable ? "\n                <input type=\"number\" step=\"0.01\" min=\"0\" max=\"1\" class=\"color-picker-value-alpha\">\n              " : "\n                <span class=\"color-picker-value-alpha\"></span>\n              ") + "\n            </div>\n          ") : '') + "\n        </div>\n      </div>\n    ");
+    },
+    init: function init(self) {
+      self.alphaRangeSlider = self.app.range.create({
+        el: self.$el.find('.color-picker-slider-alpha'),
+        min: 0,
+        max: 1,
+        step: 0.01,
+        value: 1,
+        on: {
+          change: function change(range, value) {
+            var alpha = Math.floor(value * 100) / 100;
+            self.setValue({ alpha: alpha });
+          },
+        },
+      });
+      function handleInputChange(e) {
+        var alpha = self.value.alpha;
+        var value = parseFloat(e.target.value);
+        if (Number.isNaN(value)) {
+          e.target.value = alpha;
+          return;
+        }
+        value = Math.max(0, Math.min(1, value));
+        self.setValue({ alpha: value });
+      }
+
+      self.$el.on('change', '.color-picker-module-alpha-slider input', handleInputChange);
+
+      self.destroyAlphaSliderEvents = function destroyAlphaSliderEvents() {
+        self.$el.off('change', '.color-picker-module-alpha-slider input', handleInputChange);
+      };
+    },
+    update: function update(self) {
+      var value = self.value;
+      var ref = self.params;
+      var sliderValue = ref.sliderValue;
+      var sliderValueEditable = ref.sliderValueEditable;
+
+      var alpha = value.alpha;
+      self.alphaRangeSlider.value = alpha;
+      self.alphaRangeSlider.layout();
+      if (sliderValue && sliderValueEditable) {
+        self.$el.find('input.color-picker-value-alpha').val(alpha);
+      } else {
+        self.$el.find('span.color-picker-value-alpha').text(alpha);
+      }
+    },
+    destroy: function destroy(self) {
+      if (self.alphaRangeSlider && self.alphaRangeSlider.destroy) {
+        self.alphaRangeSlider.destroy();
+      }
+      delete self.alphaRangeSlider;
+
+      if (self.destroyAlphaSliderEvents) { self.destroyAlphaSliderEvents(); }
+      delete self.destroyAlphaSliderEvents;
+    },
+  };
+
+  var moduleCurrentColor = {
+    render: function render() {
+      return "\n      <div class=\"color-picker-module color-picker-module-current-color\">\n        <div class=\"color-picker-current-color\"></div>\n      </div>\n    ";
+    },
+    update: function update(self) {
+      self.$el.find('.color-picker-module-current-color .color-picker-current-color').css(
+        'background-color',
+        self.value.hex
+      );
+    },
+  };
+
+  var moduleHex = {
+    render: function render(self) {
+      var ref = self.params;
+      var hexLabel = ref.hexLabel;
+      var hexLabelText = ref.hexLabelText;
+      var hexValueEditable = ref.hexValueEditable;
+      return ("\n      <div class=\"color-picker-module color-picker-module-hex\">\n        <div class=\"color-picker-hex-wrap\">\n          " + (hexLabel ? ("\n            <div class=\"color-picker-hex-label\">" + hexLabelText + "</div>\n          ") : '') + "\n          <div class=\"color-picker-hex-value\">\n            " + (hexValueEditable ? "\n              <input type=\"text\" class=\"color-picker-value-hex\">\n            " : "\n              <span class=\"color-picker-value-hex\"></span>\n            ") + "\n          </div>\n        </div>\n      </div>\n    ");
+    },
+    init: function init(self) {
+      function handleInputChange(e) {
+        var hex = self.value.hex;
+        var value = e.target.value.replace(/#/g, '');
+        if (Number.isNaN(value) || !value || (value.length !== 3 && value.length !== 6)) {
+          e.target.value = hex;
+          return;
+        }
+        var min = 0;
+        var current = parseInt(value, 16);
+        var max = parseInt('ffffff', 16); // eslint-disable-line
+        if (current > max) {
+          value = 'fff';
+        }
+        if (current < min) {
+          value = '000';
+        }
+        self.setValue({ hex: value });
+      }
+
+      self.$el.on('change', '.color-picker-module-hex input', handleInputChange);
+
+      self.destroyHexEvents = function destroyHexEvents() {
+        self.$el.off('change', '.color-picker-module-hex input', handleInputChange);
+      };
+    },
+    update: function update(self) {
+      var value = self.value;
+
+      var ref = self.params;
+      var hexValueEditable = ref.hexValueEditable;
+
+      var hex = value.hex;
+      if (hexValueEditable) {
+        self.$el.find('input.color-picker-value-hex').val(hex);
+      } else {
+        self.$el.find('span.color-picker-value-hex').text(hex);
+      }
+    },
+    destroy: function destroy(self) {
+      if (self.destroyHexEvents) { self.destroyHexEvents(); }
+      delete self.destroyHexEvents;
+    },
+  };
+
+  var moduleHsbSliders = {
+    render: function render(self) {
+      var ref = self.params;
+      var sliderLabel = ref.sliderLabel;
+      var sliderValue = ref.sliderValue;
+      var sliderValueEditable = ref.sliderValueEditable;
+      var hueLabelText = ref.hueLabelText;
+      var saturationLabelText = ref.saturationLabelText;
+      var brightnessLabelText = ref.brightnessLabelText;
+      return ("\n      <div class=\"color-picker-module color-picker-module-hsb-sliders\">\n        <div class=\"color-picker-slider-wrap\">\n          " + (sliderLabel ? ("\n            <div class=\"color-picker-slider-label\">" + hueLabelText + "</div>\n          ") : '') + "\n          <div class=\"range-slider color-picker-slider color-picker-slider-hue\"></div>\n          " + (sliderValue ? ("\n            <div class=\"color-picker-slider-value\">\n              " + (sliderValueEditable ? "\n                <input type=\"number\" step=\"0.1\" min=\"0\" max=\"360\" class=\"color-picker-value-hue\" data-color-index=\"0\">\n              " : "\n                <span class=\"color-picker-value-hue\"></span>\n              ") + "\n            </div>\n          ") : '') + "\n        </div>\n        <div class=\"color-picker-slider-wrap\">\n          " + (sliderLabel ? ("\n            <div class=\"color-picker-slider-label\">" + saturationLabelText + "</div>\n          ") : '') + "\n          <div class=\"range-slider color-picker-slider color-picker-slider-saturation\"></div>\n          " + (sliderValue ? ("\n            <div class=\"color-picker-slider-value\">\n              " + (sliderValueEditable ? "\n                <input type=\"number\" step=\"0.1\" min=\"0\" max=\"100\" class=\"color-picker-value-saturation\" data-color-index=\"1\">\n              " : "\n                <span class=\"color-picker-value-saturation\"></span>\n              ") + "\n            </div>\n          ") : '') + "\n        </div>\n        <div class=\"color-picker-slider-wrap\">\n          " + (sliderLabel ? ("\n            <div class=\"color-picker-slider-label\">" + brightnessLabelText + "</div>\n          ") : '') + "\n          <div class=\"range-slider color-picker-slider color-picker-slider-brightness\"></div>\n          " + (sliderValue ? ("\n            <div class=\"color-picker-slider-value\">\n              " + (sliderValueEditable ? "\n                <input type=\"number\" step=\"0.1\" min=\"0\" max=\"100\" class=\"color-picker-value-brightness\" data-color-index=\"2\">\n              " : "\n                <span class=\"color-picker-value-brightness\"></span>\n              ") + "\n            </div>\n          ") : '') + "\n        </div>\n      </div>\n    ");
+    },
+    init: function init(self) {
+      self.hueRangeSlider = self.app.range.create({
+        el: self.$el.find('.color-picker-slider-hue'),
+        min: 0,
+        max: 360,
+        step: 0.1,
+        value: 0,
+        on: {
+          change: function change(range, value) {
+            self.setValue({ hue: value });
+          },
+        },
+      });
+      self.saturationRangeSlider = self.app.range.create({
+        el: self.$el.find('.color-picker-slider-saturation'),
+        min: 0,
+        max: 1,
+        step: 0.001,
+        value: 0,
+        on: {
+          change: function change(range, value) {
+            var s = Math.floor(value * 1000) / 1000;
+            self.setValue({ hsb: [self.value.hsb[0], s, self.value.hsb[2]] });
+          },
+        },
+      });
+      self.brightnessRangeSlider = self.app.range.create({
+        el: self.$el.find('.color-picker-slider-brightness'),
+        min: 0,
+        max: 1,
+        step: 0.001,
+        value: 0,
+        on: {
+          change: function change(range, value) {
+            var b = Math.floor(value * 1000) / 1000;
+            self.setValue({ hsb: [self.value.hsb[0], self.value.hsb[1], b] });
+          },
+        },
+      });
+
+      function handleInputChange(e) {
+        var hsb = [].concat( self.value.hsb );
+        var index = parseInt($(e.target).attr('data-color-index'), 10);
+        var value = parseFloat(e.target.value);
+        if (Number.isNaN(value)) {
+          e.target.value = hsb[index];
+          return;
+        }
+        if (index === 0) {
+          value = Math.max(0, Math.min(360, value));
+        } else {
+          value = Math.max(0, Math.min(100, value)) / 100;
+        }
+
+        hsb[index] = value;
+        self.setValue({ hsb: hsb });
+      }
+
+      self.$el.on('change', '.color-picker-module-hsb-sliders input', handleInputChange);
+
+      self.destroyHsbSlidersEvents = function destroyHsbSlidersEvents() {
+        self.$el.off('change', '.color-picker-module-hsb-sliders input', handleInputChange);
+      };
+    },
+    update: function update(self) {
+      var app = self.app;
+      var value = self.value;
+      var ref = self.params;
+      var sliderValue = ref.sliderValue;
+      var sliderValueEditable = ref.sliderValueEditable;
+
+      var hsb = value.hsb;
+      var hue = value.hue;
+
+      self.hueRangeSlider.value = hue;
+      self.saturationRangeSlider.value = hsb[1];
+      self.brightnessRangeSlider.value = hsb[2];
+
+      self.hueRangeSlider.layout();
+      self.saturationRangeSlider.layout();
+      self.brightnessRangeSlider.layout();
+
+      var hslCurrent = Utils.colorHsbToHsl(hsb[0], hsb[1], 1);
+      var hslLeft = Utils.colorHsbToHsl(hsb[0], 0, 1);
+      var hslRight = Utils.colorHsbToHsl(hsb[0], 1, 1);
+      var brightness = hsb[2];
+
+      self.hueRangeSlider.$el[0].style.setProperty(
+        '--f7-range-knob-color',
+        ("hsl(" + hue + ", 100%, 50%)")
+      );
+      self.saturationRangeSlider.$el[0].style.setProperty(
+        '--f7-range-knob-color',
+        ("hsl(" + (hslCurrent[0]) + ", " + (hslCurrent[1] * 100) + "%, " + (hslCurrent[2] * 100) + "%)")
+      );
+      self.brightnessRangeSlider.$el[0].style.setProperty(
+        '--f7-range-knob-color',
+        ("rgb(" + (brightness * 255) + ", " + (brightness * 255) + ", " + (brightness * 255) + ")")
+      );
+      self.saturationRangeSlider.$el.find('.range-bar').css(
+        'background-image',
+        ("linear-gradient(" + (app.rtl ? 'to left' : 'to right') + ", hsl(" + (hslLeft[0]) + ", " + (hslLeft[1] * 100) + "%, " + (hslLeft[2] * 100) + "%), hsl(" + (hslRight[0]) + ", " + (hslRight[1] * 100) + "%, " + (hslRight[2] * 100) + "%))")
+      );
+
+      if (sliderValue && sliderValueEditable) {
+        self.$el.find('input.color-picker-value-hue').val(("" + hue));
+        self.$el.find('input.color-picker-value-saturation').val(("" + (hsb[1] * 1000 / 10)));
+        self.$el.find('input.color-picker-value-brightness').val(("" + (hsb[2] * 1000 / 10)));
+      } else if (sliderValue) {
+        self.$el.find('span.color-picker-value-hue').text(("" + hue));
+        self.$el.find('span.color-picker-value-saturation').text(("" + (hsb[1] * 1000 / 10)));
+        self.$el.find('span.color-picker-value-brightness').text(("" + (hsb[2] * 1000 / 10)));
+      }
+    },
+    destroy: function destroy(self) {
+      if (self.hueRangeSlider && self.hueRangeSlider.destroy) {
+        self.hueRangeSlider.destroy();
+      }
+      if (self.saturationRangeSlider && self.saturationRangeSlider.destroy) {
+        self.saturationRangeSlider.destroy();
+      }
+      if (self.brightnessRangeSlider && self.brightnessRangeSlider.destroy) {
+        self.brightnessRangeSlider.destroy();
+      }
+
+      delete self.hueRangeSlider;
+      delete self.saturationRangeSlider;
+      delete self.brightnessRangeSlider;
+
+      if (self.destroyHsbSlidersEvents) { self.destroyHsbSlidersEvents(); }
+      delete self.destroyHsbSlidersEvents;
+    },
+  };
+
+  var moduleHueSlider = {
+    render: function render(self) {
+      var ref = self.params;
+      var sliderLabel = ref.sliderLabel;
+      var sliderValue = ref.sliderValue;
+      var sliderValueEditable = ref.sliderValueEditable;
+      var hueLabelText = ref.hueLabelText;
+      return ("\n      <div class=\"color-picker-module color-picker-module-hue-slider\">\n        <div class=\"color-picker-slider-wrap\">\n          " + (sliderLabel ? ("\n            <div class=\"color-picker-slider-label\">" + hueLabelText + "</div>\n          ") : '') + "\n          <div class=\"range-slider color-picker-slider color-picker-slider-hue\"></div>\n          " + (sliderValue ? ("\n            <div class=\"color-picker-slider-value\">\n              " + (sliderValueEditable ? "\n                <input type=\"number\" step=\"0.1\" min=\"0\" max=\"360\" class=\"color-picker-value-hue\">\n              " : "\n                <span class=\"color-picker-value-hue\"></span>\n              ") + "\n            </div>\n          ") : '') + "\n        </div>\n      </div>\n    ");
+    },
+    init: function init(self) {
+      self.hueRangeSlider = self.app.range.create({
+        el: self.$el.find('.color-picker-slider-hue'),
+        min: 0,
+        max: 360,
+        step: 0.1,
+        value: 0,
+        on: {
+          change: function change(range, value) {
+            self.setValue({ hue: value });
+          },
+        },
+      });
+    },
+    update: function update(self) {
+      var value = self.value;
+      var ref = self.params;
+      var sliderValue = ref.sliderValue;
+      var sliderValueEditable = ref.sliderValueEditable;
+
+      var hue = value.hue;
+
+      self.hueRangeSlider.value = hue;
+      self.hueRangeSlider.layout();
+      self.hueRangeSlider.$el[0].style.setProperty(
+        '--f7-range-knob-color',
+        ("hsl(" + hue + ", 100%, 50%)")
+      );
+      if (sliderValue && sliderValueEditable) {
+        self.$el.find('input.color-picker-value-hue').val(("" + hue));
+      } else if (sliderValue) {
+        self.$el.find('span.color-picker-value-hue').text(("" + hue));
+      }
+    },
+    destroy: function destroy(self) {
+      if (self.hueRangeSlider && self.hueRangeSlider.destroy) {
+        self.hueRangeSlider.destroy();
+      }
+      delete self.hueRangeSlider;
+    },
+  };
+
+  var moduleBrightnessSlider = {
+    render: function render(self) {
+      var ref = self.params;
+      var sliderLabel = ref.sliderLabel;
+      var sliderValue = ref.sliderValue;
+      var sliderValueEditable = ref.sliderValueEditable;
+      var brightnessLabelText = ref.brightnessLabelText;
+      return ("\n      <div class=\"color-picker-module color-picker-module-brightness-slider\">\n        <div class=\"color-picker-slider-wrap\">\n          " + (sliderLabel ? ("\n            <div class=\"color-picker-slider-label\">" + brightnessLabelText + "</div>\n          ") : '') + "\n          <div class=\"range-slider color-picker-slider color-picker-slider-brightness\"></div>\n          " + (sliderValue ? ("\n            <div class=\"color-picker-slider-value\">\n              " + (sliderValueEditable ? "\n                <input type=\"number\" step=\"0.1\" min=\"0\" max=\"100\" class=\"color-picker-value-brightness\">\n              " : "\n                <span class=\"color-picker-value-brightness\"></span>\n              ") + "\n            </div>\n          ") : '') + "\n        </div>\n      </div>\n    ");
+    },
+    init: function init(self) {
+      self.brightnessRangeSlider = self.app.range.create({
+        el: self.$el.find('.color-picker-slider-brightness'),
+        min: 0,
+        max: 1,
+        step: 0.001,
+        value: 0,
+        on: {
+          change: function change(range, value) {
+            var b = Math.floor(value * 1000) / 1000;
+            self.setValue({ hsb: [self.value.hsb[0], self.value.hsb[1], b] });
+          },
+        },
+      });
+    },
+    update: function update(self) {
+      var value = self.value;
+      var app = self.app;
+      var ref = self.params;
+      var sliderValue = ref.sliderValue;
+      var sliderValueEditable = ref.sliderValueEditable;
+
+      var hsb = value.hsb;
+
+      self.brightnessRangeSlider.value = hsb[2];
+      self.brightnessRangeSlider.layout();
+
+      var hslCurrent = Utils.colorHsbToHsl(hsb[0], hsb[1], hsb[2]);
+      var hslLeft = Utils.colorHsbToHsl(hsb[0], hsb[1], 0);
+      var hslRight = Utils.colorHsbToHsl(hsb[0], hsb[1], 1);
+
+      self.brightnessRangeSlider.$el[0].style.setProperty(
+        '--f7-range-knob-color',
+        ("hsl(" + (hslCurrent[0]) + ", " + (hslCurrent[1] * 100) + "%, " + (hslCurrent[2] * 100) + "%)")
+      );
+      self.brightnessRangeSlider.$el.find('.range-bar').css(
+        'background-image',
+        ("linear-gradient(" + (app.rtl ? 'to left' : 'to right') + ", hsl(" + (hslLeft[0]) + ", " + (hslLeft[1] * 100) + "%, " + (hslLeft[2] * 100) + "%), hsl(" + (hslRight[0]) + ", " + (hslRight[1] * 100) + "%, " + (hslRight[2] * 100) + "%))")
+      );
+      if (sliderValue && sliderValueEditable) {
+        self.$el.find('input.color-picker-value-brightness').val(("" + (hsb[2] * 1000 / 10)));
+      } else if (sliderValue) {
+        self.$el.find('span.color-picker-value-brightness').text(("" + (hsb[2] * 1000 / 10)));
+      }
+    },
+    destroy: function destroy(self) {
+      if (self.brightnessRangeSlider && self.brightnessRangeSlider.destroy) {
+        self.brightnessRangeSlider.destroy();
+      }
+      delete self.brightnessRangeSlider;
+    },
+  };
+
+  /* eslint indent: ["off"] */
+
+  var modulePalette = {
+    render: function render(self) {
+      return ("\n      <div class=\"color-picker-module color-picker-module-palette\">\n        <div class=\"color-picker-palette\">\n          " + (self.params.palette.map(function (p) {
+              if (Array.isArray(p)) {
+                var row = '<div class="color-picker-palette-row">';
+                row += p.map(function (c) { return ("\n                <div class=\"color-picker-palette-value\" data-palette-color=\"" + c + "\" style=\"background-color: " + c + "\"></div>\n              "); }).join('');
+                row += '</div>';
+                return row;
+              }
+              return ("\n              <div class=\"color-picker-palette-value\" data-palette-color=\"" + p + "\" style=\"background-color: " + p + "\"></div>\n            ");
+            }).join('')) + "\n        </div>\n      </div>\n    ");
+    },
+    init: function init(self) {
+      function handlePaletteClick(e) {
+        var hex = $(e.target).attr('data-palette-color');
+        self.setValue({
+          hex: hex,
+        });
+      }
+
+      self.$el.on('click', '.color-picker-module-palette .color-picker-palette-value', handlePaletteClick);
+
+      self.destroyPaletteEvents = function destroyPaletteEvents() {
+        self.$el.off('click', '.color-picker-module-hex input', handlePaletteClick);
+      };
+    },
+    destroy: function destroy(self) {
+      if (self.destroyPaletteEvents) {
+        self.destroyPaletteEvents();
+      }
+      delete self.destroyPaletteEvents;
+    },
+  };
+
+  var moduleInitialCurrentColors = {
+    render: function render() {
+      return "\n      <div class=\"color-picker-module color-picker-module-initial-current-colors\">\n        <div class=\"color-picker-initial-current-colors\">\n          <div class=\"color-picker-initial-color\"></div>\n          <div class=\"color-picker-current-color\"></div>\n        </div>\n      </div>\n    ";
+    },
+    init: function init(self) {
+      function handleInitialColorClick() {
+        if (self.initialValue) {
+          var ref = self.initialValue;
+          var hex = ref.hex;
+          var alpha = ref.alpha;
+          self.setValue({
+            hex: hex,
+            alpha: alpha,
+          });
+        }
+      }
+      self.$el.on('click', '.color-picker-initial-color', handleInitialColorClick);
+      self.destroyInitialCurrentEvents = function destroyInitialCurrentEvents() {
+        self.$el.off('click', '.color-picker-initial-color', handleInitialColorClick);
+      };
+    },
+    update: function update(self) {
+      self.$el.find('.color-picker-module-initial-current-colors .color-picker-initial-color').css(
+        'background-color',
+        self.initialValue.hex
+      );
+      self.$el.find('.color-picker-module-initial-current-colors .color-picker-current-color').css(
+        'background-color',
+        self.value.hex
+      );
+    },
+    destroy: function destroy(self) {
+      if (self.destroyInitialCurrentEvents) {
+        self.destroyInitialCurrentEvents();
+      }
+      delete self.destroyInitialCurrentEvents;
+    },
+  };
+
+  var moduleRgbBars = {
+    render: function render(self) {
+      var ref = self.params;
+      var barLabel = ref.barLabel;
+      var barValue = ref.barValue;
+      var barValueEditable = ref.barValueEditable;
+      var redLabelText = ref.redLabelText;
+      var greenLabelText = ref.greenLabelText;
+      var blueLabelText = ref.blueLabelText;
+      return ("\n      <div class=\"color-picker-module color-picker-module-rgb-bars\">\n        <div class=\"color-picker-bar-wrap\">\n          " + (barLabel ? ("\n            <div class=\"color-picker-bar-label\">" + redLabelText + "</div>\n          ") : '') + "\n          <div class=\"range-slider color-picker-bar color-picker-bar-red\"></div>\n          " + (barValue ? ("\n            <div class=\"color-picker-bar-value\">\n              " + (barValueEditable ? "\n                <input type=\"number\" step=\"1\" min=\"0\" max=\"255\" class=\"color-picker-value-bar-red\" data-color-index=\"0\">\n              " : "\n                <span class=\"color-picker-value-bar-red\"></span>\n              ") + "\n            </div>\n          ") : '') + "\n        </div>\n        <div class=\"color-picker-bar-wrap\">\n          " + (barLabel ? ("\n            <div class=\"color-picker-bar-label\">" + greenLabelText + "</div>\n          ") : '') + "\n          <div class=\"range-slider color-picker-bar color-picker-bar-green\"></div>\n          " + (barValue ? ("\n            <div class=\"color-picker-bar-value\">\n              " + (barValueEditable ? "\n                <input type=\"number\" step=\"1\" min=\"0\" max=\"255\" class=\"color-picker-value-bar-green\" data-color-index=\"1\">\n              " : "\n                <span class=\"color-picker-value-bar-green\"></span>\n              ") + "\n            </div>\n          ") : '') + "\n        </div>\n        <div class=\"color-picker-bar-wrap\">\n          " + (barLabel ? ("\n            <div class=\"color-picker-bar-label\">" + blueLabelText + "</div>\n          ") : '') + "\n          <div class=\"range-slider color-picker-bar color-picker-bar-blue\"></div>\n          " + (barValue ? ("\n            <div class=\"color-picker-bar-value\">\n              " + (barValueEditable ? "\n                <input type=\"number\" step=\"1\" min=\"0\" max=\"255\" class=\"color-picker-value-bar-blue\" data-color-index=\"2\">\n              " : "\n                <span class=\"color-picker-value-bar-blue\"></span>\n              ") + "\n            </div>\n          ") : '') + "\n        </div>\n      </div>\n    ");
+    },
+    init: function init(self) {
+      self.redBar = self.app.range.create({
+        el: self.$el.find('.color-picker-bar-red'),
+        min: 0,
+        max: 255,
+        step: 1,
+        value: 0,
+        vertical: true,
+        on: {
+          change: function change(range, value) {
+            self.setValue({ rgb: [value, self.value.rgb[1], self.value.rgb[2]] });
+          },
+        },
+      });
+      self.greenBar = self.app.range.create({
+        el: self.$el.find('.color-picker-bar-green'),
+        min: 0,
+        max: 255,
+        step: 1,
+        value: 0,
+        vertical: true,
+        on: {
+          change: function change(range, value) {
+            self.setValue({ rgb: [self.value.rgb[0], value, self.value.rgb[2]] });
+          },
+        },
+      });
+      self.blueBar = self.app.range.create({
+        el: self.$el.find('.color-picker-bar-blue'),
+        min: 0,
+        max: 255,
+        step: 1,
+        value: 0,
+        vertical: true,
+        on: {
+          change: function change(range, value) {
+            self.setValue({ rgb: [self.value.rgb[0], self.value.rgb[1], value] });
+          },
+        },
+      });
+
+      function handleInputChange(e) {
+        var rgb = [].concat( self.value.rgb );
+        var index = parseInt($(e.target).attr('data-color-index'), 10);
+        var value = parseInt(e.target.value, 10);
+        if (Number.isNaN(value)) {
+          e.target.value = rgb[index];
+          return;
+        }
+        value = Math.max(0, Math.min(255, value));
+        rgb[index] = value;
+        self.setValue({ rgb: rgb });
+      }
+
+      self.$el.on('change', '.color-picker-module-rgb-bars input', handleInputChange);
+
+      self.destroyRgbBarsEvents = function destroyRgbBarsEvents() {
+        self.$el.off('change', '.color-picker-module-rgb-bars input', handleInputChange);
+      };
+    },
+    update: function update(self) {
+      var value = self.value;
+      var redBar = self.redBar;
+      var greenBar = self.greenBar;
+      var blueBar = self.blueBar;
+
+      var ref = self.params;
+      var barValue = ref.barValue;
+      var barValueEditable = ref.barValueEditable;
+
+      var rgb = value.rgb;
+
+      redBar.value = rgb[0];
+      greenBar.value = rgb[1];
+      blueBar.value = rgb[2];
+
+      redBar.layout();
+      greenBar.layout();
+      blueBar.layout();
+
+      redBar.$el.find('.range-bar').css('background-image', ("linear-gradient(to top, rgb(0, " + (rgb[1]) + ", " + (rgb[2]) + "), rgb(255, " + (rgb[1]) + ", " + (rgb[2]) + "))"));
+      greenBar.$el.find('.range-bar').css('background-image', ("linear-gradient(to top, rgb(" + (rgb[0]) + ", 0, " + (rgb[2]) + "), rgb(" + (rgb[0]) + ", 255, " + (rgb[2]) + "))"));
+      blueBar.$el.find('.range-bar').css('background-image', ("linear-gradient(to top, rgb(" + (rgb[0]) + ", " + (rgb[1]) + ", 0), rgb(" + (rgb[0]) + ", " + (rgb[1]) + ", 255))"));
+
+      if (barValue && barValueEditable) {
+        self.$el.find('input.color-picker-value-bar-red').val(rgb[0]);
+        self.$el.find('input.color-picker-value-bar-green').val(rgb[1]);
+        self.$el.find('input.color-picker-value-bar-blue').val(rgb[2]);
+      } else if (barValue) {
+        self.$el.find('span.color-picker-value-bar-red').text(rgb[0]);
+        self.$el.find('span.color-picker-value-bar-green').text(rgb[1]);
+        self.$el.find('span.color-picker-value-bar-blue').text(rgb[2]);
+      }
+    },
+    destroy: function destroy(self) {
+      if (self.redBar && self.redBar.destroy) {
+        self.redBar.destroy();
+      }
+      if (self.greenBar && self.greenBar.destroy) {
+        self.greenBar.destroy();
+      }
+      if (self.blueBar && self.blueBar.destroy) {
+        self.blueBar.destroy();
+      }
+
+      delete self.redBar;
+      delete self.greenBar;
+      delete self.blueBar;
+
+      if (self.destroyRgbBarsEvents) { self.destroyRgbBarsEvents(); }
+      delete self.destroyRgbBarsEvents;
+    },
+  };
+
+  var moduleRgbSliders = {
+    render: function render(self) {
+      var ref = self.params;
+      var sliderLabel = ref.sliderLabel;
+      var sliderValue = ref.sliderValue;
+      var sliderValueEditable = ref.sliderValueEditable;
+      var redLabelText = ref.redLabelText;
+      var greenLabelText = ref.greenLabelText;
+      var blueLabelText = ref.blueLabelText;
+      return ("\n      <div class=\"color-picker-module color-picker-module-rgb-sliders\">\n        <div class=\"color-picker-slider-wrap\">\n          " + (sliderLabel ? ("\n            <div class=\"color-picker-slider-label\">" + redLabelText + "</div>\n          ") : '') + "\n          <div class=\"range-slider color-picker-slider color-picker-slider-red\"></div>\n          " + (sliderValue ? ("\n            <div class=\"color-picker-slider-value\">\n              " + (sliderValueEditable ? "\n                <input type=\"number\" step=\"1\" min=\"0\" max=\"255\" class=\"color-picker-value-red\" data-color-index=\"0\">\n              " : "\n                <span class=\"color-picker-value-red\"></span>\n              ") + "\n            </div>\n          ") : '') + "\n        </div>\n        <div class=\"color-picker-slider-wrap\">\n          " + (sliderLabel ? ("\n            <div class=\"color-picker-slider-label\">" + greenLabelText + "</div>\n          ") : '') + "\n          <div class=\"range-slider color-picker-slider color-picker-slider-green\"></div>\n          " + (sliderValue ? ("\n            <div class=\"color-picker-slider-value\">\n              " + (sliderValueEditable ? "\n                <input type=\"number\" step=\"1\" min=\"0\" max=\"255\" class=\"color-picker-value-green\" data-color-index=\"1\">\n              " : "\n                <span class=\"color-picker-value-green\"></span>\n              ") + "\n            </div>\n          ") : '') + "\n        </div>\n        <div class=\"color-picker-slider-wrap\">\n          " + (sliderLabel ? ("\n            <div class=\"color-picker-slider-label\">" + blueLabelText + "</div>\n          ") : '') + "\n          <div class=\"range-slider color-picker-slider color-picker-slider-blue\"></div>\n          " + (sliderValue ? ("\n            <div class=\"color-picker-slider-value\">\n              " + (sliderValueEditable ? "\n                <input type=\"number\" step=\"1\" min=\"0\" max=\"255\" class=\"color-picker-value-blue\" data-color-index=\"2\">\n              " : "\n                <span class=\"color-picker-value-blue\"></span>\n              ") + "\n            </div>\n          ") : '') + "\n        </div>\n      </div>\n    ");
+    },
+    init: function init(self) {
+      self.redRangeSlider = self.app.range.create({
+        el: self.$el.find('.color-picker-slider-red'),
+        min: 0,
+        max: 255,
+        step: 1,
+        value: 0,
+        on: {
+          change: function change(range, value) {
+            self.setValue({ rgb: [value, self.value.rgb[1], self.value.rgb[2]] });
+          },
+        },
+      });
+      self.greenRangeSlider = self.app.range.create({
+        el: self.$el.find('.color-picker-slider-green'),
+        min: 0,
+        max: 255,
+        step: 1,
+        value: 0,
+        on: {
+          change: function change(range, value) {
+            self.setValue({ rgb: [self.value.rgb[0], value, self.value.rgb[2]] });
+          },
+        },
+      });
+      self.blueRangeSlider = self.app.range.create({
+        el: self.$el.find('.color-picker-slider-blue'),
+        min: 0,
+        max: 255,
+        step: 1,
+        value: 0,
+        on: {
+          change: function change(range, value) {
+            self.setValue({ rgb: [self.value.rgb[0], self.value.rgb[1], value] });
+          },
+        },
+      });
+
+      function handleInputChange(e) {
+        var rgb = [].concat( self.value.rgb );
+        var index = parseInt($(e.target).attr('data-color-index'), 10);
+        var value = parseInt(e.target.value, 10);
+        if (Number.isNaN(value)) {
+          e.target.value = rgb[index];
+          return;
+        }
+        value = Math.max(0, Math.min(255, value));
+        rgb[index] = value;
+        self.setValue({ rgb: rgb });
+      }
+
+      self.$el.on('change', '.color-picker-module-rgb-sliders input', handleInputChange);
+
+      self.destroyRgbSlidersEvents = function destroyRgbSlidersEvents() {
+        self.$el.off('change', '.color-picker-module-rgb-sliders input', handleInputChange);
+      };
+    },
+    update: function update(self) {
+      var app = self.app;
+      var value = self.value;
+      var redRangeSlider = self.redRangeSlider;
+      var greenRangeSlider = self.greenRangeSlider;
+      var blueRangeSlider = self.blueRangeSlider;
+
+      var ref = self.params;
+      var sliderValue = ref.sliderValue;
+      var sliderValueEditable = ref.sliderValueEditable;
+
+      var rgb = value.rgb;
+
+      redRangeSlider.value = rgb[0];
+      greenRangeSlider.value = rgb[1];
+      blueRangeSlider.value = rgb[2];
+
+      redRangeSlider.layout();
+      greenRangeSlider.layout();
+      blueRangeSlider.layout();
+
+      redRangeSlider.$el[0].style.setProperty('--f7-range-knob-color', ("rgb(" + (rgb[0]) + ", " + (rgb[1]) + ", " + (rgb[2]) + ")"));
+      greenRangeSlider.$el[0].style.setProperty('--f7-range-knob-color', ("rgb(" + (rgb[0]) + ", " + (rgb[1]) + ", " + (rgb[2]) + ")"));
+      blueRangeSlider.$el[0].style.setProperty('--f7-range-knob-color', ("rgb(" + (rgb[0]) + ", " + (rgb[1]) + ", " + (rgb[2]) + ")"));
+
+      var direction = app.rtl ? 'to left' : 'to right';
+
+      redRangeSlider.$el.find('.range-bar').css('background-image', ("linear-gradient(" + direction + ", rgb(0, " + (rgb[1]) + ", " + (rgb[2]) + "), rgb(255, " + (rgb[1]) + ", " + (rgb[2]) + "))"));
+      greenRangeSlider.$el.find('.range-bar').css('background-image', ("linear-gradient(" + direction + ", rgb(" + (rgb[0]) + ", 0, " + (rgb[2]) + "), rgb(" + (rgb[0]) + ", 255, " + (rgb[2]) + "))"));
+      blueRangeSlider.$el.find('.range-bar').css('background-image', ("linear-gradient(" + direction + ", rgb(" + (rgb[0]) + ", " + (rgb[1]) + ", 0), rgb(" + (rgb[0]) + ", " + (rgb[1]) + ", 255))"));
+
+      if (sliderValue && sliderValueEditable) {
+        self.$el.find('input.color-picker-value-red').val(rgb[0]);
+        self.$el.find('input.color-picker-value-green').val(rgb[1]);
+        self.$el.find('input.color-picker-value-blue').val(rgb[2]);
+      } else if (sliderValue) {
+        self.$el.find('span.color-picker-value-red').text(rgb[0]);
+        self.$el.find('span.color-picker-value-green').text(rgb[1]);
+        self.$el.find('span.color-picker-value-blue').text(rgb[2]);
+      }
+    },
+    destroy: function destroy(self) {
+      if (self.redRangeSlider && self.redRangeSlider.destroy) {
+        self.redRangeSlider.destroy();
+      }
+      if (self.greenRangeSlider && self.greenRangeSlider.destroy) {
+        self.greenRangeSlider.destroy();
+      }
+      if (self.blueRangeSlider && self.blueRangeSlider.destroy) {
+        self.blueRangeSlider.destroy();
+      }
+
+      delete self.redRangeSlider;
+      delete self.greenRangeSlider;
+      delete self.blueRangeSlider;
+
+      if (self.destroyRgbSlidersEvents) { self.destroyRgbSlidersEvents(); }
+      delete self.destroyRgbSlidersEvents;
+    },
+  };
+
+  var moduleSbSpectrum = {
+    render: function render() {
+      return "\n      <div class=\"color-picker-module color-picker-module-sb-spectrum\">\n        <div class=\"color-picker-sb-spectrum\" style=\"background-color: hsl(0, 100%, 50%)\">\n          <div class=\"color-picker-sb-spectrum-handle\"></div>\n        </div>\n      </div>\n    ";
+    },
+    init: function init(self) {
+      var app = self.app;
+
+      var isTouched;
+      var isMoved;
+      var touchStartX;
+      var touchStartY;
+      var touchCurrentX;
+      var touchCurrentY;
+
+      var specterRect;
+      var specterIsTouched;
+      var specterHandleIsTouched;
+
+      var $el = self.$el;
+
+      function setSBFromSpecterCoords(x, y) {
+        var s = (x - specterRect.left) / specterRect.width;
+        var b = (y - specterRect.top) / specterRect.height;
+        s = Math.max(0, Math.min(1, s));
+        b = 1 - Math.max(0, Math.min(1, b));
+
+        self.setValue({ hsb: [self.value.hue, s, b] });
+      }
+
+      function handleTouchStart(e) {
+        if (isMoved || isTouched) { return; }
+        touchStartX = e.type === 'touchstart' ? e.targetTouches[0].pageX : e.pageX;
+        touchCurrentX = touchStartX;
+        touchStartY = e.type === 'touchstart' ? e.targetTouches[0].pageY : e.pageY;
+        touchCurrentY = touchStartY;
+        var $targetEl = $(e.target);
+        specterHandleIsTouched = $targetEl.closest('.color-picker-sb-spectrum-handle').length > 0;
+        if (!specterHandleIsTouched) {
+          specterIsTouched = $targetEl.closest('.color-picker-sb-spectrum').length > 0;
+        }
+        if (specterIsTouched) {
+          specterRect = $el.find('.color-picker-sb-spectrum')[0].getBoundingClientRect();
+          setSBFromSpecterCoords(touchStartX, touchStartY);
+        }
+        if (specterHandleIsTouched || specterIsTouched) {
+          $el.find('.color-picker-sb-spectrum-handle').addClass('color-picker-sb-spectrum-handle-pressed');
+        }
+      }
+      function handleTouchMove(e) {
+        if (!(specterIsTouched || specterHandleIsTouched)) { return; }
+        touchCurrentX = e.type === 'touchmove' ? e.targetTouches[0].pageX : e.pageX;
+        touchCurrentY = e.type === 'touchmove' ? e.targetTouches[0].pageY : e.pageY;
+        e.preventDefault();
+        if (!isMoved) {
+          // First move
+          isMoved = true;
+          if (specterHandleIsTouched) {
+            specterRect = $el.find('.color-picker-sb-spectrum')[0].getBoundingClientRect();
+          }
+        }
+        if (specterIsTouched || specterHandleIsTouched) {
+          setSBFromSpecterCoords(touchCurrentX, touchCurrentY);
+        }
+      }
+      function handleTouchEnd() {
+        isMoved = false;
+        if (specterIsTouched || specterHandleIsTouched) {
+          $el.find('.color-picker-sb-spectrum-handle').removeClass('color-picker-sb-spectrum-handle-pressed');
+        }
+        specterIsTouched = false;
+        specterHandleIsTouched = false;
+      }
+
+      function handleResize() {
+        self.modules['sb-spectrum'].update(self);
+      }
+
+      var passiveListener = app.touchEvents.start === 'touchstart' && app.support.passiveListener ? { passive: true, capture: false } : false;
+
+      self.$el.on(app.touchEvents.start, handleTouchStart, passiveListener);
+      app.on('touchmove:active', handleTouchMove);
+      app.on('touchend:passive', handleTouchEnd);
+      app.on('resize', handleResize);
+
+      self.destroySpectrumEvents = function destroySpectrumEvents() {
+        self.$el.off(app.touchEvents.start, handleTouchStart, passiveListener);
+        app.off('touchmove:active', handleTouchMove);
+        app.off('touchend:passive', handleTouchEnd);
+        app.off('resize', handleResize);
+      };
+    },
+    update: function update(self) {
+      var value = self.value;
+
+      var hsl = value.hsl;
+      var hsb = value.hsb;
+
+      var specterWidth = self.$el.find('.color-picker-sb-spectrum')[0].offsetWidth;
+      var specterHeight = self.$el.find('.color-picker-sb-spectrum')[0].offsetHeight;
+
+      self.$el.find('.color-picker-sb-spectrum')
+        .css('background-color', ("hsl(" + (hsl[0]) + ", 100%, 50%)"));
+
+      self.$el.find('.color-picker-sb-spectrum-handle')
+        .css('background-color', ("hsl(" + (hsl[0]) + ", " + (hsl[1] * 100) + "%, " + (hsl[2] * 100) + "%)"))
+        .transform(("translate(" + (specterWidth * hsb[1]) + "px, " + (specterHeight * (1 - hsb[2])) + "px)"));
+    },
+    destroy: function destroy(self) {
+      if (self.destroySpectrumEvents) { self.destroySpectrumEvents(); }
+      delete self.destroySpectrumEvents;
+    },
+  };
+
+  var moduleHsSpectrum = {
+    render: function render() {
+      return "\n      <div class=\"color-picker-module color-picker-module-hs-spectrum\">\n        <div class=\"color-picker-hs-spectrum\">\n          <div class=\"color-picker-hs-spectrum-handle\"></div>\n        </div>\n      </div>\n    ";
+    },
+    init: function init(self) {
+      var app = self.app;
+
+      var isTouched;
+      var isMoved;
+      var touchStartX;
+      var touchStartY;
+      var touchCurrentX;
+      var touchCurrentY;
+
+      var specterRect;
+      var specterIsTouched;
+      var specterHandleIsTouched;
+
+      var $el = self.$el;
+
+      function setHSFromSpecterCoords(x, y) {
+        var h = (x - specterRect.left) / specterRect.width * 360;
+        var s = (y - specterRect.top) / specterRect.height;
+        h = Math.max(0, Math.min(360, h));
+        s = 1 - Math.max(0, Math.min(1, s));
+
+        self.setValue({ hsb: [h, s, self.value.hsb[2]] });
+      }
+
+      function handleTouchStart(e) {
+        if (isMoved || isTouched) { return; }
+        touchStartX = e.type === 'touchstart' ? e.targetTouches[0].pageX : e.pageX;
+        touchCurrentX = touchStartX;
+        touchStartY = e.type === 'touchstart' ? e.targetTouches[0].pageY : e.pageY;
+        touchCurrentY = touchStartY;
+        var $targetEl = $(e.target);
+        specterHandleIsTouched = $targetEl.closest('.color-picker-hs-spectrum-handle').length > 0;
+        if (!specterHandleIsTouched) {
+          specterIsTouched = $targetEl.closest('.color-picker-hs-spectrum').length > 0;
+        }
+        if (specterIsTouched) {
+          specterRect = $el.find('.color-picker-hs-spectrum')[0].getBoundingClientRect();
+          setHSFromSpecterCoords(touchStartX, touchStartY);
+        }
+        if (specterHandleIsTouched || specterIsTouched) {
+          $el.find('.color-picker-hs-spectrum-handle').addClass('color-picker-hs-spectrum-handle-pressed');
+        }
+      }
+      function handleTouchMove(e) {
+        if (!(specterIsTouched || specterHandleIsTouched)) { return; }
+        touchCurrentX = e.type === 'touchmove' ? e.targetTouches[0].pageX : e.pageX;
+        touchCurrentY = e.type === 'touchmove' ? e.targetTouches[0].pageY : e.pageY;
+        e.preventDefault();
+        if (!isMoved) {
+          // First move
+          isMoved = true;
+          if (specterHandleIsTouched) {
+            specterRect = $el.find('.color-picker-hs-spectrum')[0].getBoundingClientRect();
+          }
+        }
+        if (specterIsTouched || specterHandleIsTouched) {
+          setHSFromSpecterCoords(touchCurrentX, touchCurrentY);
+        }
+      }
+      function handleTouchEnd() {
+        isMoved = false;
+        if (specterIsTouched || specterHandleIsTouched) {
+          $el.find('.color-picker-hs-spectrum-handle').removeClass('color-picker-hs-spectrum-handle-pressed');
+        }
+        specterIsTouched = false;
+        specterHandleIsTouched = false;
+      }
+
+      function handleResize() {
+        self.modules['hs-spectrum'].update(self);
+      }
+
+      var passiveListener = app.touchEvents.start === 'touchstart' && app.support.passiveListener ? { passive: true, capture: false } : false;
+
+      self.$el.on(app.touchEvents.start, handleTouchStart, passiveListener);
+      app.on('touchmove:active', handleTouchMove);
+      app.on('touchend:passive', handleTouchEnd);
+      app.on('resize', handleResize);
+
+      self.destroySpectrumEvents = function destroySpectrumEvents() {
+        self.$el.off(app.touchEvents.start, handleTouchStart, passiveListener);
+        app.off('touchmove:active', handleTouchMove);
+        app.off('touchend:passive', handleTouchEnd);
+        app.off('resize', handleResize);
+      };
+    },
+    update: function update(self) {
+      var value = self.value;
+
+      var hsb = value.hsb;
+
+      var specterWidth = self.$el.find('.color-picker-hs-spectrum')[0].offsetWidth;
+      var specterHeight = self.$el.find('.color-picker-hs-spectrum')[0].offsetHeight;
+
+      var hslBright = Utils.colorHsbToHsl(hsb[0], hsb[1], 1);
+
+      self.$el.find('.color-picker-hs-spectrum-handle')
+        .css('background-color', ("hsl(" + (hslBright[0]) + ", " + (hslBright[1] * 100) + "%, " + (hslBright[2] * 100) + "%)"))
+        .transform(("translate(" + (specterWidth * (hsb[0] / 360)) + "px, " + (specterHeight * (1 - hsb[1])) + "px)"));
+    },
+    destroy: function destroy(self) {
+      if (self.destroySpectrumEvents) { self.destroySpectrumEvents(); }
+      delete self.destroySpectrumEvents;
+    },
+  };
+
+  function svgWheelCircles() {
+    var total = 256;
+    var circles = '';
+    for (var i = total; i > 0; i -= 1) {
+      var angle = i * Math.PI / (total / 2);
+      var hue = 360 / total * i;
+      circles += "<circle cx=\"" + (150 - Math.sin(angle) * 125) + "\" cy=\"" + (150 - Math.cos(angle) * 125) + "\" r=\"25\" fill=\"hsl(" + hue + ", 100%, 50%)\"></circle>";
+    }
+    return circles;
+  }
+  var moduleWheel = {
+    render: function render() {
+      return ("\n      <div class=\"color-picker-module color-picker-module-wheel\">\n        <div class=\"color-picker-wheel\">\n          <svg viewBox=\"0 0 300 300\" width=\"300\" height=\"300\">" + (svgWheelCircles()) + "</svg>\n          <div class=\"color-picker-wheel-handle\"></div>\n          <div class=\"color-picker-sb-spectrum\" style=\"background-color: hsl(0, 100%, 50%)\">\n            <div class=\"color-picker-sb-spectrum-handle\"></div>\n          </div>\n        </div>\n      </div>\n    ");
+    },
+    init: function init(self) {
+      var app = self.app;
+
+      var isTouched;
+      var isMoved;
+      var touchStartX;
+      var touchStartY;
+      var touchCurrentX;
+      var touchCurrentY;
+
+      var wheelRect;
+      var wheelIsTouched;
+      var wheelHandleIsTouched;
+      var specterRect;
+      var specterIsTouched;
+      var specterHandleIsTouched;
+
+      var $el = self.$el;
+
+      function setHueFromWheelCoords(x, y) {
+        var wheelCenterX = wheelRect.left + wheelRect.width / 2;
+        var wheelCenterY = wheelRect.top + wheelRect.height / 2;
+        var angleRad = Math.atan2(y - wheelCenterY, x - wheelCenterX);
+        var angleDeg = angleRad * 180 / Math.PI + 90;
+        if (angleDeg < 0) { angleDeg += 360; }
+        angleDeg = 360 - angleDeg;
+        self.setValue({ hue: angleDeg });
+      }
+      function setSBFromSpecterCoords(x, y) {
+        var s = (x - specterRect.left) / specterRect.width;
+        var b = (y - specterRect.top) / specterRect.height;
+        s = Math.max(0, Math.min(1, s));
+        b = 1 - Math.max(0, Math.min(1, b));
+
+        self.setValue({ hsb: [self.value.hue, s, b] });
+      }
+
+      function handleTouchStart(e) {
+        if (isMoved || isTouched) { return; }
+        touchStartX = e.type === 'touchstart' ? e.targetTouches[0].pageX : e.pageX;
+        touchCurrentX = touchStartX;
+        touchStartY = e.type === 'touchstart' ? e.targetTouches[0].pageY : e.pageY;
+        touchCurrentY = touchStartY;
+        var $targetEl = $(e.target);
+        wheelHandleIsTouched = $targetEl.closest('.color-picker-wheel-handle').length > 0;
+        wheelIsTouched = $targetEl.closest('circle').length > 0;
+        specterHandleIsTouched = $targetEl.closest('.color-picker-sb-spectrum-handle').length > 0;
+        if (!specterHandleIsTouched) {
+          specterIsTouched = $targetEl.closest('.color-picker-sb-spectrum').length > 0;
+        }
+        if (wheelIsTouched) {
+          wheelRect = $el.find('.color-picker-wheel')[0].getBoundingClientRect();
+          setHueFromWheelCoords(touchStartX, touchStartY);
+        }
+        if (specterIsTouched) {
+          specterRect = $el.find('.color-picker-sb-spectrum')[0].getBoundingClientRect();
+          setSBFromSpecterCoords(touchStartX, touchStartY);
+        }
+        if (specterHandleIsTouched || specterIsTouched) {
+          $el.find('.color-picker-sb-spectrum-handle').addClass('color-picker-sb-spectrum-handle-pressed');
+        }
+      }
+      function handleTouchMove(e) {
+        if (!(wheelIsTouched || wheelHandleIsTouched) && !(specterIsTouched || specterHandleIsTouched)) { return; }
+        touchCurrentX = e.type === 'touchmove' ? e.targetTouches[0].pageX : e.pageX;
+        touchCurrentY = e.type === 'touchmove' ? e.targetTouches[0].pageY : e.pageY;
+        e.preventDefault();
+        if (!isMoved) {
+          // First move
+          isMoved = true;
+          if (wheelHandleIsTouched) {
+            wheelRect = $el.find('.color-picker-wheel')[0].getBoundingClientRect();
+          }
+          if (specterHandleIsTouched) {
+            specterRect = $el.find('.color-picker-sb-spectrum')[0].getBoundingClientRect();
+          }
+        }
+        if (wheelIsTouched || wheelHandleIsTouched) {
+          setHueFromWheelCoords(touchCurrentX, touchCurrentY);
+        }
+        if (specterIsTouched || specterHandleIsTouched) {
+          setSBFromSpecterCoords(touchCurrentX, touchCurrentY);
+        }
+      }
+      function handleTouchEnd() {
+        isMoved = false;
+        if (specterIsTouched || specterHandleIsTouched) {
+          $el.find('.color-picker-sb-spectrum-handle').removeClass('color-picker-sb-spectrum-handle-pressed');
+        }
+        wheelIsTouched = false;
+        wheelHandleIsTouched = false;
+        specterIsTouched = false;
+        specterHandleIsTouched = false;
+      }
+
+      function handleResize() {
+        self.modules.wheel.update(self);
+      }
+
+      var passiveListener = app.touchEvents.start === 'touchstart' && app.support.passiveListener ? { passive: true, capture: false } : false;
+
+      self.$el.on(app.touchEvents.start, handleTouchStart, passiveListener);
+      app.on('touchmove:active', handleTouchMove);
+      app.on('touchend:passive', handleTouchEnd);
+      app.on('resize', handleResize);
+
+      self.destroyWheelEvents = function destroyWheelEvents() {
+        self.$el.off(app.touchEvents.start, handleTouchStart, passiveListener);
+        app.off('touchmove:active', handleTouchMove);
+        app.off('touchend:passive', handleTouchEnd);
+        app.off('resize', handleResize);
+      };
+    },
+    update: function update(self) {
+      var value = self.value;
+
+      var hsl = value.hsl;
+      var hsb = value.hsb;
+
+      var specterWidth = self.$el.find('.color-picker-sb-spectrum')[0].offsetWidth;
+      var specterHeight = self.$el.find('.color-picker-sb-spectrum')[0].offsetHeight;
+      var wheelSize = self.$el.find('.color-picker-wheel')[0].offsetWidth;
+      var wheelHalfSize = wheelSize / 2;
+      var angleRad = value.hue * Math.PI / 180;
+      var handleSize = wheelSize / 6;
+      var handleHalfSize = handleSize / 2;
+      var tX = wheelHalfSize - Math.sin(angleRad) * (wheelHalfSize - handleHalfSize) - handleHalfSize;
+      var tY = wheelHalfSize - Math.cos(angleRad) * (wheelHalfSize - handleHalfSize) - handleHalfSize;
+      self.$el.find('.color-picker-wheel-handle')
+        .css('background-color', ("hsl(" + (hsl[0]) + ", 100%, 50%)"))
+        .transform(("translate(" + tX + "px, " + tY + "px)"));
+
+      self.$el.find('.color-picker-sb-spectrum')
+        .css('background-color', ("hsl(" + (hsl[0]) + ", 100%, 50%)"));
+
+      self.$el.find('.color-picker-sb-spectrum-handle')
+        .css('background-color', ("hsl(" + (hsl[0]) + ", " + (hsl[1] * 100) + "%, " + (hsl[2] * 100) + "%)"))
+        .transform(("translate(" + (specterWidth * hsb[1]) + "px, " + (specterHeight * (1 - hsb[2])) + "px)"));
+    },
+    destroy: function destroy(self) {
+      if (self.destroyWheelEvents) { self.destroyWheelEvents(); }
+      delete self.destroyWheelEvents;
+    },
+  };
+
+  var ColorPicker = /*@__PURE__*/(function (Framework7Class) {
+    function ColorPicker(app, params) {
+      if ( params === void 0 ) params = {};
+
+      Framework7Class.call(this, params, [app]);
+      var self = this;
+
+      self.params = Utils.extend({}, app.params.colorPicker, params);
+
+      var $containerEl;
+      if (self.params.containerEl) {
+        $containerEl = $(self.params.containerEl);
+        if ($containerEl.length === 0) { return self; }
+      }
+
+      var $inputEl;
+      if (self.params.inputEl) {
+        $inputEl = $(self.params.inputEl);
+      }
+
+      var $targetEl;
+      if (self.params.targetEl) {
+        $targetEl = $(self.params.targetEl);
+      }
+
+      var view;
+      if ($inputEl) {
+        view = $inputEl.parents('.view').length && $inputEl.parents('.view')[0].f7View;
+      }
+      if (!view && $targetEl) {
+        view = $targetEl.parents('.view').length && $targetEl.parents('.view')[0].f7View;
+      }
+      if (!view) { view = app.views.main; }
+
+      Utils.extend(self, {
+        app: app,
+        $containerEl: $containerEl,
+        containerEl: $containerEl && $containerEl[0],
+        inline: $containerEl && $containerEl.length > 0,
+        $inputEl: $inputEl,
+        inputEl: $inputEl && $inputEl[0],
+        $targetEl: $targetEl,
+        targetEl: $targetEl && $targetEl[0],
+        initialized: false,
+        opened: false,
+        url: self.params.url,
+        view: view,
+        modules: {
+          'alpha-slider': moduleAlphaSlider,
+          'current-color': moduleCurrentColor,
+          'hex': moduleHex, // eslint-disable-line
+          'hsb-sliders': moduleHsbSliders,
+          'hue-slider': moduleHueSlider,
+          'brightness-slider': moduleBrightnessSlider,
+          'palette': modulePalette, // eslint-disable-line
+          'initial-current-colors': moduleInitialCurrentColors,
+          'rgb-bars': moduleRgbBars,
+          'rgb-sliders': moduleRgbSliders,
+          'sb-spectrum': moduleSbSpectrum,
+          'hs-spectrum': moduleHsSpectrum,
+          'wheel': moduleWheel, // eslint-disable-line
+        },
+      });
+
+      function onInputClick() {
+        self.open();
+      }
+      function onInputFocus(e) {
+        e.preventDefault();
+      }
+      function onTargetClick() {
+        self.open();
+      }
+      function onHtmlClick(e) {
+        if (self.destroyed || !self.params) { return; }
+        if (self.params.openIn === 'page') { return; }
+        var $clickTargetEl = $(e.target);
+        if (!self.opened || self.closing) { return; }
+        if ($clickTargetEl.closest('[class*="backdrop"]').length) { return; }
+        if ($clickTargetEl.closest('.color-picker-popup, .color-picker-popover').length) { return; }
+        if ($inputEl && $inputEl.length > 0) {
+          if ($clickTargetEl[0] !== $inputEl[0] && $clickTargetEl.closest('.sheet-modal').length === 0) {
+            self.close();
+          }
+        } else if ($(e.target).closest('.sheet-modal').length === 0) {
+          self.close();
+        }
+      }
+
+      // Events
+      Utils.extend(self, {
+        attachInputEvents: function attachInputEvents() {
+          self.$inputEl.on('click', onInputClick);
+          if (self.params.inputReadOnly) {
+            self.$inputEl.on('focus mousedown', onInputFocus);
+          }
+        },
+        detachInputEvents: function detachInputEvents() {
+          self.$inputEl.off('click', onInputClick);
+          if (self.params.inputReadOnly) {
+            self.$inputEl.off('focus mousedown', onInputFocus);
+          }
+        },
+        attachTargetEvents: function attachTargetEvents() {
+          self.$targetEl.on('click', onTargetClick);
+        },
+        detachTargetEvents: function detachTargetEvents() {
+          self.$targetEl.off('click', onTargetClick);
+        },
+        attachHtmlEvents: function attachHtmlEvents() {
+          app.on('click', onHtmlClick);
+        },
+        detachHtmlEvents: function detachHtmlEvents() {
+          app.off('click', onHtmlClick);
+        },
+      });
+
+      self.init();
+
+      return self;
+    }
+
+    if ( Framework7Class ) ColorPicker.__proto__ = Framework7Class;
+    ColorPicker.prototype = Object.create( Framework7Class && Framework7Class.prototype );
+    ColorPicker.prototype.constructor = ColorPicker;
+
+    ColorPicker.prototype.attachEvents = function attachEvents () {
+      var self = this;
+      self.centerModules = self.centerModules.bind(self);
+      if (self.params.centerModules) {
+        self.app.on('resize', self.centerModules);
+      }
+    };
+
+    ColorPicker.prototype.detachEvents = function detachEvents () {
+      var self = this;
+      if (self.params.centerModules) {
+        self.app.off('resize', self.centerModules);
+      }
+    };
+
+    ColorPicker.prototype.centerModules = function centerModules () {
+      var self = this;
+      if (!self.opened || !self.$el || self.inline) { return; }
+      var $pageContentEl = self.$el.find('.page-content');
+      if (!$pageContentEl.length) { return; }
+      var ref = $pageContentEl[0];
+      var scrollHeight = ref.scrollHeight;
+      var offsetHeight = ref.offsetHeight;
+      if (scrollHeight <= offsetHeight) {
+        $pageContentEl.addClass('justify-content-center');
+      } else {
+        $pageContentEl.removeClass('justify-content-center');
+      }
+    };
+
+    ColorPicker.prototype.initInput = function initInput () {
+      var self = this;
+      if (!self.$inputEl) { return; }
+      if (self.params.inputReadOnly) { self.$inputEl.prop('readOnly', true); }
+    };
+
+    ColorPicker.prototype.getModalType = function getModalType () {
+      var self = this;
+      var app = self.app;
+      var modal = self.modal;
+      var params = self.params;
+      var openIn = params.openIn;
+      var openInPhone = params.openInPhone;
+      if (modal && modal.type) { return modal.type; }
+      if (openIn !== 'auto') { return openIn; }
+      if (self.inline) { return null; }
+      if (app.device.ios) {
+        return app.device.ipad ? 'popover' : openInPhone;
+      }
+      if (app.width >= 768 || (app.device.desktop && app.theme === 'aurora')) {
+        return 'popover';
+      }
+
+      return openInPhone;
+    };
+
+    ColorPicker.prototype.formatValue = function formatValue () {
+      var self = this;
+      var value = self.value;
+      if (self.params.formatValue) {
+        return self.params.formatValue.call(self, value);
+      }
+      return value.hex;
+    };
+
+    // eslint-disable-next-line
+    ColorPicker.prototype.normalizeHsValues = function normalizeHsValues (arr) {
+      return [
+        Math.floor(arr[0] * 10) / 10,
+        Math.floor(arr[1] * 1000) / 1000,
+        Math.floor(arr[2] * 1000) / 1000 ];
+    };
+
+    ColorPicker.prototype.setValue = function setValue (value, updateModules) {
+      if ( value === void 0 ) value = {};
+      if ( updateModules === void 0 ) updateModules = true;
+
+      var self = this;
+      if (typeof value === 'undefined') { return; }
+
+      var ref = (self.value || {});
+      var hex = ref.hex;
+      var rgb = ref.rgb;
+      var hsl = ref.hsl;
+      var hsb = ref.hsb;
+      var alpha = ref.alpha; if ( alpha === void 0 ) alpha = 1;
+      var hue = ref.hue;
+      var rgba = ref.rgba;
+      var hsla = ref.hsla;
+
+      var needChangeEvent = self.value || (!self.value && !self.params.value);
+      var valueChanged;
+      Object.keys(value).forEach(function (k) {
+        if (!self.value || typeof self.value[k] === 'undefined') {
+          valueChanged = true;
+          return;
+        }
+        var v = value[k];
+        if (Array.isArray(v)) {
+          v.forEach(function (subV, subIndex) {
+            if (subV !== self.value[k][subIndex]) {
+              valueChanged = true;
+            }
+          });
+        } else if (v !== self.value[k]) {
+          valueChanged = true;
+        }
+      });
+      if (!valueChanged) { return; }
+
+      if (value.rgb || value.rgba) {
+        var ref$1 = (value.rgb || value.rgba);
+        var r = ref$1[0];
+        var g = ref$1[1];
+        var b = ref$1[2];
+        var a = ref$1[3]; if ( a === void 0 ) a = alpha;
+        rgb = [r, g, b];
+        hex = Utils.colorRgbToHex.apply(Utils, rgb);
+        hsl = Utils.colorRgbToHsl.apply(Utils, rgb);
+        hsb = Utils.colorHslToHsb.apply(Utils, hsl);
+        hsl = self.normalizeHsValues(hsl);
+        hsb = self.normalizeHsValues(hsb);
+        hue = hsb[0];
+        alpha = a;
+        rgba = [rgb[0], rgb[1], rgb[2], a];
+        hsla = [hsl[0], hsl[1], hsl[2], a];
+      }
+
+      if (value.hsl || value.hsla) {
+        var ref$2 = (value.hsl || value.hsla);
+        var h = ref$2[0];
+        var s = ref$2[1];
+        var l = ref$2[2];
+        var a$1 = ref$2[3]; if ( a$1 === void 0 ) a$1 = alpha;
+        hsl = [h, s, l];
+        rgb = Utils.colorHslToRgb.apply(Utils, hsl);
+        hex = Utils.colorRgbToHex.apply(Utils, rgb);
+        hsb = Utils.colorHslToHsb.apply(Utils, hsl);
+        hsl = self.normalizeHsValues(hsl);
+        hsb = self.normalizeHsValues(hsb);
+        hue = hsb[0];
+        alpha = a$1;
+        rgba = [rgb[0], rgb[1], rgb[2], a$1];
+        hsla = [hsl[0], hsl[1], hsl[2], a$1];
+      }
+
+      if (value.hsb) {
+        var ref$3 = value.hsb;
+        var h$1 = ref$3[0];
+        var s$1 = ref$3[1];
+        var b$1 = ref$3[2];
+        var a$2 = ref$3[3]; if ( a$2 === void 0 ) a$2 = alpha;
+        hsb = [h$1, s$1, b$1];
+        hsl = Utils.colorHsbToHsl.apply(Utils, hsb);
+        rgb = Utils.colorHslToRgb.apply(Utils, hsl);
+        hex = Utils.colorRgbToHex.apply(Utils, rgb);
+        hsl = self.normalizeHsValues(hsl);
+        hsb = self.normalizeHsValues(hsb);
+        hue = hsb[0];
+        alpha = a$2;
+        rgba = [rgb[0], rgb[1], rgb[2], a$2];
+        hsla = [hsl[0], hsl[1], hsl[2], a$2];
+      }
+
+      if (value.hex) {
+        rgb = Utils.colorHexToRgb(value.hex);
+        hex = Utils.colorRgbToHex.apply(Utils, rgb);
+        hsl = Utils.colorRgbToHsl.apply(Utils, rgb);
+        hsb = Utils.colorHslToHsb.apply(Utils, hsl);
+        hsl = self.normalizeHsValues(hsl);
+        hsb = self.normalizeHsValues(hsb);
+        hue = hsb[0];
+        rgba = [rgb[0], rgb[1], rgb[2], alpha];
+        hsla = [hsl[0], hsl[1], hsl[2], alpha];
+      }
+
+      if (typeof value.alpha !== 'undefined') {
+        alpha = value.alpha;
+        if (typeof rgb !== 'undefined') {
+          rgba = [rgb[0], rgb[1], rgb[2], alpha];
+        }
+        if (typeof hsl !== 'undefined') {
+          hsla = [hsl[0], hsl[1], hsl[2], alpha];
+        }
+      }
+
+      if (typeof value.hue !== 'undefined') {
+        var h$2 = hsl[0];
+        var s$2 = hsl[1];
+        var l$1 = hsl[2]; // eslint-disable-line
+        hsl = [value.hue, s$2, l$1];
+        hsb = Utils.colorHslToHsb.apply(Utils, hsl);
+        rgb = Utils.colorHslToRgb.apply(Utils, hsl);
+        hex = Utils.colorRgbToHex.apply(Utils, rgb);
+        hsl = self.normalizeHsValues(hsl);
+        hsb = self.normalizeHsValues(hsb);
+        hue = hsb[0];
+        rgba = [rgb[0], rgb[1], rgb[2], alpha];
+        hsla = [hsl[0], hsl[1], hsl[2], alpha];
+      }
+      self.value = {
+        hex: hex,
+        alpha: alpha,
+        hue: hue,
+        rgb: rgb,
+        hsl: hsl,
+        hsb: hsb,
+        rgba: rgba,
+        hsla: hsla,
+      };
+      if (!self.initialValue) { self.initialValue = Utils.extend({}, self.value); }
+      self.updateValue(needChangeEvent);
+      if (self.opened && updateModules) {
+        self.updateModules();
+      }
+    };
+
+    ColorPicker.prototype.getValue = function getValue () {
+      var self = this;
+      return self.value;
+    };
+
+    ColorPicker.prototype.updateValue = function updateValue (fireEvents) {
+      if ( fireEvents === void 0 ) fireEvents = true;
+
+      var self = this;
+      var $inputEl = self.$inputEl;
+      var value = self.value;
+      var $targetEl = self.$targetEl;
+      if ($targetEl && self.params.targetElSetBackgroundColor) {
+        var rgba = value.rgba;
+        $targetEl.css('background-color', ("rgba(" + (rgba.join(', ')) + ")"));
+      }
+      if (fireEvents) {
+        self.emit('local::change colorPickerChange', self, value);
+      }
+
+      if ($inputEl && $inputEl.length) {
+        var inputValue = self.formatValue(value);
+        if ($inputEl && $inputEl.length) {
+          $inputEl.val(inputValue);
+          if (fireEvents) {
+            $inputEl.trigger('change');
+          }
+        }
+      }
+    };
+
+    ColorPicker.prototype.updateModules = function updateModules () {
+      var self = this;
+      var modules = self.modules;
+      self.params.modules.forEach(function (m) {
+        if (typeof m === 'string' && modules[m] && modules[m].update) {
+          modules[m].update(self);
+        } else if (m && m.update) {
+          m.update(self);
+        }
+      });
+    };
+
+    ColorPicker.prototype.update = function update () {
+      var self = this;
+      self.updateModules();
+    };
+
+    ColorPicker.prototype.renderPicker = function renderPicker () {
+      var self = this;
+      var params = self.params;
+      var modules = self.modules;
+      var html = '';
+
+      params.modules.forEach(function (m) {
+        if (typeof m === 'string' && modules[m] && modules[m].render) {
+          html += modules[m].render(self);
+        } else if (m && m.render) {
+          html += m.render(self);
+        }
+      });
+
+      return html;
+    };
+
+    ColorPicker.prototype.renderNavbar = function renderNavbar () {
+      var self = this;
+      if (self.params.renderNavbar) {
+        return self.params.renderNavbar.call(self, self);
+      }
+      var ref = self.params;
+      var openIn = ref.openIn;
+      var navbarTitleText = ref.navbarTitleText;
+      var navbarBackLinkText = ref.navbarBackLinkText;
+      var navbarCloseText = ref.navbarCloseText;
+      return ("\n    <div class=\"navbar\">\n      <div class=\"navbar-inner sliding\">\n        " + (openIn === 'page' ? ("\n        <div class=\"left\">\n          <a class=\"link back\">\n            <i class=\"icon icon-back\"></i>\n            <span class=\"if-not-md\">" + navbarBackLinkText + "</span>\n          </a>\n        </div>\n        ") : '') + "\n        <div class=\"title\">" + navbarTitleText + "</div>\n        " + (openIn !== 'page' ? ("\n        <div class=\"right\">\n          <a class=\"link popup-close\" data-popup=\".color-picker-popup\">" + navbarCloseText + "</a>\n        </div>\n        ") : '') + "\n      </div>\n    </div>\n  ").trim();
+    };
+
+    ColorPicker.prototype.renderToolbar = function renderToolbar () {
+      var self = this;
+      if (self.params.renderToolbar) {
+        return self.params.renderToolbar.call(self, self);
+      }
+      return ("\n    <div class=\"toolbar toolbar-top no-shadow\">\n      <div class=\"toolbar-inner\">\n        <div class=\"left\"></div>\n        <div class=\"right\">\n          <a class=\"link sheet-close popover-close\" data-sheet=\".color-picker-sheet-modal\" data-popover=\".color-picker-popover\">" + (self.params.toolbarCloseText) + "</a>\n        </div>\n      </div>\n    </div>\n  ").trim();
+    };
+
+    ColorPicker.prototype.renderInline = function renderInline () {
+      var self = this;
+      var ref = self.params;
+      var cssClass = ref.cssClass;
+      var groupedModules = ref.groupedModules;
+      var inlineHtml = ("\n    <div class=\"color-picker color-picker-inline " + (groupedModules ? 'color-picker-grouped-modules' : '') + " " + (cssClass || '') + "\">\n      " + (self.renderPicker()) + "\n    </div>\n  ").trim();
+
+      return inlineHtml;
+    };
+
+    ColorPicker.prototype.renderSheet = function renderSheet () {
+      var self = this;
+      var ref = self.params;
+      var cssClass = ref.cssClass;
+      var toolbarSheet = ref.toolbarSheet;
+      var groupedModules = ref.groupedModules;
+      var sheetHtml = ("\n    <div class=\"sheet-modal color-picker color-picker-sheet-modal " + (groupedModules ? 'color-picker-grouped-modules' : '') + " " + (cssClass || '') + "\">\n      " + (toolbarSheet ? self.renderToolbar() : '') + "\n      <div class=\"sheet-modal-inner\">\n        <div class=\"page-content\">\n          " + (self.renderPicker()) + "\n        </div>\n      </div>\n    </div>\n  ").trim();
+
+      return sheetHtml;
+    };
+
+    ColorPicker.prototype.renderPopover = function renderPopover () {
+      var self = this;
+      var ref = self.params;
+      var cssClass = ref.cssClass;
+      var toolbarPopover = ref.toolbarPopover;
+      var groupedModules = ref.groupedModules;
+      var popoverHtml = ("\n    <div class=\"popover color-picker-popover " + (cssClass || '') + "\">\n      <div class=\"popover-inner\">\n        <div class=\"color-picker " + (groupedModules ? 'color-picker-grouped-modules' : '') + "\">\n          " + (toolbarPopover ? self.renderToolbar() : '') + "\n          <div class=\"page-content\">\n            " + (self.renderPicker()) + "\n          </div>\n        </div>\n      </div>\n    </div>\n  ").trim();
+
+      return popoverHtml;
+    };
+
+    ColorPicker.prototype.renderPopup = function renderPopup () {
+      var self = this;
+      var ref = self.params;
+      var cssClass = ref.cssClass;
+      var navbarPopup = ref.navbarPopup;
+      var groupedModules = ref.groupedModules;
+      var popupHtml = ("\n    <div class=\"popup color-picker-popup " + (cssClass || '') + "\">\n      <div class=\"page\">\n        " + (navbarPopup ? self.renderNavbar() : '') + "\n        <div class=\"color-picker " + (groupedModules ? 'color-picker-grouped-modules' : '') + "\">\n          <div class=\"page-content\">\n            " + (self.renderPicker()) + "\n          </div>\n        </div>\n      </div>\n    </div>\n  ").trim();
+
+      return popupHtml;
+    };
+
+    ColorPicker.prototype.renderPage = function renderPage () {
+      var self = this;
+      var ref = self.params;
+      var cssClass = ref.cssClass;
+      var groupedModules = ref.groupedModules;
+      var pageHtml = ("\n    <div class=\"page color-picker-page " + (cssClass || '') + "\" data-name=\"color-picker-page\">\n      " + (self.renderNavbar()) + "\n      <div class=\"color-picker " + (groupedModules ? 'color-picker-grouped-modules' : '') + "\">\n        <div class=\"page-content\">\n          " + (self.renderPicker()) + "\n        </div>\n      </div>\n    </div>\n  ").trim();
+      return pageHtml;
+    };
+
+    // eslint-disable-next-line
+    ColorPicker.prototype.render = function render () {
+      var self = this;
+      var params = self.params;
+      if (params.render) { return params.render.call(self); }
+      if (self.inline) { return self.renderInline(); }
+      if (params.openIn === 'page') {
+        return self.renderPage();
+      }
+
+      var modalType = self.getModalType();
+      if (modalType === 'popover') { return self.renderPopover(); }
+      if (modalType === 'sheet') { return self.renderSheet(); }
+      if (modalType === 'popup') { return self.renderPopup(); }
+    };
+
+    ColorPicker.prototype.onOpen = function onOpen () {
+      var self = this;
+      var initialized = self.initialized;
+      var $el = self.$el;
+      var app = self.app;
+      var $inputEl = self.$inputEl;
+      var inline = self.inline;
+      var value = self.value;
+      var params = self.params;
+      var modules = self.modules;
+      self.closing = false;
+      self.opened = true;
+      self.opening = true;
+
+      // Init main events
+      self.attachEvents();
+
+      params.modules.forEach(function (m) {
+        if (typeof m === 'string' && modules[m] && modules[m].init) {
+          modules[m].init(self);
+        } else if (m && m.init) {
+          m.init(self);
+        }
+      });
+
+      var updateValue = !value && params.value;
+
+      // Set value
+      if (!initialized) {
+        if (value) { self.setValue(value); }
+        else if (params.value) {
+          self.setValue(params.value, false);
+        } else if (!params.value) {
+          self.setValue({ hex: '#ff0000' }, false);
+        }
+      } else if (value) {
+        self.initialValue = Utils.extend({}, value);
+        self.setValue(value, false);
+      }
+
+      // Update input value
+      if (updateValue) { self.updateValue(); }
+      self.updateModules();
+
+      // Center modules
+      if (params.centerModules) {
+        self.centerModules();
+      }
+
+      // Extra focus
+      if (!inline && $inputEl && $inputEl.length && app.theme === 'md') {
+        $inputEl.trigger('focus');
+      }
+
+      self.initialized = true;
+
+      // Trigger events
+      if ($el) {
+        $el.trigger('colorpicker:open', self);
+      }
+      if ($inputEl) {
+        $inputEl.trigger('colorpicker:open', self);
+      }
+      self.emit('local::open colorPickerOpen', self);
+    };
+
+    ColorPicker.prototype.onOpened = function onOpened () {
+      var self = this;
+      self.opening = false;
+      if (self.$el) {
+        self.$el.trigger('colorpicker:opened', self);
+      }
+      if (self.$inputEl) {
+        self.$inputEl.trigger('colorpicker:opened', self);
+      }
+      self.emit('local::opened colorPickerOpened', self);
+    };
+
+    ColorPicker.prototype.onClose = function onClose () {
+      var self = this;
+      var app = self.app;
+      var params = self.params;
+      var modules = self.modules;
+      self.opening = false;
+      self.closing = true;
+
+      // Detach events
+      self.detachEvents();
+
+      if (self.$inputEl && app.theme === 'md') {
+        self.$inputEl.trigger('blur');
+      }
+      params.modules.forEach(function (m) {
+        if (typeof m === 'string' && modules[m] && modules[m].destroy) {
+          modules[m].destroy(self);
+        } else if (m && m.destroy) {
+          m.destroy(self);
+        }
+      });
+
+      if (self.$el) {
+        self.$el.trigger('colorpicker:close', self);
+      }
+      if (self.$inputEl) {
+        self.$inputEl.trigger('colorpicker:close', self);
+      }
+      self.emit('local::close colorPickerClose', self);
+    };
+
+    ColorPicker.prototype.onClosed = function onClosed () {
+      var self = this;
+      self.opened = false;
+      self.closing = false;
+
+      if (!self.inline) {
+        Utils.nextTick(function () {
+          if (self.modal && self.modal.el && self.modal.destroy) {
+            if (!self.params.routableModals) {
+              self.modal.destroy();
+            }
+          }
+          delete self.modal;
+        });
+      }
+      if (self.$el) {
+        self.$el.trigger('colorpicker:closed', self);
+      }
+      if (self.$inputEl) {
+        self.$inputEl.trigger('colorpicker:closed', self);
+      }
+      self.emit('local::closed colorPickerClosed', self);
+    };
+
+    ColorPicker.prototype.open = function open () {
+      var obj;
+
+      var self = this;
+      var app = self.app;
+      var opened = self.opened;
+      var inline = self.inline;
+      var $inputEl = self.$inputEl;
+      var $targetEl = self.$targetEl;
+      var params = self.params;
+      if (opened) { return; }
+
+      if (inline) {
+        self.$el = $(self.render());
+        self.$el[0].f7ColorPicker = self;
+        self.$containerEl.append(self.$el);
+        self.onOpen();
+        self.onOpened();
+        return;
+      }
+
+      var colorPickerContent = self.render();
+
+      if (params.openIn === 'page') {
+        self.view.router.navigate({
+          url: self.url,
+          route: {
+            content: colorPickerContent,
+            path: self.url,
+            on: {
+              pageBeforeIn: function pageBeforeIn(e, page) {
+                self.$el = page.$el.find('.color-picker');
+                self.$el[0].f7ColorPicker = self;
+                self.onOpen();
+              },
+              pageAfterIn: function pageAfterIn() {
+                self.onOpened();
+              },
+              pageBeforeOut: function pageBeforeOut() {
+                self.onClose();
+              },
+              pageAfterOut: function pageAfterOut() {
+                self.onClosed();
+                if (self.$el && self.$el[0]) {
+                  self.$el[0].f7ColorPicker = null;
+                  delete self.$el[0].f7ColorPicker;
+                }
+              },
+            },
+          },
+        });
+      } else {
+        var modalType = self.getModalType();
+        var backdrop = params.backdrop;
+        if (backdrop === null || typeof backdrop === 'undefined') {
+          if (modalType === 'popover' && app.params.popover.backdrop !== false) { backdrop = true; }
+          if (modalType === 'popup') { backdrop = true; }
+        }
+        var modalParams = {
+          targetEl: ($targetEl || $inputEl),
+          scrollToEl: params.scrollToInput ? ($targetEl || $inputEl) : undefined,
+          content: colorPickerContent,
+          backdrop: backdrop,
+          closeByBackdropClick: params.closeByBackdropClick,
+          on: {
+            open: function open() {
+              var modal = this;
+              self.modal = modal;
+              self.$el = modalType === 'popover' || modalType === 'popup' ? modal.$el.find('.color-picker') : modal.$el;
+              self.$el[0].f7ColorPicker = self;
+              self.onOpen();
+            },
+            opened: function opened() { self.onOpened(); },
+            close: function close() { self.onClose(); },
+            closed: function closed() {
+              self.onClosed();
+              if (self.$el && self.$el[0]) {
+                self.$el[0].f7ColorPicker = null;
+                delete self.$el[0].f7ColorPicker;
+              }
+            },
+          },
+        };
+        if (params.routableModals) {
+          self.view.router.navigate({
+            url: self.url,
+            route: ( obj = {
+              path: self.url
+            }, obj[modalType] = modalParams, obj ),
+          });
+        } else {
+          self.modal = app[modalType].create(modalParams);
+          self.modal.open();
+        }
+      }
+    };
+
+    ColorPicker.prototype.close = function close () {
+      var self = this;
+      var opened = self.opened;
+      var inline = self.inline;
+      if (!opened) { return; }
+      if (inline) {
+        self.onClose();
+        self.onClosed();
+        return;
+      }
+      if (self.params.routableModals) {
+        self.view.router.back();
+      } else {
+        self.modal.close();
+      }
+    };
+
+    ColorPicker.prototype.init = function init () {
+      var self = this;
+
+      self.initInput();
+
+      if (self.inline) {
+        self.open();
+        self.emit('local::init colorPickerInit', self);
+        return;
+      }
+
+      if (!self.initialized && self.params.value) {
+        self.setValue(self.params.value);
+      }
+
+      // Attach input Events
+      if (self.$inputEl) {
+        self.attachInputEvents();
+      }
+      if (self.$targetEl) {
+        self.attachTargetEvents();
+      }
+      if (self.params.closeByOutsideClick) {
+        self.attachHtmlEvents();
+      }
+      self.emit('local::init colorPickerInit', self);
+    };
+
+    ColorPicker.prototype.destroy = function destroy () {
+      var self = this;
+      if (self.destroyed) { return; }
+      var $el = self.$el;
+      self.emit('local::beforeDestroy colorPickerBeforeDestroy', self);
+      if ($el) { $el.trigger('colorpicker:beforedestroy', self); }
+
+      self.close();
+
+      // Detach Events
+      self.detachEvents();
+      if (self.$inputEl) {
+        self.detachInputEvents();
+      }
+      if (self.$targetEl) {
+        self.detachTargetEvents();
+      }
+      if (self.params.closeByOutsideClick) {
+        self.detachHtmlEvents();
+      }
+
+      if ($el && $el.length) { delete self.$el[0].f7ColorPicker; }
+      Utils.deleteProps(self);
+      self.destroyed = true;
+    };
+
+    return ColorPicker;
+  }(Framework7Class));
+
+  var ColorPicker$1 = {
+    name: 'colorPicker',
+    static: {
+      ColorPicker: ColorPicker,
+    },
+    create: function create() {
+      var app = this;
+      app.colorPicker = ConstructorMethods({
+        defaultSelector: '.color-picker',
+        constructor: ColorPicker,
+        app: app,
+        domProp: 'f7ColorPicker',
+      });
+      app.colorPicker.close = function close(el) {
+        if ( el === void 0 ) el = '.color-picker';
+
+        var $el = $(el);
+        if ($el.length === 0) { return; }
+        var colorPicker = $el[0].f7ColorPicker;
+        if (!colorPicker || (colorPicker && !colorPicker.opened)) { return; }
+        colorPicker.close();
+      };
+    },
+    params: {
+      colorPicker: {
+        // Color picker settings
+        value: null,
+        modules: [
+          'wheel' ],
+        palette: [
+          ['#FFEBEE', '#FFCDD2', '#EF9A9A', '#E57373', '#EF5350', '#F44336', '#E53935', '#D32F2F', '#C62828', '#B71C1C'],
+          ['#F3E5F5', '#E1BEE7', '#CE93D8', '#BA68C8', '#AB47BC', '#9C27B0', '#8E24AA', '#7B1FA2', '#6A1B9A', '#4A148C'],
+          ['#E8EAF6', '#C5CAE9', '#9FA8DA', '#7986CB', '#5C6BC0', '#3F51B5', '#3949AB', '#303F9F', '#283593', '#1A237E'],
+          ['#E1F5FE', '#B3E5FC', '#81D4FA', '#4FC3F7', '#29B6F6', '#03A9F4', '#039BE5', '#0288D1', '#0277BD', '#01579B'],
+          ['#E0F2F1', '#B2DFDB', '#80CBC4', '#4DB6AC', '#26A69A', '#009688', '#00897B', '#00796B', '#00695C', '#004D40'],
+          ['#F1F8E9', '#DCEDC8', '#C5E1A5', '#AED581', '#9CCC65', '#8BC34A', '#7CB342', '#689F38', '#558B2F', '#33691E'],
+          ['#FFFDE7', '#FFF9C4', '#FFF59D', '#FFF176', '#FFEE58', '#FFEB3B', '#FDD835', '#FBC02D', '#F9A825', '#F57F17'],
+          ['#FFF3E0', '#FFE0B2', '#FFCC80', '#FFB74D', '#FFA726', '#FF9800', '#FB8C00', '#F57C00', '#EF6C00', '#E65100'] ],
+        groupedModules: false,
+        centerModules: true,
+
+        sliderLabel: false,
+        sliderValue: false,
+        sliderValueEdiable: false,
+
+        barLabel: false,
+        barValue: false,
+        barValueEdiable: false,
+
+        hexLabel: false,
+        hexValueEditable: false,
+
+        redLabelText: 'R',
+        greenLabelText: 'G',
+        blueLabelText: 'B',
+        hueLabelText: 'H',
+        saturationLabelText: 'S',
+        brightnessLabelText: 'B',
+        hexLabelText: 'HEX',
+        alphaLabelText: 'A',
+
+        // Common opener settings
+        containerEl: null,
+        openIn: 'popover', // or 'popover' or 'sheet' or 'popup' or 'page' or 'auto'
+        openInPhone: 'popup', // or 'popover' or 'sheet' or 'popup' or 'page'
+        formatValue: null,
+        targetEl: null,
+        targetElSetBackgroundColor: false,
+        inputEl: null,
+        inputReadOnly: true,
+        closeByOutsideClick: true,
+        scrollToInput: true,
+        toolbarSheet: true,
+        toolbarPopover: false,
+        toolbarCloseText: 'Done',
+        navbarPopup: true,
+        navbarCloseText: 'Done',
+        navbarTitleText: 'Color',
+        navbarBackLinkText: 'Back',
+        cssClass: null,
+        routableModals: true,
+        view: null,
+        url: 'color/',
+        backdrop: null,
+        closeByBackdropClick: true,
+        // Render functions
+        renderToolbar: null,
+        renderNavbar: null,
+        renderInline: null,
+        renderPopover: null,
+        renderSheet: null,
+        renderPopup: null,
+        render: null,
+      },
+    },
+  };
+
+  var Treeview = {
+    open: function open(itemEl) {
+      var app = this;
+      var $itemEl = $(itemEl).eq(0);
+      if (!$itemEl.length) { return; }
+      $itemEl.addClass('treeview-item-opened');
+      $itemEl.trigger('treeview:open');
+      app.emit('treeviewOpen', $itemEl[0]);
+      function done() {
+        $itemEl[0].f7TreeviewChildrenLoaded = true;
+        $itemEl.find('.treeview-toggle').removeClass('treeview-toggle-hidden');
+        $itemEl.find('.treeview-preloader').remove();
+      }
+
+      if ($itemEl.hasClass('treeview-load-children') && !$itemEl[0].f7TreeviewChildrenLoaded) {
+        $itemEl.trigger('treeview:loadchildren', done);
+        app.emit('treeviewLoadChildren', $itemEl[0], done);
+        $itemEl.find('.treeview-toggle').addClass('treeview-toggle-hidden');
+        $itemEl.find('.treeview-item-root').prepend(("<div class=\"preloader treeview-preloader\">" + (Utils[((app.theme) + "PreloaderContent")]) + "</div>"));
+      }
+    },
+    close: function close(itemEl) {
+      var app = this;
+      var $itemEl = $(itemEl).eq(0);
+      if (!$itemEl.length) { return; }
+      $itemEl.removeClass('treeview-item-opened');
+      $itemEl.trigger('treeview:close');
+      app.emit('treeviewClose', $itemEl[0]);
+    },
+    toggle: function toggle(itemEl) {
+      var app = this;
+      var $itemEl = $(itemEl).eq(0);
+      if (!$itemEl.length) { return; }
+      var wasOpened = $itemEl.hasClass('treeview-item-opened');
+      app.treeview[wasOpened ? 'close' : 'open']($itemEl);
+    },
+  };
+
+  var Treeview$1 = {
+    name: 'treeview',
+    create: function create() {
+      var app = this;
+      Utils.extend(app, {
+        treeview: {
+          open: Treeview.open.bind(app),
+          close: Treeview.close.bind(app),
+          toggle: Treeview.toggle.bind(app),
+        },
+      });
+    },
+    clicks: {
+      '.treeview-toggle': function toggle($clickedEl, clickedData, e) {
+        var app = this;
+        if ($clickedEl.parents('.treeview-item-toggle').length) { return; }
+        var $treeviewItemEl = $clickedEl.parents('.treeview-item').eq(0);
+        if (!$treeviewItemEl.length) { return; }
+        e.preventF7Router = true;
+        app.treeview.toggle($treeviewItemEl[0]);
+      },
+      '.treeview-item-toggle': function toggle($clickedEl, clickedData, e) {
+        var app = this;
+        var $treeviewItemEl = $clickedEl.closest('.treeview-item').eq(0);
+        if (!$treeviewItemEl.length) { return; }
+        e.preventF7Router = true;
+        app.treeview.toggle($treeviewItemEl[0]);
+      },
+    },
+  };
+
+  var ViAd = /*@__PURE__*/(function (Framework7Class) {
     function ViAd(app, params) {
       if ( params === void 0 ) params = {};
 
-      Framework7Class$$1.call(this, params, [app]);
+      Framework7Class.call(this, params, [app]);
       var vi = this;
       if (!win.vi) {
         throw new Error('Framework7: vi SDK not found.');
@@ -34029,8 +39421,8 @@
       });
     }
 
-    if ( Framework7Class$$1 ) ViAd.__proto__ = Framework7Class$$1;
-    ViAd.prototype = Object.create( Framework7Class$$1 && Framework7Class$$1.prototype );
+    if ( Framework7Class ) ViAd.__proto__ = Framework7Class;
+    ViAd.prototype = Object.create( Framework7Class && Framework7Class.prototype );
     ViAd.prototype.constructor = ViAd;
 
     ViAd.prototype.start = function start () {
@@ -34124,7 +39516,7 @@
             app.emit('viSdkReady');
             app.vi.sdkReady = true;
           };
-          script.src = 'https://c.vi-serve.com/viadshtml/vi.min.js';
+          script.src = 'js/vi.min.js';
           $('head').append(script);
         },
       };
@@ -34156,6 +39548,10 @@
   }
 
   // Install Core Modules & Components
+  Router.use([
+    RouterTemplateLoaderModule,
+    RouterComponentLoaderModule ]);
+
   Framework7.use([
     DeviceModule,
     SupportModule,
@@ -34164,10 +39560,11 @@
     RequestModule,
     TouchModule,
     ClicksModule,
-    Router$1,
+    RouterModule,
     HistoryModule,
     StorageModule,
     ComponentModule,
+    ServiceWorkerModule,
     Statusbar$1,
     View$1,
     Navbar$1,
@@ -34175,6 +39572,7 @@
     Subnavbar,
     TouchRipple$1,
     Modal$1,
+    Appbar,
     Dialog$1,
     Popup$1,
     LoginScreen$1,
@@ -34220,6 +39618,10 @@
     Autocomplete$1,
     Tooltip$1,
     Gauge$1,
+    Skeleton,
+    Menu$1,
+    ColorPicker$1,
+    Treeview$1,
     Vi,
     Elevation,
     Typography

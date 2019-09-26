@@ -218,10 +218,9 @@
                     console.log(res);
                     $(".confirm-warning").addClass("text-danger").html('未知錯誤')
                 }
-            },
-            error: function (err) {
+            }, error: function (err) {
+                console.log(err);
                 if (err.responseJSON.msg === '') {
-                    console.log(err);
                     $(".confirm-warning").addClass("text-danger").html('未知錯誤')
                 } else {
                     $(".confirm-warning").addClass("text-danger").html(err.responseJSON.msg)
