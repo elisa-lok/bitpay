@@ -9,8 +9,9 @@ if (document.location.search.indexOf('theme=') >= 0) {
 
 // Init App
 var app = new Framework7({
-    id: 'io.framework7.Overux',
-    root: '#Overux',
+    id: 'com.xbitbay.app',
+    name: "xbitbay",
+    root: '#app',
     theme: theme,
     data: function () {
         return {
@@ -43,22 +44,22 @@ if (self !== top) {
 }
 
 
-var theme = 'theme-light';
-var colortheme = 'color-theme-gray';
+theme = 'theme-light';
+var colorTheme = 'color-theme-gray';
 
 
-function mycolortheme() {
+function mycolorTheme() {
     $$('.layout-theme').on('click', function () {
         $('body').removeClass(theme);
         theme = $(this).attr('value');
         $('body').addClass($(this).attr('value'));
     });
     $$('.layout-color-theme').on('click', function () {
-        $('body').removeClass(colortheme);
+        $('body').removeClass(colorTheme);
         var colorvalue = 'color-theme-' + $(this).attr('value');
-        colortheme = colorvalue;
+        colorTheme = colorvalue;
 
-        $('body').addClass(colortheme);
+        $('body').addClass(colorTheme);
     });
 }
 
@@ -71,7 +72,7 @@ $$(document).on('page:init', '.page[data-name="dashboard"]', function (e) {
         negBarColor: '#ef4055',
         zeroColor: '#ffffff'
     });
-    mycolortheme();
+    mycolorTheme();
 });
 $$(document).on('page:init', '.page[data-name="welcome"]', function (e) {
     $(".dynamicsparkline").sparkline([5, 6, 7, 2, 0, 4, 2, 5, 6, 7, 2, 0, 4, 2, 4], {
@@ -82,7 +83,7 @@ $$(document).on('page:init', '.page[data-name="welcome"]', function (e) {
         negBarColor: '#ef4055',
         zeroColor: '#ffffff'
     });
-    mycolortheme();
+    mycolorTheme();
 });
 
 $$(document).on('page:init', '.page[data-name="project-list"]', function (e) {
@@ -94,14 +95,14 @@ $$(document).on('page:init', '.page[data-name="project-list"]', function (e) {
         negBarColor: '#ef4055',
         zeroColor: '#ffffff'
     });
-    mycolortheme();
+    mycolorTheme();
 });
 
 $$(document).on('page:init', '.page[data-name="aboutus"]', function (e) {
-    mycolortheme();
+    mycolorTheme();
 });
 $$(document).on('page:init', '.page[data-name="component"]', function (e) {
-    mycolortheme();
+    mycolorTheme();
 });
 $$(document).on('page:init', '.page[data-name="profile"]', function (e) {
     $(".dynamicsparkline").sparkline([5, 6, 7, 2, 0, 4, 2, 5, 6, 7, 2, 0, 4, 2, 4], {
@@ -112,7 +113,7 @@ $$(document).on('page:init', '.page[data-name="profile"]', function (e) {
         negBarColor: '#ef4055',
         zeroColor: '#ffffff'
     });
-    mycolortheme();
+    mycolorTheme();
 });
 
 $$(document).on('page:init', '.page[data-name="project-detail"]', function (e) {
@@ -160,6 +161,6 @@ $$(document).on('page:init', '.page[data-name="project-detail"]', function (e) {
         chart.draw(data, options);
     }
 
-    mycolortheme();
+    mycolorTheme();
 
 });
