@@ -954,6 +954,7 @@ CREATE TABLE `think_order_buy` (
   `orderid` varchar(255) DEFAULT NULL,
   `platform_fee` decimal(20,8) DEFAULT '0.00000000' COMMENT '平台利润，承兑商释放订单时更新',
   `check_code` varchar(6) NOT NULL COMMENT '校验码',
+  `actual_amount` decimal(13,2) NOT NULL DEFAULT '0.00' COMMENT '实际收取金额',
   PRIMARY KEY (`id`),
   UNIQUE KEY `order_no` (`order_no`) USING BTREE,
   KEY `buy_id` (`buy_id`) USING BTREE,
