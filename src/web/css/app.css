@@ -896,7 +896,14 @@ hr {
     display: none
 }
 .navbar {
-    border-radius: 0 0 10px 10px;
+    /*border-radius: 0 0 10px 10px;*/
+    color:#fff;
+}
+.navbar a{
+    color:#fff;
+}
+.navbar::before{
+    background: none;
 }
 .small,
 small {
@@ -1475,6 +1482,7 @@ input[type=checkbox].switch:checked + label:after {
 .ios .button.button-fill,
 .ios .button.button-fill-ios {
     border: 0;
+    color: #fff;
 }
 
 /* dashbaord */
@@ -1634,6 +1642,7 @@ input[type=checkbox].switch:checked + label:after {
 }
 .list ul {
     border-radius: 10px;
+    background: inherit;
 }
 .list li {
     background-color: #ffffff;

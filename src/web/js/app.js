@@ -44,7 +44,7 @@ if (self !== top) {
 
 
 var theme = 'theme-light';
-var colortheme = 'color-theme-blue';
+var colortheme = 'color-theme-gray';
 
 
 function mycolortheme() {
