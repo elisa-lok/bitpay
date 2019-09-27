@@ -272,16 +272,12 @@ class Merchant extends Base {
 				$traders_id        = $member->where('trader_check', 1)->order('id asc')->column('id');
 				shuffle($traders_id);
 				$param['pptrader'] = implode(',', $traders_id);
-			} else {
+
+			} elseif (!empty($param['pptraders']) && is_array($param['pptraders'])) {
+				$param['pptrader'] = implode(',', $param['pptraders']);
+			}else{
 				$param['pptrader'] = '';
 			}
-
-			/*if (!empty($param['pptrader']) && is_array($param['pptrader'])) {
-				$param['pptrader'] = implode(',', $param['pptrader']);
-			} else {
-				$param['pptrader'] = '';
-			}*/
-
 			//20190830新增
 			$user = Db::name('merchant')->where('id', $param['id'])->find();
 			if ($user['usdt'] != $param['usdt']) {
@@ -314,18 +310,24 @@ class Merchant extends Base {
 		$minfo    = $member->getOneByWhere($id, 'id');
 		$pptrader = explode(',', $minfo['pptrader']);
 		$traders  = $member->field('id, name')->where('trader_check', 1)->order('id asc')->select();
-		foreach ($traders as $k => &$v) {
+	/*	foreach ($traders as $k => &$v) {
 			if (in_array($v['id'], $pptrader)) {
 				$status = 1;
 			} else {
 				$status = 0;
+			}
+		}*/
+		foreach($traders as $k=>&$v){
+			if(in_array($v['id'], $pptrader)){
+				$v['ispp'] = 1;
+			}else{
+				$v['ispp'] = 0;
 			}
 		}
 		$this->assign([
 			'merchant' => $minfo,
 			'traders'  => $traders,
 			'reg_type' => $reg_type,
-			'status'   => $status
 		]);
 		return $this->fetch();
 	}

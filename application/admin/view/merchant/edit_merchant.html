@@ -5,6 +5,7 @@
 	.file-item {float: left; position: relative; width: 110px;height: 110px; margin: 0 20px 20px 0; padding: 4px;}
 	.file-item .info {overflow: hidden;}
 	.uploader-list {width: 100%; overflow: hidden;}
+	.xz_a{margin-left: 317px; display: none;}
 </style>
 <body class="gray-bg">
 <div class="wrapper wrapper-content animated fadeInRight">
@@ -194,11 +195,15 @@
 							<label class="col-sm-3 control-label">匹配承兑商：</label>
 							<div class="input-group col-sm-9">
 								<div class="radio i-checks">
-									<input type="checkbox" name='pptrader' {if condition="$status == 1" }checked{/if} value="1"/>所有
-
+									<input type="checkbox" name='pptrader'  value="1"/>选择所有
+								     <br>
+									{volist name="traders" id="vo"}
+									<input type="checkbox" name='pptraders[]' {eq name='vo.ispp' value='1'}checked{/eq} value="{$vo.id}"/>{$vo.name}&nbsp;&nbsp;
+									{/volist}
 								</div>
 							</div>
 						</div>
+
 						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<div class="col-sm-4 col-sm-offset-3">
@@ -212,9 +217,9 @@
 		</div>
 	</div>
 </div>
+
 {include file="public/footer" /}
 <script type="text/javascript" src="/static/admin/webupload/webuploader.min.js"></script>
-
 <script type="text/javascript">
     var $list = $('#fileList');
     //上传图片,初始化WebUploader
@@ -276,6 +281,9 @@
         $('#' + file.id).find('p.state').text('上传出错!');
     });
 
+
+
+
     //提交
     $(function () {
         $('#edit_member').ajaxForm({
@@ -302,4 +310,5 @@
 
 </script>
 </body>
+
 </html>
