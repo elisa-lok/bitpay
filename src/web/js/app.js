@@ -27,9 +27,10 @@ var app = new Framework7({
         },
     },
     routes: routes,
-    vi: {
-        placementId: 'pltd4o7ibb9rc653x14',
-    }
+    // Video Intelligence
+    // vi: {
+    //     placementId: 'pltd4o7ibb9rc653x14',
+    // }
 });
 
 /* show hide app loader */
@@ -48,7 +49,7 @@ theme = 'theme-light';
 var colorTheme = 'color-theme-gray';
 
 
-function mycolorTheme() {
+function myColorTheme() {
     $$('.layout-theme').on('click', function () {
         $('body').removeClass(theme);
         theme = $(this).attr('value');
@@ -72,7 +73,7 @@ $$(document).on('page:init', '.page[data-name="dashboard"]', function (e) {
         negBarColor: '#ef4055',
         zeroColor: '#ffffff'
     });
-    mycolorTheme();
+    myColorTheme();
 });
 $$(document).on('page:init', '.page[data-name="welcome"]', function (e) {
     $(".dynamicsparkline").sparkline([5, 6, 7, 2, 0, 4, 2, 5, 6, 7, 2, 0, 4, 2, 4], {
@@ -83,7 +84,7 @@ $$(document).on('page:init', '.page[data-name="welcome"]', function (e) {
         negBarColor: '#ef4055',
         zeroColor: '#ffffff'
     });
-    mycolorTheme();
+    myColorTheme();
 });
 
 $$(document).on('page:init', '.page[data-name="project-list"]', function (e) {
@@ -95,14 +96,14 @@ $$(document).on('page:init', '.page[data-name="project-list"]', function (e) {
         negBarColor: '#ef4055',
         zeroColor: '#ffffff'
     });
-    mycolorTheme();
+    myColorTheme();
 });
 
 $$(document).on('page:init', '.page[data-name="aboutus"]', function (e) {
-    mycolorTheme();
+    myColorTheme();
 });
 $$(document).on('page:init', '.page[data-name="component"]', function (e) {
-    mycolorTheme();
+    myColorTheme();
 });
 $$(document).on('page:init', '.page[data-name="profile"]', function (e) {
     $(".dynamicsparkline").sparkline([5, 6, 7, 2, 0, 4, 2, 5, 6, 7, 2, 0, 4, 2, 4], {
@@ -113,7 +114,7 @@ $$(document).on('page:init', '.page[data-name="profile"]', function (e) {
         negBarColor: '#ef4055',
         zeroColor: '#ffffff'
     });
-    mycolorTheme();
+    myColorTheme();
 });
 
 $$(document).on('page:init', '.page[data-name="project-detail"]', function (e) {
@@ -161,6 +162,6 @@ $$(document).on('page:init', '.page[data-name="project-detail"]', function (e) {
         chart.draw(data, options);
     }
 
-    mycolorTheme();
+    myColorTheme();
 
 });
