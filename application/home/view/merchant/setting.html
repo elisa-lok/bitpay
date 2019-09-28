@@ -106,7 +106,7 @@
                                     </div>
                                 </div>
                             </div>
-                             <div class="form-group">
+                             <!--<div class="form-group">
                                 <label for="password_confirmation" class="col-sm-2  control-label">短信验证码</label>
                                 <div class="col-sm-8">
                                     <div class="input-group">
@@ -114,7 +114,7 @@
                                         <input type="number" id="code" name="code" value="" class="form-control password_confirmation" placeholder="输入短信验证码"> <span id="getcode" class="input-group-addon" onclick="getcode()" style="cursor:default;background: #00c0ef;color:#fff">获取验证码</span>
                                     </div>
                                 </div>
-                            </div>
+                            </div>-->
                         </div>
                 </div>
                 <!-- /.box-body -->
@@ -162,7 +162,7 @@
         }
 
 
-      $.post("{:url('Home/Login/sendPhoneCodeModify')}",{mobile:mobile},function(data){
+    /* $.post("{:url('Home/Login/sendPhoneCodeModify')}",{mobile:mobile},function(data){
           layer.msg(data.msg);
           if(data.code == 0){
               $("#getcode").html("获取验证码");
@@ -182,7 +182,7 @@
                 }
                  },1000)
             }
-      })
+      })*/
   }
 
     //本地URL地址解析
