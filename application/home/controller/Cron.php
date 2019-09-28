@@ -343,7 +343,7 @@ class Cron extends Base {
 	}
 
 	private function buydaojishi() {
-		$list = Db::name('order_sell')->where("" . time() . "-ctime>ltime*60 and status=0 ")->select();//dump($list);die;
+		$list = Db::name('order_sell')->where("" . time() . "-ctime > ltime*60 and status=0 ")->select();//dump($list);die;
 		if (!$list) {
 			return;
 		}
@@ -352,6 +352,7 @@ class Cron extends Base {
 				Db::startTrans();
 				$orderinfo   = [];
 				$orderinfo   = Db::table('think_order_sell')->where(['id' => $vv['id']])->find();
+				$buymerchant = Db::table('think_merchant')->where(['id' => $vv['buy_id']])->find();
 				$coin_name   = 'usdt';
 				$rs1         = Db::table('think_order_sell')->update(['status' => 5, 'id' => $vv['id']]);
 				$real_number = $orderinfo['deal_num'] + $orderinfo['fee'];
@@ -359,6 +360,11 @@ class Cron extends Base {
 				$rs3         = Db::table('think_merchant')->where(['id' => $orderinfo['sell_id']])->setInc($coin_name, $real_number);
 				if ($rs1 && $rs2 && $rs3) {
 					Db::commit();
+					$data['amount']  = $orderinfo['deal_num'];
+					$data['orderid'] = $orderinfo['orderid'];
+					$data['appid']   = $buymerchant['appid'];
+					$data['status']  = 0;
+					askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
 				} else {
 					Db::rollback();
 					throw new \Think\Exception('取消失败！');
