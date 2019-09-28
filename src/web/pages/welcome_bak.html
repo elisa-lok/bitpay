@@ -12,11 +12,21 @@
                 <figure class="logo-title md-only"><img src="img/logo-w.png" alt=""></figure>XBitBay
             </div>
             <div class="right">
-                <a class="link icon-only panel-open" data-panel="right">
-                    <i class="icon f7-icons ios-only">person</i>
-                    <i class="icon material-icons md-only">assignment_ind</i>
+                <a class="link icon-only searchbar-enable" data-searchbar=".searchbar-components">
+                    <i class="icon f7-icons ios-only">search_strong</i>
+                    <i class="icon material-icons md-only">search</i>
                 </a>
             </div>
+            <form data-search-container=".components-list" data-search-in="a" class="searchbar searchbar-expandable searchbar-components searchbar-init">
+                <div class="searchbar-inner">
+                    <div class="searchbar-input-wrap">
+                        <input type="search" placeholder="Search components" />
+                        <i class="searchbar-icon"></i>
+                        <span class="input-clear-button"></span>
+                    </div>
+                    <span class="searchbar-disable-button">Cancel</span>
+                </div>
+            </form>
         </div>
     </div>
     <div class="page-content">

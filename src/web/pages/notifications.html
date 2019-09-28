@@ -13,7 +13,7 @@
     </div>
     <div class="page-content">
       <div class="block block-strong">
-        <p>Overux comes with simple Notifications component that allows you to show some useful messages to user and request basic actions.</p>
+        <p>XBitBay comes with simple Notifications component that allows you to show some useful messages to user and request basic actions.</p>
         <p><a href="#" class="button button-raised" @click="showNotificationFull">Full layout notification</a></p>
         <p><a href="#" class="button button-raised" @click="showNotificationWithButton">With close button</a></p>
         <p><a href="#" class="button button-raised" @click="showNotificationCloseOnClick">Click to close</a></p>
@@ -31,7 +31,7 @@
         if (!self.notificationFull) {
           self.notificationFull = self.$app.notification.create({
             icon: '<i class="icon icon-f7"></i>',
-            title: 'Overux',
+            title: 'XBitBay',
             titleRightText: 'now',
             subtitle: 'This is a subtitle',
             text: 'This is a simple notification message',
@@ -47,7 +47,7 @@
         if (!self.notificationWithButton) {
           self.notificationWithButton = self.$app.notification.create({
             icon: '<i class="icon icon-f7"></i>',
-            title: 'Overux',
+            title: 'XBitBay',
             subtitle: 'Notification with close button',
             text: 'Click (x) button to close me',
             closeButton: true,
@@ -62,7 +62,7 @@
         if (!self.notificationCloseOnClick) {
           self.notificationCloseOnClick = self.$app.notification.create({
             icon: '<i class="icon icon-f7"></i>',
-            title: 'Overux',
+            title: 'XBitBay',
             titleRightText: 'now',
             subtitle: 'Notification with close on click',
             text: 'Click me to close',
@@ -78,7 +78,7 @@
         if (!self.notificationCallbackOnClose) {
           self.notificationCallbackOnClose = self.$app.notification.create({
             icon: '<i class="icon icon-f7"></i>',
-            title: 'Overux',
+            title: 'XBitBay',
             titleRightText: 'now',
             subtitle: 'Notification with close on click',
             text: 'Click me to close',

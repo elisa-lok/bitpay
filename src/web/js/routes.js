@@ -30,7 +30,7 @@ var routes = [
                 <span class="ios-only">Back</span>\
               </a>\
             </div>\
-            <div class="title">Panel Page 1</div>\
+            <div class="title" i18n="language">Language</div>\
           </div>\
         </div>\
         <div class="page-content">\
@@ -61,6 +61,45 @@ var routes = [
           <div class="block">\
             <p>This is a right panel page 2</p>\
             <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quo saepe aspernatur inventore dolorum voluptates consequatur tempore ipsum! Quia, incidunt, aliquam sit veritatis nisi aliquid porro similique ipsa mollitia eaque ex!</p>\
+          </div>\
+        </div>\
+      </div>\
+    ',
+  },
+  {
+    path: '/language/',
+    content: '\
+      <div class="page">\
+        <div class="navbar">\
+          <div class="navbar-inner sliding">\
+            <div class="left">\
+              <a href="#" class="link back">\
+                <i class="icon icon-back"></i>\
+                <span class="ios-only">Back</span>\
+              </a>\
+            </div>\
+            <div class="title" i18n="language">Language</div>\
+          </div>\
+        </div>\
+        <div class="page-content">\
+          <div class="block">\
+            <div class="list links-list">\
+                  <ul>\
+                      <li ><a href="javascript:;" data-lang="en" onclick="selectLang(this)" class="panel-close link"><svg class="icon" style="width: 1em; height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="664"><path d="M1012.532736 412.5696a467.0976 467.0976 0 0 0-20.224-73.216h-38.1952l30.5664-19.6096a486.912 486.912 0 0 0-44.8-85.1968l-161.0752 105.3696h-119.0912l241.9712-157.7984c-7.1168-8.192-14.2336-16.384-21.8624-24.576l-227.7376 148.5312V20.48a450.2528 450.2528 0 0 0-61.184-13.1072v405.248h421.632zM431.975936 7.3216c-20.736 3.2768-41.472 7.68-61.1328 13.1072v288.9216L140.903936 159.744c-21.8624 22.9376-40.96 47.5136-58.4192 73.728l162.7136 105.984H126.721536L50.791936 289.6896a575.488 575.488 0 0 0-14.1824 32.256l26.7264 17.408h-33.28c-8.7552 23.552-15.3088 48.128-20.224 73.216h422.144V7.3216z m158.4128 1009.8176c20.736-3.2768 40.96-7.68 61.1328-13.1072v-280.1664l224.4608 146.3808c22.9376-23.5008 43.7248-49.152 62.2592-76.4928l-167.1168-108.6464h119.0912l80.2816 52.4288c4.352-9.3184 8.704-18.5856 12.544-27.8528l-37.6832-24.576h46.9504c8.7552-23.5008 15.3088-48.0768 20.224-73.216h-422.144v405.248zM9.831936 611.8912c4.9152 25.1392 11.4688 49.7152 20.224 73.216h42.0352l-33.8432 21.8112c12.544 30.0544 27.2896 58.4704 44.7488 85.1968l164.9664-107.5712h119.04l-244.6848 159.488c7.1168 8.192 14.2336 16.384 21.8624 24.0128l226.0992-147.456v282.88c19.6608 5.4784 40.448 10.3936 61.184 13.1072v-405.1968l-421.632 0.512z" fill="#FFFFFF" p-id="665"></path><path d="M983.041536 709.12c3.2768-8.192 6.5536-16.384 9.2672-24.576h-46.9504l37.6832 24.576z m-331.52 294.912a506.624 506.624 0 0 0 224.4608-133.7856l-224.4608-146.3808v280.1664z m340.7872-664.064a288.0512 288.0512 0 0 0-7.6288-19.712l-30.5664 19.6608h38.1952zM144.743936 867.9936a510.1568 510.1568 0 0 0 226.0992 135.424v-282.88l-226.0992 147.456zM370.843136 20.4288a515.9936 515.9936 0 0 0-229.9392 139.264l229.888 149.6576V20.4288z m508.416 137.1136A512.6144 512.6144 0 0 0 651.521536 20.4288v285.696l227.7376-148.5824zM36.609536 322.4576c-2.2016 5.9904-4.4032 11.4688-6.5536 17.4592h33.28c0-0.512-26.7264-17.4592-26.7264-17.4592zM30.055936 684.544c2.7136 7.68 5.4272 14.7456 8.704 21.8624l33.8944-21.8624H30.055936z" fill="#002377" p-id="666"></path><path d="M590.337536 1017.1392V611.84h422.1952c6.5536-32.256 9.8304-65.536 9.8304-99.3792 0-33.8944-3.2768-67.1744-9.8304-99.4304h-422.144V7.3216a496.5888 496.5888 0 0 0-75.9296-5.9904h-7.1168c-25.6512 0-51.3024 2.1504-75.8784 5.9904v405.248H9.831936A498.8928 498.8928 0 0 0 0.001536 511.9488c0 33.8432 3.2768 67.1744 9.8304 99.3792h422.144v405.248c24.576 3.84 50.2784 5.9904 75.9296 5.9904h6.5536a436.224 436.224 0 0 0 75.9296-5.4272" fill="#C2121F" p-id="667"></path><path d="M247.963136 684.544L82.945536 791.552c12.032 18.0736 25.1392 35.5328 39.3216 51.9168l244.6848-159.488-119.04 0.5632zM245.761536 339.968L82.433536 233.472a525.824 525.824 0 0 0-32.2048 56.7808l75.9296 49.664H245.761536z m532.992 0l161.6896-105.472c-12.032-17.9712-24.576-35.4816-38.7584-52.3776l-241.408 157.7984h118.528z m-8.192 344.576l167.168 108.6976c11.9808-18.0224 22.9376-37.1712 32.2048-56.2688l-80.2816-52.4288h-119.04z" fill="#C2121F" p-id="668"></path></svg>English</a></li>\
+                      <li ><a href="javascript:;" data-lang="ar" onclick="selectLang(this)" class="panel-close link">العربية</a></li>\
+                      <li ><a href="javascript:;" data-lang="de" onclick="selectLang(this)" class="panel-close link">Deutsch</a></li>\
+                      <li ><a href="javascript:;" data-lang="es" onclick="selectLang(this)" class="panel-close link">Español</a></li>\
+                      <li ><a href="javascript:;" data-lang="fr" onclick="selectLang(this)" class="panel-close link">Français</a></li>\
+                      <li ><a href="javascript:;" data-lang="it" onclick="selectLang(this)" class="panel-close link">Italiano</a></li>\
+                      <li ><a href="javascript:;" data-lang="ko" onclick="selectLang(this)" class="panel-close link">한국어</a></li>\
+                      <li ><a href="javascript:;" data-lang="ja" onclick="selectLang(this)" class="panel-close link">日本語</a></li>\
+                      <li ><a href="javascript:;" data-lang="pt" onclick="selectLang(this)" class="panel-close link">Português</a></li>\
+                      <li ><a href="javascript:;" data-lang="ru" onclick="selectLang(this)" class="panel-close link">Pусский</a></li>\
+                      <li ><a href="javascript:;" data-lang="th" onclick="selectLang(this)" class="panel-close link">ภาษาไทย</a></li>\
+                      <li ><a href="javascript:;" data-lang="zhs" onclick="selectLang(this)" class="panel-close link">简体中文</a></li>\
+                      <li ><a href="javascript:;" data-lang="zht" onclick="selectLang(this)" class="panel-close link">繁體中文</a></li>\
+                  </ul>\
+              </div>\
           </div>\
         </div>\
       </div>\
