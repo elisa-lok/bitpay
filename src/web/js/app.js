@@ -37,7 +37,8 @@ var app = new Framework7({
 app.preloader.show();
 $(window).on('load', function () {
     app.preloader.hide();
-})
+    i18n_init();
+});
 
 /* page inside iframe just for demo app */
 if (self !== top) {
@@ -64,6 +65,63 @@ function myColorTheme() {
     });
 }
 
+
+/******************************************** language ********************************************/
+/**
+ * internationalization
+ * language file name: i18n_xx.json, xx is language shorten name
+ * this plugin cannot parse json like {"xx":{"xxx" :"xxx"}}结构，直接写入{"xx.xxx":"xxx"}
+ * .dropdown-item的属性：data-lang="xx", 控制选择该语言为xx
+ * https://github.com/T-baby/jquery.i18n
+*/
+var storeLangName = 'defaultLang';
+
+/*language initial*/
+function i18n_init() {
+  let defaultLang = localStorage.getItem(storeLangName) ? localStorage.getItem(storeLangName) : getBrowserLang();
+  $("[i18n]").i18n({
+      defaultLang: defaultLang,
+      filePath: "../i18n/",
+      filePrefix: "",
+      fileSuffix: "",
+      forever: true,
+      callback: function() {}
+  });
+}
+
+/* get client browser language*/
+function getBrowserLang() {
+    let lng = navigator.language;
+    if(lng.substr(0, 2) === 'zh'){
+        lng = lng.toLowerCase() === 'zh-cn' ? 'zhs' : 'zht'
+    }else {
+        lng = lng.substr(0, 2)
+    }
+    return lng
+}
+
+function showMenu (i) {
+  let defaultLang = localStorage.getItem(storeLangName) ? localStorage.getItem(storeLangName) : getBrowserLang();
+  $(i).find('.dropdown-menu').toggleClass('show');
+  $('.dropdown-item[data-lang="' + defaultLang + '"]').addClass('lang_active')
+}
+
+/* button to switch language*/
+function selectLang (i) {
+  $(i).addClass('lang_active').siblings().removeClass('lang_active');
+  localStorage.setItem('defaultLang',$(i).attr('data-lang'));
+  $("[i18n]").i18n({
+      defaultLang: $(i).attr('data-lang'),
+  });
+}
+
+$$(document).on('page:init', function (e) {
+    i18n_init();
+    myColorTheme();
+});
+
+/******************************************** language end ********************************************/
+
 $$(document).on('page:init', '.page[data-name="dashboard"]', function (e) {
     $(".dynamicsparkline").sparkline([5, 6, 7, 2, 0, 4, 2, 5, 6, 7, 2, 0, 4, 2, 4], {
         type: 'bar',
@@ -73,7 +131,7 @@ $$(document).on('page:init', '.page[data-name="dashboard"]', function (e) {
         negBarColor: '#ef4055',
         zeroColor: '#ffffff'
     });
-    myColorTheme();
+
 });
 $$(document).on('page:init', '.page[data-name="welcome"]', function (e) {
     $(".dynamicsparkline").sparkline([5, 6, 7, 2, 0, 4, 2, 5, 6, 7, 2, 0, 4, 2, 4], {
@@ -84,7 +142,7 @@ $$(document).on('page:init', '.page[data-name="welcome"]', function (e) {
         negBarColor: '#ef4055',
         zeroColor: '#ffffff'
     });
-    myColorTheme();
+    // myColorTheme();
 });
 
 $$(document).on('page:init', '.page[data-name="project-list"]', function (e) {
@@ -96,15 +154,8 @@ $$(document).on('page:init', '.page[data-name="project-list"]', function (e) {
         negBarColor: '#ef4055',
         zeroColor: '#ffffff'
     });
-    myColorTheme();
 });
 
-$$(document).on('page:init', '.page[data-name="aboutus"]', function (e) {
-    myColorTheme();
-});
-$$(document).on('page:init', '.page[data-name="component"]', function (e) {
-    myColorTheme();
-});
 $$(document).on('page:init', '.page[data-name="profile"]', function (e) {
     $(".dynamicsparkline").sparkline([5, 6, 7, 2, 0, 4, 2, 5, 6, 7, 2, 0, 4, 2, 4], {
         type: 'bar',
@@ -114,7 +165,6 @@ $$(document).on('page:init', '.page[data-name="profile"]', function (e) {
         negBarColor: '#ef4055',
         zeroColor: '#ffffff'
     });
-    myColorTheme();
 });
 
 $$(document).on('page:init', '.page[data-name="project-detail"]', function (e) {
@@ -157,11 +207,7 @@ $$(document).on('page:init', '.page[data-name="project-detail"]', function (e) {
                 width: '85%'
             }
         };
-
         var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
         chart.draw(data, options);
     }
-
-    myColorTheme();
-
 });

@@ -10,21 +10,23 @@
             <div class="title sliding">
                 <figure class="logo-title ios-only"><img src="img/logo.png" alt=""></figure><figure class="logo-title md-only"><img src="img/logo-w.png" alt=""></figure>Overux</div>
             <div class="right">
-                <a class="link icon-only searchbar-enable" data-searchbar=".searchbar-components3">
-                    <i class="icon f7-icons ios-only">search_strong</i>
-                    <i class="icon material-icons md-only">search</i>
+                <a class="link icon-only lang-control" onclick="showMenu(this)" href="javascript: void(0);">
+                    <!-- internationalization -->
+                    <div class="lang">
+                        <div class="dropdown">
+                            <div class="dropdown-toggle">
+                                <i class="icon f7-icons">world</i>
+                            </div>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-item" data-lang="zhs" onclick="selectLang(this)">简体中文</li>
+                                <li class="dropdown-item" data-lang="zht" onclick="selectLang(this)">繁體中文</li>
+                                <li class="dropdown-item" data-lang="en" onclick="selectLang(this)">English</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- internationalization -->
                 </a>
             </div>
-            <form data-search-container=".components-list" data-search-in="a" class="searchbar searchbar-expandable searchbar-components3 searchbar-init">
-                <div class="searchbar-inner">
-                    <div class="searchbar-input-wrap">
-                        <input type="search" placeholder="Search components" />
-                        <i class="searchbar-icon"></i>
-                        <span class="input-clear-button"></span>
-                    </div>
-                    <span class="searchbar-disable-button">Cancel</span>
-                </div>
-            </form>
         </div>
     </div>
     <div class="page-content">
@@ -35,7 +37,7 @@
                     <h5 class="color-primary text-uppercase">New York</h5>
                     <h1 class="font-light mt-5">30<sup><small>o</small></sup>C</h1>
                     <p class="mb-5 color-gray">Thursday, 8:00 AM</p>
-                    <h1><span class="font-light small">Good Morning</span><br><b class="color-primary">John</b></h1>
+                    <h1><span class="font-light small">Good Morning</span><br><b class="color-primary" i18n="userInfo.userName">John</b></h1>
                 </div>
             </div>
         </div>
@@ -433,7 +435,7 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
     <!-- theme color setting buton -->
         <div class="fab fab-right-bottom">
@@ -477,7 +479,7 @@
                         </div>
                     </div>
                 </div>
-               
+
             </div>
         </div>
         <!-- theme color popover -->

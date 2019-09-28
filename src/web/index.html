@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#2196f3">
     <meta http-equiv="Content-Security-Policy" content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: gap:">
-    <title>xbitbay - safest cryptocurrencies exchange</title>
+    <title i18n="website.title">xbitbay - safest cryptocurrencies exchange</title>
     <link rel="stylesheet" href="css/framework7.bundle.min.css">
 
     <!-- Custom style  -->
@@ -17,7 +17,7 @@
     <link rel="icon" href="img/f7-icon.png">
 </head>
 
-<body class="color-theme-gray theme-light">
+<body class="color-theme-gray theme-light" >
     <div id="app" class="sidebar-fill">
         <div class="statusbar"></div>
         <!-- left menu code  -->
@@ -31,7 +31,7 @@
                             </figure>
                             <div class="media-content">
                                 <div class="media-block-title">
-                                    <h4>John Doe <span class="status-online bg-color-success"></span></h4>
+                                    <h4 i18n="userInfo.userName">John Doe <span class="status-online bg-color-success"></span></h4>
                                     <p class="mb-0"><small>India</small></p>
                                 </div>
                             </div>
@@ -173,7 +173,32 @@
                 <div class="page-content login-page">
                     <div class="block text-center">
                         <img src="img/logo-w.png" alt="" class="login-logo">
-                        <h1 class="login-title"><small>Welcome to</small><br>XBitBay</h1>
+                        <h1 class="login-title"><small i18n="welcome.to">Welcome to</small><br>XBitBay</h1>
+                        <!-- internationalization -->
+                        <div class="lang">
+                            <div class="dropdown" onclick="showMenu(this)">
+                                <div class="dropdown-toggle">
+                                    <i class="icon f7-icons">world</i> 
+                                    <span></span>
+                                </div>
+                                <ul class="dropdown-menu">
+                                    <li class="dropdown-item" data-lang="en" onclick="selectLang(this)">English</li>
+                                    <li class="dropdown-item" data-lang="ar" onclick="selectLang(this)">العربية</li>
+                                    <li class="dropdown-item" data-lang="de" onclick="selectLang(this)">Deutsch</li>
+                                    <li class="dropdown-item" data-lang="es" onclick="selectLang(this)">Español</li>
+                                    <li class="dropdown-item" data-lang="fr" onclick="selectLang(this)">Français</li>
+                                    <li class="dropdown-item" data-lang="it" onclick="selectLang(this)">Italiano</li>
+                                    <li class="dropdown-item" data-lang="ko" onclick="selectLang(this)">한국어</li>
+                                    <li class="dropdown-item" data-lang="ja" onclick="selectLang(this)">日本語</li>
+                                    <li class="dropdown-item" data-lang="pt" onclick="selectLang(this)">Português</li>
+                                    <li class="dropdown-item" data-lang="ru" onclick="selectLang(this)">Pусский</li>
+                                    <li class="dropdown-item" data-lang="th" onclick="selectLang(this)">ภาษาไทย</li>
+                                    <li class="dropdown-item" data-lang="zhs" onclick="selectLang(this)">简体中文</li>
+                                    <li class="dropdown-item" data-lang="zht" onclick="selectLang(this)">繁體中文</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- internationalization -->
                     </div>
                     <div class="row">
                         <div class="col-10"></div>
@@ -189,7 +214,7 @@
                                                 </div>
                                                 <div class="item-inner">
                                                     <div class="item-input-wrap">
-                                                        <input type="text" placeholder="Username">
+                                                        <input type="text" placeholder="Username" i18n-only="placeholder" i18n="login.username">
                                                         <span class="input-clear-button"></span>
                                                     </div>
                                                 </div>
@@ -201,7 +226,7 @@
                                                 </div>
                                                 <div class="item-inner">
                                                     <div class="item-input-wrap">
-                                                        <input type="password" placeholder="Your password">
+                                                        <input type="password" placeholder="Your password" i18n-only="placeholder" i18n="login.password">
                                                         <span class="input-clear-button"></span>
                                                     </div>
                                                 </div>
@@ -211,16 +236,16 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col"><a href="/dashboard/" class="col button color-green rounded button-fill">Sign In</a></div>
+                                <div class="col"><a href="/dashboard/" class="col button color-green rounded button-fill" i18n="login.sign_in">Sign In</a></div>
                             </div>
                             <br>
                             <br>
                             <div class="row">
                                 <div class="col-60">
-                                    <a href="" class="color-white col">Forgot password?</a>
+                                    <a href="" class="color-white col" i18n="login.forget">Forgot password?</a>
                                 </div>
                                 <div class="col-40 text-right">
-                                    <a href="/register/" class="color-white col">Sign up</a>
+                                    <a href="/register/" class="color-white col" i18n="login.sign_up">Sign up</a>
                                 </div>
                             </div>
                             <br>
@@ -316,6 +341,8 @@
     <script src="js/routes.js"></script>
     <!-- jquery -->
     <script src="js/jquery.min.js"></script>
+    <!-- jquery internationalization -->
+    <script src="js/jquery.i18n.min.js"></script>
     <!-- sparklines js -->
     <script src="js/jquery.sparkline.min.js"></script>
     <!-- Google chart js -->

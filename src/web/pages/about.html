@@ -14,6 +14,22 @@
                     <i class="icon f7-icons ios-only">person</i>
                     <i class="icon material-icons md-only">assignment_ind</i>
                 </a>
+                <a class="link icon-only lang-control" onclick="showMenu(this)" href="javascript: void(0);">
+                    <!-- internationalization -->
+                    <div class="lang">
+                        <div class="dropdown">
+                            <div class="dropdown-toggle">
+                                <i class="icon f7-icons">world</i>
+                            </div>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-item" data-lang="zhs" onclick="selectLang(this)">简体中文</li>
+                                <li class="dropdown-item" data-lang="zht" onclick="selectLang(this)">繁體中文</li>
+                                <li class="dropdown-item" data-lang="en" onclick="selectLang(this)">English</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- internationalization -->
+                </a>
             </div>
         </div>
     </div>
@@ -121,8 +137,8 @@
                         <div class="right"><a href="#" class="link popup-close"><i class="material-icons">close</i></a></div>
                     </div>
                 </div>
-                <div class="page-content"> 
-                    
+                <div class="page-content">
+
                     <div class="block-title text-center">Select Color Scheme</div>
                     <div class="block text-center ">
                         <button class="mx-2 my-2 layout-color-theme button button-fill color-red rounded sq-button text-white" value="red"><i class="material-icons w-25px">color_lens_outline</i></button>
@@ -144,7 +160,7 @@
                         </div>
                     </div>
                 </div>
-               
+
             </div>
         </div>
         <!-- theme color popover -->

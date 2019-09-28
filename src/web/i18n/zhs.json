@@ -1,0 +1,9 @@
+{
+  "welcome.to" : "欢迎来到",
+  "login.username"   : "用户名",
+  "login.password"   : "密码",
+  "login.sign_in"    : "立即登录",
+  "login.forget"     : "忘记密码",
+  "login.sign_up"    : "立即注册",
+  "userInfo.userName": "约翰"
+}

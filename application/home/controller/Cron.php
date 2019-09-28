@@ -37,8 +37,8 @@ class Cron extends Base {
 		$cnt = 0;
 		while (TRUE) {
 			$cnt++;
-			$this->selldaojishi();//充值1
-			$this->buydaojishi();//充值2
+			$this->sellCountDown();//充值1
+			$this->buyCountDown();//充值2
 			$this->statistics();//充值2
 			sleep(30);
 			if ($cnt > 7893748927349701) break;
@@ -305,7 +305,7 @@ class Cron extends Base {
 		}
 	}
 
-	private function selldaojishi() {
+	private function sellCountDown() {
 		$list = Db::name('order_buy')->where("" . time() . "-ctime>ltime*60 and status=0 ")->select();//dump($list);die;
 		if (!$list) {
 			return;
@@ -342,7 +342,7 @@ class Cron extends Base {
 		}
 	}
 
-	private function buydaojishi() {
+	private function buyCountDown() {
 		$list = Db::name('order_sell')->where("" . time() . "-ctime > ltime*60 and status=0 ")->select();//dump($list);die;
 		if (!$list) {
 			return;
@@ -432,11 +432,7 @@ class Cron extends Base {
 			'order_buy_amount'     => $orderBuySum,
 			'create_time'          => time()
 		]);
-		if ($rs) {
-			return '更新统计表think_statistics成功';
-		} else {
-			return '更新统计表think_statistics失败';
-		}
+		return $rs ? '更新统计表think_statistics成功' : '更新统计表think_statistics失败';
 	}
 
 	private function downad() {
