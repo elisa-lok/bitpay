@@ -42,8 +42,6 @@
 						</li>
 						{/eq}
 						{else /}
-
-
 						{eq name="vo" value="zfb"}
 						<li class="p10 {eq name='key' value='0'}active{/eq}" onclick="" data-class='alipay' data-type="{$vo}">
 							<img src="__IMG__/alipay.png"/>支付宝
@@ -83,6 +81,14 @@
 							</div>
 
 							<p class='p10'>支付完成后，请点击下方的"我已付款"按钮</p>
+							<div class='paybutton mt20' style="margin-top: -0.9rem;">
+								<input type="hidden" name="paymethod" value="{$payarr[0]}"/>
+								{gt name='remaintime' value='0'}
+								<button type="button" onclick="uptrade()" class='paybutton'>我已付款 ¥ {$money}</button>
+								{else/}
+								<button type="button" class='paybutton'>订单已关闭</button>
+								{/gt}
+							</div>
 							<!-- 支付方法 -->
 					<div class='tc'>
 						<p class="ti_p">
@@ -106,7 +112,6 @@
 						<div class='bank erweima {gt name="key" value="0"}hide{/gt}'>
 							<p class='f14 p10'>请用<img src="__IMG__/bank.png" class=''/>完成支付</p>
 							<div class='mt10 bankinfo' style="    width: 80%;padding-left: 15%;">
-
 								<p class='mt10' style="color:red;text-align: left" id="copy2" data-clipboard-target="#name">真实姓名：<em id="name">{gt name='remaintime' value='0'}{$merchant.name}{/gt}</em></p>
 								<p class='mt10'  style="color:red;text-align: left;margin-top: 0.2rem;" id="copy3" data-clipboard-target="#card">银行卡号：<em id="card">{gt name='remaintime' value='0'}{$merchant.c_bank_card}{/gt}</em></p>
 								<p class='mt10' id="copy4" data-clipboard-target="#khh" style="color:red;text-align: left;margin-top: 0.2rem;">开户银行：<em id="khh">{gt name='remaintime' value='0'}{$merchant.bank}{/gt}</em></p><br>
@@ -123,21 +128,23 @@
 							</div>
 							<p class='p10'>支付完成后，请点击下方的"我已付款"按钮</p>
 							<!-- 支付方法 -->
-					<div class='tc'>
-						<p class="ti_p">
-						<span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon2 icon_wx" id="type_icon"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon3"></span>
-						</p><div class="ti_t">
-						<div>
-						<p>截屏将二维码<br>保存至本地相册</p>
-						</div>
-						<div>
-						<p>打开<span class="pay_type">微信</span><br>选择扫一扫</p>
-						</div>
-						<div>
-						<p>从本地相册选择<br>选取截屏二维码</p>
-						</div>
-						</div>
-					</div>
+							<div class='tc'>
+								<p class="ti_p">
+									<span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span>
+									<span class="ticon icon2 icon_wx" id="type_icon"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon3"></span>
+								</p>
+								<div class="ti_t">
+									<div>
+										<p>截屏将二维码<br>保存至本地相册</p>
+									</div>
+									<div>
+										<p>打开<span class="pay_type">微信</span><br>选择扫一扫</p>
+									</div>
+									<div>
+										<p>从本地相册选择<br>选取截屏二维码</p>
+									</div>
+								</div>
+							</div>
 					<!-- 支付方法 -->
 						</div>
 						{/eq}
@@ -150,21 +157,23 @@
 							</div>
 							<p class='p10'>支付完成后，请点击下方的"我已付款"按钮</p>
 							<!-- 支付方法 -->
-					<div class='tc'>
-						<p class="ti_p">
-						<span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon2 icon_ysf" id="type_icon"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon3"></span>
-						</p><div class="ti_t">
-						<div>
-						<p>截屏将二维码<br>保存至本地相册</p>
-						</div>
-						<div>
-						<p>打开<span class="pay_type">云闪付</span><br>选择扫一扫</p>
-						</div>
-						<div>
-						<p>从本地相册选择<br>选取截屏二维码</p>
-						</div>
-						</div>
-					</div>
+							<div class='tc'>
+								<p class="ti_p">
+									<span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span>
+									<span class="ticon icon2 icon_ysf" id="type_icon"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon3"></span>
+								</p>
+								<div class="ti_t">
+									<div>
+										<p>截屏将二维码<br>保存至本地相册</p>
+									</div>
+									<div>
+										<p>打开<span class="pay_type">云闪付</span><br>选择扫一扫</p>
+									</div>
+									<div>
+										<p>从本地相册选择<br>选取截屏二维码</p>
+									</div>
+								</div>
+							</div>
 					<!-- 支付方法 -->
 						</div>
 						{/eq}
@@ -176,14 +185,7 @@
 		</div>
 	</div>
 </div>
-<div class='paybutton mt20' style="margin-top: -0.9rem;">
-	<input type="hidden" name="paymethod" value="{$payarr[0]}"/>
-	{gt name='remaintime' value='0'}
-	<button type="button" onclick="uptrade()" class='paybutton'>我已付款 ¥ {$money}</button>
-	{else/}
-	<button type="button" class='paybutton'>订单已关闭</button>
-	{/gt}
-</div>
+
 </body>
 <script>
 	var copy1T;
