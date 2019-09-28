@@ -21,7 +21,9 @@ class Merchant extends Base {
 	//商户首页
 	public function index() {
 		// echo session('user.name');die;
-
+		if (!session('uid')) {
+			$this->error('请登陆操作', url('home/login/login'));
+		}
 		$model = new MerchantModel();
 		$this->assign('merchant', $model->getUserByParam(session('uid'), 'id'));
 		$myinfo = $model->getUserByParam(session('uid'), 'id');
@@ -2717,13 +2719,6 @@ class Merchant extends Base {
 				$this->error('下单失败！');
 			}
 		}
-	}
-	public function adpay(){
-
-
-
-
-		return $this->fetch();
 	}
 	public function ordersell() {
 		if (!session('uid')) {
