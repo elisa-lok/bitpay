@@ -2,6 +2,7 @@
 
 namespace app\api\controller;
 
+use app\home\model\OrderModel;
 use think\Controller;
 use think\Db;
 
@@ -274,10 +275,10 @@ class Merchant extends Controller {
 		Db::startTrans();
 		try {
 			$checkCode = $this->check_code();
-			$rs1 = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setDec('usdt', $data['amount']);
-			$rs3 = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setInc('usdtd', $data['amount']);
-			$rs4 = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setInc('pp_amount', 1);
-			$rs2 = Db::table('think_order_buy')->insertGetId([
+			$rs1       = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setDec('usdt', $data['amount']);
+			$rs3       = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setInc('usdtd', $data['amount']);
+			$rs4       = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setInc('pp_amount', 1);
+			$rs2       = Db::table('think_order_buy')->insertGetId([
 				'buy_id'       => $this->merchant['id'],//接口请求时,返回商户的id,放行时增加商户的USDT,有疑问?!
 				// 'buy_id'=>'',//暂时改成空
 				'sell_id'      => $onlinead['traderid'],
@@ -304,9 +305,9 @@ class Merchant extends Controller {
 					$send_content = Db::table('think_config')->where('name', 'send_message_content')->value('value');
 					if ($send_content) {
 
-						$content = str_replace('{usdt}', round($data['amount'],2), $send_content);//dump($content);
+						$content = str_replace('{usdt}', round($data['amount'], 2), $send_content);//dump($content);
 						$content = str_replace('{tx_id}', $data['orderid'], $content);
-						$content = str_replace('{check_code}', ''.$checkCode.'', $content);
+						$content = str_replace('{check_code}', '' . $checkCode . '', $content);
 						//$this->myerror($onlinead['mobile']);die;
 						sendSms($onlinead['mobile'], $content);
 					}
@@ -429,10 +430,10 @@ class Merchant extends Controller {
 		Db::startTrans();
 		try {
 			$checkCode = $this->check_code();
-			$rs1 = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setDec('usdt', $actualamount);
-			$rs3 = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setInc('usdtd', $actualamount);
-			$rs4 = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setInc('pp_amount', 1);
-			$rs2 = Db::table('think_order_buy')->insertGetId([
+			$rs1       = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setDec('usdt', $actualamount);
+			$rs3       = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setInc('usdtd', $actualamount);
+			$rs4       = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setInc('pp_amount', 1);
+			$rs2       = Db::table('think_order_buy')->insertGetId([
 				'buy_id'       => $this->merchant['id'],//接口请求时,返回商户的id,放行时增加商户的USDT,有疑问?!
 				// 'buy_id'=>'',//暂时改成空
 				'sell_id'      => $onlinead['traderid'],
@@ -457,9 +458,9 @@ class Merchant extends Controller {
 				Db::commit();
 				//todo 发送短信给承兑商
 				if (!empty($onlinead['mobile'])) {
-					$content = str_replace('{usdt}', round($actualamount,2), config('send_message_content'));
+					$content = str_replace('{usdt}', round($actualamount, 2), config('send_message_content'));
 					$content = str_replace('{tx_id}', $data['orderid'], $content);
-					$content = str_replace('{check_code}', ''.$checkCode.'', $content);
+					$content = str_replace('{check_code}', '' . $checkCode . '', $content);
 					sendSms($onlinead['mobile'], $content);
 				}
 				$http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
@@ -477,26 +478,40 @@ class Merchant extends Controller {
 		}
 	}
 
+	public function OrderList() {
+		$data = input('post.orderid');
+		!$data && $this->myerror('填写订单号');
+		$model2            = new OrderModel();
+		$where['order_no'] = $data;
+		$list              = $model2->getOne($where, 'id desc');
+		!$list && $this->myerror('订单不存在');
+		$arr ['order_no']     = $list['order_no'];//订单号
+		$arr ['deal_amount']  = $list['deal_amount'];//金额
+		$arr ['buy_username'] = $list['buy_username'];//买家
+		$arr ['deal_num']     = $list['deal_num'];//交易数量
+		$arr ['deal_price']   = $list['deal_price'];//交易价格
+		$arr ['ctime']        = $list['ctime'];//创建时间
+		$arr ['status']       = $list['status'];//交易状态
+		$this->mysuccess($arr);
+	}
+
 	private function checkSign($data) {
 		ksort($data);
 		if (empty($data['appid'])) {
-			echo json_encode(['status' => 0, 'err' => '缺少appid参数' . __LINE__]);
-			exit();
+			exit(json_encode(['status' => 0, 'err' => '缺少appid参数' . __LINE__]));
 		}
 		$appsecret_arr = Db::name('merchant')->where(['appid' => $data['appid']])->find();
 		if (empty($appsecret_arr)) {
-			echo json_encode(['status' => 0, 'err' => 'appid不存在' . __LINE__]);
-			exit();
+			exit(json_encode(['status' => 0, 'err' => 'appid不存在' . __LINE__]));
 		}
 		if ($appsecret_arr['status'] == 0) {
-			echo json_encode(['status' => 0, 'err' => 'appid被禁用' . __LINE__]);
-			exit();
+			exit(json_encode(['status' => 0, 'err' => 'appid被禁用' . __LINE__]));
 		}
 		$sign = $data['sign'];
 		// echo json_encode(array('status'=>0,'err'=>$data));
 		// echo json_encode(array('status'=>0,'err'=>$data['sign']));
 		unset($data['sign']);
-		$serverStr = "";
+		$serverStr = '';
 		foreach ($data as $k => $v) {
 			$serverStr = $serverStr . $k . $v;
 		}
@@ -507,8 +522,7 @@ class Merchant extends Controller {
 		// echo json_encode(array('status'=>0,'err'=>$reserverSign));exit;
 
 		if ($sign != $reserverSign) {
-			echo json_encode(['status' => 0, 'err' => '签名错误' . __LINE__]);
-			exit();
+			exit(json_encode(['status' => 0, 'err' => '签名错误' . __LINE__]));
 		}
 	}
 
