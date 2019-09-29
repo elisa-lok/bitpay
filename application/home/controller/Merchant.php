@@ -2720,6 +2720,7 @@ class Merchant extends Base {
 			}
 		}
 	}
+
 	public function ordersell() {
 		if (!session('uid')) {
 			$this->error('请登陆操作', url('home/login/login'));
@@ -2822,7 +2823,7 @@ class Merchant extends Base {
 		$wxid   = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method3');//4
 		$ysfid  = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method4');//2
 
-		$arr    = [];
+		$arr = [];
 		$this->assign('id', $id);
 		$this->assign('appid', $appid);
 		$this->assign('money', $order['deal_amount']);
