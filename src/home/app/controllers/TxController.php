@@ -2,6 +2,10 @@
 
 namespace BITPAY\Home\Controllers;
 
+// https://api.huobi.pro/market/tickers 获取火币所有ticket
+
+
+
 class TxController extends ControllerBase {
 	//-------------------------------------------------------------------------------------------------------------------------
 	public function initialize() {
