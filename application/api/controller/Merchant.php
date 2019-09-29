@@ -18,13 +18,13 @@ class Merchant extends Controller {
 	}
 
 	private function mysuccess($data) {
-		 /* 返回状态，200 成功，500失败 */
-		die(json_encode(['status' => 1, 'data'   => $data,],320));
+		/* 返回状态，200 成功，500失败 */
+		die(json_encode(['status' => 1, 'data' => $data,], 320));
 	}
 
 	private function myerror($message) {
 		/* 返回状态，200 成功，500失败 */
-		die(json_encode(['status' => 0, 'err'    => $message,],320));
+		die(json_encode(['status' => 0, 'err' => $message,], 320));
 	}
 
 	public function getInfo() {
@@ -297,7 +297,7 @@ class Merchant extends Controller {
 		empty($data['orderid']) && $this->myerror('订单号不能为空');
 		empty($data['return_url']) && $this->myerror('同步通知页面地址错误');
 		empty($data['notify_url']) && $this->myerror('异步回调页面地址错误');
-		(empty($data['type']) || !in_array($data['type'], ['wxpay', 'alipay', 'unionpay', 'bank'])) && $this->myerror('支付方式不正确');
+		(empty($data['type']) || !in_array($data['type'], ['wxpay', 'alipay', 'unionpay', 'bank','all'])) && $this->myerror('支付方式不正确');
 		$find = Db::name('order_buy')->where('orderid', $data['orderid'])->find();
 		!empty($find) && $this->myerror('订单号已存在，请勿重复提交');
 		$pk_num       = Db::table('think_config')->where('name', 'pk_waiting_finished_num')->value('value');
@@ -314,14 +314,15 @@ class Merchant extends Controller {
 		$where['state']                = 1;
 		$where['min_limit']            = ['elt', $data['amount']];
 		$where['max_limit']            = ['egt', $data['amount']];
-		$method                        = [
-			'bank'     => 'pay_method',
-			'alipay'   => 'pay_method2',
-			'wxpay'    => 'pay_method3',
-			'unionpay' => 'pay_method4',
-		];
-		$where[$method[$data['type']]] = ['gt', 0];
-
+		if($data['type'] != 'all'){
+			$method                        = [
+				'bank'     => 'pay_method',
+				'alipay'   => 'pay_method2',
+				'wxpay'    => 'pay_method3',
+				'unionpay' => 'pay_method4',
+			];
+			$where[$method[$data['type']]] = ['gt', 0];
+		}
 		//判断是否商户匹配交易
 		$pptrader = $this->merchant['pptrader'];
 
@@ -403,7 +404,11 @@ class Merchant extends Controller {
 					sendSms($onlinead['mobile'], $content);
 				}
 				$http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
-				$url       = $http_type . $_SERVER['HTTP_HOST'] . '/home/merchant/pay_a?id=' . $rs2 . '&appid=' . $data['appid'] . '&type=' . $data['type'];
+				if($data['type'] != 'all'){
+					$url       = $http_type . $_SERVER['HTTP_HOST'] . '/home/merchant/pay_a?id=' . $rs2 . '&appid=' . $data['appid'] . '&type=' . $data['type'];
+				}else{
+					$url       = $http_type . $_SERVER['HTTP_HOST'] . '/merchant/pay?id=' . $rs2 . '&appid=' . $data['appid'] . '&type=' . $data['type'];
+				}
 				$this->mysuccess($url);
 			} else {
 				// 回滚事务
