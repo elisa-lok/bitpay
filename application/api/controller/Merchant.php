@@ -18,25 +18,16 @@ class Merchant extends Controller {
 	}
 
 	private function mysuccess($data) {
-		$return = [
-			'status' => 1,    /* 返回状态，200 成功，500失败 */
-			'data'   => $data,
-		];
-		echo json_encode($return);
-		die;
+		 /* 返回状态，200 成功，500失败 */
+		die(json_encode(['status' => 1, 'data'   => $data,],320));
 	}
 
 	private function myerror($message) {
-		$return = [
-			'status' => 0,    /* 返回状态，200 成功，500失败 */
-			'err'    => $message,
-		];
-		echo json_encode($return);
-		die;
+		/* 返回状态，200 成功，500失败 */
+		die(json_encode(['status' => 0, 'err'    => $message,],320));
 	}
 
 	public function getInfo() {
-		die;
 		$return = $this->model->index('getinfo', $addr = NULL, $mum = NULL, $index = NULL, $count = NULL, $skip = NULL);
 		$this->mysuccess($return);
 	}
@@ -70,12 +61,10 @@ class Merchant extends Controller {
 					apilog($this->merchant['pid'], $this->merchant['id'], '生成地址', $request_param, $return['data']);
 				}
 				$this->mysuccess($return['data']);
-			} else {
-				$this->myerror('数据库更新失败');
 			}
-		} else {
-			$this->myerror('生成钱包地址失败');
+			$this->myerror('数据库更新失败');
 		}
+		$this->myerror('生成钱包地址失败');
 	}
 
 	/**
@@ -84,9 +73,7 @@ class Merchant extends Controller {
 	 */
 	public function rechargeRecord() {
 		$data = input('post.');
-		if (empty($data['address'])) {
-			$this->myerror('钱包地址不能为空');
-		}
+		empty($data['address']) && $this->myerror('钱包地址不能为空');
 		$list = Db::name('merchant_user_recharge')->field('from_address, to_address, txid, mum, status, confirmations')->where(['to_address' => $data['address'], 'merchant_id' => $this->merchant['id']])->select();
 		if ($this->merchant['pid'] > 0) {
 			$request_param = "address=>" . $data['address'];
@@ -101,19 +88,14 @@ class Merchant extends Controller {
 	 */
 	public function getBalance() {
 		$data = input('post.');
-		if (empty($data['address'])) {
-			$this->myerror('钱包地址不能为空');
-		}
+		empty($data['address']) && $this->myerror('钱包地址不能为空');
 		$return = $this->model->index('getbalance', $data['address'], $mum = NULL, $index = NULL, $count = NULL, $skip = NULL);
-		if ($return['code'] == 0) {
-			$this->myerror($return['msg']);
-		} else {
-			if ($this->merchant['pid'] > 0) {
-				$request_param = "address=>" . $data['address'];
-				apilog($this->merchant['pid'], $this->merchant['id'], '获取usdt账户余额', $request_param, $return['data']);
-			}
-			$this->mysuccess($return['data']);
+		($return['code'] == 0) && $this->myerror($return['msg']);
+		if ($this->merchant['pid'] > 0) {
+			$request_param = "address=>" . $data['address'];
+			apilog($this->merchant['pid'], $this->merchant['id'], '获取usdt账户余额', $request_param, $return['data']);
 		}
+		$this->mysuccess($return['data']);
 	}
 
 	/**
@@ -122,22 +104,12 @@ class Merchant extends Controller {
 	 */
 	public function makeWithdraw() {
 		$data = input('post.');
-		if (empty($data['address'])) {
-			$this->myerror('钱包地址不能为空');
-		}
-		if (empty($data['num'])) {
-			$this->myerror('提现数量不能为空');
-		}
-		if ($data['num'] < 0) {
-			$this->myerror('请输入正确的提现数量');
-		}
-		if (empty($data['username'])) {
-			$this->myerror('用户名不能为空');
-		}
+		empty($data['address']) && $this->myerror('钱包地址不能为空');
+		empty($data['num']) && $this->myerror('提现数量不能为空');
+		($data['num'] < 0) && $this->myerror('请输入正确的提现数量');
+		empty($data['username']) && $this->myerror('用户名不能为空');
 		$usdt = $this->merchant['usdt'];
-		if ($usdt * 100000000 < $data['num'] * 100000000) {
-			$this->myerror('商户余额不足');
-		}
+		($usdt * 100000000 < $data['num'] * 100000000) && $this->myerror('商户余额不足');
 		$ordersn = createOrderNo(2, $this->merchant['id']);
 		$rs      = Db::name('merchant_user_withdraw')->insert([
 			'merchant_id' => $this->merchant['id'],
@@ -164,13 +136,9 @@ class Merchant extends Controller {
 	 */
 	public function getWithdraw() {
 		$data = input('post.');
-		if (empty($data['ordersn'])) {
-			$this->myerror('提币订单号不能为空');
-		}
+		empty($data['ordersn']) && $this->myerror('提币订单号不能为空');
 		$withdraw = Db::name('merchant_user_withdraw')->where(['ordersn' => $data['ordersn']])->find();
-		if (empty($withdraw)) {
-			$this->myerror('提币订单号不存在');
-		}
+		empty($withdraw) && $this->myerror('提币订单号不存在');
 		if ($this->merchant['pid'] > 0) {
 			$request_param = "ordersn=>" . $data['ordersn'];
 			apilog($this->merchant['pid'], $this->merchant['id'], '获取用户提币状态', $request_param, json_encode(['status' => $withdraw['status'], 'txid' => $withdraw['txid']]));
@@ -189,31 +157,15 @@ class Merchant extends Controller {
 	 */
 	public function requestTraderRecharge() {
 		$data = input('post.');
-		if (empty($data['amount']) || $data['amount'] <= 0) {
-			$this->myerror('请输入正确的充值数量');
-		}
-		if (empty($data['address'])) {
-			$this->myerror('充值地址不正确');
-		}
-		if (empty($data['username'])) {
-			$this->myerror('用户名不正确');
-		}
-		if (strlen($data['username']) >= 15) {
-			$this->myerror('用户名不能超过15个字符');
-		}
-		if (empty($data['orderid'])) {
-			$this->myerror('订单号不能为空');
-		}
-		if (empty($data['return_url'])) {
-			$this->myerror('同步通知页面地址错误');
-		}
-		if (empty($data['notify_url'])) {
-			$this->myerror('异步回调页面地址错误');
-		}
+		(empty($data['amount']) || $data['amount'] <= 0) && $this->myerror('请输入正确的充值数量');
+		empty($data['address']) && $this->myerror('充值地址不正确');
+		empty($data['username']) && $this->myerror('用户名不正确');
+		(strlen($data['username']) >= 15) && $this->myerror('用户名不能超过15个字符');
+		empty($data['orderid']) && $this->myerror('订单号不能为空');
+		empty($data['return_url']) && $this->myerror('同步通知页面地址错误');
+		empty($data['notify_url']) && $this->myerror('异步回调页面地址错误');
 		$find = Db::name('order_buy')->where('orderid', $data['orderid'])->find();
-		if (!empty($find)) {
-			$this->myerror('订单号已存在，请勿重复提交');
-		}
+		!empty($find) && $this->myerror('订单号已存在，请勿重复提交');
 		$pk_num       = Db::table('think_config')->where('name', 'pk_waiting_finished_num')->value('value');//盘口订单限制
 		$trader_limit = Db::table('think_config')->where('name', 'trader_pp_max_unfinished_order')->value('value');
 		if ($pk_num > 0) {
@@ -236,21 +188,21 @@ class Merchant extends Controller {
 		if (!empty($pptrader) && is_array($pptraderarray)) {
 			$where['c.id'] = ['in', $pptraderarray];
 		}
-		$join         = [['__MERCHANT__ c', 'a.userid=c.id', 'LEFT']];
-		$ads          = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile')->alias('a')->join($join)->group('a.id')->where($where)->order('online desc,price asc,averge asc,pp_amount asc,id asc')->select();
-		$onlinead     = [];
-		$actualamount = 0;
+		$join      = [['__MERCHANT__ c', 'a.userid=c.id', 'LEFT']];
+		$ads       = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile')->alias('a')->join($join)->group('a.id')->where($where)->order('online desc,price asc,averge asc,pp_amount asc,id asc')->select();
+		$onlinead  = [];
+		$actualAmt = 0;
 		//$this->mysuccess($ads);
 		foreach ($ads as $k => $v) {
 			$total = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 9)->sum('deal_num');
 			if (($v['amount'] - $total) < $data['amount']) {
 				continue;
 			}
-			$actualamount = $data['amount'] * $v['price'];
-			if ($v['min_limit'] > $actualamount) {
+			$actualAmt = $data['amount'] * $v['price'];
+			if ($v['min_limit'] > $actualAmt) {
 				continue;
 			}
-			if ($v['max_limit'] < $actualamount) {
+			if ($v['max_limit'] < $actualAmt) {
 				continue;
 			}
 			//判断承兑商是否被其它盘口设置过
@@ -283,7 +235,7 @@ class Merchant extends Controller {
 				// 'buy_id'=>'',//暂时改成空
 				'sell_id'      => $onlinead['traderid'],
 				'sell_sid'     => $onlinead['id'],
-				'deal_amount'  => $actualamount,
+				'deal_amount'  => $actualAmt,
 				'deal_num'     => $data['amount'],
 				'deal_price'   => $onlinead['price'],
 				'ctime'        => time(),
@@ -338,41 +290,21 @@ class Merchant extends Controller {
 	 */
 	public function requestTraderRechargeRmb() {
 		$data = input('post.');
-		if (empty($data['amount']) || $data['amount'] <= 0) {
-			$this->myerror('请输入正确的充值金额');
-		}
-		if (empty($data['address'])) {
-			//$this->myerror('充值地址不正确');
-		}
-		if (empty($data['username'])) {
-			$this->myerror('用户名不正确');
-		}
-		if (strlen($data['username']) >= 15) {
-			$this->myerror('用户名不能超过15个字符');
-		}
-		if (empty($data['orderid'])) {
-			$this->myerror('订单号不能为空');
-		}
-		if (empty($data['return_url'])) {
-			$this->myerror('同步通知页面地址错误');
-		}
-		if (empty($data['notify_url'])) {
-			$this->myerror('异步回调页面地址错误');
-		}
-		if (empty($data['type']) || !in_array($data['type'], ['wxpay', 'alipay', 'unionpay', 'bank'])) {
-			$this->myerror('支付方式不正确');
-		}
+		(empty($data['amount']) || $data['amount'] <= 0) && $this->myerror('请输入正确的充值金额');
+		//empty($data['address']) && $this->myerror('充值地址不正确');
+		empty($data['username']) && $this->myerror('用户名不正确');
+		(strlen($data['username']) >= 15) && $this->myerror('用户名不能超过15个字符');
+		empty($data['orderid']) && $this->myerror('订单号不能为空');
+		empty($data['return_url']) && $this->myerror('同步通知页面地址错误');
+		empty($data['notify_url']) && $this->myerror('异步回调页面地址错误');
+		(empty($data['type']) || !in_array($data['type'], ['wxpay', 'alipay', 'unionpay', 'bank'])) && $this->myerror('支付方式不正确');
 		$find = Db::name('order_buy')->where('orderid', $data['orderid'])->find();
-		if (!empty($find)) {
-			$this->myerror('订单号已存在，请勿重复提交');
-		}
+		!empty($find) && $this->myerror('订单号已存在，请勿重复提交');
 		$pk_num       = Db::table('think_config')->where('name', 'pk_waiting_finished_num')->value('value');
 		$trader_limit = Db::table('think_config')->where('name', 'trader_pp_max_unfinished_order')->value('value');
 		if ($pk_num > 0) {
 			$count = Db::name('order_buy')->where('buy_id', $this->merchant['id'])->where('status', 'in', [0, 1])->count();
-			if ($count >= $pk_num) {
-				$this->myerror('您有未完成的订单');
-			}
+			($count >= $pk_num) && $this->myerror('您有未完成的订单');
 		}
 		//设置承兑商在线状态
 		$ids = Db::name('login_log')->where('online=1 and unix_timestamp(now())-update_time<1800')->column('merchant_id');
@@ -397,20 +329,20 @@ class Merchant extends Controller {
 		if (!empty($pptrader) && is_array($pptraderarray)) {
 			$where['c.id'] = ['in', $pptraderarray];
 		}
-		$join         = [
+		$join      = [
 			['__MERCHANT__ c', 'a.userid=c.id', 'LEFT'],
 		];
-		$ads          = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile, c.usdt')->alias('a')->join($join)->group('a.id')->where($where)->order('online desc,price asc,averge asc,pp_amount asc,id asc')->select();
-		$onlinead     = [];
-		$actualamount = 0;
+		$ads       = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile, c.usdt')->alias('a')->join($join)->group('a.id')->where($where)->order('online desc,price asc,averge asc,pp_amount asc,id asc')->select();
+		$onlinead  = [];
+		$actualAmt = 0;
 		// $this->myerror(json_encode($ads));
 		// dump($ads);
 		// $this->myerror($where);
 		foreach ($ads as $k => $v) {
 			//开始判断挂单剩余
-			$total        = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 9)->sum('deal_num');
-			$actualamount = round($data['amount'] / $v['price'], 8);
-			if (($v['amount'] - $total) < $actualamount || $v['usdt'] < $actualamount) {
+			$total     = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 9)->sum('deal_num');
+			$actualAmt = round($data['amount'] / $v['price'], 8);
+			if (($v['amount'] - $total) < $actualAmt || $v['usdt'] < $actualAmt) {
 				//dump(1);die;
 				continue;
 			}
@@ -431,17 +363,15 @@ class Merchant extends Controller {
 			$onlinead = $v;
 			break;
 		}
-		if (empty($onlinead)) {
-			$this->myerror('暂无可用订单');
-		}
+		empty($onlinead) && $this->myerror('暂无可用订单');
 
 		// $this->myerror($onlinead);
 		//开始冻结承兑商usdt
 		Db::startTrans();
 		try {
 			$checkCode = $this->check_code();
-			$rs1       = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setDec('usdt', $actualamount);
-			$rs3       = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setInc('usdtd', $actualamount);
+			$rs1       = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setDec('usdt', $actualAmt);
+			$rs3       = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setInc('usdtd', $actualAmt);
 			$rs4       = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setInc('pp_amount', 1);
 			$rs2       = Db::table('think_order_buy')->insertGetId([
 				'buy_id'       => $this->merchant['id'],//接口请求时,返回商户的id,放行时增加商户的USDT,有疑问?!
@@ -449,7 +379,7 @@ class Merchant extends Controller {
 				'sell_id'      => $onlinead['traderid'],
 				'sell_sid'     => $onlinead['id'],
 				'deal_amount'  => $data['amount'],
-				'deal_num'     => $actualamount,
+				'deal_num'     => $actualAmt,
 				'deal_price'   => $onlinead['price'],
 				'ctime'        => time(),
 				'ltime'        => 15,
@@ -467,7 +397,7 @@ class Merchant extends Controller {
 				Db::commit();
 				//todo 发送短信给承兑商
 				if (!empty($onlinead['mobile'])) {
-					$content = str_replace('{usdt}', round($actualamount, 2), config('send_message_content'));
+					$content = str_replace('{usdt}', round($actualAmt, 2), config('send_message_content'));
 					$content = str_replace('{tx_id}', $data['orderid'], $content);
 					$content = str_replace('{check_code}', '' . $checkCode . '', $content);
 					sendSms($onlinead['mobile'], $content);
@@ -506,19 +436,11 @@ class Merchant extends Controller {
 
 	private function checkSign($data) {
 		ksort($data);
-		if (empty($data['appid'])) {
-			exit(json_encode(['status' => 0, 'err' => '缺少appid参数' . __LINE__]));
-		}
-		if (empty($data['type'])) {
-			exit(json_encode(['status' => 0, 'err' => '缺少支付方式' . __LINE__]));
-		}
+		empty($data['appid']) && exit(json_encode(['status' => 0, 'err' => '缺少appid参数' . __LINE__]));
+		empty($data['type']) && exit(json_encode(['status' => 0, 'err' => '缺少支付方式' . __LINE__]));
 		$appsecret_arr = Db::name('merchant')->where(['appid' => $data['appid']])->find();
-		if (empty($appsecret_arr)) {
-			exit(json_encode(['status' => 0, 'err' => 'appid不存在' . __LINE__]));
-		}
-		if ($appsecret_arr['status'] == 0) {
-			exit(json_encode(['status' => 0, 'err' => 'appid被禁用' . __LINE__]));
-		}
+		empty($appsecret_arr) && exit(json_encode(['status' => 0, 'err' => 'appid不存在' . __LINE__]));
+		($appsecret_arr['status'] == 0) && exit(json_encode(['status' => 0, 'err' => 'appid被禁用' . __LINE__]));
 
 		$sign = $data['sign'];
 		// echo json_encode(array('status'=>0,'err'=>$data));
@@ -526,17 +448,14 @@ class Merchant extends Controller {
 		unset($data['sign']);
 		$serverStr = '';
 		foreach ($data as $k => $v) {
-			$serverStr = $serverStr . $k . $v;
+			$serverStr = $serverStr . $k . trim($v);
 		}
 		$reserverStr  = $serverStr . $appsecret_arr['key'];
 		$reserverSign = strtoupper(sha1($reserverStr));
 
 		// $reserverSign = $this->sign($data,$appsecret_arr['key']);
 		// echo json_encode(array('status'=>0,'err'=>$reserverSign));exit;
-
-		if ($sign != $reserverSign) {
-			exit(json_encode(['status' => 0, 'err' => '签名错误' . __LINE__]));
-		}
+		($sign != $reserverSign) && exit(json_encode(['status' => 0, 'err' => '签名错误' . __LINE__]));
 	}
 
 	private function sign($dataArr, $key) {
