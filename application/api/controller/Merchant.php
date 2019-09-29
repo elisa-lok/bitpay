@@ -332,7 +332,7 @@ class Merchant extends Controller {
 		$join      = [
 			['__MERCHANT__ c', 'a.userid=c.id', 'LEFT'],
 		];
-		$ads       = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile, c.usdt')->alias('a')->join($join)->group('a.id')->where($where)->order('online desc,price asc,averge asc,pp_amount asc,id asc')->select();
+		$ads       = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile, c.usdt')->alias('a')->join($join)->group('a.id')->where($where)->orderRaw(' rand() ')->select(); // order('online DESC,price ASC,averge ASC,pp_amount ASC,id ASC')->select();
 		$onlinead  = [];
 		$actualAmt = 0;
 		// $this->myerror(json_encode($ads));
