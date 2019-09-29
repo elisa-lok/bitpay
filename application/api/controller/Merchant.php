@@ -359,6 +359,9 @@ class Merchant extends Controller {
 		if (empty($data['notify_url'])) {
 			$this->myerror('异步回调页面地址错误');
 		}
+		if (empty($data['type']) || !in_array($data['type'], ['wxpay', 'alipay', 'unionpay', 'bank'])) {
+			$this->myerror('支付方式不正确');
+		}
 		$find = Db::name('order_buy')->where('orderid', $data['orderid'])->find();
 		if (!empty($find)) {
 			$this->myerror('订单号已存在，请勿重复提交');
@@ -372,14 +375,21 @@ class Merchant extends Controller {
 			}
 		}
 		//设置承兑商在线状态
-		$ids    = Db::name('login_log')->where('online=1 and unix_timestamp(now())-update_time<1800')->column('merchant_id');
-		$sql    = 'Update think_merchant set online=0';
-		$result = Db::query($sql);
+		$ids = Db::name('login_log')->where('online=1 and unix_timestamp(now())-update_time<1800')->column('merchant_id');
+		Db::query('Update think_merchant set online=0');
 		Db::name('merchant')->where('id', 'in', $ids)->update(['online' => 1]);
 		//系统自动选择在线的承兑商和能够交易这个金额的承兑商
-		$where['state']     = 1;
-		$where['min_limit'] = ['elt', $data['amount']];
-		$where['max_limit'] = ['egt', $data['amount']];
+		$where['state']                = 1;
+		$where['min_limit']            = ['elt', $data['amount']];
+		$where['max_limit']            = ['egt', $data['amount']];
+		$method                        = [
+			'bank'     => 'pay_method',
+			'alipay'   => 'pay_method2',
+			'wxpay'    => 'pay_method3',
+			'unionpay' => 'pay_method4',
+		];
+		$where[$method[$data['type']]] = ['gt', 0];
+
 		//判断是否商户匹配交易
 		$pptrader = $this->merchant['pptrader'];
 
@@ -452,7 +462,6 @@ class Merchant extends Controller {
 				'check_code'   => $checkCode,
 				'status'       => 0,
 			]);
-
 			if ($rs1 && $rs2 && $rs3 && $rs4) {
 				// 提交事务
 				Db::commit();
@@ -464,7 +473,7 @@ class Merchant extends Controller {
 					sendSms($onlinead['mobile'], $content);
 				}
 				$http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
-				$url       = $http_type . $_SERVER['HTTP_HOST'] . '/merchant/pay?id=' . $rs2 . '&appid=' . $data['appid'];
+				$url       = $http_type . $_SERVER['HTTP_HOST'] . '/home/merchant/pay_a?id=' . $rs2 . '&appid=' . $data['appid'] . '&type=' . $data['type'];
 				$this->mysuccess($url);
 			} else {
 				// 回滚事务
@@ -500,6 +509,9 @@ class Merchant extends Controller {
 		if (empty($data['appid'])) {
 			exit(json_encode(['status' => 0, 'err' => '缺少appid参数' . __LINE__]));
 		}
+		if (empty($data['type'])) {
+			exit(json_encode(['status' => 0, 'err' => '缺少支付方式' . __LINE__]));
+		}
 		$appsecret_arr = Db::name('merchant')->where(['appid' => $data['appid']])->find();
 		if (empty($appsecret_arr)) {
 			exit(json_encode(['status' => 0, 'err' => 'appid不存在' . __LINE__]));
@@ -507,6 +519,7 @@ class Merchant extends Controller {
 		if ($appsecret_arr['status'] == 0) {
 			exit(json_encode(['status' => 0, 'err' => 'appid被禁用' . __LINE__]));
 		}
+
 		$sign = $data['sign'];
 		// echo json_encode(array('status'=>0,'err'=>$data));
 		// echo json_encode(array('status'=>0,'err'=>$data['sign']));
