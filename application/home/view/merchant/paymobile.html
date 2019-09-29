@@ -19,7 +19,6 @@
 			<p class="red_p">输错金额和多次支付,自己承担损失 <span class="red_arrow"></span></p>
 			<!-- 确认信息开始 -->
 			<div class="confirminfo">
-				<h3>请确认您的充值信息:</h3>
 				<div class="infodetail">
 					<p class='p1050'>购买数量：<span  class="red">{$amount} USDT</span></p>
 					<p class='p1050'>支付金额：<span class="red">￥<font class='f14'>{$money}</font></span></p>
@@ -32,7 +31,6 @@
 				<span>
 					支付倒计时：<font class="red"><em id='minute'>00</em>:<em id='second'>00</em></font>
 				</span>
-				<h3 class="mt20">交易方式</h3>
 				<ul class="paymethod mt10">
 					{volist name="payarr" id="vo"}
 					{if condition="$money gt 10000"}
@@ -69,11 +67,13 @@
 				</ul>
 				<div class='trade-knowledge mt20'>
 					<div class='sellerinfo'>
+						<!--
 						<ul class='p10'>
 							<li>卖家信用</li>
 							<li>成功交易笔数：{$merchant.transact}笔</li>
 							<li>平均确认时间：{$min}分{$second}秒</li>
 						</ul>
+						-->
 						{volist name="payarr" id="vo"}
 						{eq name="vo" value="zfb"}
 						<div class='alipay erweima {gt name="key" value="0"}hide{/gt}'>
@@ -176,7 +176,7 @@
 		</div>
 	</div>
 </div>
-<div class='paybutton mt20' style="margin-top: -0.9rem;">
+<div class='paybutton mt20' style="margin-top: -0.4rem;">
 	<input type="hidden" name="paymethod" value="{$payarr[0]}"/>
 	{gt name='remaintime' value='0'}
 	<button type="button" onclick="uptrade()" class='paybutton'>我已付款 ¥ {$money}</button>
