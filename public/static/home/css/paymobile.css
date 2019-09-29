@@ -82,7 +82,6 @@ img{vertical-align:middle}
 .red {
     color: red;
 }
-.content{padding:.2rem;}
 .main {
     background: #e9e9e9;
     width: 100%;
@@ -94,7 +93,6 @@ img{vertical-align:middle}
 .paycontent {
     background: #fff;
     border-radius: 0.02rem;
-    margin-top: 0.2rem;
 	padding:0.2rem;
 }
 .confirminfo .infodetail {
@@ -142,8 +140,7 @@ em {
     border-color: #44679b;
 }
 .sellerinfo {
-    height: 6.2rem;
-    background: #eef7fd;
+    background: rgba(80, 183, 243, 0.11);
     border-radius: 0.1rem;
 }
 .sellerinfo ul {
