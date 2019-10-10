@@ -5,6 +5,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title></title>
 	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="stylesheet" href="__CSS__/paymobile.css">
 	<script type="text/javascript" charset="utf-8" src="__JS__/jquery.min.js"></script>
 	<script type="text/javascript" charset="utf-8" src="__JS__/rem.js"></script>
@@ -20,9 +21,11 @@
 			<!-- 确认信息开始 -->
 			<div class="confirminfo">
 				<div class="infodetail">
-					<p class='p1050'>购买数量：<span  class="red">{$amount} USDT</span></p>
-					<p class='p1050'>支付金额：<span class="red">￥<font class='f14'>{$money}</font></span></p>
-					<p class='p1050' id="copy1" data-clipboard-target="#adno">订单号：<span class="red"><font class='f14' id="adno" >{$no}</font></span><a id="fz">(点击复制)</a></p>
+					<p class='p1050'>你正在交易USDT数量：<span class="red">{$amount} USDT</span></p>
+					<p class='p1050'>买家需支付金额：<span class="red">￥<font class='f14'>{$money}</font></span></p>
+					<p class='p1050' id="copy1" data-clipboard-target="#adno">订单号：<span class="red"><font class='f14' id="adno">{$no}</font></span><a id="fz">&nbsp;(点击复制)</a></p>
+					<p class='p1050'>卖家成功交易笔数：{$merchant.transact}笔</p>
+					<p class='p1050'>卖家平均确认时间：{$min}分{$second}秒</p>
 				</div>
 			</div>
 			<!-- 确认信息结束 -->
@@ -41,7 +44,6 @@
 					{/eq}
 					{else /}
 
-
 					{eq name="vo" value="zfb"}
 					<li class="p10 {eq name='key' value='0'}active{/eq}" onclick="" data-class='alipay' data-type="{$vo}">
 						<img src="__IMG__/alipay.png"/>支付宝
@@ -59,7 +61,7 @@
 					{/eq}
 					{eq name="vo" value="ysf"}
 					<li class="p10 {eq name='key' value='0'}active{/eq}" data-class='ysf' data-type="4">
-						<img src="__IMG__/yun.png" width="32" height="32" />云闪付
+						<img src="__IMG__/yun.png" width="32" height="32"/>云闪付
 					</li>
 					{/eq}
 					{/if}
@@ -67,13 +69,11 @@
 				</ul>
 				<div class='trade-knowledge mt20'>
 					<div class='sellerinfo'>
-						<!--
-						<ul class='p10'>
+						<!--<ul class='p10'>
 							<li>卖家信用</li>
 							<li>成功交易笔数：{$merchant.transact}笔</li>
 							<li>平均确认时间：{$min}分{$second}秒</li>
-						</ul>
-						-->
+						</ul>-->
 						{volist name="payarr" id="vo"}
 						{eq name="vo" value="zfb"}
 						<div class='alipay erweima {gt name="key" value="0"}hide{/gt}'>
@@ -86,18 +86,20 @@
 							<!-- 支付方法 -->
 							<div class='tc'>
 								<p class="ti_p">
-									<span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon2 icon_alipay" id="type_icon"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon3"></span>
-								</p><div class="ti_t">
-								<div>
-									<p>截屏将二维码<br>保存至本地相册</p>
+									<span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span>
+									<span class="ticon icon2 icon_alipay" id="type_icon"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon3"></span>
+								</p>
+								<div class="ti_t">
+									<div>
+										<p>截屏将二维码<br>保存至本地相册</p>
+									</div>
+									<div>
+										<p>打开<span class="pay_type">支付宝</span><br>选择扫一扫</p>
+									</div>
+									<div>
+										<p>从本地相册选择<br>选取截屏二维码</p>
+									</div>
 								</div>
-								<div>
-									<p>打开<span class="pay_type">支付宝</span><br>选择扫一扫</p>
-								</div>
-								<div>
-									<p>从本地相册选择<br>选取截屏二维码</p>
-								</div>
-							</div>
 							</div>
 							<!-- 支付方法 -->
 						</div>
@@ -107,9 +109,10 @@
 							<p class='f14 p10'>请用<img src="__IMG__/bank.png" class=''/>完成支付</p>
 							<div class='mt10 bankinfo' style="    width: 80%;padding-left: 15%;">
 
-								<p class='mt10' style="color:red;text-align: left" id="copy2" data-clipboard-target="#name">真实姓名：<em id="name">{gt name='remaintime' value='0'}{$merchant.name}{/gt}</em></p>
-								<p class='mt10'  style="color:red;text-align: left;margin-top: 0.2rem;" id="copy3" data-clipboard-target="#card">银行卡号：<em id="card">{gt name='remaintime' value='0'}{$merchant.c_bank_card}{/gt}</em></p>
-								<p class='mt10' id="copy4" data-clipboard-target="#khh" style="color:red;text-align: left;margin-top: 0.2rem;">开户银行：<em id="khh">{gt name='remaintime' value='0'}{$merchant.bank}{/gt}</em></p><br>
+								<p class='mt10' style="color:red;text-align: left" id="copy2" data-clipboard-target="#name">真实姓名：<em id="name">{gt name='remaintime' value='0'}{$merchant.name}{/gt}</em><a id="fz1">&nbsp;(点击复制)</a></p>
+								<p class='mt10' style="color:red;text-align: left;margin-top: 0.2rem;" id="copy3" data-clipboard-target="#card">银行卡号：<em id="card">{gt name='remaintime'
+																																								   value='0'}{$merchant.c_bank_card}{/gt}</em><a id="fz2">&nbsp;(点击复制)</a></p>
+								<p class='mt10' id="copy4" data-clipboard-target="#khh" style="color:red;text-align: left;margin-top: 0.2rem;">开户银行：<em id="khh">{gt name='remaintime' value='0'}{$merchant.bank}{/gt}</em><a id="fz3">&nbsp;(点击复制)</a></p><br>
 							</div>
 							<p style="color:blue;margin-top: 2rem;">温馨提示:点击相应资料可进行复制</p>
 							<p class='p10' style="color:red;">支付完成后，请点击下方的"我已付款"按钮</p>
@@ -125,18 +128,20 @@
 							<!-- 支付方法 -->
 							<div class='tc'>
 								<p class="ti_p">
-									<span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon2 icon_wx" id="type_icon"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon3"></span>
-								</p><div class="ti_t">
-								<div>
-									<p>截屏将二维码<br>保存至本地相册</p>
+									<span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span>
+									<span class="ticon icon2 icon_wx" id="type_icon"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon3"></span>
+								</p>
+								<div class="ti_t">
+									<div>
+										<p>截屏将二维码<br>保存至本地相册</p>
+									</div>
+									<div>
+										<p>打开<span class="pay_type">微信</span><br>选择扫一扫</p>
+									</div>
+									<div>
+										<p>从本地相册选择<br>选取截屏二维码</p>
+									</div>
 								</div>
-								<div>
-									<p>打开<span class="pay_type">微信</span><br>选择扫一扫</p>
-								</div>
-								<div>
-									<p>从本地相册选择<br>选取截屏二维码</p>
-								</div>
-							</div>
 							</div>
 							<!-- 支付方法 -->
 						</div>
@@ -144,7 +149,7 @@
 
 						{eq name="vo" value="ysf"}
 						<div class='ysf erweima {gt name="key" value="0"}hide{/gt}'>
-							<p class='f14 p10'>请用<img src="__IMG__/yun.png" class='' width="32"  height="32" />扫码完成支付</p>
+							<p class='f14 p10'>请用<img src="__IMG__/yun.png" class='' width="32" height="32"/>扫码完成支付</p>
 							<div class='mt10 payma'>
 								<img src="/uploads/face/{$merchant.c_ysf_img}" style=''/>
 							</div>
@@ -152,18 +157,20 @@
 							<!-- 支付方法 -->
 							<div class='tc'>
 								<p class="ti_p">
-									<span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon2 icon_ysf" id="type_icon"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon3"></span>
-								</p><div class="ti_t">
-								<div>
-									<p>截屏将二维码<br>保存至本地相册</p>
+									<span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span>
+									<span class="ticon icon2 icon_ysf" id="type_icon"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon3"></span>
+								</p>
+								<div class="ti_t">
+									<div>
+										<p>截屏将二维码<br>保存至本地相册</p>
+									</div>
+									<div>
+										<p>打开<span class="pay_type">云闪付</span><br>选择扫一扫</p>
+									</div>
+									<div>
+										<p>从本地相册选择<br>选取截屏二维码</p>
+									</div>
 								</div>
-								<div>
-									<p>打开<span class="pay_type">云闪付</span><br>选择扫一扫</p>
-								</div>
-								<div>
-									<p>从本地相册选择<br>选取截屏二维码</p>
-								</div>
-							</div>
 							</div>
 							<!-- 支付方法 -->
 						</div>
@@ -175,111 +182,154 @@
 			<!-- 收银台结束 -->
 		</div>
 	</div>
+	<div class='paybutton mt20' style="margin-top: 0.30rem;">
+		<input type="hidden" name="paymethod" value="{$payarr[0]}"/>
+		{gt name='remaintime' value='0'}
+		<button type="button" onclick="uptrade()" class='paybutton'>我已付款 ¥ {$money}</button>
+		{else/}
+		<button type="button" class='paybutton'>订单已关闭</button>
+		{/gt}
+	</div>
 </div>
-<div class='paybutton mt20' style="margin-top: -0.4rem;">
-	<input type="hidden" name="paymethod" value="{$payarr[0]}"/>
-	{gt name='remaintime' value='0'}
-	<button type="button" onclick="uptrade()" class='paybutton'>我已付款 ¥ {$money}</button>
-	{else/}
-	<button type="button" class='paybutton'>订单已关闭</button>
-	{/gt}
-</div>
+
 </body>
 <script>
     var copy1T;
     var clipboard1 = new ClipboardJS('#copy1');
-    clipboard1.on('success', function(e) {
-        $("#fz").html("(复制成功)")
-        clearTimeout(copy1T);
-        copy1T = setTimeout(function() {
-            $("#fz").html("(点击复制)")
-        }, 2000)
-        e.clearSelection()
-    });
-    var clipboard2 = new ClipboardJS('#copy2');
-    clipboard1.on('success', function(e) {
-        alert('收款人姓名复制成功!');
-    });
+	if (clipboard1){
+        clipboard1.on('success', function (e) {
+            $("#fz").html("&nbsp;(复制成功)")
+            clearTimeout(copy1T);
+            copy1T = setTimeout(function () {
+                $("#fz").html("&nbsp;(点击复制)")
+            }, 2000)
+            e.clearSelection()
+        });
+	}
+	 var clipboard2 = new ClipboardJS('#copy2');
+	 if (clipboard2) {
+         clipboard2.on('success', function (e) {
+             $("#fz1").html("&nbsp;(复制成功)")
+             clearTimeout(copy1T);
+             copy1T = setTimeout(function () {
+                 $("#fz1").html("&nbsp;(点击复制)")
+             }, 2000)
+             e.clearSelection()
+         });
+     }
     var clipboard3 = new ClipboardJS('#copy3');
-    clipboard1.on('success', function(e) {
-        alert('银行账号复制成功!');
-    });
+    if (clipboard3) {
+        clipboard3.on('success', function (e) {
+            $("#fz2").html("&nbsp;(复制成功)")
+            clearTimeout(copy1T);
+            copy1T = setTimeout(function () {
+                $("#fz2").html("&nbsp;(点击复制)")
+            }, 2000)
+            e.clearSelection()
+        });
+    }
     var clipboard4 = new ClipboardJS('#copy4');
-    clipboard1.on('success', function(e) {
-        alert('开户行复制成功!');
-    });
+    if (clipboard4) {
+        clipboard4.on('success', function (e) {
+            $("#fz3").html("&nbsp;(复制成功)")
+            clearTimeout(copy1T);
+            copy1T = setTimeout(function () {
+                $("#fz3").html("&nbsp;(点击复制)")
+            }, 2000)
+            e.clearSelection()
+        });
+    }
+
     var flag;
-    $('.usdt').mouseover(function(){
+    $('.usdt').mouseover(function () {
         $('.descusdt').show();
     });
-    $('.usdt').mouseout(function(){
+    $('.usdt').mouseout(function () {
         $('.descusdt').hide();
     });
-    $('.paymethod li').click(function(){
+    $('.paymethod li').click(function () {
         var type = $(this).attr('data-type');
         var showclass = $(this).attr('data-class');
         $('.paymethod li').removeClass('active');
         $(this).addClass('active');
         $('input[name="paymethod"]').val(type);
         $('.erweima').hide();
-        $('.'+showclass).show();
+        $('.' + showclass).show();
     })
-    var remaintime = {$remaintime|default=0};
-    if(remaintime > 0){
+    var remaintime = {$remaintime |
+    default
+    = 0
+    }
+    ;
+    if (remaintime > 0) {
         resetTime(remaintime);
     }
     CheckOutTime();
-    function resetTime(time){
-        var timer=null;
-        var t=time;
-        var m=0;
-        var s=0;
-        m=Math.floor(t/60%60);
-        m<10&&(m='0'+m);
-        s=Math.floor(t%60);
-        function countDown(){
+
+    function resetTime(time) {
+        var timer = null;
+        var t = time;
+        var m = 0;
+        var s = 0;
+        m = Math.floor(t / 60 % 60);
+        m < 10 && (m = '0' + m);
+        s = Math.floor(t % 60);
+
+        function countDown() {
             s--;
-            s<10&&(s='0'+s);
-            if(s.length>=3){
-                s=59;
-                m="0"+(Number(m)-1);
+            s < 10 && (s = '0' + s);
+            if (s.length >= 3) {
+                s = 59;
+                m = "0" + (Number(m) - 1);
             }
-            if(m.length>=3){
-                m='00';
-                s='00';
+            if (m.length >= 3) {
+                m = '00';
+                s = '00';
                 clearInterval(timer);
             }
             $('#minute').html(m);
             $('#second').html(s);
             //console.log(m+"分钟"+s+"秒");
         }
-        timer=setInterval(countDown,1000);
+
+        timer = setInterval(countDown, 1000);
     }
-    function CheckOutTime(){
-        var id = {$id|default=0};
-        $.post('{:url("home/merchant/CheckOutTime")}', {id:id}, function(data){
-            if(data.code === 1){
+
+    function CheckOutTime() {
+        var id = {$id |
+    default
+        = 0
+    }
+        ;
+        $.post('{:url("home/merchant/CheckOutTime")}', {id: id}, function (data) {
+            if (data.code === 1) {
                 clearTimeout(flag);
                 $('.payma img').attr('src', '__IMG__/outtime.png');
                 $('.bankinfo').hide();
                 $('.infodetail p span').html('订单已关闭');
                 $('.paybutton').attr('disabled', true);
-            }else{
-                flag=setTimeout('CheckOutTime()',3000);
+            } else {
+                flag = setTimeout('CheckOutTime()', 3000);
             }
         })
 
     }
-    function uptrade(){
-        if(!confirm('确认付款后,请等待承兑商放行,确认吗？')){
+
+    function uptrade() {
+        if (!confirm('确认付款后,请等待承兑商放行,确认吗？')) {
             return false;
         }
         var appid = "{$appid|default=''}";
-        var id = {$id|default=0};
-        $.post('{:url("home/merchant/uptrade")}', {id:id, appid:appid}, function(data){
-            if(data.code == 1){
-                alert('操作成功，请等待承兑商释放');window.location.href=data.msg;
-            }else{
+        var id = {$id |
+    default
+        = 0
+    }
+        ;
+        $.post('{:url("home/merchant/uptrade")}', {id: id, appid: appid}, function (data) {
+            if (data.code == 1) {
+                alert('操作成功，请等待承兑商释放');
+                window.location.href = data.msg;
+            } else {
                 alert(data.msg);
             }
         })

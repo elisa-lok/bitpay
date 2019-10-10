@@ -15,7 +15,7 @@ body{
 	overflow-x:hidden;
 	text-align:left;
 	position:relative;
-	font-size:0.24rem;
+	font-size:0.22rem;
 }
 /*不同设备字体em基准*/
 html{
@@ -82,24 +82,25 @@ img{vertical-align:middle}
 .red {
     color: red;
 }
-.main {
+/*.main {
     background: #e9e9e9;
     width: 100%;
 	padding-bottom:50px;
-}
+}*/
 .header{background:#778696;padding:10px;}
 .header img{height:35px;}
 .header span{font-size:0.22rem;}
 .paycontent {
     background: #fff;
-    border-radius: 0.02rem;
 	padding:0.2rem;
+    border-radius:0.06rem;
 }
 .confirminfo .infodetail {
     position: relative;
     margin-left: 0.2rem;
-    background: #f0fff0;
+    background: #e1edf7;
     margin-top: 0.2rem;
+    border-radius:0.06rem;
 }
 .p1050 {
     padding: 0.1rem 0.5rem;
@@ -125,11 +126,13 @@ em {
     font-style: normal;
 }
 .paymethod li {
-    border: 1px solid #ccc;
+    border:1px solid #ccc;
     display: inline-block;
     width: 20%;
+    margin-top: 0.1rem;
     /*width: 29%;*/
     cursor: pointer;
+    border-radius:0.06rem;
 }
 .paydesk span.coundownspan {
     position: absolute;
@@ -140,7 +143,7 @@ em {
     border-color: #44679b;
 }
 .sellerinfo {
-    background: rgba(80, 183, 243, 0.11);
+    background: #e1edf7;
     border-radius: 0.1rem;
 }
 .sellerinfo ul {
@@ -175,12 +178,13 @@ em {
 .m10{margin-top:0.1rem;}
 .red_p {
     text-align: center;
-    font-size: 18px;
-    line-height: 32px;
+    font-size: 0.18rem;
+    line-height: 0.32rem;
     background: #FA555C;
     color: #FFF;
     font-weight: 600;
     position: relative;
+    border-radius:0.06rem;
 }
 .red_p .red_arrow {
     position: absolute;
