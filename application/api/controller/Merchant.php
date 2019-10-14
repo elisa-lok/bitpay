@@ -292,6 +292,8 @@ class Merchant extends Controller {
 		$data = input('post.');
 		(empty($data['amount']) || $data['amount'] <= 0) && $this->myerror('请输入正确的充值金额');
 		//empty($data['address']) && $this->myerror('充值地址不正确');
+        $data['amount'] < 100 && $this->myerror('你的充值金额不能小于100');
+		$data['amount'] > 5000 && $this->myerror('你的充值金额不能大于5000');
 		empty($data['username']) && $this->myerror('用户名不正确');
 		(strlen($data['username']) >= 15) && $this->myerror('用户名不能超过15个字符');
 		empty($data['orderid']) && $this->myerror('订单号不能为空');
