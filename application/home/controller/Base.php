@@ -27,9 +27,9 @@ class Base extends Controller
     	$action = $request->action();
     	if(session('uid')){
     	    $user = Db::name('merchant')->where('id', session('uid'))->find();
-    	    if(!in_array($action, array('loginout', 'merchantset', 'login','jiancega','register')) && empty($user['ga'])){
-    	        header('Location: /merchant/merchantSet');die;
-    	    }
+    	    //if(!in_array($action, array('loginout', 'merchantset', 'login','jiancega','register')) && empty($user['ga'])){
+    	        //header('Location: /merchant/merchantSet');die;
+    	   // }
     	}
 		if (isset($_GET['invite'])) {
     	    session('invite', $_GET['invite']);
