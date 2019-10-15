@@ -25,7 +25,10 @@ if ($_POST) {
 } else {
 	$txId = 'E' . date("YmdHis") . rand(100000, 999999);    //订单号
 	$user = '1380' . rand(1000000, 9999999);    //订单号
-	$url  = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/api/merchant/requestTraderRechargeRmb';
+	$srv = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'];
+	$url  = $srv . '/api/merchant/requestTraderRechargeRmb';
+	$returnUrl  = $srv . '/test_return.php';
+	$notifyUrl  = $srv . '/test_notify.php';
 }
 
 function sign($dataArr, $key) {
@@ -115,13 +118,13 @@ function sign($dataArr, $key) {
 			<div class="row">
 				<div class="col-sm-6">
 					<div class="form-group">
-						<label>同步回调地址 *</label> <input type="text" name="return_url" class="form-control" placeholder="" required="required" value="http://baidu.com">
+						<label>同步回调地址 *</label> <input type="text" name="return_url" class="form-control" placeholder="" required="required" value="<?php echo $returnUrl;?>">
 						<div class="help-block with-errors"></div>
 					</div>
 				</div>
 				<div class="col-sm-6">
 					<div class="form-group">
-						<label>异步回调地址 *</label> <input type="text" name="notify_url" class="form-control" placeholder="" required="required" value="http://baidu.com">
+						<label>异步回调地址 *</label> <input type="text" name="notify_url" class="form-control" placeholder="" required="required" value="<?php echo $notifyUrl;?>">
 						<div class="help-block with-errors"></div>
 					</div>
 				</div>
@@ -155,10 +158,10 @@ function sign($dataArr, $key) {
 				console.log(res);
 				if(res.status === 1){
 					$("#msg").html("点我跳转").attr("href",res.data)
+					window.open(res.data)
 				}else{
 					$("#msg").html("生成订单错误")
 				}
-
 			}, error: function (err) {
 				console.log(err);
 				$("#msg").html("生成订单错误")
