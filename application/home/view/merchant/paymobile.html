@@ -10,6 +10,9 @@
 	<script type="text/javascript" charset="utf-8" src="__JS__/jquery.min.js"></script>
 	<script type="text/javascript" charset="utf-8" src="__JS__/rem.js"></script>
 	<script src="__JS__/pay/clipboard.min.js"></script>
+	<style>
+		.warn{color: red;text-shadow: 0 2px 2px rgba(0,0,0,.2);font-size: 16px;}
+	</style>
 </head>
 <body>
 <div class='main'>
@@ -17,12 +20,12 @@
 
 		<!-- 内容开始 -->
 		<div class="paycontent">
-			<p class="red_p">输错金额和多次支付,自己承担损失 <span class="red_arrow"></span></p>
+			<p class="red_p">付错金额，重复支付，充值将不到账！ <span class="red_arrow"></span></p>
 			<!-- 确认信息开始 -->
 			<div class="confirminfo">
 				<div class="infodetail">
 					<p class='p1050'>你正在交易USDT数量：<span class="red">{$amount} USDT</span></p>
-					<p class='p1050'>买家需支付金额：<span class="red">￥<font class='f14'>{$money}</font></span></p>
+					<p class='p1050'>需支付金额：<span class="red">￥<font class='f14'>{$money}</font></span></p>
 					<p class='p1050' id="copy1" data-clipboard-target="#adno">订单号：<span class="red"><font class='f14' id="adno">{$no}</font></span><a id="fz">&nbsp;(点击复制)</a></p>
 					<p class='p1050'>卖家成功交易笔数：{$merchant.transact}笔</p>
 					<p class='p1050'>卖家平均确认时间：{$min}分{$second}秒</p>
@@ -82,7 +85,8 @@
 								<img src="/uploads/face/{$merchant.c_alipay_img}" style=''/>
 							</div>
 
-							<p class='p10'>支付完成后，请点击下方的"我已付款"按钮</p>
+							<p class='warn'>注意! 付错金额，重复支付，充值将不到账！</p>
+							<p class='p10 warn'>支付完成后，请点击下方的"我已付款"按钮</p>
 							<!-- 支付方法 -->
 							<div class='tc'>
 								<p class="ti_p">
@@ -115,7 +119,8 @@
 								<p class='mt10' id="copy4" data-clipboard-target="#khh" style="color:red;text-align: left;margin-top: 0.2rem;">开户银行：<em id="khh">{gt name='remaintime' value='0'}{$merchant.bank}{/gt}</em><a id="fz3">&nbsp;(点击复制)</a></p><br>
 							</div>
 							<p style="color:blue;margin-top: 2rem;">温馨提示:点击相应资料可进行复制</p>
-							<p class='p10' style="color:red;">支付完成后，请点击下方的"我已付款"按钮</p>
+							<p class='warn'>注意! 付错金额，重复支付，充值将不到账！</p>
+							<p class='p10 warn'>支付完成后，请点击下方的"我已付款"按钮</p>
 						</div>
 						{/eq}
 						{eq name="vo" value="wx"}
@@ -124,7 +129,8 @@
 							<div class='mt10 payma'>
 								<img src="/uploads/face/{$merchant.c_wechat_img}" style=''/>
 							</div>
-							<p class='p10'>支付完成后，请点击下方的"我已付款"按钮</p>
+							<p class='warn'>注意! 付错金额，重复支付，充值将不到账！</p>
+							<p class='p10 warn'>支付完成后，请点击下方的"我已付款"按钮</p>
 							<!-- 支付方法 -->
 							<div class='tc'>
 								<p class="ti_p">
@@ -153,7 +159,8 @@
 							<div class='mt10 payma'>
 								<img src="/uploads/face/{$merchant.c_ysf_img}" style=''/>
 							</div>
-							<p class='p10'>支付完成后，请点击下方的"我已付款"按钮</p>
+							<p class='warn'>注意! 付错金额，重复支付，充值将不到账！</p>
+							<p class='p10 warn'>支付完成后，请点击下方的"我已付款"按钮</p>
 							<!-- 支付方法 -->
 							<div class='tc'>
 								<p class="ti_p">
@@ -185,7 +192,7 @@
 	<div class='paybutton mt20' style="margin-top: 0.30rem;">
 		<input type="hidden" name="paymethod" value="{$payarr[0]}"/>
 		{gt name='remaintime' value='0'}
-		<button type="button" onclick="uptrade()" class='paybutton'>我已付款 ¥ {$money}</button>
+		<button type="button" onclick="uptrade()" class='paybutton'>我已足额付款¥{$money}</button>
 		{else/}
 		<button type="button" class='paybutton'>订单已关闭</button>
 		{/gt}
@@ -256,11 +263,7 @@
         $('.erweima').hide();
         $('.' + showclass).show();
     })
-    var remaintime = {$remaintime |
-    default
-    = 0
-    }
-    ;
+    var remaintime = {$remaintime |default= 0};
     if (remaintime > 0) {
         resetTime(remaintime);
     }
@@ -296,11 +299,7 @@
     }
 
     function CheckOutTime() {
-        var id = {$id |
-    default
-        = 0
-    }
-        ;
+        var id = {$id |default= 0};
         $.post('{:url("home/merchant/CheckOutTime")}', {id: id}, function (data) {
             if (data.code === 1) {
                 clearTimeout(flag);
@@ -320,11 +319,7 @@
             return false;
         }
         var appid = "{$appid|default=''}";
-        var id = {$id |
-    default
-        = 0
-    }
-        ;
+        var id = {$id |default= 0};
         $.post('{:url("home/merchant/uptrade")}', {id: id, appid: appid}, function (data) {
             if (data.code == 1) {
                 alert('操作成功，请等待承兑商释放');
