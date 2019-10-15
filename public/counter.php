@@ -1,5 +1,8 @@
 <?php
 if ($_POST) {
+	ini_set('display_errors', '1');
+	error_reporting(-1);
+
 	$data   = $_POST;
 	$reqUrl = $data['req_url'];
 	unset($data['req_url']);
@@ -7,18 +10,18 @@ if ($_POST) {
 	$appKey = $data['appkey'];
 	unset($data['appkey']);
 
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+	$data['sign'] = sign($data, $appKey);
+	$ch              = curl_init($reqUrl);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 	//允许请求以文件流的形式返回
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 	curl_setopt($ch, CURLOPT_POST, 1);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
 	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
 	curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 30);
-	curl_setopt($ch, CURLOPT_URL, $url);
 	$res = curl_exec($ch); //执行发送
 	curl_close($ch);
-	die($res);
+	echo($res);die;
 } else {
 	$txId = 'E' . date("YmdHis") . rand(100000, 999999);    //订单号
 	$user = '1380' . rand(1000000, 9999999);    //订单号
@@ -88,18 +91,22 @@ function sign($dataArr, $key) {
 				</div>
 				<div class="col-sm-4">
 					<div class="form-group">
-						<label>APPID *</label> <input type="text" name="appid" class="form-control" placeholder="" required="required">
+						<label>APPID *</label> <input type="text" name="appid" class="form-control" placeholder="" required="required" value="2yMFyGPmo3tmhzXE">
 						<div class="help-block with-errors"></div>
 					</div>
 				</div>
 				<div class="col-sm-4">
 					<div class="form-group">
-						<label>APPKEY *</label> <input type="text" name="appkey" class="form-control" placeholder="">
+						<label>APPKEY *</label> <input type="text" name="appkey" class="form-control" value="10ba8b016b722b6f0e906f5d5b052b31">
 						<div class="help-block with-errors"></div>
 					</div>
 				</div>
 				<div class="form-group">
 					<input type="hidden" name="type" class="form-control" value="all">
+					<div class="help-block with-errors"></div>
+				</div>
+				<div class="form-group">
+					<input type="hidden" name="address" class="form-control" value="">
 					<div class="help-block with-errors"></div>
 				</div>
 			</div>
@@ -108,21 +115,23 @@ function sign($dataArr, $key) {
 			<div class="row">
 				<div class="col-sm-6">
 					<div class="form-group">
-						<label>同步回调地址 *</label> <input type="text" name="return_url" class="form-control" placeholder="" required="required">
+						<label>同步回调地址 *</label> <input type="text" name="return_url" class="form-control" placeholder="" required="required" value="http://baidu.com">
 						<div class="help-block with-errors"></div>
 					</div>
 				</div>
 				<div class="col-sm-6">
 					<div class="form-group">
-						<label>异步回调地址 *</label> <input type="text" name="notify_url" class="form-control" placeholder="" required="required">
+						<label>异步回调地址 *</label> <input type="text" name="notify_url" class="form-control" placeholder="" required="required" value="http://baidu.com">
 						<div class="help-block with-errors"></div>
 					</div>
 				</div>
 			</div>
 		</div>
+		<div class="row messages col-md-6"></div>
 		<div class="row">
-			<div class="col-md-12">
-				<button type="button" class="btn btn-warning btn-send">Go</button>
+			<div class="messages col-md-6"><a id="msg" href=""></a></div>
+			<div class="col-md-6">
+				<button type="button" class="btn btn-warning btn-send" onclick="requestPay()">Go</button>
 			</div>
 		</div>
 		<div class="row">
@@ -130,7 +139,7 @@ function sign($dataArr, $key) {
 				<p class="text-muted"><strong>*</strong> These fields are required.</p>
 			</div>
 		</div>
-		<div class="messages"></div>
+
 	</form>
 </div>
 <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
@@ -143,20 +152,16 @@ function sign($dataArr, $key) {
 			data    : $('#pay-form').serialize(),
 			dataType: "json",
 			success : function (res) {
-				if (res.code === 200) {
-					$(".confirm-warning").addClass("text-success").html('确认成功,稍后将关闭网页')
-					closeMe();
-				} else {
-					console.log(res);
-					$(".confirm-warning").addClass("text-danger").html('未知錯誤')
+				console.log(res);
+				if(res.status === 1){
+					$("#msg").html("点我跳转").attr("href",res.data)
+				}else{
+					$("#msg").html("生成订单错误")
 				}
+
 			}, error: function (err) {
 				console.log(err);
-				if (err.responseJSON.msg === '') {
-					$(".confirm-warning").addClass("text-danger").html('未知錯誤')
-				} else {
-					$(".confirm-warning").addClass("text-danger").html(err.responseJSON.msg)
-				}
+				$("#msg").html("生成订单错误")
 			}
 		});
 	}
