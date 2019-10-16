@@ -94,12 +94,11 @@ img{vertical-align:middle}
     background: #fff;
 	padding:0.2rem;
     border-radius:0.06rem;
+    margin-bottom: 100px;
 }
 .confirminfo .infodetail {
     position: relative;
-    margin-left: 0.2rem;
     background: #e1edf7;
-    margin-top: 0.2rem;
     border-radius:0.06rem;
 }
 .p1050 {
@@ -159,8 +158,8 @@ em {
     text-align: center;
 }
 .erweima div img {
-    width: 25%;
-    height: 2.5rem;
+    width: 90%;
+    max-width: 320px;
 }
 .paybutton {
     text-align: center;

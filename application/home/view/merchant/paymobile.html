@@ -11,7 +11,19 @@
 	<script type="text/javascript" charset="utf-8" src="__JS__/rem.js"></script>
 	<script src="__JS__/pay/clipboard.min.js"></script>
 	<style>
-		.warn{color: red;text-shadow: 0 2px 2px rgba(0,0,0,.2);font-size: 20px;}
+		.warn {color: red;text-shadow: 0 2px 2px rgba(0, 0, 0, .2);font-size: 18px;}
+		.footer {cursor: pointer;
+			position: fixed;
+			left: 0px;
+			bottom: 0px;
+			width: 100%;
+			height: 50px;
+			background-color: #bf0000;
+			z-index: 9999;
+			color: #ffffff;
+			line-height: 50px;
+			box-shadow: 0 -2px 5px rgba(0, 0, 0, .2);
+		}
 	</style>
 </head>
 <body>
@@ -81,11 +93,10 @@
 						<div class='alipay erweima {gt name="key" value="0"}hide{/gt}'>
 							<p class='f14 p10'>请用<img src="__IMG__/alipay2.png" class='w80'/>扫码完成支付</p>
 							<div class='mt10 payma'>
-								<img src="/uploads/face/{$merchant.c_alipay_img}" style=''/>
+								<img src="/uploads/face/{$merchant.c_alipay_img}"/>
 							</div>
-
 							<p class='warn'>注意! 付错金额，重复支付，充值将不到账！</p>
-							<p class='p10 warn'>支付完成后，请点击下方的"我已付款"按钮</p>
+							<p class='warn'>支付完成后，请点击下方的"我已付款"按钮</p>
 							<!-- 支付方法 -->
 							<div class='tc'>
 								<p class="ti_p">
@@ -188,14 +199,13 @@
 			<!-- 收银台结束 -->
 		</div>
 	</div>
-	<div class='paybutton mt20' style="margin-top: 0.30rem;">
-		<input type="hidden" name="paymethod" value="{$payarr[0]}"/>
+	<input type="hidden" name="paymethod" value="{$payarr[0]}"/>
 		{gt name='remaintime' value='0'}
-		<button type="button" onclick="uptrade()" class='paybutton'>我已足额付款¥{$money}</button>
+		<div class='footer paybutton' onclick="uptrade()"><b>我已付款¥{$money}</b></div>
 		{else/}
-		<button type="button" class='paybutton'>订单已关闭</button>
+		<div class='footer paybutton' style="background-color: #aaa;"><b>订单已关闭</b></div>
 		{/gt}
-	</div>
+
 </div>
 
 </body>
@@ -211,7 +221,7 @@
 	font-size: 20px;
 }</style>
 <script>
-    swal( {title:"温馨提示",text: "* 注意! 付错金额，重复支付，充值将不到账！\n* 点击相应资料可进行复制 \n* 支付完成后，请务必点击下方的\"我已付款\"按钮",icon:"warning"});
+    swal( {title:"温馨提示",text: "* 注意! 付错金额，重复支付，充值将不到账！\n* 支付完成后，请务必点击下方的\"我已付款\"按钮",icon:"warning"});
     var copy1T;
     var clipboard1 = new ClipboardJS('#copy1');
 	if (clipboard1){
@@ -326,19 +336,39 @@
     }
 
     function uptrade() {
-        if (!confirm('确认付款后,请等待承兑商放行,确认吗？')) {
-            return false;
-        }
-        var appid = "{$appid|default=''}";
-        var id = {$id |default= 0};
-        $.post('{:url("home/merchant/uptrade")}', {id: id, appid: appid}, function (data) {
-            if (data.code == 1) {
-                alert('操作成功，请等待承兑商释放');
-                window.location.href = data.msg;
-            } else {
-                alert(data.msg);
+        var isConfirm = swal({
+            title  : "确认已付款 ¥{$money}元 ？",
+            text   : "注意! 付错金额，重复支付，充值将不到账！",
+            icon   : "warning",
+            buttons: {
+                cancel : {
+                    text      : "取消",
+                    value     : false,
+                    visible   : true,
+                    className : "",
+                    closeModal: true,
+                },
+                confirm: {
+                    text      : "确认",
+                    value     : true,
+                    visible   : true,
+                    className : "",
+                    closeModal: true
+                }
             }
-        })
+        }).then(function (result){
+            if(!result){return false}
+            var appid = "{$appid|default=''}";
+            var id = {$id |default= 0};
+            $.post('{:url("home/merchant/uptrade")}', {id: id, appid: appid}, function (data) {
+                if (data.code == 1) {
+                    swal("操作成功","请等待交易确认","success");
+                    setTimeout(function (){window.location.href = data.msg}, 2000);
+                } else {
+                    swal({title: data.msg, icon : "error",});
+                }
+            })
+		})
     }
 </script>
 </html>
