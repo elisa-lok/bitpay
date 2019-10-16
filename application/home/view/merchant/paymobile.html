@@ -11,7 +11,7 @@
 	<script type="text/javascript" charset="utf-8" src="__JS__/rem.js"></script>
 	<script src="__JS__/pay/clipboard.min.js"></script>
 	<style>
-		.warn {color: red;text-shadow: 0 2px 2px rgba(0, 0, 0, .2);font-size: 18px;}
+		.warn {color: red;text-shadow: 0 2px 2px rgba(0, 0, 0, .2);font-size: 16px;}
 		.footer {cursor: pointer;
 			position: fixed;
 			left: 0px;
@@ -201,9 +201,9 @@
 	</div>
 	<input type="hidden" name="paymethod" value="{$payarr[0]}"/>
 		{gt name='remaintime' value='0'}
-		<div class='footer paybutton' onclick="uptrade()"><b>我已付款¥{$money}</b></div>
+		<div class='footer paybutton' style="font-size:2em;" onclick="uptrade()"><b>我已付款¥{$money}</b></div>
 		{else/}
-		<div class='footer paybutton' style="background-color: #aaa;"><b>订单已关闭</b></div>
+		<div class='footer paybutton' style="background-color: #aaa;font-size:2em;"><b>订单已关闭</b></div>
 		{/gt}
 
 </div>
@@ -212,13 +212,13 @@
 <script src="https://cdn.staticfile.org/sweetalert/2.1.2/sweetalert.min.js"></script>
 <style>.swal-text {
 	background-color: #FEFAE3;
-	padding: 17px;
+	padding: 10px;
 	border: 1px solid #F0E1A1;
 	display: block;
-	margin: 22px;
+	margin: 16px;
 	text-align: left;
 	color: #ff0000;
-	font-size: 20px;
+	font-size: 16px;
 }</style>
 <script>
     swal( {title:"温馨提示",text: "* 注意! 付错金额，重复支付，充值将不到账！\n* 支付完成后，请务必点击下方的\"我已付款\"按钮",icon:"warning"});
