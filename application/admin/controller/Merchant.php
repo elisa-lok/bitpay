@@ -1370,7 +1370,7 @@ class Merchant extends Base {
 		if ($type != 1 && $type != 2) {
 			return json(['code' => 0, 'msg' => '回调选择错误']);
 		}
-		if ($amount == '' || ($amount * 100 > $orderInfo['deal_amount'] * 100)) {
+		if ($amount == '' || ($amount * 100 > $orderinfo['deal_amount'] * 100)) {
 			return json(['code' => 0, 'msg' => '回调金额错误']);
 		}
 		$oldNum = $orderinfo['deal_num'];
