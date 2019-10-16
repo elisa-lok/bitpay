@@ -1370,7 +1370,7 @@ class Merchant extends Base {
 		if ($type != 1 && $type != 2) {
 			return json(['code' => 0, 'msg' => '回调选择错误']);
 		}
-		if ($amount == '') {
+		if ($amount == '' || ($amount * 100 > $orderInfo['deal_amount'] * 100)) {
 			return json(['code' => 0, 'msg' => '回调金额错误']);
 		}
 		$oldNum = $orderinfo['deal_num'];
@@ -1384,7 +1384,7 @@ class Merchant extends Base {
 		$mum         = $orderinfo['deal_num'] - $sfee;
 		$buymerchant = Db::name('merchant')->where('id', $orderinfo['buy_id'])->find();
 		$trader      = Db::name('merchant')->where('id', $orderinfo['sell_id'])->find();
-		if ($trader['usdtd'] < $orderinfo['deal_num']) {
+		if ($trader['usdtd'] < $oldNum) {
 			return json(['code' => 0, 'msg' => '承兑商冻结不足']);
 		}
 		if ($amount * 100 > $orderinfo['deal_amount'] * 100 && $trader['usdt'] < ($orderinfo['deal_num'] - $oldNum)) {
