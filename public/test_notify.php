@@ -5,7 +5,7 @@ $now = date('Y-m-d H:i:s');
 $notifyPath = 'notify_' . date('ymd') . '.log';
 // 异步回调通知形式
 if ($_POST) {
-	$str = "【" . $now . "】 【FORM】\n" . var_export($_POST);
+	$str = "【" . $now . "】 【FORM】\n" . json_encode($_POST,320);
 	file_put_contents($notifyPath, $str, $now);
 	die;
 } elseif ($rawArr) {
