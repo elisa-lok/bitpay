@@ -1,0 +1,181 @@
+{include file="public/header" /}
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+	<!-- Panel Other -->
+	<div class="ibox float-e-margins">
+		<div class="ibox-title">
+			<h5>商户订单列表</h5>
+		</div>
+		<div class="ibox-content">
+			<!--搜索框开始-->
+			<div class="row">
+				<div class="col-sm-12">
+
+					<form name="admin_list_sea" class="form-search" method="post" action="{:url('order')}">
+						<div class="col-sm-6">
+							<div class="input-group">
+								<!--<input type="text" id="key" class="form-control" style="width:40%;" name="key" value="" placeholder="输入承兑商姓名/手机号" />-->
+								<input type="text" id="oid" class="form-control" style="width:40%;" name="oid" value="" placeholder="输入订单号" />
+								<select name="status" class="form-control" id="status" style="width:23%;margin-left: .2rem">
+									<option value="0" {empty name="status"}selected{/empty}>选择状态</option>
+									<option value="1" {eq name="status" value="1"}selected{/eq}>待付款</option>
+									<option value="2" {eq name="status" value="2"}selected{/eq}>已付款</option>
+									<option value="5" {eq name="status" value="5"}selected{/eq}>已完成</option>
+									<option value="6" {eq name="status" value="6"}selected{/eq}>已关闭</option>
+									<option value="7" {eq name="status" value="7"}selected{/eq}>申诉中</option>
+									<option value="10" {eq name="status" value="10"}selected{/eq}>订单失败</option>
+								</select>
+								<span class="input-group-btn">
+                                    <button type="button" class="btn btn-primary" onclick="Ajaxpage()"><i class="fa fa-search"></i> 搜索</button>
+                                </span>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+			<!--搜索框结束-->
+			<div class="hr-line-dashed"></div>
+			<div class="example-wrap">
+				<span>
+                            <a class="btn btn-sm btn-primary grid-refresh"><i class="fa fa-refresh"></i> 刷新</a>
+				</span>
+				<div class="example">
+					<table class="table table-bordered table-hover">
+						<thead>
+						<tr class="long-tr">
+							<th width="">订单编号</th>
+							<th>买家</th>
+							<th>交易金额</th>
+							<th>交易数量</th>
+							<th>交易价格</th>
+							<th>创建时间</th>
+							<th>完成时间</th>
+							<th>交易码</th>
+							<th>交易状态</th>
+						</tr>
+						</thead>
+						<script id="list-template" type="text/html">
+							{{# for(var i=0;i<d.length;i++){  }}
+							<tr class="long-td">
+
+								<td>{{d[i].order_no}}</td>
+								<td>{{d[i].buy_username}}</td>
+								<td>{{d[i].deal_amount}}</td>
+								<td>{{d[i].deal_num}}</td>
+								<td>{{d[i].deal_price}}</td>
+								<td>{{d[i].ctime}}</td>
+								<td>{{d[i].finished_time}}</td>
+								<td>{{d[i].check_code}}</td>
+								<td>
+									{{# if(d[i].status == 0){ }}
+									待付款
+									{{# }else if(d[i].status == 1){ }}
+									已付款
+									{{# }else if(d[i].status == 4){ }}
+									已完成
+									{{# }else if(d[i].status == 5){ }}
+									已关闭
+									{{# }else if(d[i].status == 6){ }}
+									申诉中
+									{{# }else if(d[i].status == 9){ }}
+									订单失败
+									{{# } }}
+								</td>
+							</tr>
+							{{# } }}
+						</script>
+							</tr>
+						<tbody id="list-content"></tbody>
+					</table>
+					<div id="AjaxPage" style=" text-align: right;"></div>
+					<div id="allpage" style=" text-align: right;"></div>
+				</div>
+			</div>
+			<!-- End Example Pagination -->
+		</div>
+	</div>
+</div>
+<!-- End Panel Other -->
+</div>
+
+<!-- 加载动画 -->
+<div class="spiner-example">
+	<div class="sk-spinner sk-spinner-three-bounce">
+		<div class="sk-bounce1"></div>
+		<div class="sk-bounce2"></div>
+		<div class="sk-bounce3"></div>
+	</div>
+</div>
+
+{include file="public/footer" /}
+
+<script type="text/javascript">
+    //laypage分页
+    Ajaxpage();
+    function Ajaxpage(curr){
+        var key=$('#key').val();
+        var oid=$('#oid').val();
+        var status = $('#status option:selected').val();
+        $.getJSON('{:url("Merchant/order")}', {page: curr || 1,key:key, oid:oid,status:status},
+			function(data){
+
+            $(".spiner-example").css('display','none'); //数据加载完关闭动画
+            if(data==''){
+                $("#list-content").html('<td colspan="13" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>');
+            }else{
+                var tpl = document.getElementById('list-template').innerHTML;
+                laytpl(tpl).render(data, function(html){
+                    document.getElementById('list-content').innerHTML = html;
+                });
+                laypage({
+                    cont: $('#AjaxPage'),//容器。值支持id名、原生dom对象，jquery对象,
+                    pages:'{$allpage}',//总页数
+                    skip: true,//是否开启跳页
+                    skin: '#1AB5B7',//分页组件颜色
+                    curr: curr || 1,
+                    groups: 3,//连续显示分页数
+                    jump: function(obj, first){
+                        if(!first){
+                            Ajaxpage(obj.curr)
+                        }
+                        $('#allpage').html('第'+ obj.curr +'页，共'+ obj.pages +'页');
+                    }
+                });
+            }
+        });
+    }
+    $('.grid-refresh').on('click', function() {
+        //$.pjax.reload('#pjax-container');
+        //toastr.success('刷新成功 !');
+        window.location.reload();
+    });
+    function showtxid(txid){
+        var str="<a href='https://www.omniexplorer.info/search/"+txid+"' target='_blank'>"+txid+"</a>";
+        layer.alert(str);
+    }
+
+    function showqr(url){
+        layer.open({
+            type: 1,
+            title: false,
+            closeBtn: 0,
+            area: ['300px','300px'],
+            skin: 'layui-layer-nobg', //没有背景色
+            shadeClose: true,
+            content: '<img style="width:300px;height:300px;" src="'+url+'">'
+        });
+    }
+    function showbank(url){
+        layer.open({
+            type: 1,
+            title: false,
+            closeBtn: 0,
+            area: ['300px','300px'],
+            // skin: 'layui-layer-nobg', //没有背景色
+            shadeClose: true,
+            content: url
+        });
+    }
+</script>
+</body>
+</html>

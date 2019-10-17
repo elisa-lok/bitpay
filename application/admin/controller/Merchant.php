@@ -2,6 +2,7 @@
 
 namespace app\admin\controller;
 
+use app\home\model\OrderModel;
 use think\db;
 use app\admin\model\TibiModel;
 use app\admin\model\AddressModel;
@@ -1609,13 +1610,52 @@ class Merchant extends Base {
 	 * [user_order 商户订单]
 	 * @return mixed
 	 */
-	public function order(){
-		if (!session('uid')) {
-			$this->error('请登录操作', url('home/login/login'));
+	public function order() {
+		$key = input('key');
+		$oid = input('oid');
+		// dump($oid);
+		$status                    = input('status');
+		$map['think_order_buy.id'] = ['gt', 0];
+		if ($key && $key !== "") {
+			$where['name|mobile'] = $key;
+			$id                   = Db::name('merchant')->where($where)->value('id');
+			$map['sell_id']       = $id;
 		}
-        $list = Db::name("order_buy")->select();
-        var_dump($list);
-		$this->assign('list', $list);
+		if ($oid && $oid !== "") {
+			$map['order_no'] = ['like', '%' . $oid . '%'];
+		}
+		if (!empty($status)) {
+			$map['think_order_buy.status'] = $status - 1;
+		}
+		// dump($map);
+		$member  = new MerchantModel();
+		$Nowpage = input('get.page') ? input('get.page') : 1;
+		$limits  = config('list_rows');// 获取总条数
+		$count   = $member->getAllCountOrder($map);//计算总页面
+		$allpage = intval(ceil($count / $limits));
+		$lists   = $member->getOrderByWhere($map, $Nowpage, $limits);;
+		foreach ($lists as $k => $v) {
+			$user    = Db::name('merchant')->where(['id' => $v['sell_id']])->find();
+			$accuser = Db::name('merchant')->where(['id' => $user['pid']])->find();
+
+			$lists[$k]['accuser'] = $accuser['name'] . '/' . $accuser['mobile'];
+			$lists[$k]['ctime']   = date("Y/m/d H:i:s", $v['ctime']);
+			if ($lists[$k]['finished_time']) {
+				$lists[$k]['finished_time'] = date("Y/m/d H:i:s", $v['finished_time']);
+			} else {
+				$lists[$k]['finished_time'] = '无';
+			}
+		}
+		//dump($lists);die;
+		// dump($lists);
+		$this->assign('Nowpage', $Nowpage); //当前页
+		$this->assign('allpage', $allpage); //总页数
+		$this->assign('val', $key);
+		$this->assign('oid', $oid);
+		$this->assign('status', $status);
+		if (input('get.page')) {
+			return json($lists);
+		}
 		return $this->fetch();
 	}
 }
