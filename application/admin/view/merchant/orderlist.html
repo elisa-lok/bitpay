@@ -199,8 +199,8 @@ function huitiao(id){
         });
 }
 function success(id){
-	layer.confirm('请发送回调订单失败？', {
-		  btn: ['失败'] //按钮
+	layer.confirm('请选择回调成功或者失败？', {
+		  btn: ['成功','失败'] //按钮
 		}, function(){
 			$.post('{:url("sssuccess")}',{id:id,type:1},function(res){
 				if(res.code == 1){
