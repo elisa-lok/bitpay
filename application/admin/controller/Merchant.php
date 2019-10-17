@@ -1284,7 +1284,7 @@ class Merchant extends Base {
 				$data['orderid'] = $orderinfo['orderid'];
 				$data['appid']   = $buymerchant['appid'];
 				if ($type == 1) {
-					$status = 1;
+					$status = 0;
 				} elseif ($type == 2) {
 					$status = 0;
 				}
@@ -1602,6 +1602,20 @@ class Merchant extends Base {
 		if (input('get.page')) {
 			return json($lists);
 		}
+		return $this->fetch();
+	}
+
+	/**
+	 * [user_order 商户订单]
+	 * @return mixed
+	 */
+	public function order(){
+		if (!session('uid')) {
+			$this->error('请登录操作', url('home/login/login'));
+		}
+        $list = Db::name("order_buy")->select();
+        var_dump($list);
+		$this->assign('list', $list);
 		return $this->fetch();
 	}
 }
