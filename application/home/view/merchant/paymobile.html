@@ -122,10 +122,8 @@
 						<div class='bank erweima {gt name="key" value="0"}hide{/gt}'>
 							<p class='f14 p10'>请用<img src="__IMG__/bank.png" class=''/>完成支付</p>
 							<div class='mt10 bankinfo' style="    width: 80%;padding-left: 15%;">
-
 								<p class='mt10' style="color:red;text-align: left" id="copy2" data-clipboard-target="#name">真实姓名：<em id="name">{gt name='remaintime' value='0'}{$merchant.name}{/gt}</em><a id="fz1">&nbsp;(点击复制)</a></p>
-								<p class='mt10' style="color:red;text-align: left;margin-top: 0.2rem;" id="copy3" data-clipboard-target="#card">银行卡号：<em id="card">{gt name='remaintime'
-																																								   value='0'}{$merchant.c_bank_card}{/gt}</em><a id="fz2">&nbsp;(点击复制)</a></p>
+								<p class='mt10' style="color:red;text-align: left;margin-top: 0.2rem;" id="copy3" data-clipboard-target="#card">银行卡号：<em id="card">{gt name='remaintime' value='0'}{$merchant.c_bank_card}{/gt}</em><a id="fz2">&nbsp;(点击复制)</a></p>
 								<p class='mt10' id="copy4" data-clipboard-target="#khh" style="color:red;text-align: left;margin-top: 0.2rem;">开户银行：<em id="khh">{gt name='remaintime' value='0'}{$merchant.bank}{/gt}</em><a id="fz3">&nbsp;(点击复制)</a></p><br>
 							</div>
 							<p style="color:blue;margin-top: 2rem;font-size:18px;">温馨提示:点击相应资料可进行复制</p>
@@ -336,7 +334,7 @@
     }
 
     function uptrade() {
-        var isConfirm = swal({
+        swal({
             title  : "确认已付款 ¥{$money}元 ？",
             text   : "注意! 付错金额，重复支付，充值将不到账！",
             icon   : "warning",
