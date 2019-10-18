@@ -270,13 +270,13 @@ class Merchant extends Base {
 				$param['password'] = md5($param['password']);
 			}
 			if (!empty($param['pptrader'])) {
-				$traders_id        = $member->where('trader_check', 1)->order('id asc')->column('id');
+				$traders_id = $member->where('trader_check', 1)->order('id asc')->column('id');
 				shuffle($traders_id);
 				$param['pptrader'] = implode(',', $traders_id);
 
 			} elseif (!empty($param['pptraders']) && is_array($param['pptraders'])) {
 				$param['pptrader'] = implode(',', $param['pptraders']);
-			}else{
+			} else {
 				$param['pptrader'] = '';
 			}
 			//20190830新增
@@ -311,17 +311,17 @@ class Merchant extends Base {
 		$minfo    = $member->getOneByWhere($id, 'id');
 		$pptrader = explode(',', $minfo['pptrader']);
 		$traders  = $member->field('id, name')->where('trader_check', 1)->order('id asc')->select();
-	/*	foreach ($traders as $k => &$v) {
+		/*	foreach ($traders as $k => &$v) {
+				if (in_array($v['id'], $pptrader)) {
+					$status = 1;
+				} else {
+					$status = 0;
+				}
+			}*/
+		foreach ($traders as $k => &$v) {
 			if (in_array($v['id'], $pptrader)) {
-				$status = 1;
-			} else {
-				$status = 0;
-			}
-		}*/
-		foreach($traders as $k=>&$v){
-			if(in_array($v['id'], $pptrader)){
 				$v['ispp'] = 1;
-			}else{
+			} else {
 				$v['ispp'] = 0;
 			}
 		}
@@ -1111,11 +1111,15 @@ class Merchant extends Base {
 		$allpage = intval(ceil($count / $limits));
 		$lists   = $member->getOrderByWhere($map, $Nowpage, $limits);
 		// dump($lists);
+		$buyerIds      = array_column($lists, 'buy_id');
+		$buyerUsername = Db::name('merchant')->where('id', 'in', $buyerIds)->select();
+		$buyerUsername = array_column($buyerUsername, 'name', 'id');
 		foreach ($lists as $k => $v) {
 			$user    = Db::name('merchant')->where(['id' => $v['sell_id']])->find();
 			$accuser = Db::name('merchant')->where(['id' => $user['pid']])->find();
 
 			$lists[$k]['accuser'] = $accuser['name'] . '/' . $accuser['mobile'];
+			$lists[$k]['name']    = $buyerUsername[$lists[$k]['buy_id']];
 			$lists[$k]['ctime']   = date("Y/m/d H:i:s", $v['ctime']);
 			if ($lists[$k]['finished_time']) {
 				$lists[$k]['finished_time'] = date("Y/m/d H:i:s", $v['finished_time']);
@@ -1634,13 +1638,13 @@ class Merchant extends Base {
 		$count   = $member->getAllCountOrder($map);//计算总页面
 		$allpage = intval(ceil($count / $limits));
 		$lists   = $member->getOrderByWhere($map, $Nowpage, $limits);
-		if($lists){
-			$buyerIds = array_column($lists, 'buy_id');
-			$buyerUsername = Db::name('merchant')->where('id','in', $buyerIds)->select();
+		if ($lists) {
+			$buyerIds      = array_column($lists, 'buy_id');
+			$buyerUsername = Db::name('merchant')->where('id', 'in', $buyerIds)->select();
 			$buyerUsername = array_column($buyerUsername, 'name', 'id');
 			foreach ($lists as $k => $v) {
-				$lists[$k]['name'] = $buyerUsername[$lists[$k]['buy_id']];
-				$lists[$k]['ctime']   = date("Y/m/d H:i:s", $v['ctime']);
+				$lists[$k]['name']  = $buyerUsername[$lists[$k]['buy_id']];
+				$lists[$k]['ctime'] = date("Y/m/d H:i:s", $v['ctime']);
 				if ($lists[$k]['finished_time']) {
 					$lists[$k]['finished_time'] = date("Y/m/d H:i:s", $v['finished_time']);
 				} else {
