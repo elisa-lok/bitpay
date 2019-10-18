@@ -1633,17 +1633,19 @@ class Merchant extends Base {
 		$limits  = config('list_rows');// 获取总条数
 		$count   = $member->getAllCountOrder($map);//计算总页面
 		$allpage = intval(ceil($count / $limits));
-		$lists   = $member->getOrderByWhere($map, $Nowpage, $limits);;
-		foreach ($lists as $k => $v) {
-			$user    = Db::name('merchant')->where(['id' => $v['sell_id']])->find();
-			$accuser = Db::name('merchant')->where(['id' => $user['pid']])->find();
-
-			$lists[$k]['accuser'] = $accuser['name'] . '/' . $accuser['mobile'];
-			$lists[$k]['ctime']   = date("Y/m/d H:i:s", $v['ctime']);
-			if ($lists[$k]['finished_time']) {
-				$lists[$k]['finished_time'] = date("Y/m/d H:i:s", $v['finished_time']);
-			} else {
-				$lists[$k]['finished_time'] = '无';
+		$lists   = $member->getOrderByWhere($map, $Nowpage, $limits);
+		if($lists){
+			$buyerIds = array_column($lists, 'buy_id');
+			$buyerUsername = Db::name('merchant')->where('id','in', $buyerIds)->select();
+			$buyerUsername = array_column($buyerUsername, 'name', 'id');
+			foreach ($lists as $k => $v) {
+				$lists[$k]['name'] = $buyerUsername[$lists[$k]['buy_id']];
+				$lists[$k]['ctime']   = date("Y/m/d H:i:s", $v['ctime']);
+				if ($lists[$k]['finished_time']) {
+					$lists[$k]['finished_time'] = date("Y/m/d H:i:s", $v['finished_time']);
+				} else {
+					$lists[$k]['finished_time'] = '无';
+				}
 			}
 		}
 		//dump($lists);die;
