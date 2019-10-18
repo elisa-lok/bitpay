@@ -379,8 +379,8 @@ function curl_get($url) {
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	//参数为0表示不带头文件，为1表示带头文件
 	curl_setopt($ch, CURLOPT_HEADER, 0);
-	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
-	curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 30);
+	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+	curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 10);
 	//curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded'));
 	$output = curl_exec($ch);
 	curl_close($ch);

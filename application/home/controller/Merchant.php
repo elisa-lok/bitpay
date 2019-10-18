@@ -30,6 +30,7 @@ class Merchant extends Base {
 		$this->assign('myacc', $model->getUserByParam($myinfo['pid'], 'id'));
 		$ids  = Db::name('article_cate')->field('id, name')->order('orderby asc')->select();
 		$list = Db::name('article_cate')->field('a.name, b.id, b.title, b.cate_id, b.create_time')->alias('a')->join('think_article b', 'a.id=b.cate_id')->where('a.status', 1)->select();
+		$haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->where('state', 1)->sum('amount');
 		foreach ($ids as $k => $v) {
 			foreach ($list as $kk => $vv) {
 				if ($v['id'] == $vv['cate_id']) {
@@ -39,6 +40,7 @@ class Merchant extends Base {
 		}
 		// dump(getUsdtPrice());die;
 		$this->assign('article', $ids);
+		$this->assign('froze', $haveadsum);
 		$this->assign('price', getUsdtPrice());
 		return $this->fetch();
 	}
