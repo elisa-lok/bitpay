@@ -482,7 +482,7 @@ function askNotify($data, $url, $key) {
 	$sign         = strtoupper(sha1($reserverStr));
 	$data['sign'] = $sign;
 	$return       = curl_post($url, $data);
-	file_put_contents("./data/notify.txt", " - " . $return . '|' . $url . "|" . date("Y-m-d H:i:s", time()) . "|" . $reserverStr . " + " . PHP_EOL, FILE_APPEND);
+	file_put_contents(RUNTIME_PATH."data/notify.txt", " - " . $return . '|' . $url . "|" . date("Y-m-d H:i:s", time()) . "|" . $reserverStr . " + " . PHP_EOL, FILE_APPEND);
 }
 
 function go_mobile() {

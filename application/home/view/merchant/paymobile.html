@@ -219,7 +219,7 @@
 	font-size: 16px;
 }</style>
 <script>
-    swal( {title:"温馨提示",text: "* 注意! 付错金额，重复支付，充值将不到账！\n* 支付完成后，请务必点击下方的\"我已付款\"按钮",icon:"warning"});
+    swal( {title:"你需支付¥{$money}元",text: "温馨提示：\n* 注意! 付错金额，重复支付，充值将不到账！\n* 支付完成后，请务必点击下方的\"我已付款\"按钮",icon:"warning"});
     var copy1T;
     var clipboard1 = new ClipboardJS('#copy1');
 	if (clipboard1){
@@ -316,7 +316,10 @@
 
         timer = setInterval(countDown, 1000);
     }
-
+    setInterval(function(){ swal("超时请重新发起订单", {
+        buttons: false,
+        timer: 2000,
+    });}, 30000);
     function CheckOutTime() {
         var id = {$id |default= 0};
         $.post('{:url("home/merchant/CheckOutTime")}', {id: id}, function (data) {

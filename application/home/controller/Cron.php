@@ -166,7 +166,7 @@ class Cron extends Base {
 						throw new \think\Exception('write databses fail');
 					}
 				} catch (\think\Exception $e) {
-					file_put_contents("./data/zrdebug.txt", " - " . $v2['txid'] . "|" . date("Y-m-d H:i:s", $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
+					file_put_contents(RUNTIME_PATH."data/zrdebug.txt", " - " . $v2['txid'] . "|" . date("Y-m-d H:i:s", $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
 					Db::rollback();
 				}
 			}
@@ -298,7 +298,7 @@ class Cron extends Base {
 						throw new \think\Exception('write databses fail');
 					}
 				} catch (\think\Exception $e) {
-					file_put_contents("./data/traderzrdebug.txt", " - " . $v2['txid'] . "|" . date("Y-m-d H:i:s", $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
+					file_put_contents(RUNTIME_PATH."data/traderzrdebug.txt", " - " . $v2['txid'] . "|" . date("Y-m-d H:i:s", $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
 					Db::rollback();
 				}
 			}
