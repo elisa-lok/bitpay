@@ -94,13 +94,13 @@ function sign($dataArr, $key) {
 				</div>
 				<div class="col-sm-4">
 					<div class="form-group">
-						<label>APPID *</label> <input type="text" name="appid" class="form-control" placeholder="" required="required" value="2yMFyGPmo3tmhzXE">
+						<label>APPID *</label> <input type="text" name="appid" class="form-control" placeholder="" required="required" value="ZoeMlmDPziecgEAp">
 						<div class="help-block with-errors"></div>
 					</div>
 				</div>
 				<div class="col-sm-4">
 					<div class="form-group">
-						<label>APPKEY *</label> <input type="text" name="appkey" class="form-control" value="10ba8b016b722b6f0e906f5d5b052b31">
+						<label>APPKEY *</label> <input type="text" name="appkey" class="form-control" value="862dc61c1eb982e64e36f669d22791ce">
 						<div class="help-block with-errors"></div>
 					</div>
 				</div>
