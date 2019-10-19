@@ -17,7 +17,7 @@ define('UPLOAD_PATH', __DIR__ . '/../public');
 // 定义应用缓存目录
 define('RUNTIME_PATH', __DIR__ . '/../runtime/');
 // 开启调试模式
-define('APP_DEBUG', TRUE);
+define('APP_DEBUG', false);
 
 define('ADMIN_KEY', '123poiASDMNB');
 // 加载框架引导文件
