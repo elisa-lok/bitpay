@@ -152,7 +152,7 @@ class Auto extends Base {
 									throw new \think\Exception('write databses fail');
 								}
 							} catch (\think\Exception $e) {
-								file_put_contents(RUNTIME_PATH."data/traderzrdebug.txt", " - " . $v2['hash'] . "|" . date("Y-m-d H:i:s", $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
+								file_put_contents(RUNTIME_PATH . "data/traderzrdebug.txt", " - " . $v2['hash'] . "|" . date("Y-m-d H:i:s", $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
 								Db::rollback();
 							}
 						}
@@ -292,7 +292,7 @@ class Auto extends Base {
 						throw new \think\Exception('write databses fail');
 					}
 				} catch (\think\Exception $e) {
-					file_put_contents(RUNTIME_PATH."data/zrdebug.txt", " - " . $v2['txid'] . "|" . date("Y-m-d H:i:s", $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
+					file_put_contents(RUNTIME_PATH . "data/zrdebug.txt", " - " . $v2['txid'] . "|" . date("Y-m-d H:i:s", $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
 					Db::rollback();
 				}
 			}
@@ -429,7 +429,7 @@ class Auto extends Base {
 						throw new \think\Exception('write databses fail');
 					}
 				} catch (\think\Exception $e) {
-					file_put_contents(RUNTIME_PATH."data/traderzrdebug.txt", " - " . $v2['txid'] . "|" . date("Y-m-d H:i:s", $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
+					file_put_contents(RUNTIME_PATH . "data/traderzrdebug.txt", " - " . $v2['txid'] . "|" . date("Y-m-d H:i:s", $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
 					Db::rollback();
 				}
 			}
@@ -446,33 +446,29 @@ class Auto extends Base {
 			return;
 		}
 		foreach ($list as $key => $vv) {
-			try {
-				Db::startTrans();
-				$orderinfo = [];
-				$orderinfo = Db::table('think_order_buy')->where(['id' => $vv['id']])->find();
-				$coin_name = 'usdt';
-				//$seller = Db::table('think_merchant')->where(array('id'=>$vv['sell_id']))->find();
-				$buymerchant = Db::table('think_merchant')->where(['id' => $vv['buy_id']])->find();
-				//$table = "movesay_".$coin_name."_log";
-				$rs1         = Db::table('think_order_buy')->update(['status' => 5, 'id' => $vv['id']]);
-				$real_number = $orderinfo['deal_num'] + $orderinfo['fee'];
-				$rs2         = Db::table('think_merchant')->where(['id' => $orderinfo['sell_id']])->setDec($coin_name . 'd', $real_number);
-				$rs3         = Db::table('think_merchant')->where(['id' => $orderinfo['sell_id']])->setInc($coin_name, $real_number);
-				if ($rs1 && $rs2 && $rs3) {
-					Db::commit();
-					//请求回调接口,失败
-					$data['amount']  = $orderinfo['deal_num'];
-					$data['orderid'] = $orderinfo['orderid'];
-					$data['appid']   = $buymerchant['appid'];
-					$data['status']  = 0;
-					askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
-				} else {
-					Db::rollback();
-					throw new \Think\Exception('取消失败！');
-				}
-			} catch (\Think\Exception $e) {
+			Db::startTrans();
+			$orderinfo = [];
+			$orderinfo = Db::table('think_order_buy')->where(['id' => $vv['id']])->find();
+			$coin_name = 'usdt';
+			//$seller = Db::table('think_merchant')->where(array('id'=>$vv['sell_id']))->find();
+			$buymerchant = Db::table('think_merchant')->where(['id' => $vv['buy_id']])->find();
+			//$table = "movesay_".$coin_name."_log";
+			$rs1         = Db::table('think_order_buy')->update(['status' => 5, 'id' => $vv['id']]);
+			$real_number = $orderinfo['deal_num'] + $orderinfo['fee'];
+			$rs2         = Db::table('think_merchant')->where(['id' => $orderinfo['sell_id']])->setDec($coin_name . 'd', $real_number);
+			$rs3         = Db::table('think_merchant')->where(['id' => $orderinfo['sell_id']])->setInc($coin_name, $real_number);
+			if ($rs1 && $rs2 && $rs3) {
+				Db::commit();
+				//请求回调接口,失败
+				$data['amount']  = $orderinfo['deal_num'];
+				$data['orderid'] = $orderinfo['orderid'];
+				$data['appid']   = $buymerchant['appid'];
+				$data['status']  = 0;
+				askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
+			} else {
 				Db::rollback();
-				continue;
+				$msg = '【' . date('Y-m-d H:i:s') . '】 订单' . $vv['id'] . '回滚失败, 买家ID: ' . $vv['buy_id'] . ' , 卖家ID: ' . $vv['sell_id'] . ", 失败步骤: $rs1,$rs2,$rs3";
+				file_put_contents(RUNTIME_PATH . 'data/cli_sellCountDown_' . date('ymd') . '.log', $msg, FILE_APPEND);
 			}
 		}
 	}
@@ -487,24 +483,20 @@ class Auto extends Base {
 			return;
 		}
 		foreach ($list as $key => $vv) {
-			try {
-				Db::startTrans();
-				$orderinfo   = [];
-				$orderinfo   = Db::table('think_order_sell')->where(['id' => $vv['id']])->find();
-				$coin_name   = 'usdt';
-				$rs1         = Db::table('think_order_sell')->update(['status' => 5, 'id' => $vv['id']]);
-				$real_number = $orderinfo['deal_num'] + $orderinfo['fee'];
-				$rs2         = Db::table('think_merchant')->where(['id' => $orderinfo['sell_id']])->setDec($coin_name . 'd', $real_number);
-				$rs3         = Db::table('think_merchant')->where(['id' => $orderinfo['sell_id']])->setInc($coin_name, $real_number);
-				if ($rs1 && $rs2 && $rs3) {
-					Db::commit();
-				} else {
-					Db::rollback();
-					throw new \Think\Exception('取消失败！');
-				}
-			} catch (\Think\Exception $e) {
+			Db::startTrans();
+			$orderinfo   = [];
+			$orderinfo   = Db::table('think_order_sell')->where(['id' => $vv['id']])->find();
+			$coin_name   = 'usdt';
+			$rs1         = Db::table('think_order_sell')->update(['status' => 5, 'id' => $vv['id']]);
+			$real_number = $orderinfo['deal_num'] + $orderinfo['fee'];
+			$rs2         = Db::table('think_merchant')->where(['id' => $orderinfo['sell_id']])->setDec($coin_name . 'd', $real_number);
+			$rs3         = Db::table('think_merchant')->where(['id' => $orderinfo['sell_id']])->setInc($coin_name, $real_number);
+			if ($rs1 && $rs2 && $rs3) {
+				Db::commit();
+			} else {
 				Db::rollback();
-				continue;
+				$msg = '【' . date('Y-m-d H:i:s') . '】 订单' . $vv['id'] . '回滚失败, 买家ID: ' . $vv['buy_id'] . ' , 卖家ID: ' . $vv['sell_id'] . ", 失败步骤: $rs1,$rs2,$rs3";
+				file_put_contents(RUNTIME_PATH . 'data/cli_buyCountDown_' . date('ymd') . '.log', $msg, FILE_APPEND);
 			}
 		}
 	}
@@ -621,7 +613,7 @@ class Auto extends Base {
 					} else {
 						$msg = '汇总成功(用户:' . $v['mobile'] . ',地址:' . $v['usdtb'] . ',数量:' . $usdt['data'] . '):' . $return['data'];
 					}
-					file_put_contents(RUNTIME_PATH."data/usdtcover.txt", " - " . $msg . "|" . date("Y-m-d H:i:s", $time) . " + " . PHP_EOL, FILE_APPEND);
+					file_put_contents(RUNTIME_PATH . "data/usdtcover.txt", " - " . $msg . "|" . date("Y-m-d H:i:s", $time) . " + " . PHP_EOL, FILE_APPEND);
 				}
 			}
 		}
