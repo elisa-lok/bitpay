@@ -28,8 +28,8 @@ class Merchant extends Base {
 		$this->assign('merchant', $model->getUserByParam(session('uid'), 'id'));
 		$myinfo = $model->getUserByParam(session('uid'), 'id');
 		$this->assign('myacc', $model->getUserByParam($myinfo['pid'], 'id'));
-		$ids  = Db::name('article_cate')->field('id, name')->order('orderby asc')->select();
-		$list = Db::name('article_cate')->field('a.name, b.id, b.title, b.cate_id, b.create_time')->alias('a')->join('think_article b', 'a.id=b.cate_id')->where('a.status', 1)->select();
+		$ids       = Db::name('article_cate')->field('id, name')->order('orderby asc')->select();
+		$list      = Db::name('article_cate')->field('a.name, b.id, b.title, b.cate_id, b.create_time')->alias('a')->join('think_article b', 'a.id=b.cate_id')->where('a.status', 1)->select();
 		$haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->where('state', 1)->sum('amount');
 		foreach ($ids as $k => $v) {
 			foreach ($list as $kk => $vv) {
@@ -3084,6 +3084,28 @@ class Merchant extends Base {
 		}
 
 		$list = $model2->getOrder($where, 'id desc');
+		if ($list) {
+			$dealerFee = config('usdt_price_add'); //承兑商费用
+			$newList   = $list->toArray();
+			$sellerIds = array_unique(array_column($newList['data'], 'sell_id'));
+			$mcModel   = Db::name('merchant');
+			$agentIds  = $mcModel->where('id', 'in', array_unique($sellerIds))->column('pid', 'id');
+			$agFeeRate = 0;
+			if ($agentIds) {
+				$agFeeRate = $mcModel->where('id', 'in', array_values($agentIds))->column('trader_parent_get', 'id');
+			}
+			foreach ($list as $k => $v) {
+				$list[$k]['fee_amount'] = $list[$k]['fee'] = $list[$k]['rec_amount'] = $list[$k]['rec'] = $list[$k]['fee_rate'] = 0;
+				if($v['status'] == 4){
+					$agentFeeRate = isset($agentIds[$v['sell_id']]) && isset($agFeeRate[$agentIds[$v['sell_id']]]) ? $agFeeRate[$agentIds[$v['sell_id']]] / 100 : 0;
+					$list[$k]['fee_amount'] = $v['deal_amount'] - (($v['deal_num'] - $v['platform_fee'] - number_format($v['deal_num'] * $agentFeeRate, 8, '.', '')) * ($v['deal_price'] - $dealerFee)); //费用金额
+					$list[$k]['fee']        = $list[$k]['fee_amount'] / $v['deal_price'];
+					$list[$k]['rec_amount'] = $v['deal_amount'] - $list[$k]['fee_amount']; // 到账费用
+					$list[$k]['rec']        = $v['deal_num'] - $list[$k]['fee']; // 到账数量
+					$list[$k]['fee_rate']   = number_format($list[$k]['fee_amount'] * 100 / $v['deal_amount'],1,'.',''); // 到账数量
+				}
+			}
+		}
 		$this->assign('list', $list);
 		return $this->fetch();
 	}
