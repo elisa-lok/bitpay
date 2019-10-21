@@ -619,6 +619,40 @@ class Auto extends Base {
 		}
 
 	}
+
+	// 更新市价单价格
+	public function updateAdSellPrice() {
+		$usdtPriceWay = Db::name('config')->where('name', 'usdt_price_way')->value('value');
+		($usdtPriceWay == 0) && die;
+		$addFee = $usdtPriceWay == 2 ? config('usdt_price_add') : 0;
+		// 只有支持加价模式的变动
+		Db::startTrans();
+		$res = Db::name('ad_sell')->where('state=1')->update(['price' => getUsdtPrice() + $addFee]);
+		if ($res) {
+			Db::commit();
+			die;
+		}
+		Db::rollback();
+		$msg = '【' . date('Y-m-d H:i:s') . '】 卖单加价价格更新失败';
+		file_put_contents(RUNTIME_PATH . 'data/cli_updateAdSellPrice_' . date('ymd') . '.log', $msg, FILE_APPEND);
+	}
+
+	// 更新市价单价格
+	public function updateAdBuyPrice() {
+		$usdtPriceWay = Db::name('config')->where('name', 'usdt_price_way_buys')->value('value');
+		($usdtPriceWay == 0) && die;
+		$addFee = $usdtPriceWay == 2 ? config('usdt_price_add_buy') : 0;
+		// 只有支持加价模式的变动
+		Db::startTrans();
+		$res = Db::name('ad_buy')->where('state=1')->update(['price' => getUsdtPrice() + $addFee]);
+		if ($res) {
+			Db::commit();
+			die;
+		}
+		Db::rollback();
+		$msg = '【' . date('Y-m-d H:i:s') . '】 买单加价价格更新失败';
+		file_put_contents(RUNTIME_PATH . 'data/cli_updateAdBuyPrice_' . date('ymd') . '.log', $msg, FILE_APPEND);
+	}
 }
 
 ?>

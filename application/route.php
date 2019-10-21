@@ -44,3 +44,8 @@ Route::rule('merchant/detail','home/merchant/detail', 'GET|POST');
 Route::rule('logout','home/login/logout', 'GET');
 Route::rule('merchant/traderreward','home/merchant/traderreward', 'GET|POST');
 Route::rule('merchant/pkorder','home/merchant/pkorder', 'GET');
+// CLI
+Route::rule('auto/sellCountDown','home/auto/sellCountDown', 'GET');
+Route::rule('auto/buyCountDown','home/auto/buyCountDown', 'GET');
+Route::rule('auto/updateAdSellPrice','home/auto/updateAdSellPrice', 'GET');
+Route::rule('auto/updateAdBuyPrice','home/auto/updateAdBuyPrice', 'GET');
