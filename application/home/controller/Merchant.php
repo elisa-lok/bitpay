@@ -3014,7 +3014,8 @@ class Merchant extends Base {
 			$moble = Db::name('merchant')->where('id', $order['sell_id'])->value('mobile');
 			if (!empty($moble)) {
 				$content = str_replace('{usdt}', round($order['deal_num'], 2), config('send_message_content'));
-				$content = str_replace('{tx_id}', $id, $content);
+				$content = str_replace('{tx_id}', $order['orderid'], $content);
+				$content = str_replace('{check_code}', $order['check_code'], $content);
 				sendSms($moble, $content);
 			}
 			$this->success($order['return_url']);

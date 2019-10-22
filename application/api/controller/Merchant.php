@@ -256,11 +256,9 @@ class Merchant extends Controller {
 				if (!empty($onlinead['mobile'])) {
 					$send_content = Db::table('think_config')->where('name', 'send_message_content')->value('value');
 					if ($send_content) {
-
 						$content = str_replace('{usdt}', round($data['amount'], 2), $send_content);//dump($content);
 						$content = str_replace('{tx_id}', $data['orderid'], $content);
 						$content = str_replace('{check_code}', '' . $checkCode . '', $content);
-						//$this->myerror($onlinead['mobile']);die;
 						sendSms($onlinead['mobile'], $content);
 					}
 				}
