@@ -2914,7 +2914,7 @@ class Merchant extends Base {
 		// $this->assign('payarr', $payarr);
 		$this->assign('id', $id);
 		$this->assign('appid', $appid);
-		$this->assign('money', $order['deal_amount']);
+		$this->assign('money', round($order['deal_amount'],2));
 		$this->assign('amount', $order['deal_num']);
 		$this->assign('no', $order['order_no']);
 		$merchant = Db::name('merchant')->where('id', $order['sell_id'])->find();

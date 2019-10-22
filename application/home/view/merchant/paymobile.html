@@ -311,15 +311,10 @@
             }
             $('#minute').html(m);
             $('#second').html(s);
-            //console.log(m+"分钟"+s+"秒");
         }
 
         timer = setInterval(countDown, 1000);
     }
-    setInterval(function(){ swal("超时请重新发起订单", {
-        buttons: false,
-        timer: 2000,
-    });}, 30000);
     function CheckOutTime() {
         var id = {$id |default= 0};
         $.post('{:url("home/merchant/CheckOutTime")}', {id: id}, function (data) {
