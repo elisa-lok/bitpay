@@ -38,8 +38,6 @@
                                 <th width="5%">用户ID</th>
                                 <th width="5%">操作用户</th>
                                 <th width="15%">描述</th>
-                                <th width="8%">操作IP</th>
-                                <th width="10%">地址</th>
                                 <th width="6%">状态</th>
                                 <th width="10%">操作时间</th>
                                 <th width="8%">操作</th>
@@ -51,9 +49,7 @@
                                     <td>{{d[i].log_id}}</td>
                                     <td>{{d[i].admin_id}}</td>
                                     <td>{{d[i].admin_name}}</td> 
-                                    <td>{{d[i].description}}</td>  
-                                    <td>{{d[i].ip}}</td> 
-                                    <td>{{d[i].ipaddr.country}}{{d[i].ipaddr.area}}</td> 
+                                    <td>{{d[i].description}}</td>
                                     <td>
                                         {{# if(d[i].status==1){ }}
                                             操作成功
