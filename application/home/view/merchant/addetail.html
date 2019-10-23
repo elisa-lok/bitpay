@@ -149,8 +149,19 @@
                                         {/php}
                                     </div>
                                 </div>
+                                {eq name="ga" value="1"}
+                                <div class="form-group 1">
+                                    <label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
+                                    <div class="col-sm-2">
+                                        <div class="input-group">
+                                            <input type="text" name="ga" value="" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                {/eq}
+
                                 <div class="text">
-                                    <label for="channel_remark" class="col-sm-3 control-label">&nbsp;</label>
+                                    <label class="col-sm-3 control-label">&nbsp;</label>
                                     <div class="col-sm-5">
                                         <br><b> 交易须知：</b><br>
                                         1. 交易前请详细了解对方的交易信息。<br>

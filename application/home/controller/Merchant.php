@@ -677,32 +677,23 @@ class Merchant extends Base {
 		}
 		$model = new MerchantModel();
 		if (request()->isPost()) {
-			if (!session('uid')) {
-				$this->error('登录已经失效,请重新登录!');
-			}
+			!session('uid') && $this->error('登录已经失效,请重新登录!');
 			$delete      = '';
 			$gacode      = trim(input('post.ga'));
 			$type        = trim(input('post.type'));
 			$ga_login    = (input('post.ga_login') == FALSE ? 0 : 1);
 			$ga_transfer = (input('post.ga_transfer') == FALSE ? 0 : 1);
+			$ga_trust    = (input('post.ga_trust') == FALSE ? 0 : 1);
+			$ga_binding  = (input('post.ga_binding') == FALSE ? 0 : 1);
 
-			if (!$gacode) {
-				$this->error('请输入验证码!');
-			}
+			!$gacode && $this->error('请输入验证码!');
 
 			if ($type == 'add') {
 				$secret = session('secret');
-
-				if (!$secret) {
-					$this->error('验证码已经失效,请刷新网页!');
-				}
+				!$secret && $this->error('验证码已经失效,请刷新网页!');
 			} elseif (($type == 'updat') || ($type == 'delet')) {
 				$user = $model->getUserByParam(session('uid'), 'id');;
-
-				if (!$user['ga']) {
-					$this->error('还未设置谷歌验证码!');
-				}
-
+				!$user['ga'] && $this->error('还未设置谷歌验证码!');
 				$arr    = explode('|', $user['ga']);
 				$secret = $arr[0];
 				$delete = ($type == 'delet' ? 1 : 0);
@@ -713,20 +704,16 @@ class Merchant extends Base {
 			$ga = new \com\GoogleAuthenticator();
 
 			if ($ga->verifyCode($secret, $gacode, 1)) {
-				$ga_val = ($delete == '' ? $secret . '|' . $ga_login . '|' . $ga_transfer : '');
+				$ga_val = ($delete == '' ? $secret . '|' . $ga_login . '|' . $ga_transfer . '|' . $ga_trust . '|' . $ga_binding : '');
 				$rs     = $model->updateOne(['id' => session('uid'), 'ga' => $ga_val]);
-				if ($rs) {
-					$this->success('操作成功');
-				} else {
-					$this->error('操作失败');
-				}
+				$rs ? $this->success('操作成功') : $this->error('操作失败');
 			} else {
 				$this->error('验证失败');
 			}
 		} else {
 			$user  = $model->getUserByParam(session('uid'), 'id');
 			$is_ga = ($user['ga'] ? 1 : 0);
-			$this->assign('is_ga', $is_ga);//dump($_SERVER['HTTP_HOST']);
+			$this->assign('is_ga', $is_ga);
 			if (!$is_ga) {
 				$ga     = new \com\GoogleAuthenticator();
 				$secret = $ga->createSecret();
@@ -741,6 +728,8 @@ class Merchant extends Base {
 				$arr = explode('|', $user['ga']);
 				$this->assign('ga_login', $arr[1]);
 				$this->assign('ga_transfer', $arr[2]);
+				$this->assign('ga_trust', $arr[3]);
+				$this->assign('ga_binding', $arr[4]);
 				$this->assign('Asecret', '');
 				return $this->fetch('merchantSet');
 			}
@@ -1069,9 +1058,7 @@ class Merchant extends Base {
 	}
 
 	public function payset() {
-		if (!session('uid')) {
-			$this->error('请登陆操作', url('home/login/login'));
-		}
+		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
 		$user = Db::name('merchant')->where(['id' => session('uid')])->find();
 		$this->assign('user', $user);
 		$bankModel = new \app\home\model\BankModel();
@@ -1082,6 +1069,8 @@ class Merchant extends Base {
 		$this->assign('list2', $zfb->getBank(['merchant_id' => session('uid')], 'id desc'));
 		$this->assign('list3', $wx->getBank(['merchant_id' => session('uid')], 'id desc'));
 		$this->assign('list4', $ysf->getBank(['merchant_id' => session('uid')], 'id desc'));
+		$ga = explode('|', $user['ga']);
+		$this->assign('ga', ($ga['4'] ?? 0));
 		return $this->fetch();
 	}
 
@@ -1115,9 +1104,7 @@ class Merchant extends Base {
 
 	public function doaccount() {
 		if (request()->isPost()) {
-			if (!session('uid')) {
-				$this->error('请登陆操作', url('home/login/login'));
-			}
+			!session('uid') && $this->error('请登陆操作', url('home/login/login'));
 			$c_bank                     = input('post.c_bank');
 			$c_bank_detail              = input('post.c_bank_detail');
 			$c_bank_card                = input('post.c_bank_card');
@@ -1131,23 +1118,28 @@ class Merchant extends Base {
 			$param['merchant_id']       = session('uid');
 			$param['name']              = input('post.name');
 			$param['truename']          = input('post.truename');
+
+			$user = Db::name('merchant')->where('id', session('uid'))->find();
+			$ga   = explode('|', $user['ga']);
+			if (isset($ga[4]) && $ga[4]) {
+				$code = input('post.ga');
+				!$code && $this->error('请输入谷歌验证码');
+				$google = new \com\GoogleAuthenticator();
+				!$google->verifyCode($ga['0'], $code, 1) && $this->error('谷歌验证码错误！');
+			}
 			if ($id) {
 				$param['id'] = $id;
 				$rs          = $m->updateOne($param);
 			} else {
 				$rs = $m->insertOne($param);
 			}
-			if ($rs['code'] == 1) {
-				$this->success($rs['msg']);
-			} else {
-				$this->error($rs['msg']);
-			}
+			($rs['code'] == 1) ? $this->success($rs['msg']) : $this->error($rs['msg']);
+			// TODO ?????????? 为什么没往下写?
 			$param['id']            = session('uid');
 			$param['c_bank']        = $c_bank;
 			$param['c_bank_detail'] = $c_bank_detail;
 			$param['c_bank_card']   = $c_bank_card;
-			$param['name']          = $name;
-			$name                   = input('post.name');
+			$param['name']          = $name = input('post.name');
 			if (empty($name) || !checkName($name)) {
 				$this->error('请填写真实姓名');
 			}
@@ -1179,14 +1171,24 @@ class Merchant extends Base {
 	}
 
 	public function doalipay() {
+
 		if (request()->isPost()) {
 			if (!session('uid')) {
 				$this->error('请登陆操作', url('home/login/login'));
+			}
+			$user = Db::name('merchant')->where('id', session('uid'))->find();
+			$ga   = explode('|', $user['ga']);
+			if (isset($ga[4]) && $ga[4]) {
+				$code = input('post.ga');
+				!$code && $this->error('请输入谷歌验证码');
+				$google = new \com\GoogleAuthenticator();
+				!$google->verifyCode($ga['0'], $code, 1) && $this->error('谷歌验证码错误！');
 			}
 			$name = input('post.name');
 			if (empty($name) || !checkName($name)) {
 				$this->error('请填写真实姓名');
 			}
+
 			$file = request()->file('avatar');
 			if ($file) {
 				$info = $file->validate(['size' => 3145728, 'ext' => 'jpg,png'])->move(ROOT_PATH . 'public' . DS . 'uploads/face');
@@ -1223,6 +1225,14 @@ class Merchant extends Base {
 		if (request()->isPost()) {
 			if (!session('uid')) {
 				$this->error('请登陆操作', url('home/login/login'));
+			}
+			$user = Db::name('merchant')->where('id', session('uid'))->find();
+			$ga   = explode('|', $user['ga']);
+			if (isset($ga[4]) && $ga[4]) {
+				$code = input('post.ga');
+				!$code && $this->error('请输入谷歌验证码');
+				$google = new \com\GoogleAuthenticator();
+				!$google->verifyCode($ga['0'], $code, 1) && $this->error('谷歌验证码错误！');
 			}
 			$name = input('post.name');
 			if (empty($name) || !checkName($name)) {
@@ -1265,7 +1275,14 @@ class Merchant extends Base {
 			if (!session('uid')) {
 				$this->error('请登陆操作', url('home/login/login'));
 			}
-			// dump(input());die;
+			$user = Db::name('merchant')->where('id', session('uid'))->find();
+			$ga   = explode('|', $user['ga']);
+			if (isset($ga[4]) && $ga[4]) {
+				$code = input('post.ga');
+				!$code && $this->error('请输入谷歌验证码');
+				$google = new \com\GoogleAuthenticator();
+				!$google->verifyCode($ga['0'], $code, 1) && $this->error('谷歌验证码错误！');
+			}
 			$truename       = input('post.zfbtruename');
 			$name           = input('post.zfbname');
 			$alipay_account = input('post.alipay_account');
@@ -2526,31 +2543,29 @@ class Merchant extends Base {
 	}
 
 	public function addetail() {
-		$id     = input('get.id');
-		$model  = new AdbuyModel();
-		$model2 = new MerchantModel();
-		$ad     = $model->getOne(['id' => $id]);
-		if (empty($ad)) {
-			$this->error('挂单不存在');
-		}
-		if ($ad['state'] != 1) {
-			$this->error('挂单未上架');
-		}
+		$id        = input('get.id');
+		$adModel   = new AdbuyModel();
+		$userModel = new MerchantModel();
+		$ad        = $adModel->getOne(['id' => $id]);
+		empty($ad) && $this->error('挂单不存在');
+		($ad['state'] != 1) && $this->error('挂单未上架');
 		$m               = new \app\home\model\BankModel();
 		$zfb             = new \app\home\model\ZfbModel();
 		$wx              = new \app\home\model\WxModel();
 		$ysf             = new \app\home\model\YsfModel();
-		$AdOwner         = $model2->getUserByParam($ad['userid'], 'id');
+		$AdOwner         = $userModel->getUserByParam($ad['userid'], 'id');
 		$deal_num        = Db::name('order_sell')->where('buy_bid', $id)->where('status', 'neq', 5)->sum('deal_num');
 		$ad['RemainNum'] = $ad['amount'] - $deal_num;
 		$this->assign('ad', $ad);
-		// dump($ad['price']);die;
 		$this->assign('AdOwner', $AdOwner);
 		$banks = $m->where('merchant_id', session('uid'))->order('id desc')->select();
 		$this->assign('zfb', $zfb->getBank(['merchant_id' => session('uid')], 'id desc'));
 		$this->assign('wx', $wx->getBank(['merchant_id' => session('uid')], 'id desc'));
 		$this->assign('ysf', $ysf->getBank(['merchant_id' => session('uid')], 'id desc'));
 		$this->assign('banks', $banks);
+		$user = $userModel->getUserByParam(session('uid'), 'id');
+		$ga   = explode('|', $user['ga']);
+		$this->assign('ga', ($ga['3'] ?? 0));
 		return $this->fetch();
 	}
 
@@ -2560,22 +2575,24 @@ class Merchant extends Base {
 		$num     = input('post.qty');//数量
 		$tid     = input('post.tid');
 		$tamount = input('post.amount');//金额
-		if (!session('uid')) {
-			$this->error('请登陆操作', url('home/login/login'));
-		}
-		//       $getpaymethod = input('post.getpaymethod/a', []);
-		// if(empty($getpaymethod)){
-		//           $this->error('请选择收款方式');
-		//       }
-		if (empty($_POST['bank']) && empty($_POST['zfb']) && empty($_POST['wx'])) {
-			$this->error('请选择收款方式');
-		}
+		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
+		// $getpaymethod = input('post.getpaymethod/a', []);
+		// empty($getpaymethod)&&$this->error('请选择收款方式');
+		(empty($_POST['bank']) && empty($_POST['zfb']) && empty($_POST['wx'])) && $this->error('请选择收款方式');
 		$model = new MerchantModel();
 		$my    = $model->getUserByParam(session('uid'), 'id');
-		$m     = new \app\home\model\BankModel();
-		$zfb   = new \app\home\model\ZfbModel();
-		$wx    = new \app\home\model\WxModel();
-		$ysf   = new \app\home\model\YsfModel();
+		$ga    = explode('|', $my['ga']);
+		if (isset($ga[3]) && $ga[3]) {
+			$code = input('post.ga');
+			!$code && $this->error('请输入谷歌验证码');
+			$google = new \com\GoogleAuthenticator();
+			!$google->verifyCode($ga['0'], $code, 1) && $this->error('谷歌验证码错误！');
+		}
+
+		$m   = new \app\home\model\BankModel();
+		$zfb = new \app\home\model\ZfbModel();
+		$wx  = new \app\home\model\WxModel();
+		$ysf = new \app\home\model\YsfModel();
 		//查询用户的银行卡信息
 		$where1['merchant_id'] = session('uid');
 		$where1['id']          = $_POST['bank'];
@@ -2914,7 +2931,7 @@ class Merchant extends Base {
 		// $this->assign('payarr', $payarr);
 		$this->assign('id', $id);
 		$this->assign('appid', $appid);
-		$this->assign('money', round($order['deal_amount'],2));
+		$this->assign('money', round($order['deal_amount'], 2));
 		$this->assign('amount', $order['deal_num']);
 		$this->assign('no', $order['order_no']);
 		$merchant = Db::name('merchant')->where('id', $order['sell_id'])->find();
@@ -3014,10 +3031,10 @@ class Merchant extends Base {
 			$moble = Db::name('merchant')->where('id', $order['sell_id'])->value('mobile');
 			if (!empty($moble)) {
 				$send_content = Db::table('think_config')->where('name', 'send_message_content')->value('value');
-				$content = str_replace('{usdt}', round($order['deal_num'], 2), $send_content);
-				$content = str_replace('{cny}', round($order['deal_amount'], 2), $content);
-				$content = str_replace('{tx_id}', $order['orderid'], $content);
-				$content = str_replace('{check_code}', $order['check_code'], $content);
+				$content      = str_replace('{usdt}', round($order['deal_num'], 2), $send_content);
+				$content      = str_replace('{cny}', round($order['deal_amount'], 2), $content);
+				$content      = str_replace('{tx_id}', $order['orderid'], $content);
+				$content      = str_replace('{check_code}', $order['check_code'], $content);
 				sendSms($moble, $content);
 			}
 			$this->success($order['return_url']);
@@ -3099,13 +3116,13 @@ class Merchant extends Base {
 			}
 			foreach ($list as $k => $v) {
 				$list[$k]['fee_amount'] = $list[$k]['fee'] = $list[$k]['rec_amount'] = $list[$k]['rec'] = $list[$k]['fee_rate'] = 0;
-				if($v['status'] == 4){
-					$agentFeeRate = isset($agentIds[$v['sell_id']]) && isset($agFeeRate[$agentIds[$v['sell_id']]]) ? $agFeeRate[$agentIds[$v['sell_id']]] / 100 : 0;
+				if ($v['status'] == 4) {
+					$agentFeeRate           = isset($agentIds[$v['sell_id']]) && isset($agFeeRate[$agentIds[$v['sell_id']]]) ? $agFeeRate[$agentIds[$v['sell_id']]] / 100 : 0;
 					$list[$k]['fee_amount'] = $v['deal_amount'] - (($v['deal_num'] - $v['platform_fee'] - number_format($v['deal_num'] * $agentFeeRate, 8, '.', '')) * ($v['deal_price'] - $dealerFee)); //费用金额
 					$list[$k]['fee']        = $list[$k]['fee_amount'] / $v['deal_price'];
 					$list[$k]['rec_amount'] = $v['deal_amount'] - $list[$k]['fee_amount']; // 到账费用
 					$list[$k]['rec']        = $v['deal_num'] - $list[$k]['fee']; // 到账数量
-					$list[$k]['fee_rate']   = number_format($list[$k]['fee_amount'] * 100 / $v['deal_amount'],1,'.',''); // 到账数量
+					$list[$k]['fee_rate']   = number_format($list[$k]['fee_amount'] * 100 / $v['deal_amount'], 1, '.', ''); // 到账数量
 				}
 			}
 		}
