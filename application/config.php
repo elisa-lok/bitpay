@@ -49,7 +49,7 @@ return [
 		'id'             => '',
 		'var_session_id' => '',// SESSION_ID的提交变量,解决flash上传跨域
 		'prefix'         => 'think',// SESSION 前缀
-		'type'           => '',// 驱动方式 支持redis memcache memcached
+		'type'           => 'redis',// 驱动方式 支持redis memcache memcached
 		'auto_start'     => TRUE,// 是否自动开启 SESSION
 	],
 
@@ -82,4 +82,6 @@ return [
 	'auth_key'                   => 'JUD6FCtZsqrmVXc2apev4TRn3O8gAhxbSlH9wfPN', //默认数据加密KEY
 	'pages'                      => '10',//分页数
 	'salt'                       => 'wZPb~yxvA!ir38&Z!!@',//加密串
+
+	'order_expire'               => 30,  //订单超时时间
 ];

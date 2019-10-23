@@ -239,7 +239,7 @@ class Merchant extends Controller {
 				'deal_num'     => $data['amount'],
 				'deal_price'   => $onlinead['price'],
 				'ctime'        => time(),
-				'ltime'        => 15,
+				'ltime'        => config('order_expire'),
 				'order_no'     => $data['orderid'],
 				'buy_username' => $data['username'],
 				'buy_address'  => $data['address'],
@@ -254,9 +254,10 @@ class Merchant extends Controller {
 				Db::commit();
 				//todo 发送短信给承兑商
 				if (!empty($onlinead['mobile'])) {
-					$send_content = Db::table('think_config')->where('name', 'send_message_content')->value('value');
+					$send_content = Db::table('think_config')->where('name', 'send_sms_notify')->value('value');
 					if ($send_content) {
-						$content = str_replace('{usdt}', round($data['amount'], 2), $send_content);//dump($content);
+						$content = str_replace('{usdt}', round($data['amount'], 2), $send_content);
+						$content = str_replace('{cny}', round($actualAmt, 2), $content);
 						$content = str_replace('{tx_id}', $data['orderid'], $content);
 						$content = str_replace('{check_code}', '' . $checkCode . '', $content);
 						sendSms($onlinead['mobile'], $content);
@@ -290,14 +291,14 @@ class Merchant extends Controller {
 		$data = input('post.');
 		(empty($data['amount']) || $data['amount'] <= 0) && $this->myerror('请输入正确的充值金额');
 		//empty($data['address']) && $this->myerror('充值地址不正确');
-        $data['amount'] < 100 && $this->myerror('你的充值金额不能小于100');
+		$data['amount'] < 100 && $this->myerror('你的充值金额不能小于100');
 		$data['amount'] > 5000 && $this->myerror('你的充值金额不能大于5000');
 		empty($data['username']) && $this->myerror('用户名不正确');
 		(strlen($data['username']) >= 15) && $this->myerror('用户名不能超过15个字符');
 		empty($data['orderid']) && $this->myerror('订单号不能为空');
 		empty($data['return_url']) && $this->myerror('同步通知页面地址错误');
 		empty($data['notify_url']) && $this->myerror('异步回调页面地址错误');
-		(empty($data['type']) || !in_array($data['type'], ['wxpay', 'alipay', 'unionpay', 'bank','all'])) && $this->myerror('支付方式不正确');
+		(empty($data['type']) || !in_array($data['type'], ['wxpay', 'alipay', 'unionpay', 'bank', 'all'])) && $this->myerror('支付方式不正确');
 		$find = Db::name('order_buy')->where('orderid', $data['orderid'])->find();
 		!empty($find) && $this->myerror('订单号已存在，请勿重复提交');
 		$pk_num       = Db::table('think_config')->where('name', 'pk_waiting_finished_num')->value('value');
@@ -311,10 +312,10 @@ class Merchant extends Controller {
 		Db::query('Update think_merchant set online=0');
 		Db::name('merchant')->where('id', 'in', $ids)->update(['online' => 1]);
 		//系统自动选择在线的承兑商和能够交易这个金额的承兑商
-		$where['state']                = 1;
-		$where['min_limit']            = ['elt', $data['amount']];
-		$where['max_limit']            = ['egt', $data['amount']];
-		if($data['type'] != 'all'){
+		$where['state']     = 1;
+		$where['min_limit'] = ['elt', $data['amount']];
+		$where['max_limit'] = ['egt', $data['amount']];
+		if ($data['type'] != 'all') {
 			$method                        = [
 				'bank'     => 'pay_method',
 				'alipay'   => 'pay_method2',
@@ -330,10 +331,11 @@ class Merchant extends Controller {
 		if (!empty($pptrader) && is_array($pptraderarray)) {
 			$where['c.id'] = ['in', $pptraderarray];
 		}
-		$join      = [
+		$join = [
 			['__MERCHANT__ c', 'a.userid=c.id', 'LEFT'],
 		];
-		$ads       = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile, c.usdt')->alias('a')->join($join)->group('a.id')->where($where)->orderRaw(' rand() ')->select(); // order('online DESC,price ASC,averge ASC,pp_amount ASC,id ASC')->select();
+		$ads  = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile, c.usdt')->alias('a')->join($join)->group('a.id')->where($where)->order('online DESC,price ASC,averge ASC,pp_amount ASC,id ASC')->select();
+
 		$onlinead  = [];
 		$actualAmt = 0;
 		// $this->myerror(json_encode($ads));
@@ -379,11 +381,13 @@ class Merchant extends Controller {
 				// 'buy_id'=>'',//暂时改成空
 				'sell_id'      => $onlinead['traderid'],
 				'sell_sid'     => $onlinead['id'],
+				'raw_amount'   => $data['amount'],
+				'raw_num'      => $actualAmt,
 				'deal_amount'  => $data['amount'],
 				'deal_num'     => $actualAmt,
 				'deal_price'   => $onlinead['price'],
 				'ctime'        => time(),
-				'ltime'        => 15,
+				'ltime'        => config('order_expire'),
 				'order_no'     => $data['orderid'],
 				'buy_username' => $data['username'],
 				'buy_address'  => $data['address'],
@@ -396,18 +400,20 @@ class Merchant extends Controller {
 			if ($rs1 && $rs2 && $rs3 && $rs4) {
 				// 提交事务
 				Db::commit();
-				//todo 发送短信给承兑商
+				//发送短信给承兑商
 				if (!empty($onlinead['mobile'])) {
-					$content = str_replace('{usdt}', round($actualAmt, 2), config('send_message_content'));
-					$content = str_replace('{tx_id}', $data['orderid'], $content);
-					$content = str_replace('{check_code}', '' . $checkCode . '', $content);
+					$send_content = Db::table('think_config')->where('name', 'send_sms_notify')->value('value');
+					$content      = str_replace('{usdt}', round($actualAmt, 2), $send_content);
+					$content      = str_replace('{cny}', round($data['amount'], 2), $content);
+					$content      = str_replace('{tx_id}', $data['orderid'], $content);
+					$content      = str_replace('{check_code}', '' . $checkCode . '', $content);
 					sendSms($onlinead['mobile'], $content);
 				}
 				$http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
-				if($data['type'] != 'all'){
-					$url       = $http_type . $_SERVER['HTTP_HOST'] . '/home/merchant/pay_a?id=' . $rs2 . '&appid=' . $data['appid'] . '&type=' . $data['type'];
-				}else{
-					$url       = $http_type . $_SERVER['HTTP_HOST'] . '/merchant/pay?id=' . $rs2 . '&appid=' . $data['appid'] . '&type=' . $data['type'];
+				if ($data['type'] != 'all') {
+					$url = $http_type . $_SERVER['HTTP_HOST'] . '/home/merchant/pay_a?id=' . $rs2 . '&appid=' . $data['appid'] . '&type=' . $data['type'];
+				} else {
+					$url = $http_type . $_SERVER['HTTP_HOST'] . '/merchant/pay?id=' . $rs2 . '&appid=' . $data['appid'] . '&type=' . $data['type'];
 				}
 				$this->mysuccess($url);
 			} else {

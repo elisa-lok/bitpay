@@ -2687,7 +2687,7 @@ class Merchant extends Base {
 			$arr['deal_num']    = $num;
 			$arr['deal_price']  = $orderinfo['price'];
 			$arr['ctime']       = time();
-			$arr['ltime']       = 15;
+			$arr['ltime']       = config('order_expire');
 			$arr['order_no']    = createOrderNo(4, session('uid'));
 			$arr['fee']         = $fee;
 			$arr['pay']         = $_POST['bank'];
@@ -3013,7 +3013,9 @@ class Merchant extends Base {
 		if ($rs) {
 			$moble = Db::name('merchant')->where('id', $order['sell_id'])->value('mobile');
 			if (!empty($moble)) {
-				$content = str_replace('{usdt}', round($order['deal_num'], 2), config('send_message_content'));
+				$send_content = Db::table('think_config')->where('name', 'send_message_content')->value('value');
+				$content = str_replace('{usdt}', round($order['deal_num'], 2), $send_content);
+				$content = str_replace('{cny}', round($order['deal_amount'], 2), $content);
 				$content = str_replace('{tx_id}', $order['orderid'], $content);
 				$content = str_replace('{check_code}', $order['check_code'], $content);
 				sendSms($moble, $content);
