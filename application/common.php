@@ -536,3 +536,8 @@ function getStatisticsOfOrder($buyerid, $sellerid, $buyamount, $sellamount) {
 	Db::name('merchant')->where('id', $sellerid)->setInc('order_sell_usdt_amount', $sellamount);
 	Db::name('merchant')->where('id', $buyerid)->setInc('order_buy_usdt_amount', $buyamount);
 }
+
+function showMsg($msg = '', $code = 1, $data = [], $url = '#') {
+	header('Content-Type:application/json; charset=utf-8');
+	die(json_encode(['code' => $code, 'msg' => $msg, 'data' => $data, 'url' => $url], 320));
+}
