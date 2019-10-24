@@ -2923,19 +2923,13 @@ class Merchant extends Base {
 		$zfbid  = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method2');
 		$wxid   = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method3');
 		$ysfid  = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method4');
-		// dump($pay);die;
-		// $payarr = explode(',', $bankid);
-		// $payarr =array();
-		// dump($payarr);die;
 
-		// $this->assign('payarr', $payarr);
 		$this->assign('id', $id);
 		$this->assign('appid', $appid);
 		$this->assign('money', round($order['deal_amount'], 2));
-		$this->assign('amount', $order['deal_num']);
+		$this->assign('amount', round($order['deal_num'],4));
 		$this->assign('no', $order['order_no']);
 		$merchant = Db::name('merchant')->where('id', $order['sell_id'])->find();
-		$bank     = [];
 		$payarr   = [];
 		if ($bankid > 0) {
 			$bank                    = Db::name('merchant_bankcard')->where('id', $bankid)->find();
@@ -2965,7 +2959,6 @@ class Merchant extends Base {
 			$merchant['c_ysf_img'] = $ysf['c_bank_detail'];
 			$payarr[]              .= 'ysf';
 		}
-		// dump($payarr);die;
 		$this->assign('payarr', $payarr);
 		$this->assign('merchant', $merchant);
 		//平均确认时间
@@ -2978,14 +2971,9 @@ class Merchant extends Base {
 			$min     = intval(floor($average / 60));
 			$second  = $average % 60;
 		}
-		// dump($payarr);
 		$this->assign('min', $min);
 		$this->assign('second', $second);
-		if (go_mobile()) {
-			return $this->fetch('paymobile');
-		} else {
-			return $this->fetch('paymobile');
-		}
+		return $this->fetch('paymobile');
 	}
 
 	public function CheckOutTime() {

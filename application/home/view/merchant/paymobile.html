@@ -38,16 +38,14 @@
 					<p class='p1050'>你正在交易USDT数量：<span class="red">{$amount} USDT</span></p>
 					<p class='p1050'>需支付金额：<span class="red">￥<font class='f14'>{$money}</font></span></p>
 					<p class='p1050' id="copy1" data-clipboard-target="#adno">订单号：<span class="red"><font class='f14' id="adno">{$no}</font></span><a id="fz">&nbsp;(点击复制)</a></p>
-					<p class='p1050'>卖家成功交易笔数：{$merchant.transact}笔</p>
-					<p class='p1050'>卖家平均确认时间：{$min}分{$second}秒</p>
 				</div>
 			</div>
 			<!-- 确认信息结束 -->
 			<!-- 收银台开始 -->
 			<div class="paydesk mt20">
-				<span>
-					支付倒计时：<font class="red"><em id='minute'>00</em>:<em id='second'>00</em></font>
-				</span>
+				<p style="text-align: right">
+					支付倒计时：<span class="red"><em id='minute'>00</em>:<em id='second'>00</em></span>
+				</p>
 				<ul class="paymethod mt10">
 					{volist name="payarr" id="vo"}
 					{if condition="$money gt 10000"}
@@ -83,11 +81,6 @@
 				</ul>
 				<div class='trade-knowledge mt20'>
 					<div class='sellerinfo'>
-						<!--<ul class='p10'>
-							<li>卖家信用</li>
-							<li>成功交易笔数：{$merchant.transact}笔</li>
-							<li>平均确认时间：{$min}分{$second}秒</li>
-						</ul>-->
 						{volist name="payarr" id="vo"}
 						{eq name="vo" value="zfb"}
 						<div class='alipay erweima {gt name="key" value="0"}hide{/gt}'>
