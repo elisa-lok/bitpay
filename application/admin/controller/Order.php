@@ -27,8 +27,8 @@ class Order extends Base {
 				!in_array($orderInfo['status'], ['5','9']) && showMsg('该状态不能重建订单', 0);
 				//在余额里面进行扣钱
 				$realAmt = $orderInfo['deal_num'] + $orderInfo['fee'];
-				$res2     = Db::table('pre_merchant')->where(['id' => $orderInfo['sell_id']])->setDec('usdt', $realAmt);
-				$res3     = Db::table('pre_merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdtd', $realAmt);
+				$res2     = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec('usdt', $realAmt);
+				$res3     = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdtd', $realAmt);
 			}
 			if($res1 && $res2 && $res3){
 				Db::commit();
