@@ -35,7 +35,6 @@
 			<!-- 确认信息开始 -->
 			<div class="confirminfo">
 				<div class="infodetail">
-					<p class='p1050'>你正在交易USDT数量：<span class="red">{$amount} USDT</span></p>
 					<p class='p1050'>需支付金额：<span class="red">￥<font class='f14'>{$money}</font></span></p>
 					<p class='p1050' id="copy1" data-clipboard-target="#adno">订单号：<span class="red"><font class='f14' id="adno">{$no}</font></span><a id="fz">&nbsp;(点击复制)</a></p>
 				</div>
@@ -349,7 +348,8 @@
             if(!result){return false}
             var appid = "{$appid|default=''}";
             var id = {$id |default= 0};
-            $.post('{:url("home/merchant/uptrade")}', {id: id, appid: appid}, function (data) {
+			var payway = $(".paydesk ul .active").index();
+            $.post('{:url("home/merchant/uptrade")}', {id: id, appid: appid, payway: payway}, function (data) {
                 if (data.code == 1) {
                     swal("操作成功","请等待交易确认","success");
                     setTimeout(function (){window.location.href = data.msg}, 2000);
