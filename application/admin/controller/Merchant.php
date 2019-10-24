@@ -1294,7 +1294,7 @@ class Merchant extends Base {
 					$status = 0;
 				}
 				$data['status'] = $status;
-				askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
+				//askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
 				writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】申诉订单:' . $orderinfo['id'] . '成功', 1);
 				$this->success('操作成功');
 			} else {
@@ -1499,7 +1499,7 @@ class Merchant extends Base {
 					$status = 0;
 				}
 				$data['status'] = $status;
-				askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
+				//askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
 				$this->success('操作成功');
 			} else {
 				// 回滚事务
