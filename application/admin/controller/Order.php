@@ -11,8 +11,13 @@ class Order extends Base {
 		!$orderInfo && $this->error('订单不存在');
 		if (request()->isPost()) {
 			$args = input('post.');
-			$orderInfo['status'] == $args['status'] && showMsg('操作成功'); //状态未改变
+
+			($orderInfo['status'] == $args['status']) && ($orderInfo['deal_amount'] == $args['deal_amount']) && showMsg('操作成功'); //状态未改变
 			$updateArr = ['status' => $args['status']];
+			if($args['deal_amount'] != $orderInfo['deal_amount']){
+				$updateArr['deal_amount'] = $args['deal_amount'];
+				$updateArr['deal_num'] = number_format($args['deal_amount'] / $orderInfo['deal_price'], 8,'.','');
+			}
 			if ($args['timeout']) {
 				//计算延长时间
 				$updateArr['ltime']         = ((time() - $orderInfo['ctime']) / 60) + 61;//延长60分钟, 预留多一分钟
@@ -24,16 +29,16 @@ class Order extends Base {
 			$res2 = $res3 = 1;
 			// 重建订单信息
 			if ($args['refactor']) {
-				!in_array($orderInfo['status'], ['5','9']) && showMsg('该状态不能重建订单', 0);
+				!in_array($orderInfo['status'], ['5', '9']) && showMsg('该状态不能重建订单', 0);
 				//在余额里面进行扣钱
 				$realAmt = $orderInfo['deal_num'] + $orderInfo['fee'];
-				$res2     = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec('usdt', $realAmt);
-				$res3     = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdtd', $realAmt);
+				$res2    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec('usdt', $realAmt);
+				$res3    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdtd', $realAmt);
 			}
-			if($res1 && $res2 && $res3){
+			if ($res1 && $res2 && $res3) {
 				Db::commit();
 				showMsg('操作成功', 1);
-			} else{
+			} else {
 				Db::rollback();
 				showMsg('操作失败', 0);
 			}

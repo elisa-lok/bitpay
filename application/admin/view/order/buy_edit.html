@@ -37,21 +37,33 @@
 							</div>
 						</div>
 						<div class="form-group">
+							<label class="col-sm-3 control-label">原始总额：</label>
+							<div class="input-group col-sm-4">
+								<input type="text" class="form-control" name="deal_price" placeholder="成交价格" value="{$data.raw_amount}" readonly>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">原始数量：</label>
+							<div class="input-group col-sm-4">
+								<input type="text" class="form-control" name="deal_price" placeholder="成交价格" value="{$data.raw_num}" readonly>
+							</div>
+						</div>
+						<div class="form-group">
 							<label class="col-sm-3 control-label">成交价格：</label>
 							<div class="input-group col-sm-4">
-								<input type="text" class="form-control" name="deal_price" placeholder="成交价格" value="{$data.deal_price}" readonly>
+								<input type="text" class="form-control" id="dealPrice" name="deal_price" placeholder="成交价格" value="{$data.deal_price}" readonly>
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">成交总额：</label>
 							<div class="input-group col-sm-4">
-								<input type="text" class="form-control" name="deal_amount" placeholder="成交总额" value="{$data.deal_amount}" readonly>
+								<input type="text" class="form-control" id="dealAmt" name="deal_amount" placeholder="成交总额" value="{$data.deal_amount}" onkeyup="calcAmt()">
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">成交数量：</label>
 							<div class="input-group col-sm-4">
-								<input type="text" class="form-control" name="deal_num" placeholder="成交数量" value="{$data.deal_num}" readonly>
+								<input type="text" class="form-control" id="dealNum" name="deal_num" placeholder="成交数量" value="{$data.deal_num}" readonly>
 							</div>
 						</div>
 						<div class="form-group">
@@ -123,6 +135,11 @@
 				return false;
 			}
 		})
+	}
+
+	function calcAmt() {
+		var c = parseFloat($("#dealAmt").val()) / parseFloat($("#dealPrice").val())
+		$("#dealNum").val(c.toFixed(8))
 	}
 </script>
 </body>
