@@ -85,5 +85,5 @@ return [
 	'salt'                       => 'wZPb~yxvA!ir38&Z!!@',//加密串
 
 	//订单超时时间
-	'order_expire'               => 30,
+	'order_expire'               => 15,
 ];
