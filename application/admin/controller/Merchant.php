@@ -1499,7 +1499,7 @@ class Merchant extends Base {
 					$status = 0;
 				}
 				$data['status'] = $status;
-				//askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
+				$status && askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
 				$this->success('操作成功');
 			} else {
 				// 回滚事务
