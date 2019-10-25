@@ -51,17 +51,18 @@ return [
 		'prefix'         => 'think',// SESSION 前缀
 		'type'           => 'redis',// 驱动方式 支持redis memcache memcached
 		'auto_start'     => TRUE,// 是否自动开启 SESSION
+		'expire'         => 5184000,
 	],
 
 	// | Cookie设置
 	'cookie'                     => [
-		'prefix'    => '',// cookie 名称前缀
-		'expire'    => 0,// cookie 保存时间
-		'path'      => '/',// cookie 保存路径
-		'domain'    => '',// cookie 有效域名
-		'secure'    => FALSE,//  cookie 启用安全传输
-		'httponly'  => '',// httponly设置
-		'setcookie' => TRUE,// 是否使用 setcookie
+		'prefix'    => '',		// cookie 名称前缀
+		'expire'    => 5184000,	// cookie 保存时间
+		'path'      => '/',		// cookie 保存路径
+		'domain'    => '',		// cookie 有效域名
+		'secure'    => FALSE,	// cookie 启用安全传输
+		'httponly'  => '',		// httponly设置
+		'setcookie' => TRUE,	// 是否使用 setcookie
 	],
 
 	//分页配置
@@ -83,5 +84,6 @@ return [
 	'pages'                      => '10',//分页数
 	'salt'                       => 'wZPb~yxvA!ir38&Z!!@',//加密串
 
-	'order_expire'               => 30,  //订单超时时间
+	//订单超时时间
+	'order_expire'               => 30,
 ];
