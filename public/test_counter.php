@@ -57,7 +57,6 @@ function sign($dataArr, $key) {
 			<div class="col-md-12">
 				<div class="form-group">
 					<label>请求地址</label> <input id="req_url" type="text" name="req_url" class="form-control" placeholder="Please enter request url" required="required" data-error="url is required." value="<?php echo $url; ?>">
-					<div class="help-block with-errors"></div>
 				</div>
 			</div>
 		</div>
@@ -66,19 +65,16 @@ function sign($dataArr, $key) {
 				<div class="col-sm-4">
 					<div class="form-group">
 						<label>订单号 *</label> <input type="text" name="orderid" class="form-control" placeholder="请输入事务id" required="required" data-error="name is required." value="<?php echo $txId; ?>" readonly>
-						<div class="help-block with-errors"></div>
 					</div>
 				</div>
 				<div class="col-sm-4">
 					<div class="form-group">
 						<label>金额(元) *</label> <input type="number" name="amount" class="form-control" required="required" value="1000">
-						<div class="help-block with-errors"></div>
 					</div>
 				</div>
 				<div class="col-sm-4">
 					<div class="form-group">
 						<label>用户名 *</label> <input type="text" name="username" class="form-control" placeholder="Please enter username" value="<?php echo $user; ?>">
-						<div class="help-block with-errors"></div>
 					</div>
 				</div>
 			</div>
@@ -89,50 +85,54 @@ function sign($dataArr, $key) {
 				<div class="col-sm-4">
 					<div class="form-group">
 						<label>币种 *</label> <input type="text" class="form-control" required="required" value="USDT" readonly>
-						<div class="help-block with-errors"></div>
+
 					</div>
 				</div>
 				<div class="col-sm-4">
 					<div class="form-group">
 						<label>APPID *</label> <input type="text" name="appid" class="form-control" placeholder="" required="required" value="ZoeMlmDPziecgEAp">
-						<div class="help-block with-errors"></div>
 					</div>
 				</div>
 				<div class="col-sm-4">
 					<div class="form-group">
 						<label>APPKEY *</label> <input type="text" name="appkey" class="form-control" value="862dc61c1eb982e64e36f669d22791ce">
-						<div class="help-block with-errors"></div>
 					</div>
 				</div>
 				<div class="form-group">
-					<input type="hidden" name="type" class="form-control" value="all">
-					<div class="help-block with-errors"></div>
-				</div>
-				<div class="form-group">
 					<input type="hidden" name="address" class="form-control" value="">
-					<div class="help-block with-errors"></div>
 				</div>
 			</div>
 		</div>
 		<div class="controls">
 			<div class="row">
-				<div class="col-sm-6">
+				<div class="col-sm-2">
 					<div class="form-group">
-						<label>同步回调地址 *</label> <input type="text" name="return_url" class="form-control" placeholder="" required="required" value="<?php echo $returnUrl;?>">
-						<div class="help-block with-errors"></div>
+						<label>付款方式 *</label>
+						<select class="form-control" name="type">
+							<option value="all">全部</option>
+							<option value="bank">银行卡转账</option>
+							<option value="alipay">支付宝</option>
+							<option value="wxpay">微信</option>
+							<option value="unionpay">云闪付</option>
+						</select>
 					</div>
 				</div>
-				<div class="col-sm-6">
+				<div class="col-sm-5">
+					<div class="form-group">
+						<label>同步回调地址 *</label> <input type="text" name="return_url" class="form-control" placeholder="" required="required" value="<?php echo $returnUrl;?>">
+					</div>
+				</div>
+				<div class="col-sm-5">
 					<div class="form-group">
 						<label>异步回调地址 *</label> <input type="text" name="notify_url" class="form-control" placeholder="" required="required" value="<?php echo $notifyUrl;?>">
-						<div class="help-block with-errors"></div>
+
 					</div>
 				</div>
 			</div>
 		</div>
 		<div class="row messages col-md-6"></div>
 		<div class="row">
-			<div class="messages col-md-6"><a id="msg" href=""></a></div>
+			<div class="messages col-md-6"><a id="msg" href="javascript:;"></a></div>
 			<div class="col-md-6">
 				<button type="button" class="btn btn-warning btn-send" onclick="requestPay()">Go</button>
 			</div>
@@ -142,7 +142,6 @@ function sign($dataArr, $key) {
 				<p class="text-muted"><strong>*</strong> These fields are required.</p>
 			</div>
 		</div>
-
 	</form>
 </div>
 <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>

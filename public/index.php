@@ -20,5 +20,11 @@ define('RUNTIME_PATH', __DIR__ . '/../runtime/');
 define('APP_DEBUG', false);
 
 define('ADMIN_KEY', '123poiASDMNB');
+error_reporting(0);
+ini_set('display_errors', '0');
+if(APP_DEBUG){
+	ini_set('display_errors', '1');
+	error_reporting(-1);
+}
 // 加载框架引导文件
 require __DIR__ . '/../thinkphp/start.php';
