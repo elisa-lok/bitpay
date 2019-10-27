@@ -343,12 +343,13 @@ class Merchant extends Controller {
 		// $this->myerror(json_encode($ads));
 		// dump($ads);
 		// $this->myerror($where);
+		$minimalSellOrder = NULL;
+		$minimalCount     = 1;
 		foreach ($ads as $k => $v) {
 			//开始判断挂单剩余
 			$total     = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 9)->sum('deal_num');
 			$actualAmt = round($data['amount'] / $v['price'], 8);
 			if (($v['amount'] - $total) < $actualAmt || $v['usdt'] < $actualAmt) {
-				//dump(1);die;
 				continue;
 			}
 			//判断承兑商是否被其它盘口设置过
@@ -357,18 +358,30 @@ class Merchant extends Controller {
 				if (!empty($find)) {
 					continue;
 				}
-
 			}
 			//判断未完成的单子
 			$trader_count = Db::name('order_buy')->where('sell_id', $v['traderid'])->where('status', 'in', [0, 1])->count();
+			if ($trader_count < $minimalCount) {
+				$minimalCount     = $trader_count;
+				$minimalSellOrder = $v;
+			}
 			if ($trader_limit && $trader_count >= $trader_limit) {
-				//dump($trader_limit);die;
 				continue;
+			}
+			// 同金额不允许匹配
+			if($trader_count > 0){
+				$sameAmtCount = Db::name('order_buy')->where('sell_id', $v['traderid'])->where('status', 'in', [0, 1])->where('raw_amount',$data['amount'])->count();
+				if($sameAmtCount > 0){
+					continue;
+				}
 			}
 			$onlinead = $v;
 			break;
 		}
-		empty($onlinead) && $this->myerror('暂无可用订单');
+		if (empty($onlineAd)) {
+			!$minimalSellOrder && $this->myerror('暂无可用订单');
+			$onlineAd = $minimalSellOrder;
+		}
 
 		// $this->myerror($onlinead);
 		//开始冻结承兑商usdt
