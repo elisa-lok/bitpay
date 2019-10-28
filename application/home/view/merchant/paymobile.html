@@ -96,8 +96,8 @@
 						<div class='alipay erweima {gt name="key" value="0"}hide{/gt}'>
 							<p class='f14 p10'>请用<img src="__IMG__/alipay2.png" class='w80'/>完成支付</p>
 							<div class='mt10 bankinfo' style="    width: 80%;padding-left: 15%;">
-								<p class='mt10' style="color:red;text-align: left" id="copy_alipay_name" data-clipboard-target="#name">真实姓名：<em id="alipay_name">{gt name='remaintime' value='0'}{$merchant.alipay_name}{/gt}</em><a id="cp_alipay_name">&nbsp;(点击复制)</a></p>
-								<p class='mt10' style="color:red;text-align: left;margin-top: 0.2rem;" id="copy_alipay_account" data-clipboard-target="#card">支付宝账号：<em id="alipay">{gt name='remaintime' value='0'}{$merchant.zfb}{/gt}</em><a id="cp_alipay">&nbsp;(点击复制)</a></p>
+								<p class='mt10' style="color:red;text-align: left" id="copy_alipay_name" data-clipboard-target="#alipay_name">支付宝姓名：<em id="alipay_name">{gt name='remaintime' value='0'}{$merchant.alipay_name}{/gt}</em><a id="cp_alipay_name">&nbsp;(点击复制)</a></p>
+								<p class='mt10' style="color:red;text-align: left;margin-top: 0.2rem;" id="copy_alipay_acc" data-clipboard-target="#alipay_acc">支付宝账号：<em id="alipay_acc">{gt name='remaintime' value='0'}{$merchant.alipay_acc}{/gt}</em><a id="cp_alipay_acc">&nbsp;(点击复制)</a></p>
 							</div>
 							<p style="color:blue;margin-top: 2rem;font-size:18px;">温馨提示:点击相应资料可进行复制<br>复制上述资料->支付宝转账->点击完成</p>
 						</div>
@@ -106,8 +106,8 @@
 						<div class='wechatpay erweima {gt name="key" value="0"}hide{/gt}'>
 							<p class='f14 p10'>请用<img src="__IMG__/wechatpay.png" class=''/>完成支付</p>
 							<div class='mt10 bankinfo' style="    width: 80%;padding-left: 15%;">
-								<p class='mt10' style="color:red;text-align: left" id="copy_wx_name" data-clipboard-target="#name">真实姓名：<em id="wx_name">{gt name='remaintime' value='0'}{$merchant.wxpay_name}{/gt}</em><a id="cp_wx_name">&nbsp;(点击复制)</a></p>
-								<p class='mt10' style="color:red;text-align: left;margin-top: 0.2rem;" id="copy_wx_account" data-clipboard-target="#card">微信手机：<em id="wxpay">{gt name='remaintime' value='0'}{$merchant.wx}{/gt}</em><a id="cp_wx">&nbsp;(点击复制)</a></p>
+								<p class='mt10' style="color:red;text-align: left" id="copy_wxpay_name" data-clipboard-target="#wx_name">真实姓名：<em id="wx_name">{gt name='remaintime' value='0'}{$merchant.wxpay_name}{/gt}</em><a id="cp_wxpay_name">&nbsp;(点击复制)</a></p>
+								<p class='mt10' style="color:red;text-align: left;margin-top: 0.2rem;" id="copy_wxpay_acc" data-clipboard-target="#wx_acc">微信手机：<em id="wx_acc">{gt name='remaintime' value='0'}{$merchant.wxpay_acc}{/gt}</em><a id="cp_wxpay_acc">&nbsp;(点击复制)</a></p>
 							</div>
 							<p style="color:blue;margin-top: 2rem;font-size:18px;">温馨提示:点击相应资料可进行复制<br>复制上述资料->微信收付款->转账到银行卡或手机号码->进行付款</p>
 						</div>
@@ -205,12 +205,46 @@
         clipboard4.on('success', function (e) {
             $("#fz3").html("&nbsp;(复制成功)")
             clearTimeout(copy1T);
-            copy1T = setTimeout(function () {
-                $("#fz3").html("&nbsp;(点击复制)")
-            }, 2000)
+            copy1T = setTimeout(function () {$("#fz3").html("&nbsp;(点击复制)")}, 2000)
             e.clearSelection()
         });
     }
+	var alipayNameCopy = new ClipboardJS('#copy_alipay_name');
+	if (alipayNameCopy) {
+		alipayNameCopy.on('success', function (e) {
+			$("#cp_alipay_name").html("&nbsp;(复制成功)")
+			clearTimeout(copy1T);
+			copy1T = setTimeout(function () {$("#cp_alipay_name").html("&nbsp;(点击复制)")}, 2000)
+			e.clearSelection()
+		});
+	}
+	var alipayAccCopy = new ClipboardJS('#copy_alipay_acc');
+	if (alipayAccCopy) {
+		alipayAccCopy.on('success', function (e) {
+			$("#cp_alipay_acc").html("&nbsp;(复制成功)")
+			clearTimeout(copy1T);
+			copy1T = setTimeout(function () {$("#cp_alipay_acc").html("&nbsp;(点击复制)")}, 2000)
+			e.clearSelection()
+		});
+	}
+	var wxpayNameCopy = new ClipboardJS('#copy_wxpay_name');
+	if (wxpayNameCopy) {
+		wxpayNameCopy.on('success', function (e) {
+			$("#cp_wxpay_name").html("&nbsp;(复制成功)")
+			clearTimeout(copy1T);
+			copy1T = setTimeout(function () {$("#cp_wxpay_name").html("&nbsp;(点击复制)")}, 2000)
+			e.clearSelection()
+		});
+	}
+	var wxpayAccCopy = new ClipboardJS('#copy_wxpay_acc');
+	if (wxpayAccCopy) {
+		wxpayAccCopy.on('success', function (e) {
+			$("#cp_wxpay_acc").html("&nbsp;(复制成功)")
+			clearTimeout(copy1T);
+			copy1T = setTimeout(function () {$("#cp_wxpay_acc").html("&nbsp;(点击复制)")}, 2000)
+			e.clearSelection()
+		});
+	}
 
     var flag;
     $('.usdt').mouseover(function () {

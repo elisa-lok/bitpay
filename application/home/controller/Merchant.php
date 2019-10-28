@@ -1724,10 +1724,9 @@ class Merchant extends Base {
 			$flag   = $model2->insertOne([
 				'userid'      => session('uid'),
 				'add_time'    => time(),
-				'coin'        => 'usdt',
+				'coin'        => '0',
 				'min_limit'   => $min_limit,
 				'max_limit'   => $max_limit,
-				'state'       => 0,
 				'pay_method'  => $_POST['bank'],
 				'pay_method2' => $_POST['zfb'],
 				'pay_method3' => $_POST['wx'],
@@ -1735,6 +1734,7 @@ class Merchant extends Base {
 				'ad_no'       => $ad_no,
 				'amount'      => $amount,
 				'price'       => $price,
+				'message'     => '',
 				'state'       => 1
 			]);
 			//增加在售挂单数
@@ -2943,6 +2943,7 @@ class Merchant extends Base {
 			$merchant['zfb']          = $zfb['c_bank_card'];
 			$merchant['alipay_name']  = $zfb['truename'];
 			$merchant['c_alipay_img'] = $zfb['c_bank_detail'];
+			$merchant['alipay_acc']   = $zfb['c_bank'];
 			$payarr[]                 .= 'zfb';
 		}
 		if ($wxid > 0) {
@@ -2950,6 +2951,7 @@ class Merchant extends Base {
 			$merchant['wx']           = $wx['c_bank_card'];
 			$merchant['wxpay_name']   = $wx['truename'];
 			$merchant['c_wechat_img'] = $wx['c_bank_detail'];
+			$merchant['wxpay_acc']    = $wx['c_bank'];
 			$payarr[]                 .= 'wx';
 		}
 		if ($ysfid > 0) {
@@ -2957,6 +2959,7 @@ class Merchant extends Base {
 			$merchant['ysf']           = $ysf['c_bank_card'];
 			$merchant['unionpay_name'] = $ysf['truename'];
 			$merchant['c_ysf_img']     = $ysf['c_bank_detail'];
+			$merchant['unionpay_acc']  = $ysf['c_bank'];
 			$payarr[]                  .= 'ysf';
 		}
 		$this->assign('payarr', $payarr);
