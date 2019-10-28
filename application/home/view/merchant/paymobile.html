@@ -81,35 +81,6 @@
 				<div class='trade-knowledge mt20'>
 					<div class='sellerinfo'>
 						{volist name="payarr" id="vo"}
-						{eq name="vo" value="zfb"}
-						<div class='alipay erweima {gt name="key" value="0"}hide{/gt}'>
-							<p class='f14 p10'>请用<img src="__IMG__/alipay2.png" class='w80'/>扫码完成支付</p>
-							<div class='mt10 payma'>
-								<img src="/uploads/face/{$merchant.c_alipay_img}"/>
-							</div>
-							<p class='warn'>注意! 付错金额，重复支付，充值将不到账！</p>
-							<p class='warn'>支付完成后，请点击下方的"我已付款"按钮</p>
-							<!-- 支付方法 -->
-							<div class='tc'>
-								<p class="ti_p">
-									<span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span>
-									<span class="ticon icon2 icon_alipay" id="type_icon"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon3"></span>
-								</p>
-								<div class="ti_t">
-									<div>
-										<p>截屏将二维码<br>保存至本地相册</p>
-									</div>
-									<div>
-										<p>打开<span class="pay_type">支付宝</span><br>选择扫一扫</p>
-									</div>
-									<div>
-										<p>从本地相册选择<br>选取截屏二维码</p>
-									</div>
-								</div>
-							</div>
-							<!-- 支付方法 -->
-						</div>
-						{/eq}
 						{eq name="vo" value="bank"}
 						<div class='bank erweima {gt name="key" value="0"}hide{/gt}'>
 							<p class='f14 p10'>请用<img src="__IMG__/bank.png" class=''/>完成支付</p>
@@ -119,37 +90,26 @@
 								<p class='mt10' id="copy4" data-clipboard-target="#khh" style="color:red;text-align: left;margin-top: 0.2rem;">开户银行：<em id="khh">{gt name='remaintime' value='0'}{$merchant.bank}{/gt}</em><a id="fz3">&nbsp;(点击复制)</a></p><br>
 							</div>
 							<p style="color:blue;margin-top: 2rem;font-size:18px;">温馨提示:点击相应资料可进行复制</p>
-							<p class='warn'>注意! 付错金额，重复支付，充值将不到账！</p>
-							<p class='p10 warn'>支付完成后，请点击下方的"我已付款"按钮</p>
+						</div>
+						{/eq}
+						{eq name="vo" value="zfb"}
+						<div class='alipay erweima {gt name="key" value="0"}hide{/gt}'>
+							<p class='f14 p10'>请用<img src="__IMG__/alipay2.png" class='w80'/>完成支付</p>
+							<div class='mt10 bankinfo' style="    width: 80%;padding-left: 15%;">
+								<p class='mt10' style="color:red;text-align: left" id="copy_alipay_name" data-clipboard-target="#name">真实姓名：<em id="alipay_name">{gt name='remaintime' value='0'}{$merchant.alipay_name}{/gt}</em><a id="cp_alipay_name">&nbsp;(点击复制)</a></p>
+								<p class='mt10' style="color:red;text-align: left;margin-top: 0.2rem;" id="copy_alipay_account" data-clipboard-target="#card">支付宝账号：<em id="alipay">{gt name='remaintime' value='0'}{$merchant.zfb}{/gt}</em><a id="cp_alipay">&nbsp;(点击复制)</a></p>
+							</div>
+							<p style="color:blue;margin-top: 2rem;font-size:18px;">温馨提示:点击相应资料可进行复制<br>复制上述资料->支付宝转账->点击完成</p>
 						</div>
 						{/eq}
 						{eq name="vo" value="wx"}
 						<div class='wechatpay erweima {gt name="key" value="0"}hide{/gt}'>
-							<p class='f14 p10'>请用<img src="__IMG__/wechatpay.png" class=''/>扫码完成支付</p>
-							<div class='mt10 payma'>
-								<img src="/uploads/face/{$merchant.c_wechat_img}" style=''/>
+							<p class='f14 p10'>请用<img src="__IMG__/wechatpay.png" class=''/>完成支付</p>
+							<div class='mt10 bankinfo' style="    width: 80%;padding-left: 15%;">
+								<p class='mt10' style="color:red;text-align: left" id="copy_wx_name" data-clipboard-target="#name">真实姓名：<em id="wx_name">{gt name='remaintime' value='0'}{$merchant.wxpay_name}{/gt}</em><a id="cp_wx_name">&nbsp;(点击复制)</a></p>
+								<p class='mt10' style="color:red;text-align: left;margin-top: 0.2rem;" id="copy_wx_account" data-clipboard-target="#card">微信手机：<em id="wxpay">{gt name='remaintime' value='0'}{$merchant.wx}{/gt}</em><a id="cp_wx">&nbsp;(点击复制)</a></p>
 							</div>
-							<p class='warn'>注意! 付错金额，重复支付，充值将不到账！</p>
-							<p class='p10 warn'>支付完成后，请点击下方的"我已付款"按钮</p>
-							<!-- 支付方法 -->
-							<div class='tc'>
-								<p class="ti_p">
-									<span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span>
-									<span class="ticon icon2 icon_wx" id="type_icon"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon3"></span>
-								</p>
-								<div class="ti_t">
-									<div>
-										<p>截屏将二维码<br>保存至本地相册</p>
-									</div>
-									<div>
-										<p>打开<span class="pay_type">微信</span><br>选择扫一扫</p>
-									</div>
-									<div>
-										<p>从本地相册选择<br>选取截屏二维码</p>
-									</div>
-								</div>
-							</div>
-							<!-- 支付方法 -->
+							<p style="color:blue;margin-top: 2rem;font-size:18px;">温馨提示:点击相应资料可进行复制<br>复制上述资料->微信收付款->转账到银行卡或手机号码->进行付款</p>
 						</div>
 						{/eq}
 
@@ -168,15 +128,9 @@
 									<span class="ticon icon2 icon_ysf" id="type_icon"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon3"></span>
 								</p>
 								<div class="ti_t">
-									<div>
-										<p>截屏将二维码<br>保存至本地相册</p>
-									</div>
-									<div>
-										<p>打开<span class="pay_type">云闪付</span><br>选择扫一扫</p>
-									</div>
-									<div>
-										<p>从本地相册选择<br>选取截屏二维码</p>
-									</div>
+									<div><p>截屏将二维码<br>保存至本地相册</p></div>
+									<div><p>打开<span class="pay_type">云闪付</span><br>选择扫一扫</p></div>
+									<div><p>从本地相册选择<br>选取截屏二维码</p></div>
 								</div>
 							</div>
 							<!-- 支付方法 -->

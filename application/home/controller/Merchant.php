@@ -2941,23 +2941,23 @@ class Merchant extends Base {
 		if ($zfbid > 0) {
 			$zfb                      = Db::name('merchant_zfb')->where('id', $zfbid)->find();
 			$merchant['zfb']          = $zfb['c_bank_card'];
-			$merchant['name']         = $zfb['truename'];
+			$merchant['alipay_name']  = $zfb['truename'];
 			$merchant['c_alipay_img'] = $zfb['c_bank_detail'];
 			$payarr[]                 .= 'zfb';
 		}
 		if ($wxid > 0) {
 			$wx                       = Db::name('merchant_wx')->where('id', $wxid)->find();
 			$merchant['wx']           = $wx['c_bank_card'];
-			$merchant['name']         = $wx['truename'];
+			$merchant['wxpay_name']   = $wx['truename'];
 			$merchant['c_wechat_img'] = $wx['c_bank_detail'];
 			$payarr[]                 .= 'wx';
 		}
 		if ($ysfid > 0) {
-			$ysf                   = Db::name('merchant_ysf')->where('id', $ysfid)->find();
-			$merchant['ysf']       = $ysf['c_bank_card'];
-			$merchant['name']      = $ysf['truename'];
-			$merchant['c_ysf_img'] = $ysf['c_bank_detail'];
-			$payarr[]              .= 'ysf';
+			$ysf                       = Db::name('merchant_ysf')->where('id', $ysfid)->find();
+			$merchant['ysf']           = $ysf['c_bank_card'];
+			$merchant['unionpay_name'] = $ysf['truename'];
+			$merchant['c_ysf_img']     = $ysf['c_bank_detail'];
+			$payarr[]                  .= 'ysf';
 		}
 		$this->assign('payarr', $payarr);
 		$this->assign('merchant', $merchant);
