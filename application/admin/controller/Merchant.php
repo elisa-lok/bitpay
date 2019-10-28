@@ -1515,7 +1515,6 @@ class Merchant extends Base {
 
 	/**
 	 * 币给商户
-	 * @return unknown
 	 */
 	public function ssfailbuy() {
 		$id        = input('post.id');
@@ -1533,12 +1532,12 @@ class Merchant extends Base {
 		}
 		Db::startTrans();
 		try {
-			$rs1 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $orderinfo['deal_num'] + $orderinfo['fee']);
+			$rs1 = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->setDec('usdtd', $orderinfo['deal_num'] + $orderinfo['fee']);
 			$rs2 = Db::table('think_order_sell')->update(['id' => $orderinfo['id'], 'status' => 4, 'finished_time' => time()]);
-			$rs3 = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->setInc('usdt', $orderinfo['deal_num'] + $orderinfo['fee']);
+			$rs3 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $orderinfo['deal_num'] + $orderinfo['fee']);
 			if ($rs1 && $rs2 && $rs3) {
 				financelog($orderinfo['sell_id'], ($orderinfo['deal_num'] + $orderinfo['fee']), '卖出USDT_释放_3', 1, session('username'));//添加日志
-				financelog($orderinfo['buy_id'], $mum, '买入USDT_3', 0, session('username'));//添加日志
+				financelog($orderinfo['buy_id'], ($orderinfo['deal_num'] + $orderinfo['fee']), '买入USDT_3', 0, session('username'));//添加日志
 				// 提交事务
 				Db::commit();
 				$this->success('操作成功');
