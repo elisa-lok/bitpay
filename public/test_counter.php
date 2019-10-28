@@ -159,7 +159,7 @@ function sign($dataArr, $key) {
 					$("#msg").html("点我跳转").attr("href",res.data)
 					window.open(res.data)
 				}else{
-					$("#msg").html("生成订单错误")
+					$("#msg").html("错误: "+ res.err)
 				}
 			}, error: function (err) {
 				console.log(err);
