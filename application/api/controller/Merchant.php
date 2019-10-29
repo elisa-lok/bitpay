@@ -348,8 +348,8 @@ class Merchant extends Controller {
 		$minimalCount     = 1;
 		foreach ($ads as $k => $v) {
 			//开始判断挂单剩余
-			$total     = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 9)->sum('deal_num');
-			$actualAmt = round($data['amount'] / $v['price'], 8);
+			$total     = Db::name('order_buy')->where('sell_sid', $v['id'])->whereNotIn('status','5,9')->sum('deal_num');
+			$actualAmt = number_format($data['amount'] / $v['price'], '.', '');
 			if (($v['amount'] - $total) < $actualAmt || $v['usdt'] < $actualAmt) {
 				continue;
 			}
