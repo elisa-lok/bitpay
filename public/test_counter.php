@@ -6,12 +6,12 @@ if ($_POST) {
 	$data   = $_POST;
 	$reqUrl = $data['req_url'];
 	unset($data['req_url']);
-
 	$appKey = $data['appkey'];
 	unset($data['appkey']);
+	$data['orderid'] = 'T' . str_replace('.', '', microtime(TRUE)) . mt_rand(1000, 9999);
 
 	$data['sign'] = sign($data, $appKey);
-	$ch              = curl_init($reqUrl);
+	$ch           = curl_init($reqUrl);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 	//允许请求以文件流的形式返回
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
@@ -21,14 +21,14 @@ if ($_POST) {
 	curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 30);
 	$res = curl_exec($ch); //执行发送
 	curl_close($ch);
-	echo($res);die;
+	die($res);
 } else {
-	$txId = 'E' . date("YmdHis") . rand(100000, 999999);    //订单号
-	$user = '1380' . rand(1000000, 9999999);    //订单号
-	$srv = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'];
-	$url  = $srv . '/api/merchant/requestTraderRechargeRmb';
-	$returnUrl  = $srv . '/test_return.php';
-	$notifyUrl  = $srv . '/test_notify.php';
+	$txId      = 'T' . date('ymdHis') . mt_rand(100000, 999999);    //订单号
+	$user      = '1380' . rand(1000000, 9999999);    //订单号
+	$srv       = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'];
+	$url       = $srv . '/api/merchant/requestTraderRechargeRmb';
+	$returnUrl = $srv . '/test_return.php';
+	$notifyUrl = $srv . '/test_notify.php';
 }
 
 function sign($dataArr, $key) {
@@ -64,12 +64,12 @@ function sign($dataArr, $key) {
 			<div class="row">
 				<div class="col-sm-4">
 					<div class="form-group">
-						<label>订单号 *</label> <input type="text" name="orderid" class="form-control" placeholder="请输入事务id" required="required" data-error="name is required." value="<?php echo $txId; ?>" readonly>
+						<label>订单号 *</label> <input type="text" name="orderid" class="form-control" placeholder="请输入事务id" required="required" data-error="name is required." value="随机生成" readonly>
 					</div>
 				</div>
 				<div class="col-sm-4">
 					<div class="form-group">
-						<label>金额(元) *</label> <input type="number" name="amount" class="form-control" required="required" value="1000">
+						<label>金额(元) *</label> <input type="number" name="amount" class="form-control" required="required" value="100">
 					</div>
 				</div>
 				<div class="col-sm-4">
@@ -85,7 +85,6 @@ function sign($dataArr, $key) {
 				<div class="col-sm-4">
 					<div class="form-group">
 						<label>币种 *</label> <input type="text" class="form-control" required="required" value="USDT" readonly>
-
 					</div>
 				</div>
 				<div class="col-sm-4">
@@ -107,8 +106,7 @@ function sign($dataArr, $key) {
 			<div class="row">
 				<div class="col-sm-2">
 					<div class="form-group">
-						<label>付款方式 *</label>
-						<select class="form-control" name="type">
+						<label>付款方式 *</label> <select class="form-control" name="type">
 							<option value="all">全部</option>
 							<option value="bank">银行卡转账</option>
 							<option value="alipay">支付宝</option>
@@ -119,13 +117,12 @@ function sign($dataArr, $key) {
 				</div>
 				<div class="col-sm-5">
 					<div class="form-group">
-						<label>同步回调地址 *</label> <input type="text" name="return_url" class="form-control" placeholder="" required="required" value="<?php echo $returnUrl;?>">
+						<label>同步回调地址 *</label> <input type="text" name="return_url" class="form-control" placeholder="" required="required" value="<?php echo $returnUrl; ?>">
 					</div>
 				</div>
 				<div class="col-sm-5">
 					<div class="form-group">
-						<label>异步回调地址 *</label> <input type="text" name="notify_url" class="form-control" placeholder="" required="required" value="<?php echo $notifyUrl;?>">
-
+						<label>异步回调地址 *</label> <input type="text" name="notify_url" class="form-control" placeholder="" required="required" value="<?php echo $notifyUrl; ?>">
 					</div>
 				</div>
 			</div>
@@ -155,11 +152,11 @@ function sign($dataArr, $key) {
 			dataType: "json",
 			success : function (res) {
 				console.log(res);
-				if(res.status === 1){
-					$("#msg").html("点我跳转").attr("href",res.data)
+				if (res.status === 1) {
+					$("#msg").html("点我跳转").attr("href", res.data)
 					window.open(res.data)
-				}else{
-					$("#msg").html("错误: "+ res.err)
+				} else {
+					$("#msg").html("错误 : " + res.err)
 				}
 			}, error: function (err) {
 				console.log(err);
