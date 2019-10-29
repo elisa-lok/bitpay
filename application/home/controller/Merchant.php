@@ -1188,6 +1188,10 @@ class Merchant extends Base {
 			if (empty($name) || !checkName($name)) {
 				$this->error('请填写真实姓名');
 			}
+			$alipay_account = input('post.alipay_account');
+			if (!$alipay_account) {
+				$this->error('请输入支付宝账户');
+			}
 
 			$file = request()->file('avatar');
 			if ($file) {
@@ -1195,19 +1199,19 @@ class Merchant extends Base {
 				if ($info) {
 					$param['c_alipay_img'] = $info->getSaveName();
 				} else {
-					$this->error('请上传支付宝收款码：' . $file->getError());
+					$param['c_alipay_img'] = '';
+					// $this->error('请上传支付宝收款码：' . $file->getError());
 				}
 			} else {
 				$last_img = input('post.last_alipay_img');
 				if (empty($last_img)) {
-					$this->error('请上传支付宝收款码');
+					$param['c_alipay_img'] = '';
+					//$this->error('请上传支付宝收款码');
+				} else {
+					$param['c_alipay_img'] = $last_img;
 				}
-				$param['c_alipay_img'] = $last_img;
 			}
-			$alipay_account = input('post.alipay_account');
-			if (!$alipay_account) {
-				$this->error('请输入支付宝账户');
-			}
+
 			$param['id']               = session('uid');
 			$param['c_alipay_account'] = $alipay_account;
 			$param['name']             = $name;
@@ -1244,14 +1248,17 @@ class Merchant extends Base {
 				if ($info) {
 					$param['c_wechat_img'] = $info->getSaveName();
 				} else {
-					$this->error('请上传微信收款码：' . $file->getError());
+					$param['c_wechat_img'] = '';
+					// $this->error('请上传微信收款码：' . $file->getError());
 				}
 			} else {
 				$last_img = input('post.last_wechat_img');
 				if (empty($last_img)) {
-					$this->error('请上传微信收款码');
+					$param['c_wechat_img'] = '';
+					// $this->error('请上传微信收款码');
+				} else {
+					$param['c_wechat_img'] = $last_img;
 				}
-				$param['c_wechat_img'] = $last_img;
 			}
 			$wechat_account = input('post.wechat_account');
 			if (!$wechat_account) {
@@ -1301,14 +1308,18 @@ class Merchant extends Base {
 				if ($info) {
 					$param['c_bank_detail'] = $info->getSaveName();
 				} else {
-					$this->error('请上传支付宝收款码：' . $file->getError());
+					$param['c_bank_detail'] = '';
+					// $this->error('请上传支付宝收款码：' . $file->getError());
 				}
 			} else {
 				$last_img = input('post.last_alipay_img');
 				if (empty($last_img)) {
-					$this->error('请上传支付宝收款码');
+					$param['c_bank_detail'] = '';
+					// $this->error('请上传支付宝收款码');
+				}else{
+					$param['c_bank_detail'] = $last_img;
 				}
-				$param['c_bank_detail'] = $last_img;
+
 			}
 
 			$param['merchant_id'] = session('uid');
@@ -1348,14 +1359,17 @@ class Merchant extends Base {
 				if ($info) {
 					$param['c_bank_detail'] = $info->getSaveName();
 				} else {
-					$this->error('请上传微信收款码：' . $file->getError());
+					$param['c_bank_detail'] = '';
+					//$this->error('请上传微信收款码：' . $file->getError());
 				}
 			} else {
 				$last_img = input('post.last_wechat_img');
 				if (empty($last_img)) {
-					$this->error('请上传微信收款码');
+					$param['c_bank_detail'] = '';
+					// $this->error('请上传微信收款码');
+				} else {
+					$param['c_bank_detail'] = $last_img;
 				}
-				$param['c_bank_detail'] = $last_img;
 			}
 
 			$param['merchant_id'] = session('uid');
