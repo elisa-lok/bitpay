@@ -2709,6 +2709,9 @@ class Merchant extends Base {
 				// if($my[$coin_name]*1<$num*1){
 				$this->error('您的账户余额不足，请先充值' . strtoupper($coin_name) . '，再进行出售');
 			}
+			//判断剩余数量, 防止超卖
+			$soldNum = Db::name('order_sell')->where('buy_bid', $orderinfo['id'])->sum('deal_num');
+			($orderinfo['amount'] - $soldNum < number_format(($tamount / $orderinfo['price']), 8, '.', '')) && $this->error('挂单余量不足,请选择其它挂单');
 
 			$arr                = [];
 			$arr['buy_id']      = $orderinfo['userid'];
