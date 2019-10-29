@@ -3,6 +3,7 @@
 namespace app\api\controller;
 
 use app\home\model\OrderModel;
+use think\Cache;
 use think\Controller;
 use think\Db;
 
@@ -190,7 +191,7 @@ class Merchant extends Controller {
 		}
 		$join      = [['__MERCHANT__ c', 'a.userid=c.id', 'LEFT']];
 		$ads       = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile')->alias('a')->join($join)->group('a.id')->where($where)->order('online desc,price asc,averge asc,pp_amount asc,id asc')->select();
-		$onlinead  = [];
+		$onlineAd  = [];
 		$actualAmt = 0;
 		//$this->mysuccess($ads);
 		foreach ($ads as $k => $v) {
@@ -217,27 +218,27 @@ class Merchant extends Controller {
 			if ($trader_limit && $trader_count >= $trader_limit) {
 				continue;
 			}
-			$onlinead = $v;
+			$onlineAd = $v;
 			break;
 		}
-		if (empty($onlinead)) {
+		if (empty($onlineAd)) {
 			$this->myerror('暂无可用订单');
 		}
 		//开始冻结承兑商usdt
 		Db::startTrans();
 		try {
 			$checkCode = $this->check_code();
-			$rs1       = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setDec('usdt', $data['amount']);
-			$rs3       = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setInc('usdtd', $data['amount']);
-			$rs4       = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setInc('pp_amount', 1);
+			$rs1       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setDec('usdt', $data['amount']);
+			$rs3       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setInc('usdtd', $data['amount']);
+			$rs4       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setInc('pp_amount', 1);
 			$rs2       = Db::table('think_order_buy')->insertGetId([
 				'buy_id'       => $this->merchant['id'],//接口请求时,返回商户的id,放行时增加商户的USDT,有疑问?!
 				// 'buy_id'=>'',//暂时改成空
-				'sell_id'      => $onlinead['traderid'],
-				'sell_sid'     => $onlinead['id'],
+				'sell_id'      => $onlineAd['traderid'],
+				'sell_sid'     => $onlineAd['id'],
 				'deal_amount'  => $actualAmt,
 				'deal_num'     => $data['amount'],
-				'deal_price'   => $onlinead['price'],
+				'deal_price'   => $onlineAd['price'],
 				'ctime'        => time(),
 				'ltime'        => config('order_expire'),
 				'order_no'     => $data['orderid'],
@@ -253,14 +254,14 @@ class Merchant extends Controller {
 				// 提交事务
 				Db::commit();
 				//todo 发送短信给承兑商
-				if (!empty($onlinead['mobile'])) {
+				if (!empty($onlineAd['mobile'])) {
 					$send_content = Db::table('think_config')->where('name', 'send_sms_notify')->value('value');
 					if ($send_content) {
 						$content = str_replace('{usdt}', round($data['amount'], 2), $send_content);
 						$content = str_replace('{cny}', round($actualAmt, 2), $content);
 						$content = str_replace('{tx_id}', $data['orderid'], $content);
 						$content = str_replace('{check_code}', '' . $checkCode . '', $content);
-						sendSms($onlinead['mobile'], $content);
+						sendSms($onlineAd['mobile'], $content);
 					}
 				}
 				$http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
@@ -338,7 +339,7 @@ class Merchant extends Controller {
 		$ads  = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile, c.usdt')->alias('a')->join($join)->group('a.id')->where($where)->order('pp_amount ASC,online DESC,averge ASC,price ASC,id ASC')->select();
 		// $ads  = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile, c.usdt')->alias('a')->join($join)->group('a.id')->where($where)->orderRaw(' rand() ')->select();
 
-		$onlinead  = [];
+		$onlineAd  = [];
 		$actualAmt = 0;
 		// $this->myerror(json_encode($ads));
 		// dump($ads);
@@ -375,7 +376,9 @@ class Merchant extends Controller {
 					continue;
 				}
 			}
-			$onlinead = $v;
+			if(Cache::get('sell_order_lock_'.$v['id'])) continue; //锁单不允许同一张单同时在卖
+			Cache::set('sell_order_lock_'.$v['id'], $v['id'], 5);
+			$onlineAd = $v;
 			break;
 		}
 		if (empty($onlineAd)) {
@@ -383,24 +386,24 @@ class Merchant extends Controller {
 			$onlineAd = $minimalSellOrder;
 		}
 
-		// $this->myerror($onlinead);
+		// $this->myerror($onlineAd);
 		//开始冻结承兑商usdt
 		Db::startTrans();
 		try {
 			$checkCode = $this->check_code();
-			$rs1       = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setDec('usdt', $actualAmt);
-			$rs3       = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setInc('usdtd', $actualAmt);
-			$rs4       = Db::table('think_merchant')->where('id', $onlinead['traderid'])->setInc('pp_amount', 1);
+			$rs1       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setDec('usdt', $actualAmt);
+			$rs3       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setInc('usdtd', $actualAmt);
+			$rs4       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setInc('pp_amount', 1);
 			$rs2       = Db::table('think_order_buy')->insertGetId([
 				'buy_id'       => $this->merchant['id'],//接口请求时,返回商户的id,放行时增加商户的USDT,有疑问?!
 				// 'buy_id'=>'',//暂时改成空
-				'sell_id'      => $onlinead['traderid'],
-				'sell_sid'     => $onlinead['id'],
+				'sell_id'      => $onlineAd['traderid'],
+				'sell_sid'     => $onlineAd['id'],
 				'raw_amount'   => $data['amount'],
 				'raw_num'      => $actualAmt,
 				'deal_amount'  => $data['amount'],
 				'deal_num'     => $actualAmt,
-				'deal_price'   => $onlinead['price'],
+				'deal_price'   => $onlineAd['price'],
 				'ctime'        => time(),
 				'ltime'        => config('order_expire'),
 				'order_no'     => $data['orderid'],
@@ -416,13 +419,13 @@ class Merchant extends Controller {
 				// 提交事务
 				Db::commit();
 				//发送短信给承兑商
-				if (!empty($onlinead['mobile'])) {
+				if (!empty($onlineAd['mobile'])) {
 					$send_content = Db::table('think_config')->where('name', 'send_sms_notify')->value('value');
 					$content      = str_replace('{usdt}', round($actualAmt, 2), $send_content);
 					$content      = str_replace('{cny}', round($data['amount'], 2), $content);
 					$content      = str_replace('{tx_id}', $data['orderid'], $content);
 					$content      = str_replace('{check_code}', '' . $checkCode . '', $content);
-					sendSms($onlinead['mobile'], $content);
+					sendSms($onlineAd['mobile'], $content);
 				}
 				$http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
 				if ($data['type'] != 'all') {
@@ -430,10 +433,12 @@ class Merchant extends Controller {
 				} else {
 					$url = $http_type . $_SERVER['HTTP_HOST'] . '/merchant/pay?id=' . $rs2 . '&appid=' . $data['appid'] . '&type=' . $data['type'];
 				}
+				Cache::rm('sell_order_lock_'.$onlineAd['id']);
 				$this->mysuccess($url);
 			} else {
 				// 回滚事务
 				Db::rollback();
+				Cache::rm('sell_order_lock_'.$onlineAd['id']);
 				$this->myerror('提交失败');
 			}
 		} catch (\think\Exception\DbException $e) {

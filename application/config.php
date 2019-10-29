@@ -37,12 +37,8 @@ return [
 	],
 
 	// | 缓存设置
-	'cache'                      => [
-		'type'   => 'file',// 驱动方式
-		'path'   => CACHE_PATH,// 缓存保存目录
-		'prefix' => '',// 缓存前缀
-		'expire' => 0,// 缓存有效期 0表示永久缓存
-	],
+	// 'cache'                      => ['type' => 'file', 'path' => CACHE_PATH, 'prefix' => '', 'expire' => 0,],
+	'cache'                      => ['type' => 'redis', 'host' => '127.0.0.1', 'prefix' => 'cache_', 'expire' => 0],
 
 	// | 会话设置
 	'session'                    => [
@@ -56,13 +52,13 @@ return [
 
 	// | Cookie设置
 	'cookie'                     => [
-		'prefix'    => '',		// cookie 名称前缀
-		'expire'    => 5184000,	// cookie 保存时间
-		'path'      => '/',		// cookie 保存路径
-		'domain'    => '',		// cookie 有效域名
-		'secure'    => FALSE,	// cookie 启用安全传输
-		'httponly'  => '',		// httponly设置
-		'setcookie' => TRUE,	// 是否使用 setcookie
+		'prefix'    => '',        // cookie 名称前缀
+		'expire'    => 5184000,    // cookie 保存时间
+		'path'      => '/',        // cookie 保存路径
+		'domain'    => '',        // cookie 有效域名
+		'secure'    => FALSE,    // cookie 启用安全传输
+		'httponly'  => '',        // httponly设置
+		'setcookie' => TRUE,    // 是否使用 setcookie
 	],
 
 	//分页配置
