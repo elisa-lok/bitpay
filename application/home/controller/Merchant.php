@@ -2880,6 +2880,8 @@ class Merchant extends Base {
 			$merchant['zfb']          = $zfb['c_bank_card'];
 			$merchant['name']         = $zfb['truename'];
 			$merchant['c_alipay_img'] = $zfb['c_bank_detail'];
+			$merchant['alipay_name']  = $zfb['truename'];
+			$merchant['alipay_acc']   = $zfb['c_bank'];
 			$payarr[]                 .= 'zfb';
 		}
 		if ($type == 'wxpay' && $wxid > 0) {
@@ -2888,6 +2890,8 @@ class Merchant extends Base {
 			$merchant['wx']           = $wx['c_bank_card'];
 			$merchant['name']         = $wx['truename'];
 			$merchant['c_wechat_img'] = $wx['c_bank_detail'];
+			$merchant['wxpay_name']   = $wx['truename'];
+			$merchant['wxpay_acc']    = $wx['c_bank'];
 			$payarr[]                 .= 'wx';
 		}
 		if ($type == 'unionpay' && $ysfid > 0) {
@@ -2895,6 +2899,8 @@ class Merchant extends Base {
 			$merchant['ysf']       = $ysf['c_bank_card'];
 			$merchant['name']      = $ysf['truename'];
 			$merchant['c_ysf_img'] = $ysf['c_bank_detail'];
+			$merchant['unionpay_name'] = $ysf['truename'];
+			$merchant['unionpay_acc']  = $ysf['c_bank'];
 			$payarr[]              .= 'ysf';
 		}
 		// dump($payarr);die;
@@ -2913,11 +2919,7 @@ class Merchant extends Base {
 		// dump($payarr);
 		$this->assign('min', $min);
 		$this->assign('second', $second);
-		if (go_mobile()) {
-			return $this->fetch('paymobile');
-		} else {
-			return $this->fetch('paymobile');
-		}
+		return $this->fetch('paymobile');
 	}
 
 	public function pay() {
