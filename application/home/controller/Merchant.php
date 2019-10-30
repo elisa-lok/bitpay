@@ -3036,7 +3036,7 @@ class Merchant extends Base {
 		}
 		$rs = Db::name('order_buy')->where('id', $id)->update(['status' => 1, 'dktime' => time()]);
 		if ($rs) {
-			$moble = Db::name('merchant')->where('id', $order['sell_id'])->value('mobile');
+			/*$moble = Db::name('merchant')->where('id', $order['sell_id'])->value('mobile');
 			if (!empty($moble)) {
 				$send_content = Db::table('think_config')->where('name', 'send_message_content')->value('value');
 				$content      = str_replace('{usdt}', round($order['deal_num'], 2), $send_content);
@@ -3044,7 +3044,7 @@ class Merchant extends Base {
 				$content      = str_replace('{tx_id}', $order['orderid'], $content);
 				$content      = str_replace('{check_code}', $order['check_code'], $content);
 				sendSms($moble, $content);
-			}
+			}*/
 			$this->success($order['return_url']);
 		} else {
 			$this->error('确认失败，请稍后再试');

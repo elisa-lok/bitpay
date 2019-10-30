@@ -336,7 +336,7 @@ class Merchant extends Controller {
 			['__MERCHANT__ c', 'a.userid=c.id', 'LEFT'],
 		];
 		//$ads  = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile, c.usdt')->alias('a')->join($join)->group('a.id')->where($where)->order('online DESC,price ASC,averge ASC,pp_amount ASC,id ASC')->select();
-		$ads  = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile, c.usdt')->alias('a')->join($join)->group('a.id')->where($where)->order('pp_amount ASC,online DESC,averge ASC,price ASC,id ASC')->select();
+		$ads = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile, c.usdt')->alias('a')->join($join)->group('a.id')->where($where)->order('pp_amount ASC,online DESC,averge ASC,price ASC,id ASC')->select();
 		// $ads  = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile, c.usdt')->alias('a')->join($join)->group('a.id')->where($where)->orderRaw(' rand() ')->select();
 
 		$onlineAd  = [];
@@ -348,8 +348,8 @@ class Merchant extends Controller {
 		$minimalCount     = 1;
 		foreach ($ads as $k => $v) {
 			//开始判断挂单剩余
-			$total     = Db::name('order_buy')->where('sell_sid', $v['id'])->whereNotIn('status','5,9')->sum('deal_num');
-			$actualAmt = number_format($data['amount'] / $v['price'], '.', '');
+			$total     = Db::name('order_buy')->where('sell_sid', $v['id'])->whereNotIn('status', '5,9')->sum('deal_num');
+			$actualAmt = number_format($data['amount'] / $v['price'], 8, '.', '');
 			if (($v['amount'] - $total) < $actualAmt || $v['usdt'] < $actualAmt) {
 				continue;
 			}
@@ -370,14 +370,14 @@ class Merchant extends Controller {
 				continue;
 			}
 			// 同金额不允许匹配
-			if($trader_count > 0){
-				$sameAmtCount = Db::name('order_buy')->where('sell_id', $v['traderid'])->where('status', 'in', [0, 1])->where('raw_amount',$data['amount'])->count();
-				if($sameAmtCount > 0){
+			if ($trader_count > 0) {
+				$sameAmtCount = Db::name('order_buy')->where('sell_id', $v['traderid'])->where('status', 'in', [0, 1])->where('raw_amount', $data['amount'])->count();
+				if ($sameAmtCount > 0) {
 					continue;
 				}
 			}
-			if(Cache::get('sell_order_lock_'.$v['id'])) continue; //锁单不允许同一张单同时在卖
-			Cache::set('sell_order_lock_'.$v['id'], $v['id'], 5);
+			if (Cache::get('sell_order_lock_' . $v['id'])) continue; //锁单不允许同一张单同时在卖
+			Cache::set('sell_order_lock_' . $v['id'], $v['id'], 5);
 			$onlineAd = $v;
 			break;
 		}
@@ -433,12 +433,12 @@ class Merchant extends Controller {
 				} else {
 					$url = $http_type . $_SERVER['HTTP_HOST'] . '/merchant/pay?id=' . $rs2 . '&appid=' . $data['appid'] . '&type=' . $data['type'];
 				}
-				Cache::rm('sell_order_lock_'.$onlineAd['id']);
+				Cache::rm('sell_order_lock_' . $onlineAd['id']);
 				$this->mysuccess($url);
 			} else {
 				// 回滚事务
 				Db::rollback();
-				Cache::rm('sell_order_lock_'.$onlineAd['id']);
+				Cache::rm('sell_order_lock_' . $onlineAd['id']);
 				$this->myerror('提交失败');
 			}
 		} catch (\think\Exception\DbException $e) {
