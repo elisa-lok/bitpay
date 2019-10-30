@@ -336,7 +336,7 @@ class Merchant extends Controller {
 			['__MERCHANT__ c', 'a.userid=c.id', 'LEFT'],
 		];
 		//$ads  = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile, c.usdt')->alias('a')->join($join)->group('a.id')->where($where)->order('online DESC,price ASC,averge ASC,pp_amount ASC,id ASC')->select();
-		$ads = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile, c.usdt')->alias('a')->join($join)->group('a.id')->where($where)->order('pp_amount ASC,online DESC,averge ASC,price ASC,id ASC')->select();
+		$ads = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile, c.usdt')->alias('a')->join($join)->group('a.id')->where($where)->order('match_time ASC, pp_amount ASC,online DESC,averge ASC,price ASC,id ASC')->select();
 		// $ads  = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile, c.usdt')->alias('a')->join($join)->group('a.id')->where($where)->orderRaw(' rand() ')->select();
 
 		$onlineAd  = [];
@@ -394,6 +394,7 @@ class Merchant extends Controller {
 			$rs1       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setDec('usdt', $actualAmt);
 			$rs3       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setInc('usdtd', $actualAmt);
 			$rs4       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setInc('pp_amount', 1);
+			Db::name('merchant')->where('id',$onlineAd['sell_id'])->update(['match_time', time()]);
 			$rs2       = Db::table('think_order_buy')->insertGetId([
 				'buy_id'       => $this->merchant['id'],//接口请求时,返回商户的id,放行时增加商户的USDT,有疑问?!
 				// 'buy_id'=>'',//暂时改成空
@@ -419,6 +420,7 @@ class Merchant extends Controller {
 				// 提交事务
 				Db::commit();
 				//发送短信给承兑商
+
 				if (!empty($onlineAd['mobile'])) {
 					$send_content = Db::table('think_config')->where('name', 'send_sms_notify')->value('value');
 					$content      = str_replace('{usdt}', round($actualAmt, 2), $send_content);
