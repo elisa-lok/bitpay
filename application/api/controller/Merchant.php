@@ -394,7 +394,7 @@ class Merchant extends Controller {
 			$rs1       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setDec('usdt', $actualAmt);
 			$rs3       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setInc('usdtd', $actualAmt);
 			$rs4       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setInc('pp_amount', 1);
-			Db::name('merchant')->where('id',$onlineAd['sell_id'])->update(['match_time', time()]);
+			$rs5       = Db::name('merchant')->where('id', $onlineAd['traderid'])->update(['match_time' => time()]);
 			$rs2       = Db::table('think_order_buy')->insertGetId([
 				'buy_id'       => $this->merchant['id'],//接口请求时,返回商户的id,放行时增加商户的USDT,有疑问?!
 				// 'buy_id'=>'',//暂时改成空
