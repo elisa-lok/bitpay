@@ -169,9 +169,9 @@
 	</div>
 	<input type="hidden" name="paymethod" value="{$payarr[0]}"/>
 		{gt name='remaintime' value='0'}
-		<!-- <div class='footer paybutton' style="font-size:2em;" onclick="uptrade()"><b>我已付款¥{$money}</b></div> -->
+		 <a href="{$order.return_url}"><div class='footer paybutton' style="background-color: #00af43;font-size:1.5em;"><b>返回</b></div></a>
 		{else/}
-		<div class='footer paybutton' style="background-color: #aaa;font-size:2em;"><b>订单已关闭</b></div>
+		<a href="{$order.return_url}"> <div class='footer paybutton' style="background-color: #aaa;font-size:1.5em;"><b>已关闭 点我返回</b></div></a>
 		{/gt}
 
 </div>
@@ -381,6 +381,6 @@
 				console.log(data)
 			}
 		})
-	}, 12000);
+	}, 15000);
 </script>
 </html>

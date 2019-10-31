@@ -2861,6 +2861,7 @@ class Merchant extends Base {
 
 		$arr = [];
 		$this->assign('id', $id);
+		$this->assign('order', $order);
 		$this->assign('appid', $appid);
 		$this->assign('money', round($order['deal_amount'], 2));
 		$this->assign('amount', $order['deal_num']);
@@ -2944,6 +2945,7 @@ class Merchant extends Base {
 		$ysfid  = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method4');
 
 		$this->assign('id', $id);
+		$this->assign('order', $order);
 		$this->assign('appid', $appid);
 		$this->assign('money', round($order['deal_amount'], 2));
 		$this->assign('amount', round($order['deal_num'], 4));
