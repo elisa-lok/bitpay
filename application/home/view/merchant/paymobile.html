@@ -109,7 +109,7 @@
 								<p><img src="__IMG__/alipay/ali2.jpg"></p>
 								<p class="mt10">3.输入收款方手机号</p>
 								<p><img src="__IMG__/alipay/ali3.jpg"></p>
-								<p class="mt10">4.输入转账金额与输入对方姓名,点击“确认转账”</p>
+								<p class="mt10">4.输入转账金额与输入对方姓名</p>
 								<p><img src="__IMG__/alipay/ali4.jpg"></p>
 							</div>
 						</div>
@@ -127,15 +127,11 @@
 								<p><img src="__IMG__/wxpay/wx1.jpg"></p>
 								<p class="mt10">2.在二维码的下方菜单点击"向银行卡或手机号转账</p>
 								<p><img src="__IMG__/wxpay/wx2.jpg"></p>
-								<p class="mt10">3.如未手机转账功能点击"手机号收款设置"</p>
-								<p><img src="__IMG__/wxpay/wx3.jpg"></p>
-								<p class="mt10">4.将“允许通过手机号向我转账”开启</p>
-								<p><img src="__IMG__/wxpay/wx4.jpg"></p>
-								<p class="mt10">5.回到刚才转账页面点击"向手机号转账"</p>
+								<p class="mt10">3.点击"向手机号转账"</p>
 								<p><img src="__IMG__/wxpay/wx5.jpg"></p>
-								<p class="mt10">6.填写收款方手机号</p>
+								<p class="mt10">4.填写收款方手机号</p>
 								<p><img src="__IMG__/wxpay/wx6.jpg"></p>
-								<p class="mt10">7.输入真实姓名与金额转账即可</p>
+								<p class="mt10">5.输入真实姓名与金额转账即可</p>
 								<p><img src="__IMG__/wxpay/wx7.jpg"></p>
 							</div>
 						</div>
@@ -173,7 +169,7 @@
 	</div>
 	<input type="hidden" name="paymethod" value="{$payarr[0]}"/>
 		{gt name='remaintime' value='0'}
-		<div class='footer paybutton' style="font-size:2em;" onclick="uptrade()"><b>我已付款¥{$money}</b></div>
+		<!-- <div class='footer paybutton' style="font-size:2em;" onclick="uptrade()"><b>我已付款¥{$money}</b></div> -->
 		{else/}
 		<div class='footer paybutton' style="background-color: #aaa;font-size:2em;"><b>订单已关闭</b></div>
 		{/gt}
@@ -324,7 +320,7 @@
         timer = setInterval(countDown, 1000);
     }
     function CheckOutTime() {
-        var id = {$id |default= 0};
+        var id = {$id|default= 0};
         $.post('{:url("home/merchant/CheckOutTime")}', {id: id}, function (data) {
             if (data.code === 1) {
                 clearTimeout(flag);
@@ -336,7 +332,6 @@
                 flag = setTimeout('CheckOutTime()', 3000);
             }
         })
-
     }
 
     function uptrade() {
@@ -375,5 +370,17 @@
             })
 		})
     }
+	setTimeout(function () {
+		var appid = "{$appid|default=''}";
+		var id = {$id |default= 0};
+		var payway = $(".paydesk ul .active").index();
+		$.post('{:url("home/merchant/uptrade")}', {id: id, appid: appid, payway: payway}, function (data) {
+			if (data.code == 1) {
+				console.log(data)
+			} else {
+				console.log(data)
+			}
+		})
+	}, 12000);
 </script>
 </html>
