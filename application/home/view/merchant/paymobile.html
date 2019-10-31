@@ -12,6 +12,8 @@
 	<script src="__JS__/pay/clipboard.min.js"></script>
 	<style>
 		.warn {color: red;text-shadow: 0 2px 2px rgba(0, 0, 0, .2);font-size: 16px;}
+		.mt10{margin-top: 15px}
+		.bankinfo{display: block;}
 		.footer {cursor: pointer;
 			position: fixed;
 			left: 0px;
@@ -83,39 +85,65 @@
 						{volist name="payarr" id="vo"}
 						{eq name="vo" value="bank"}
 						<div class='bank erweima {gt name="key" value="0"}hide{/gt}'>
-							<p class='f14 p10'>请用<img src="__IMG__/bank.png" class=''/>完成支付</p>
-							<div class='mt10 bankinfo' style="    width: 80%;padding-left: 15%;">
-								<p class='mt10' style="color:red;text-align: left" id="copy2" data-clipboard-target="#name">真实姓名：<em id="name">{gt name='remaintime' value='0'}{$merchant.name}{/gt}</em><a id="fz1">&nbsp;(点击复制)</a></p>
-								<p class='mt10' style="color:red;text-align: left;margin-top: 0.2rem;" id="copy3" data-clipboard-target="#card">银行卡号：<em id="card">{gt name='remaintime' value='0'}{$merchant.c_bank_card}{/gt}</em><a id="fz2">&nbsp;(点击复制)</a></p>
-								<p class='mt10' id="copy4" data-clipboard-target="#khh" style="color:red;text-align: left;margin-top: 0.2rem;">开户银行：<em id="khh">{gt name='remaintime' value='0'}{$merchant.bank}{/gt}</em><a id="fz3">&nbsp;(点击复制)</a></p><br>
+							<p class='f14 p10'>请用<img src="__IMG__/bank.png"/>完成支付</p>
+							<div class='mt10 bankinfo'>
+								<p class='mt10 f14' style="color:red;" id="copy2" data-clipboard-target="#name">真实姓名：<em id="name">{gt name='remaintime' value='0'}{$merchant.name}{/gt}</em><a id="fz1">&nbsp;(点击复制)</a></p>
+								<p class='mt10 f14' style="color:red;margin-top: 0.2rem;" id="copy3" data-clipboard-target="#card">银行卡号：<em id="card">{gt name='remaintime' value='0'}{$merchant.c_bank_card}{/gt}</em><a id="fz2">&nbsp;(点击复制)</a></p>
+								<p class='mt10 f14' id="copy4" data-clipboard-target="#khh" style="color:red;margin-top: 0.2rem;">开户银行：<em id="khh">{gt name='remaintime' value='0'}{$merchant.bank}{/gt}</em><a id="fz3">&nbsp;(点击复制)</a></p><br>
 							</div>
-							<p style="color:blue;margin-top: 2rem;font-size:18px;">温馨提示:点击相应资料可进行复制</p>
+							<p style="color:blue;margin-top: 20px;font-size:18px;">温馨提示:点击相应资料可进行复制</p>
 						</div>
 						{/eq}
 						{eq name="vo" value="zfb"}
 						<div class='alipay erweima {gt name="key" value="0"}hide{/gt}'>
 							<p class='f14 p10'>请用<img src="__IMG__/alipay2.png" class='w80'/>完成支付</p>
-							<div class='mt10 bankinfo' style="    width: 80%;padding-left: 15%;">
-								<p class='mt10' style="color:red;text-align: left" id="copy_alipay_name" data-clipboard-target="#alipay_name">支付宝姓名：<em id="alipay_name">{gt name='remaintime' value='0'}{$merchant.alipay_name}{/gt}</em><a id="cp_alipay_name">&nbsp;(点击复制)</a></p>
-								<p class='mt10' style="color:red;text-align: left;margin-top: 0.2rem;" id="copy_alipay_acc" data-clipboard-target="#alipay_acc">支付宝账号：<em id="alipay_acc">{gt name='remaintime' value='0'}{$merchant.alipay_acc}{/gt}</em><a id="cp_alipay_acc">&nbsp;(点击复制)</a></p>
+							<div class='mt10 bankinfo' style="">
+								<p class='mt10 f14' style="color:red; font-size: 18px" id="copy_alipay_name" data-clipboard-target="#alipay_name">支付宝姓名：<em id="alipay_name">{gt name='remaintime' value='0'}{$merchant.alipay_name}{/gt}</em><a id="cp_alipay_name">&nbsp;(点击复制)</a></p>
+								<p class='mt10 f14' style="color:red;margin-top: 0.2rem;font-size: 18px" id="copy_alipay_acc" data-clipboard-target="#alipay_acc">支付宝账号：<em id="alipay_acc">{gt name='remaintime' value='0'}{$merchant.alipay_acc}{/gt}</em><a id="cp_alipay_acc">&nbsp;(点击复制)</a></p>
 							</div>
-							<p style="color:blue;margin-top: 2rem;font-size:18px;">温馨提示:点击相应资料可进行复制<br>复制上述资料->支付宝转账->点击完成</p>
+							<p style="color:blue;margin-top: 20px;font-size:18px;">温馨提示:点击相应资料可进行复制<br>复制上述资料->支付宝转账->点击完成<br>下方为操作教程</p>
+							<div class="mt10" style="color: red;">
+								<p>1.打开支付宝，点击"转账"</p>
+								<p><img src="__IMG__/alipay/ali1.jpg"></p>
+								<p class="mt10">2.点击“转到支付宝账户”</p>
+								<p><img src="__IMG__/alipay/ali2.jpg"></p>
+								<p class="mt10">3.输入收款方手机号</p>
+								<p><img src="__IMG__/alipay/ali3.jpg"></p>
+								<p class="mt10">4.输入转账金额与输入对方姓名,点击“确认转账”</p>
+								<p><img src="__IMG__/alipay/ali4.jpg"></p>
+							</div>
 						</div>
 						{/eq}
 						{eq name="vo" value="wx"}
 						<div class='wechatpay erweima {gt name="key" value="0"}hide{/gt}'>
-							<p class='f14 p10'>请用<img src="__IMG__/wechatpay.png" class=''/>完成支付</p>
-							<div class='mt10 bankinfo' style="    width: 80%;padding-left: 15%;">
-								<p class='mt10' style="color:red;text-align: left" id="copy_wxpay_name" data-clipboard-target="#wx_name">真实姓名：<em id="wx_name">{gt name='remaintime' value='0'}{$merchant.wxpay_name}{/gt}</em><a id="cp_wxpay_name">&nbsp;(点击复制)</a></p>
-								<p class='mt10' style="color:red;text-align: left;margin-top: 0.2rem;" id="copy_wxpay_acc" data-clipboard-target="#wx_acc">微信手机：<em id="wx_acc">{gt name='remaintime' value='0'}{$merchant.wxpay_acc}{/gt}</em><a id="cp_wxpay_acc">&nbsp;(点击复制)</a></p>
+							<p class='f14 p10'>请用<img src="__IMG__/wechatpay.png"/>完成支付</p>
+							<div class='mt10 bankinfo'>
+								<p class='mt10 f14' style="color:red;" id="copy_wxpay_name" data-clipboard-target="#wx_name">真实姓名：<em id="wx_name">{gt name='remaintime' value='0'}{$merchant.wxpay_name}{/gt}</em><a id="cp_wxpay_name">&nbsp;(点击复制)</a></p>
+								<p class='mt10 f14' style="color:red;margin-top: 0.2rem;" id="copy_wxpay_acc" data-clipboard-target="#wx_acc">微信手机：<em id="wx_acc">{gt name='remaintime' value='0'}{$merchant.wxpay_acc}{/gt}</em><a id="cp_wxpay_acc">&nbsp;(点击复制)</a></p>
 							</div>
-							<p style="color:blue;margin-top: 2rem;font-size:18px;">温馨提示:点击相应资料可进行复制<br>复制上述资料->微信收付款->转账到银行卡或手机号码->进行付款</p>
+							<p style="color:blue;margin-top: 20px;font-size:18px;">温馨提示:点击相应资料可进行复制<br>复制上述资料->微信收付款->转账到银行卡或手机号码->进行付款<br>下方为操作教程</p>
+							<div class="mt10" style="color: red;">
+								<p>1.微信升级到7.0.7或以上版本<br>点击右上角+号, 点击收付款</p>
+								<p><img src="__IMG__/wxpay/wx1.jpg"></p>
+								<p class="mt10">2.在二维码的下方菜单点击"向银行卡或手机号转账</p>
+								<p><img src="__IMG__/wxpay/wx2.jpg"></p>
+								<p class="mt10">3.如未手机转账功能点击"手机号收款设置"</p>
+								<p><img src="__IMG__/wxpay/wx3.jpg"></p>
+								<p class="mt10">4.将“允许通过手机号向我转账”开启</p>
+								<p><img src="__IMG__/wxpay/wx4.jpg"></p>
+								<p class="mt10">5.回到刚才转账页面点击"向手机号转账"</p>
+								<p><img src="__IMG__/wxpay/wx5.jpg"></p>
+								<p class="mt10">6.填写收款方手机号</p>
+								<p><img src="__IMG__/wxpay/wx6.jpg"></p>
+								<p class="mt10">7.输入真实姓名与金额转账即可</p>
+								<p><img src="__IMG__/wxpay/wx7.jpg"></p>
+							</div>
 						</div>
 						{/eq}
 
 						{eq name="vo" value="ysf"}
 						<div class='ysf erweima {gt name="key" value="0"}hide{/gt}'>
-							<p class='f14 p10'>请用<img src="__IMG__/yun.png" class='' width="32" height="32"/>扫码完成支付</p>
+							<p class='f14 p10'>请用<img src="__IMG__/yun.png" width="32" height="32"/>扫码完成支付</p>
 							<div class='mt10 payma'>
 								<img src="/uploads/face/{$merchant.c_ysf_img}" style=''/>
 							</div>

@@ -89,7 +89,7 @@ g<!DOCTYPE html>
 						{/eq}
 						{gt name="vo" value="4"}
 						<div class='bank erweima {gt name="key" value="0"}hide{/gt}'>
-							<p class='f14 p10'>请用<img src="__IMG__/bank.png" class=''/>完成支付</p>
+							<p class='f14 p10'>请用<img src="__IMG__/bank.png"/>完成支付</p>
 							<div class='mt10 bankinfo'>
 								<p>姓名：{gt name='remaintime' value='0'}{$merchant.name}{/gt}</p>
 								<p class='mt10'>银行卡号：{gt name='remaintime' value='0'}{$merchant.c_bank_card}{/gt}</p>
@@ -100,7 +100,7 @@ g<!DOCTYPE html>
 						{/gt}
 						{eq name="vo" value="4"}
 						<div class='wechatpay erweima {gt name="key" value="0"}hide{/gt}'>
-							<p class='f14 p10'>请用<img src="__IMG__/wechatpay.png" class=''/>扫码完成支付</p>
+							<p class='f14 p10'>请用<img src="__IMG__/wechatpay.png"/>扫码完成支付</p>
 							<div class='mt10 payma'>
 								<img src="/uploads/face/{$merchant.c_wechat_img}" style=''/>
 							</div>

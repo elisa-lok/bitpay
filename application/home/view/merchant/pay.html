@@ -27,7 +27,7 @@
 						</a>
 					</div>
 					<div class="descusdt hide">
-						<p class=''>
+						<p>
 							USDT是Tether公司推出的基于稳定价值货币美元（USD）的代币Tether USD（简称USDT），1 USDT=1美元。<br>
 
 							USDT的发行和交易使用的是Omni（原Mastercoin）协议，它是一个基于比特币区块链的2.0币种。USDT的交易确认等参数与比特币是一致的。用户可以通过SWIFT电汇美元至Tether公司提供的银行帐户，或通过交易所换取USDT。赎回美元时，反向操作即可。用户也可在交易所用比特币换取USDT。<br>
@@ -88,7 +88,7 @@
 				{/eq}
 				{gt name="vo" value="2"}
 				<div class='bank erweima {gt name="key" value="0"}hide{/gt}'>
-					<p class='f14 p10'>请用<img src="__IMG__/bank.png" class='' />完成支付</p>
+					<p class='f14 p10'>请用<img src="__IMG__/bank.png" />完成支付</p>
 					<div class='mt10 payma2'>
 						<p>姓名：{$merchant.name}</p>
 						<p class='mt10'>银行卡号：{$merchant.c_bank_card}</p>
@@ -98,7 +98,7 @@
 				{/gt}
 				{eq name="vo" value="4"}
 				<div class='wechatpay erweima {gt name="key" value="0"}hide{/gt}'>
-					<p class='f14 p10'>请用<img src="__IMG__/wechatpay.png" class='' />扫码完成支付</p>
+					<p class='f14 p10'>请用<img src="__IMG__/wechatpay.png" />扫码完成支付</p>
 					<div class='mt10 payma'>
 						<img src="/uploads/face/{$merchant.c_wechat_img}" style='' />
 					</div>
