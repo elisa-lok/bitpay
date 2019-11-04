@@ -1,5 +1,11 @@
 <?php
+error_reporting(0);
+ini_set('display_errors', '0');
 
+if (APP_DEBUG) {
+	ini_set('display_errors', '1');
+	error_reporting(-1);
+}
 return [
 	// | auth配置
 	'auth_config'                => [
