@@ -2,6 +2,7 @@
 
 namespace app\home\controller;
 
+use org\QRcode;
 use think\db;
 use think\request;
 use app\home\model\ZfbModel;
@@ -1316,7 +1317,7 @@ class Merchant extends Base {
 				if (empty($last_img)) {
 					$param['c_bank_detail'] = '';
 					// $this->error('请上传支付宝收款码');
-				}else{
+				} else {
 					$param['c_bank_detail'] = $last_img;
 				}
 
@@ -2756,7 +2757,27 @@ class Merchant extends Base {
 			}
 		}
 	}
+	public function BackArr($key){
+		$bankArr  = [
+			'建设银行'     => 'CCB',
+			'农业银行'     => 'ABC',
+			'工商银行'     => 'ICBC',
+			'中国银行'     => 'BOC',
+			'民生银行'     => 'CMBC',
+			'招商银行'     => 'CMB',
+			'兴业银行'     => 'CIB',
+			'北京银行'     => 'BOB',
+			'交通银行'     => 'BCM',
+			'平安银行'     => 'SPAB',
+			'光大银行'     => 'CEB',
+			'中信银行'     => 'CITIC',
+			'广东发展银行'   => 'GDB',
+			'上海浦东发展银行' => 'SPDB',
+			'深圳发展银行'   => 'SDB',
+		];
+		return $bankArr[$key];
 
+	}
 	public function ordersell() {
 		if (!session('uid')) {
 			$this->error('请登陆操作', url('home/login/login'));
@@ -2877,13 +2898,27 @@ class Merchant extends Base {
 			$payarr[]                = 'bank';
 		}
 		if ($type == 'alipay' && $zfbid > 0) {
-			$zfb                      = Db::name('merchant_zfb')->where('id', $zfbid)->find();
+			$bank    = Db::name('merchant_bankcard')->where('id', $bankid)->find();
+			$url     = 'https://api.uomg.com/api/long2dwz';
+			$bankVal = $this->BackArr($bank['c_bank']);
+			$longUrl = 'https://www.alipay.com/?appId=09999988&actionType=toCard&sourceId=bill&cardNo=' . $bank['c_bank_card'] . '&bankAccount=' . $bank['truename'] . '&money=&amount=&bankMark='.$bankVal.'&bankName=' . $bank['c_bank'] . '&money=' . $order['deal_amount'] . '&amount=' . $order['deal_amount'] . '';
+			$data    = [
+				'dwzapi' => 'urlcn',
+				'url'    => $longUrl
+			];
+			$res     = $this->Scurl($url, $data);
+			$obj     = json_decode($res);
+			//echo '<img src="' . QRcode::base64($obj->{'ae_url'}) . '">';
+			$merchant['c_alipay_img'] = QRcode::base64($obj->{'ae_url'});
+			//print_r($merchant);
+			$payarr[]                 .= 'zfb';
+			/*$zfb                      = Db::name('merchant_zfb')->where('id', $zfbid)->find();
 			$merchant['zfb']          = $zfb['c_bank_card'];
 			$merchant['name']         = $zfb['truename'];
 			$merchant['c_alipay_img'] = $zfb['c_bank_detail'];
 			$merchant['alipay_name']  = $zfb['truename'];
 			$merchant['alipay_acc']   = $zfb['c_bank'];
-			$payarr[]                 .= 'zfb';
+			$payarr[]                 .= 'zfb';*/
 		}
 		if ($type == 'wxpay' && $wxid > 0) {
 
@@ -2896,13 +2931,13 @@ class Merchant extends Base {
 			$payarr[]                 .= 'wx';
 		}
 		if ($type == 'unionpay' && $ysfid > 0) {
-			$ysf                   = Db::name('merchant_ysf')->where('id', $ysfid)->find();
-			$merchant['ysf']       = $ysf['c_bank_card'];
-			$merchant['name']      = $ysf['truename'];
-			$merchant['c_ysf_img'] = $ysf['c_bank_detail'];
+			$ysf                       = Db::name('merchant_ysf')->where('id', $ysfid)->find();
+			$merchant['ysf']           = $ysf['c_bank_card'];
+			$merchant['name']          = $ysf['truename'];
+			$merchant['c_ysf_img']     = $ysf['c_bank_detail'];
 			$merchant['unionpay_name'] = $ysf['truename'];
 			$merchant['unionpay_acc']  = $ysf['c_bank'];
-			$payarr[]              .= 'ysf';
+			$payarr[]                  .= 'ysf';
 		}
 		// dump($payarr);die;
 		$this->assign('payarr', $payarr);
@@ -2921,6 +2956,23 @@ class Merchant extends Base {
 		$this->assign('min', $min);
 		$this->assign('second', $second);
 		return $this->fetch('paymobile');
+	}
+
+	public function Scurl($url, $data = []) {
+		//使用crul模拟
+		$ch = curl_init();
+		//禁用https
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+		//允许请求以文件流的形式返回
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
+		curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 30);
+		curl_setopt($ch, CURLOPT_URL, $url);
+		$result = curl_exec($ch); //执行发送
+		curl_close($ch);
+		return $result;
 	}
 
 	public function pay() {
@@ -2952,6 +3004,7 @@ class Merchant extends Base {
 		$this->assign('no', $order['order_no']);
 		$merchant = Db::name('merchant')->where('id', $order['sell_id'])->find();
 		$payarr   = [];
+
 		if ($bankid > 0) {
 			$bank                    = Db::name('merchant_bankcard')->where('id', $bankid)->find();
 			$merchant['c_bank_card'] = $bank['c_bank_card'];
@@ -2960,12 +3013,28 @@ class Merchant extends Base {
 			$payarr[]                = 'bank';
 		}
 		if ($zfbid > 0) {
+			//echo 111;die;
+			$bank    = Db::name('merchant_bankcard')->where('id', $bankid)->find();
+			$url     = 'https://api.uomg.com/api/long2dwz';
+			$bankVal = $this->BackArr($bank['c_bank']);
+			$longUrl = 'https://www.alipay.com/?appId=09999988&actionType=toCard&sourceId=bill&cardNo=' . $bank['c_bank_card'] . '&bankAccount=' . $bank['truename'] . '&money=&amount=&bankMark='.$bankVal.'&bankName=' . $bank['c_bank'] . '&money=' . $order['deal_amount'] . '&amount=' . $order['deal_amount'] . '';
+			$data    = [
+				'dwzapi' => 'urlcn',
+				'url'    => $longUrl
+			];
+			$res     = $this->Scurl($url, $data);
+			$obj     = json_decode($res);
+			//echo '<img src="' . QRcode::base64($obj->{'ae_url'}) . '">';
+			$merchant['c_alipay_img'] = QRcode::base64($obj->{'ae_url'});
+			$payarr[]                 .= 'zfb';
+			/*var_dump($bank);
+			die;
 			$zfb                      = Db::name('merchant_zfb')->where('id', $zfbid)->find();
 			$merchant['zfb']          = $zfb['c_bank_card'];
 			$merchant['alipay_name']  = $zfb['truename'];
-			$merchant['c_alipay_img'] = $zfb['c_bank_detail'];
+			$merchant['c_alipay_img'] = QRcode::base64($obj->{'ae_url'});
 			$merchant['alipay_acc']   = $zfb['c_bank'];
-			$payarr[]                 .= 'zfb';
+			$payarr[]                 .= 'zfb';*/
 		}
 		if ($wxid > 0) {
 			$wx                       = Db::name('merchant_wx')->where('id', $wxid)->find();
