@@ -438,9 +438,10 @@ class Auto extends Base {
 
 	public function selldaojishi() {
 		if (PHP_SAPI != 'cli') {//只允许cli模式访问
-			die('error');
+			//die('error');
 		}
-		$list = Db::name('order_buy')->where("" . time() . "-ctime>ltime*60 and status=0 ")->select();
+		// $list = Db::name('order_buy')->where("" . time() . "-ctime>ltime*60 and status=0 ")->select();
+		$list = Db::name('order_buy')->where('status', 0)->select();
 		// dump($list);die;
 		if (!$list) {
 			return;
@@ -453,12 +454,25 @@ class Auto extends Base {
 			//$seller = Db::table('think_merchant')->where(array('id'=>$vv['sell_id']))->find();
 			$buymerchant = Db::table('think_merchant')->where(['id' => $vv['buy_id']])->find();
 			//$table = "movesay_".$coin_name."_log";
-			$rs1         = Db::table('think_order_buy')->update(['status' => 5, 'id' => $vv['id']]);
+			$rs1 = Db::table('think_order_buy')->update(['status' => 5, 'id' => $vv['id']]);
 			$real_number = $orderinfo['deal_num'] + $orderinfo['fee'];
-			$rs2         = Db::table('think_merchant')->where(['id' => $orderinfo['sell_id']])->setDec($coin_name . 'd', $real_number);
-			$rs3         = Db::table('think_merchant')->where(['id' => $orderinfo['sell_id']])->setInc($coin_name, $real_number);
-			if ($rs1 && $rs2 && $rs3) {
+			// 回滚挂单
+            $rs2 = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])
+                ->setInc('remain_amount', $real_number);  // 增加剩余量
+            $rs3 = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])
+                ->setDec('trading_volume', $real_number);  // 减少交易量
+            // 获取挂单
+            $sellInfo = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])->find();
+
+            $rs4 = $rs5 = 1;
+            if ($sellInfo['state'] == 2){
+			    // 如果挂单已下架 回滚余额
+                $rs4 = Db::name('merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $real_number);
+                $rs5 = Db::name('merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $real_number);
+            }
+			if ($rs1 && $rs2 && $rs3 && $rs4 && $rs5) {
 				Db::commit();
+
 				//请求回调接口,失败
 				$data['amount']  = $orderinfo['deal_num'];
 				$data['orderid'] = $orderinfo['orderid'];
