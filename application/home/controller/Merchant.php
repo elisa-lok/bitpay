@@ -2836,11 +2836,7 @@ class Merchant extends Base {
             '上海银行'     => 'BOS',
             '邮政储蓄'     => 'PSBC',
 		];
-		if (in_array($bankArr,$key)){
-			return $bankArr[$key];
-		}else{
-			exit('无法匹配该银行');
-		}
+		return $bankArr[$key] ?? showMsg('暂不支持该银行');
 	}
 
 	public function ordersell() {
