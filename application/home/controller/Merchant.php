@@ -31,7 +31,8 @@ class Merchant extends Base {
 		$this->assign('myacc', $model->getUserByParam($myinfo['pid'], 'id'));
 		$ids       = Db::name('article_cate')->field('id, name')->order('orderby asc')->select();
 		$list      = Db::name('article_cate')->field('a.name, b.id, b.title, b.cate_id, b.create_time')->alias('a')->join('think_article b', 'a.id=b.cate_id')->where('a.status', 1)->select();
-		$haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->where('state', 1)->sum('amount');
+		//$haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->where('state', 1)->sum('amount');
+		$haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->sum('remain_amount');
 		foreach ($ids as $k => $v) {
 			foreach ($list as $kk => $vv) {
 				if ($v['id'] == $vv['cate_id']) {
@@ -1793,10 +1794,16 @@ class Merchant extends Base {
 				'pay_method4' => $_POST['ysf'],
 				'ad_no'       => $ad_no,
 				'amount'      => $amount,
+                'remain_amount' => $amount,
 				'price'       => $price,
 				'message'     => '',
 				'state'       => 1
 			]);
+
+            // 减少余额 增加冻结余额
+            Db::name('merchant')->where('id', session('uid'))->setDec('usdt', $amount);
+            Db::name('merchant')->where('id', session('uid'))->setInc('usdtd', $amount);
+
 			//增加在售挂单数
 			$count = $model2->where('userid', session('uid'))->where('state', 1)->where('amount', 'gt', 0)->count();
 			$model->updateOne(['id' => session('uid'), 'ad_on_sell' => $count]);

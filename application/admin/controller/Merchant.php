@@ -845,7 +845,9 @@ class Merchant extends Base {
 			$deal_num            = Db::name('order_buy')->where(['sell_sid' => $v['id'], 'status' => ['neq', 5], 'status' => ['neq', 9]])->sum('deal_num');
 			$deal_num            = $deal_num ? $deal_num : 0;
 			$lists[$k]['deal']   = $deal_num;
-			$lists[$k]['remain'] = $v['amount'] - $lists[$k]['deal'];
+			//$lists[$k]['remain'] = $v['amount'] - $lists[$k]['deal'];
+			$lists[$k]['remain'] = $v['remain_amount'];
+			$lists[$k]['trading_volume'] = $v['trading_volume'];
 			$lists[$k]['payway'] = $str;
 		}
 		$this->assign('Nowpage', $Nowpage); //当前页
