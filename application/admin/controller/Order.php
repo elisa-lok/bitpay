@@ -40,8 +40,9 @@ class Order extends Base {
 			//  判断取消订单
             if ($args['status'] == 5 && ($src_status == 0 || $src_status == 1)){
                 // 减少挂卖单交易量和增加挂卖单剩余量
-                $res4    = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid']])->setDec('trading_volume', $orderInfo['deal_num']);
-                $res5    = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid']])->setInc('remain_amount', $orderInfo['deal_num']);
+                $real_number = $orderInfo['deal_num'] + $orderInfo['fee'];
+                $res4    = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid']])->setDec('trading_volume', $real_number);
+                $res5    = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid']])->setInc('remain_amount', $real_number);
                 // 减少用户冻结余额和增加用户余额
                 //$res2    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdt', $orderInfo['deal_num']);
                 //$res3    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdtd', $orderInfo['deal_num']);
