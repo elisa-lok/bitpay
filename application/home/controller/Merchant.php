@@ -2828,7 +2828,7 @@ class Merchant extends Base {
             '兴业银行'     => 'CIB',
             '北京银行'     => 'BCCB',
             '北京农商'     => 'BRCB',
-            '交通银行'     => 'BCM',
+            '交通银行'     => 'BOCOM',
             '平安银行'     => 'PAB',
             '光大银行'     => 'CEB',
             '中信银行'     => 'CNCB',
