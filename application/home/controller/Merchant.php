@@ -2827,15 +2827,13 @@ class Merchant extends Base {
             '广发银行'     => 'GDB',
             '兴业银行'     => 'CIB',
             '北京银行'     => 'BCCB',
-            '北京农商'     => 'BRCB',
-            '交通银行'     => 'BOCOM',
-            '平安银行'     => 'PAB',
+            '交通银行'     => 'COMM',
+            '平安银行'     => 'SPABANK',
             '光大银行'     => 'CEB',
             '中信银行'     => 'CNCB',
             '民生银行'     => 'CMBC',
             '华夏银行'     => 'HXB',
             '上海银行'     => 'BOS',
-            '上海农商'     => 'SRCB',
             '邮政储蓄'     => 'PSBC',
 		];
 		return $bankArr[$key];
