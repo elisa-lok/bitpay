@@ -2535,8 +2535,14 @@ class Merchant extends Base {
 			$haveadsum = $haveadsum ? $haveadsum : 0;
 			if (($ad_info['amount'] + $haveadsum) * 1 > $merchant['usdt'] * 1) {
 				$this->error('开启失败：账户余额不足');
-			}
-		}
+			}else{
+                Db::name('merchant')->where('id', session('uid'))->setDec('usdt', $ad_info['remain_amount']);
+                Db::name('merchant')->where('id', session('uid'))->setInc('usdtd', $ad_info['remain_amount']);
+            }
+		}elseif($act == 2){
+            Db::name('merchant')->where('id', session('uid'))->setInc('usdt', $ad_info['remain_amount']);
+            Db::name('merchant')->where('id', session('uid'))->setDec('usdtd', $ad_info['remain_amount']);
+        }
 
 		$result = $model->updateOne(['id' => $id, 'state' => $act]);
 		if ($result['code'] == 1) {
@@ -2812,21 +2818,25 @@ class Merchant extends Base {
 
 	public function BackArr($key) {
 		$bankArr = [
-			'建设银行'     => 'CCB',
-			'农业银行'     => 'ABC',
-			'工商银行'     => 'ICBC',
-			'中国银行'     => 'BOC',
-			'民生银行'     => 'CMBC',
-			'招商银行'     => 'CMB',
-			'兴业银行'     => 'CIB',
-			'北京银行'     => 'BOB',
-			'交通银行'     => 'BCM',
-			'平安银行'     => 'SPAB',
-			'光大银行'     => 'CEB',
-			'中信银行'     => 'CITIC',
-			'广东发展银行'   => 'GDB',
-			'上海浦东发展银行' => 'SPDB',
-			'深圳发展银行'   => 'SDB',
+            '工商银行'     => 'ICBC',
+            '农业银行'     => 'ABC',
+            '中国银行'     => 'BOC',
+            '建设银行'     => 'CCB',
+            '招商银行'     => 'CMB',
+            '浦发银行'     => 'SPDB',
+            '广发银行'     => 'GDB',
+            '兴业银行'     => 'CIB',
+            '北京银行'     => 'BCCB',
+            '北京农商'     => 'BRCB',
+            '交通银行'     => 'BCM',
+            '平安银行'     => 'PAB',
+            '光大银行'     => 'CEB',
+            '中信银行'     => 'CNCB',
+            '民生银行'     => 'CMBC',
+            '华夏银行'     => 'HXB',
+            '上海银行'     => 'BOS',
+            '上海农商'     => 'SRCB',
+            '邮政储蓄'     => 'PSBC',
 		];
 		return $bankArr[$key];
 
