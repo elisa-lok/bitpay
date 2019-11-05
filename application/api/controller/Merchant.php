@@ -231,7 +231,10 @@ class Merchant extends Controller {
 			$rs1       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setDec('usdt', $data['amount']);
 			$rs3       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setInc('usdtd', $data['amount']);
 			$rs4       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setInc('pp_amount', 1);
-			$rs2       = Db::table('think_order_buy')->insertGetId([
+            //$rs6       = Db::table('think_ad_sell')->where('id', $onlineAd['id'])-> setDec('remain_amount', $data['amount']);
+            //$rs7       = Db::table('think_ad_sell')->where('id', $onlineAd['id'])-> setInc('trading_volume', $data['amount']);
+
+            $rs2       = Db::table('think_order_buy')->insertGetId([
 				'buy_id'       => $this->merchant['id'],//接口请求时,返回商户的id,放行时增加商户的USDT,有疑问?!
 				// 'buy_id'=>'',//暂时改成空
 				'sell_id'      => $onlineAd['traderid'],
@@ -350,7 +353,8 @@ class Merchant extends Controller {
 			//开始判断挂单剩余
 			$total     = Db::name('order_buy')->where('sell_sid', $v['id'])->whereNotIn('status', '5,9')->sum('deal_num');
 			$actualAmt = number_format($data['amount'] / $v['price'], 8, '.', '');
-			if (($v['amount'] - $total) < $actualAmt || $v['usdt'] < $actualAmt) {
+
+			if ($v['remain_amount'] < $actualAmt || $v['usdt'] < $actualAmt) {
 				continue;
 			}
 			//判断承兑商是否被其它盘口设置过
@@ -391,9 +395,11 @@ class Merchant extends Controller {
 		Db::startTrans();
 		try {
 			$checkCode = $this->check_code();
-			$rs1       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setDec('usdt', $actualAmt);
-			$rs3       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setInc('usdtd', $actualAmt);
+			//$rs1       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setDec('usdt', $actualAmt);
+			//$rs3       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setInc('usdtd', $actualAmt);
 			$rs4       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setInc('pp_amount', 1);
+			$rs6       = Db::table('think_ad_sell')->where('id', $onlineAd['id'])-> setDec('remain_amount', $actualAmt);
+			$rs7       = Db::table('think_ad_sell')->where('id', $onlineAd['id'])-> setInc('trading_volume', $actualAmt);
 			$rs5       = Db::name('merchant')->where('id', $onlineAd['traderid'])->update(['match_time' => time()]);
 			$rs2       = Db::table('think_order_buy')->insertGetId([
 				'buy_id'       => $this->merchant['id'],//接口请求时,返回商户的id,放行时增加商户的USDT,有疑问?!
@@ -416,7 +422,7 @@ class Merchant extends Controller {
 				'check_code'   => $checkCode,
 				'status'       => 0,
 			]);
-			if ($rs1 && $rs2 && $rs3 && $rs4) {
+			if ($rs2 && $rs4 && $rs6 && $rs7) {
 				// 提交事务
 				Db::commit();
 				//发送短信给承兑商
@@ -436,6 +442,7 @@ class Merchant extends Controller {
 					$url = $http_type . $_SERVER['HTTP_HOST'] . '/merchant/pay?id=' . $rs2 . '&appid=' . $data['appid'] . '&type=' . $data['type'];
 				}
 				Cache::rm('sell_order_lock_' . $onlineAd['id']);
+
 				$this->mysuccess($url);
 			} else {
 				// 回滚事务

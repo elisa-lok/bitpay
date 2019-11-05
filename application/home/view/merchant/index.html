@@ -13,7 +13,7 @@
                                 <span class="info-box-text">
                                     <h5>总余额(1 USDT=¥{$price})</h5>
                                 </span>
-                                <span class="info-box-number">{$merchant['usdt']}</span>
+                                <span class="info-box-number">{$merchant['usdt']+$froze}</span>
                                 <span class="info-box-number">≈¥{:round($merchant['usdt']*$price, 4)}</span>
                             </div>
                         </div>
@@ -25,8 +25,8 @@
                                 <span class="info-box-text">
                                     <h5>冻结余额(1 USDT=¥{$price})</h5>
                                 </span>
-                                <span class="info-box-number">{$merchant['usdtd'] + $froze}</span>
-                                <span class="info-box-number">≈¥{:round(($froze+$merchant['usdtd'])*$price, 4)}</span>
+                                <span class="info-box-number">{$merchant['usdtd']}</span>
+                                <span class="info-box-number">≈¥{:round(($merchant['usdtd'])*$price, 4)}</span>
                             </div>
                         </div>
                     </div>
@@ -37,8 +37,8 @@
                                 <span class="info-box-text">
                                     <h5>可用余额</h5>
                                 </span>
-                                <span class="info-box-number">{$merchant['usdt'] - $froze}</span>
-                                <span class="info-box-number">≈¥{:round(($merchant['usdt'] - $froze)*$price, 4)}</span>
+                                <span class="info-box-number">{$merchant['usdt']}</span>
+                                <span class="info-box-number">≈¥{:round(($merchant['usdt'])*$price, 4)}</span>
                             </div>
                         </div>
                     </div>

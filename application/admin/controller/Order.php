@@ -12,6 +12,8 @@ class Order extends Base {
 		if (request()->isPost()) {
 			$args = input('post.');
 
+			$src_status = $orderInfo['status'];
+
 			($orderInfo['status'] == $args['status']) && ($orderInfo['deal_amount'] == $args['deal_amount']) && showMsg('操作成功'); //状态未改变
 			$updateArr = ['status' => $args['status']];
 			if($args['deal_amount'] != $orderInfo['deal_amount']){
@@ -26,7 +28,7 @@ class Order extends Base {
 			Db::startTrans();
 			$res1 = Db::name('order_buy')->where('id=' . $edit)->update($updateArr); // 更新订单
 			// 判断剩余额度
-			$res2 = $res3 = 1;
+			$res2 = $res3 = $res4 = $res5 = $res6 = $res7 = 1;
 			// 重建订单信息
 			if ($args['refactor']) {
 				!in_array($orderInfo['status'], ['5', '9']) && showMsg('该状态不能重建订单', 0);
@@ -35,7 +37,16 @@ class Order extends Base {
 				$res2    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec('usdt', $realAmt);
 				$res3    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdtd', $realAmt);
 			}
-			if ($res1 && $res2 && $res3) {
+			//  判断取消订单
+            if ($args['status'] == 5 && ($src_status == 0 || $src_status == 1)){
+                // 减少挂卖单交易量和增加挂卖单剩余量
+                $res4    = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid']])->setDec('trading_volume', $orderInfo['deal_num']);
+                $res5    = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid']])->setInc('remain_amount', $orderInfo['deal_num']);
+                // 减少用户冻结余额和增加用户余额
+                //$res2    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdt', $orderInfo['deal_num']);
+                //$res3    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdtd', $orderInfo['deal_num']);
+            }
+			if ($res1 && $res2 && $res3 && $res4 && $res5) {
 				Db::commit();
 				showMsg('操作成功', 1);
 			} else {
