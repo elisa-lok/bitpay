@@ -214,6 +214,11 @@ class Merchant extends Base {
 			return json(['code' => 0, 'msg' => '用户注册类型错误']);
 		}
 		if (Db::name('merchant')->where('id', $id)->update($update)) {
+		    if ($user['reg_type'] == 2){
+                Db::name('merchant')->where('reg_type', 1)
+                    ->update(['pptrader' => Db::raw("CONCAT(pptrader, ',{$id}')")]);
+		    }
+
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】审核用户:' . $id . '成功', 1);
 			return json(['code' => 1, 'msg' => '操作成功']);
 		} else {
@@ -260,7 +265,7 @@ class Merchant extends Base {
 	}
 
 	public function edit_merchant() {
-		$member = new MerchantModel();
+        $member = new MerchantModel();
 
 		if (request()->isAjax()) {
 			$param = input('post.');

@@ -354,7 +354,7 @@ class Merchant extends Controller {
 			$total     = Db::name('order_buy')->where('sell_sid', $v['id'])->whereNotIn('status', '5,9')->sum('deal_num');
 			$actualAmt = number_format($data['amount'] / $v['price'], 8, '.', '');
 
-			if ($v['remain_amount'] < $actualAmt || $v['usdt'] < $actualAmt) {
+			if ($v['remain_amount'] < $actualAmt) {
 				continue;
 			}
 			//判断承兑商是否被其它盘口设置过
