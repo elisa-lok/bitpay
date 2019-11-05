@@ -1,5 +1,5 @@
 <?php
-
+namespace org;
 // 二维码合成
 class QRCodeMerge {
 	public function getQRCode($content, $bgFilePath = '', $iconFilePath = '', $edgeSize, $dstX, $dstY) {
