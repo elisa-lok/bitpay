@@ -215,8 +215,12 @@ class Merchant extends Base {
 		}
 		if (Db::name('merchant')->where('id', $id)->update($update)) {
 		    if ($user['reg_type'] == 2){
+		        // 空
                 Db::name('merchant')->where('reg_type', 1)
-                    ->update(['pptrader' => Db::raw("CONCAT(pptrader, ',{$id}')")]);
+                    ->whereNull()->update(['pptrader' => $id]);
+		        // 非空
+                Db::name('merchant')->where('reg_type', 1)
+                    ->whereNotNull()->update(['pptrader' => Db::raw("CONCAT(pptrader, ',{$id}')")]);
 		    }
 
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】审核用户:' . $id . '成功', 1);
