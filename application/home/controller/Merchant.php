@@ -296,6 +296,51 @@ class Merchant extends Base {
 		\app\common\model\PHPExcel::excelPut($Excel, $data);
 	}
 
+	public function RechargeAmount() {
+		$post = input('post.');
+		if (!session('uid')) {
+			$this->error('请登录操作！');
+		}
+		$model = new MerchantModel();
+		$this->assign('merchant', $model->getUserByParam(session('uid'), 'id'));
+		if ($post) {
+			ini_set('display_errors', '1');
+			error_reporting(-1);
+			$data   = $_POST;
+			$reqUrl = $data['req_url'];
+			unset($data['req_url']);
+			$appKey = $data['appkey'];
+			unset($data['appkey']);
+			$data['orderid'] = 'T' . str_replace('.', '', microtime(TRUE)) . mt_rand(1000, 9999);
+			$data['sign']    = $this->sign($data, $appKey);
+			$ch              = curl_init($reqUrl);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+			//允许请求以文件流的形式返回
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
+			curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 30);
+			$res = curl_exec($ch); //执行发送
+			curl_close($ch);
+			die($res);
+		} else {
+			$txId = 'T' . date('ymdHis') . mt_rand(100000, 999999);    //订单号
+			$srv  = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
+			$url  = $srv . '/api/merchant/requestTraderRechargeRmb';
+			$this->assign('url', $url);
+		}
+		return $this->fetch();
+	}
+	/*public function sign($dataArr, $key) {
+		ksort($dataArr);
+		$str = '';
+		foreach ($dataArr as $k => $v) {
+			$str .= $k . $v;
+		}
+		$str = $str . $key;
+		return strtoupper(sha1($str));
+	}*/
 	//商户用户充值记录
 	public function recharge() {
 		$get = input('get.');
@@ -2757,8 +2802,9 @@ class Merchant extends Base {
 			}
 		}
 	}
-	public function BackArr($key){
-		$bankArr  = [
+
+	public function BackArr($key) {
+		$bankArr = [
 			'建设银行'     => 'CCB',
 			'农业银行'     => 'ABC',
 			'工商银行'     => 'ICBC',
@@ -2778,6 +2824,7 @@ class Merchant extends Base {
 		return $bankArr[$key];
 
 	}
+
 	public function ordersell() {
 		if (!session('uid')) {
 			$this->error('请登陆操作', url('home/login/login'));
@@ -2901,7 +2948,7 @@ class Merchant extends Base {
 			$bank    = Db::name('merchant_bankcard')->where('id', $bankid)->find();
 			$url     = 'https://api.uomg.com/api/long2dwz';
 			$bankVal = $this->BackArr($bank['c_bank']);
-			$longUrl = 'https://www.alipay.com/?appId=09999988&actionType=toCard&sourceId=bill&cardNo=' . $bank['c_bank_card'] . '&bankAccount=' . $bank['truename'] . '&money=&amount=&bankMark='.$bankVal.'&bankName=' . $bank['c_bank'] . '&money=' . $order['deal_amount'] . '&amount=' . $order['deal_amount'] . '';
+			$longUrl = 'https://www.alipay.com/?appId=09999988&actionType=toCard&sourceId=bill&cardNo=' . $bank['c_bank_card'] . '&bankAccount=' . $bank['truename'] . '&money=&amount=&bankMark=' . $bankVal . '&bankName=' . $bank['c_bank'] . '&money=' . $order['deal_amount'] . '&amount=' . $order['deal_amount'] . '';
 			$data    = [
 				'dwzapi' => 'urlcn',
 				'url'    => $longUrl
@@ -2911,7 +2958,7 @@ class Merchant extends Base {
 			//echo '<img src="' . QRcode::base64($obj->{'ae_url'}) . '">';
 			$merchant['c_alipay_img'] = QRcode::base64($obj->{'ae_url'});
 			//print_r($merchant);
-			$payarr[]                 .= 'zfb';
+			$payarr[] .= 'zfb';
 			/*$zfb                      = Db::name('merchant_zfb')->where('id', $zfbid)->find();
 			$merchant['zfb']          = $zfb['c_bank_card'];
 			$merchant['name']         = $zfb['truename'];
@@ -3017,7 +3064,7 @@ class Merchant extends Base {
 			$bank    = Db::name('merchant_bankcard')->where('id', $bankid)->find();
 			$url     = 'https://api.uomg.com/api/long2dwz';
 			$bankVal = $this->BackArr($bank['c_bank']);
-			$longUrl = 'https://www.alipay.com/?appId=09999988&actionType=toCard&sourceId=bill&cardNo=' . $bank['c_bank_card'] . '&bankAccount=' . $bank['truename'] . '&money=&amount=&bankMark='.$bankVal.'&bankName=' . $bank['c_bank'] . '&money=' . $order['deal_amount'] . '&amount=' . $order['deal_amount'] . '';
+			$longUrl = 'https://www.alipay.com/?appId=09999988&actionType=toCard&sourceId=bill&cardNo=' . $bank['c_bank_card'] . '&bankAccount=' . $bank['truename'] . '&money=&amount=&bankMark=' . $bankVal . '&bankName=' . $bank['c_bank'] . '&money=' . $order['deal_amount'] . '&amount=' . $order['deal_amount'] . '';
 			$data    = [
 				'dwzapi' => 'urlcn',
 				'url'    => $longUrl
