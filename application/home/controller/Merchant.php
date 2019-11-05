@@ -1741,8 +1741,8 @@ class Merchant extends Base {
 			if ($user['trader_check'] != 1) {
 				$this->error('您的承兑商资格未通过');
 			}
-			$haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->where('state', 1)->sum('amount');
-			// $haveadsum = 0;
+			//$haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->where('state', 1)->sum('amount');
+			$haveadsum = 0;
 			if ($user['usdt'] < $amount + $haveadsum) {
 				$this->error('账户余额不足');
 			}
