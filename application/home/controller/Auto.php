@@ -438,9 +438,10 @@ class Auto extends Base {
 
 	public function selldaojishi() {
 		if (PHP_SAPI != 'cli') {//只允许cli模式访问
-			die('error');
+			//die('error');
 		}
-		$list = Db::name('order_buy')->where("" . time() . "-ctime>ltime*60 and status=0 ")->select();
+		// $list = Db::name('order_buy')->where("" . time() . "-ctime>ltime*60 and status=0 ")->select();
+		$list = Db::name('order_buy')->where('status', 0)->select();
 		// dump($list);die;
 		if (!$list) {
 			return;
