@@ -1,5 +1,6 @@
 <?php
 namespace org;
+use think\Exception;
 // Encoding modes
 define('QR_MODE_NUL', -1);
 define('QR_MODE_NUM', 0);
