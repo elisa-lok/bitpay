@@ -885,7 +885,7 @@ class Merchant extends Base {
 			$map['ad_no'] = ['like', '%' . $oid . '%'];
 		}
 		if (!empty($status)) {
-			$map['state'] = $status;
+			$map['think_ad_sell.state'] = $status;
 		}
 		$member  = new MerchantModel();
 		$Nowpage = input('get.page') ? input('get.page') : 1;
