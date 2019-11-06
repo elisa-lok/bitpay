@@ -43,11 +43,18 @@ class Order extends Base {
                 $real_number = $orderInfo['deal_num'] + $orderInfo['fee'];
                 $res4    = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid']])->setDec('trading_volume', $real_number);
                 $res5    = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid']])->setInc('remain_amount', $real_number);
+                // 获取挂单
+                $sell = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->find();
+                if ($sell['state'] == 2){
+                    // 如果挂单已下架 回滚余额
+                    $res6 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $real_number);
+                    $res7 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $real_number);
+                }
                 // 减少用户冻结余额和增加用户余额
                 //$res2    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdt', $orderInfo['deal_num']);
                 //$res3    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdtd', $orderInfo['deal_num']);
             }
-			if ($res1 && $res2 && $res3 && $res4 && $res5) {
+			if ($res1 && $res2 && $res3 && $res4 && $res5 && $res6 && $res7) {
 				Db::commit();
 				showMsg('操作成功', 1);
 			} else {
