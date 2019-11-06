@@ -2,7 +2,7 @@
 
 namespace app\home\controller;
 
-use org\QRcode;
+use org\QRCode;
 use think\db;
 use think\request;
 use app\home\model\ZfbModel;
