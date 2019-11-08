@@ -32,9 +32,10 @@ class Merchant extends Base {
 		$this->assign('merchant', $model->getUserByParam(session('uid'), 'id'));
 		$myinfo = $model->getUserByParam(session('uid'), 'id');
 		$this->assign('myacc', $model->getUserByParam($myinfo['pid'], 'id'));
-		$ids       = Db::name('article_cate')->field('id, name')->order('orderby asc')->select();
-		$list      = Db::name('article_cate')->field('a.name, b.id, b.title, b.cate_id, b.create_time')->alias('a')->join('think_article b', 'a.id=b.cate_id')->where('a.status', 1)->select();
+		$ids  = Db::name('article_cate')->field('id, name')->order('orderby asc')->select();
+		$list = Db::name('article_cate')->field('a.name, b.id, b.title, b.cate_id, b.create_time')->alias('a')->join('think_article b', 'a.id=b.cate_id')->where('a.status', 1)->select();
 		//$haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->where('state', 1)->sum('amount');
+		$haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->sum('remain_amount');
 		$haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->sum('remain_amount');
 		foreach ($ids as $k => $v) {
 			foreach ($list as $kk => $vv) {
@@ -1115,6 +1116,7 @@ class Merchant extends Base {
 		$zfb       = new \app\home\model\ZfbModel();
 		$wx        = new \app\home\model\WxModel();
 		$ysf       = new \app\home\model\YsfModel();
+		$this->assign('generate_alipayid', 'https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id=2016110502555511&redirect_uri=https%3A%2F%2Fwww.dedemao.com%2Falipay%2Fauthorize.php%3Fscope%3Dauth_base&scope=auth_base&state=STATE');
 		$this->assign('list', $bankModel->getBank(['merchant_id' => session('uid')], 'id desc'));
 		$this->assign('list2', $zfb->getBank(['merchant_id' => session('uid')], 'id desc'));
 		$this->assign('list3', $wx->getBank(['merchant_id' => session('uid')], 'id desc'));
@@ -1343,12 +1345,12 @@ class Merchant extends Base {
 			$truename       = input('post.zfbtruename');
 			$name           = input('post.zfbname');
 			$alipay_account = input('post.alipay_account');
-			if (empty($truename)) {
-				$this->error('请填写真实姓名');
-			}
-			if (empty($name)) {
-				$this->error('请填写标识名称');
-			}
+			$alipay_id      = input('post.alipay_id');
+			empty($truename) && $this->error('请填写真实姓名');
+
+			empty($name) && $this->error('请填写标识名称');
+
+			empty($alipay_id) && $this->error('请输入支付宝ID');
 			// if(!$alipay_account){
 			//     $this->error('请输入支付宝账户');
 			// }
@@ -1376,6 +1378,7 @@ class Merchant extends Base {
 			$param['c_bank']      = $alipay_account;
 			$param['truename']    = $truename;
 			$param['name']        = $name;
+			$param['alipay_id']   = trim($alipay_id);
 			$model                = new ZfbModel();
 			$return               = $model->insertOne($param);
 			if ($return['code'] == 1) {
@@ -1786,26 +1789,26 @@ class Merchant extends Base {
 			$ad_no  = $this->getadvno();
 			$model2 = new AdModel();
 			$flag   = $model2->insertOne([
-				'userid'      => session('uid'),
-				'add_time'    => time(),
-				'coin'        => '0',
-				'min_limit'   => $min_limit,
-				'max_limit'   => $max_limit,
-				'pay_method'  => $_POST['bank'],
-				'pay_method2' => $_POST['zfb'],
-				'pay_method3' => $_POST['wx'],
-				'pay_method4' => $_POST['ysf'],
-				'ad_no'       => $ad_no,
-				'amount'      => $amount,
-                'remain_amount' => $amount,
-				'price'       => $price,
-				'message'     => '',
-				'state'       => 1
+				'userid'        => session('uid'),
+				'add_time'      => time(),
+				'coin'          => '0',
+				'min_limit'     => $min_limit,
+				'max_limit'     => $max_limit,
+				'pay_method'    => $_POST['bank'],
+				'pay_method2'   => $_POST['zfb'],
+				'pay_method3'   => $_POST['wx'],
+				'pay_method4'   => $_POST['ysf'],
+				'ad_no'         => $ad_no,
+				'amount'        => $amount,
+				'remain_amount' => $amount,
+				'price'         => $price,
+				'message'       => '',
+				'state'         => 1
 			]);
 
-            // 减少余额 增加冻结余额
-            Db::name('merchant')->where('id', session('uid'))->setDec('usdt', $amount);
-            Db::name('merchant')->where('id', session('uid'))->setInc('usdtd', $amount);
+			// 减少余额 增加冻结余额
+			Db::name('merchant')->where('id', session('uid'))->setDec('usdt', $amount);
+			Db::name('merchant')->where('id', session('uid'))->setInc('usdtd', $amount);
 
 			//增加在售挂单数
 			$count = $model2->where('userid', session('uid'))->where('state', 1)->where('amount', 'gt', 0)->count();
@@ -2539,14 +2542,14 @@ class Merchant extends Base {
 			$haveadsum = 0;
 			if (($ad_info['remain_amount'] + $haveadsum) * 1 > $merchant['usdt'] * 1) {
 				$this->error('开启失败：账户余额不足');
-			}else{
-                Db::name('merchant')->where('id', session('uid'))->setDec('usdt', $ad_info['remain_amount']);
-                Db::name('merchant')->where('id', session('uid'))->setInc('usdtd', $ad_info['remain_amount']);
-            }
-		}elseif($act == 2){
-            Db::name('merchant')->where('id', session('uid'))->setInc('usdt', $ad_info['remain_amount']);
-            Db::name('merchant')->where('id', session('uid'))->setDec('usdtd', $ad_info['remain_amount']);
-        }
+			} else {
+				Db::name('merchant')->where('id', session('uid'))->setDec('usdt', $ad_info['remain_amount']);
+				Db::name('merchant')->where('id', session('uid'))->setInc('usdtd', $ad_info['remain_amount']);
+			}
+		} elseif ($act == 2) {
+			Db::name('merchant')->where('id', session('uid'))->setInc('usdt', $ad_info['remain_amount']);
+			Db::name('merchant')->where('id', session('uid'))->setDec('usdtd', $ad_info['remain_amount']);
+		}
 
 		$result = $model->updateOne(['id' => $id, 'state' => $act]);
 		if ($result['code'] == 1) {
@@ -2822,23 +2825,23 @@ class Merchant extends Base {
 
 	public function BackArr($key) {
 		$bankArr = [
-            '工商银行'     => 'ICBC',
-            '农业银行'     => 'ABC',
-            '中国银行'     => 'BOC',
-            '建设银行'     => 'CCB',
-            '招商银行'     => 'CMB',
-            '浦发银行'     => 'SPDB',
-            '广发银行'     => 'GDB',
-            '兴业银行'     => 'CIB',
-            '北京银行'     => 'BCCB',
-            '交通银行'     => 'COMM',
-            '平安银行'     => 'SPABANK',
-            '光大银行'     => 'CEB',
-            '中信银行'     => 'CNCB',
-            '民生银行'     => 'CMBC',
-            '华夏银行'     => 'HXB',
-            '上海银行'     => 'BOS',
-            '邮政储蓄'     => 'PSBC',
+			'工商银行' => 'ICBC',
+			'农业银行' => 'ABC',
+			'中国银行' => 'BOC',
+			'建设银行' => 'CCB',
+			'招商银行' => 'CMB',
+			'浦发银行' => 'SPDB',
+			'广发银行' => 'GDB',
+			'兴业银行' => 'CIB',
+			'北京银行' => 'BCCB',
+			'交通银行' => 'COMM',
+			'平安银行' => 'SPABANK',
+			'光大银行' => 'CEB',
+			'中信银行' => 'CNCB',
+			'民生银行' => 'CMBC',
+			'华夏银行' => 'HXB',
+			'上海银行' => 'BOS',
+			'邮政储蓄' => 'PSBC',
 		];
 		return $bankArr[$key] ?? showMsg('暂不支持该银行');
 	}
@@ -2963,19 +2966,20 @@ class Merchant extends Base {
 			$payarr[]                = 'bank';
 		}
 		if ($type == 'alipay' && $zfbid > 0) {
-			$bank    = Db::name('merchant_bankcard')->where('id', $bankid)->find();
+			$zfb                      = Db::name('merchant_zfb')->where('id', $zfbid)->find();
+			//var_dump($zfb);die;
 			$url     = 'https://api.uomg.com/api/long2dwz';
-			$bankVal = $this->BackArr($bank['c_bank']);
-			$longUrl = 'https://www.alipay.com/?appId=09999988&actionType=toCard&sourceId=bill&cardNo=' . $bank['c_bank_card'] . '&bankAccount=' . $bank['truename'] . '&money=&amount=&bankMark=' . $bankVal . '&bankName=' . $bank['c_bank'] . '&money=' . $order['deal_amount'] . '&amount=' . $order['deal_amount'] . '';
+			$longUrl = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] . '&amount=' . $order['deal_amount'] . '';
 			$data    = [
 				'dwzapi' => 'urlcn',
 				'url'    => $longUrl
 			];
 			$res     = $this->Scurl($url, $data);
 			$obj     = json_decode($res);
-			//echo '<img src="' . QRcode::base64($obj->{'ae_url'}) . '">';
+			echo '<img src="' . QRcode::base64($obj->{'ae_url'}) . '">';
 			$merchant['c_alipay_img'] = QRcode::base64($obj->{'ae_url'});
-			//print_r($merchant);
+			$merchant['alipay_name']  = $zfb['truename'];
+			$merchant['alipay_acc']   = $zfb['c_bank'];
 			$payarr[] .= 'zfb';
 			/*$zfb                      = Db::name('merchant_zfb')->where('id', $zfbid)->find();
 			$merchant['zfb']          = $zfb['c_bank_card'];
@@ -3004,7 +3008,7 @@ class Merchant extends Base {
 			$merchant['unionpay_acc']  = $ysf['c_bank'];
 			$payarr[]                  .= 'ysf';
 		}
-		// dump($payarr);die;
+		//dump($merchant);die;
 		$this->assign('payarr', $payarr);
 		$this->assign('merchant', $merchant);
 		//平均确认时间
@@ -3079,19 +3083,22 @@ class Merchant extends Base {
 		}
 		if ($zfbid > 0) {
 			//echo 111;die;
-			$bank    = Db::name('merchant_bankcard')->where('id', $bankid)->find();
+			//$bank    = Db::name('merchant_bankcard')->where('id', $bankid)->find();
+			$zfb                      = Db::name('merchant_zfb')->where('id', $zfbid)->find();
+			//var_dump($zfb);die;
 			$url     = 'https://api.uomg.com/api/long2dwz';
-			$bankVal = $this->BackArr($bank['c_bank']);
-			$longUrl = 'https://www.alipay.com/?appId=09999988&actionType=toCard&sourceId=bill&cardNo=' . $bank['c_bank_card'] . '&bankAccount=' . $bank['truename'] . '&money=&amount=&bankMark=' . $bankVal . '&bankName=' . $bank['c_bank'] . '&money=' . $order['deal_amount'] . '&amount=' . $order['deal_amount'] . '';
+			$longUrl = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] . '&amount=' . $order['deal_amount'] . '';
 			$data    = [
 				'dwzapi' => 'urlcn',
 				'url'    => $longUrl
 			];
 			$res     = $this->Scurl($url, $data);
 			$obj     = json_decode($res);
-			//echo '<img src="' . QRcode::base64($obj->{'ae_url'}) . '">';
+			//echo '<img src="' . QRcode::base64($obj->{'ae_url'}) . '">';die;
 			$merchant['c_alipay_img'] = QRcode::base64($obj->{'ae_url'});
-			$payarr[]                 .= 'zfb';
+			$merchant['zfb']          = $zfb['c_bank_card'];
+			$merchant['alipay_name']  = $zfb['truename'];
+			$payarr[] .= 'zfb';
 			/*var_dump($bank);
 			die;
 			$zfb                      = Db::name('merchant_zfb')->where('id', $zfbid)->find();
@@ -3275,7 +3282,8 @@ class Merchant extends Base {
 		$this->assign('list', $list);
 		return $this->fetch();
 	}
-	public function OutUserPkOrder(){
+
+	public function OutUserPkOrder() {
 		/* [
 		['order_no','订单编号'],
 		['buy_username','买家'],
@@ -3295,9 +3303,9 @@ class Merchant extends Base {
 		!session('uid') && $this->error('请登陆操作');
 		$where['buy_id'] = session('uid');
 		$get             = input('get.');
-		$order                  = 'id desc';
-		$model                  = new OrderBuyModel();
-		$list                   = $model->getAllByWhere($where, $order);
+		$order           = 'id desc';
+		$model           = new OrderBuyModel();
+		$list            = $model->getAllByWhere($where, $order);
 		//var_dump($list);die;
 		if (!empty($get['created_at']['start']) && !empty($get['created_at']['end'])) {
 			$start          = strtotime($get['created_at']['start']);
@@ -3307,14 +3315,14 @@ class Merchant extends Base {
 		if ($list) {
 			$usdtPriceWay = Db::name('config')->where('name', 'usdt_price_way')->value('value');
 			$dealerFee    = 0; //承兑商费用
-			$newList   = collection($list)->toArray();
-			$sellerIds = array_unique(array_column($newList, 'sell_id'));
-			$mcModel   = Db::name('merchant');
-			$agentIds  = $mcModel->where('id', 'in', array_unique($sellerIds))->column('pid', 'id');
-			$agFeeRate = 0;
+			$newList      = collection($list)->toArray();
+			$sellerIds    = array_unique(array_column($newList, 'sell_id'));
+			$mcModel      = Db::name('merchant');
+			$agentIds     = $mcModel->where('id', 'in', array_unique($sellerIds))->column('pid', 'id');
+			$agFeeRate    = 0;
 			$agentIds && ($agFeeRate = $mcModel->where('id', 'in', array_values($agentIds))->column('trader_parent_get', 'id'));
-			$addFee = config('usdt_price_add');
-			$statusArr           = [0 => '代付款', 1 => '待放行', 4 => '已完成', 5=>'已关闭' , 6=>'申诉中',9=>'订单失败'];
+			$addFee    = config('usdt_price_add');
+			$statusArr = [0 => '代付款', 1 => '待放行', 4 => '已完成', 5 => '已关闭', 6 => '申诉中', 9 => '订单失败'];
 			foreach ($list as $k => $v) {
 				$list[$k]['fee_amount'] = $list[$k]['fee'] = $list[$k]['rec_amount'] = $list[$k]['rec'] = $list[$k]['fee_rate'] = 0;
 				if ($v['status'] == 4) {
@@ -3333,10 +3341,10 @@ class Merchant extends Base {
 		}
 
 		//文件名称
-		$data=collection($list)->toArray();
+		$data                = collection($list)->toArray();
 		$Excel['fileName']   = "订单列表" . date('Y年m月d日-His', time());//or $xlsTitle
-		$Excel['cellName']   = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K' ,'L' ,'M' ,'N'];
-		$Excel['H']          = ['A' => 10, 'B' => 15, 'C' => 15, 'D' => 35, 'E' => 35, 'F' => 15, 'G' => 15, 'H' => 20, 'I' => 30 ,'J'=>20 ,'K'=>15, 'L'=>20, 'M'=>15,'N'=>20];//横向水平宽度
+		$Excel['cellName']   = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'];
+		$Excel['H']          = ['A' => 10, 'B' => 15, 'C' => 15, 'D' => 35, 'E' => 35, 'F' => 15, 'G' => 15, 'H' => 20, 'I' => 30, 'J' => 20, 'K' => 15, 'L' => 20, 'M' => 15, 'N' => 20];//横向水平宽度
 		$Excel['V']          = ['1' => 40, '2' => 26];                                                                             //纵向垂直高度
 		$Excel['sheetTitle'] = "订单列表";                                                                                  //大标题，自定义
 		$Excel['xlsCell']    = Data::headPkorder();
