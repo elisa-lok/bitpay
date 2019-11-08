@@ -2534,7 +2534,7 @@ class Merchant extends Base {
 			// $haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->where('state', 1)->sum('amount');
 			// $haveadsum = $haveadsum ? $haveadsum : 0;
 			$haveadsum = 0;
-			if (($ad_info['amount'] + $haveadsum) * 1 > $merchant['usdt'] * 1) {
+			if (($ad_info['remain_amount'] + $haveadsum) * 1 > $merchant['usdt'] * 1) {
 				$this->error('开启失败：账户余额不足');
 			}else{
                 Db::name('merchant')->where('id', session('uid'))->setDec('usdt', $ad_info['remain_amount']);
