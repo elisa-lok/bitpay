@@ -2531,8 +2531,9 @@ class Merchant extends Base {
 		}
 		$merchant = $model2->getUserByParam(session('uid'), 'id');
 		if ($act == 1) {
-			$haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->where('state', 1)->sum('amount');
-			$haveadsum = $haveadsum ? $haveadsum : 0;
+			// $haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->where('state', 1)->sum('amount');
+			// $haveadsum = $haveadsum ? $haveadsum : 0;
+			$haveadsum = 0;
 			if (($ad_info['amount'] + $haveadsum) * 1 > $merchant['usdt'] * 1) {
 				$this->error('开启失败：账户余额不足');
 			}else{
