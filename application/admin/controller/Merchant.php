@@ -68,6 +68,7 @@ class Merchant extends Base {
 		$allpage         = intval(ceil($count / $limits));
 		$lists           = $member->getMerchantByWhere($map, $Nowpage, $limits);
 		foreach ($lists as $k => &$v) {
+			$v['total_usdt'] = $v['usdt'] + $v['usdtd'];
 			$v['addtime'] = getTime($v['addtime']);
 			$v['parent']  = $member->where('id', $v['pid'])->value('name');
 		}

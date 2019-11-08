@@ -35,6 +35,7 @@
 							<th width="6%">身份证</th>
 							<th width="5%">正面</th>
 							<th width="5%">反面</th>
+							<th width="5%">总USDT</th>
 							<th width="5%">可用USDT</th>
 							<th width="5%">冻结USDT</th>
 							<th width="5%">谷歌验证</th>
@@ -61,6 +62,7 @@
 								<td>
 									<a href="/uploads/idcard/{{d[i].idcard_fan}}" target="_blank" title="点击查看原图"><img src="/uploads/idcard/{{d[i].idcard_fan}}" class="img-circle" style="width:35px;height:35px" onerror="this.src='/static/admin/images/head_default.gif'"/></a>
 								</td>
+								<td>{{d[i].total_usdt}}</td>
 								<td>{{d[i].usdt}}</td>
 								<td>{{d[i].usdtd}}</td>
 								<td>
