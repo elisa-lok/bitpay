@@ -179,7 +179,7 @@
 </body>
 <script src="https://cdn.staticfile.org/sweetalert/2.1.2/sweetalert.min.js"></script>
 <script type="text/javascript" src="__JS__/jquery.qrcode.min.js"></script>
-<script>$("#qrcode").qrcode({render: "canvas", size: 180, text: "{$merchant.c_alipay_img}"});</script>
+<script>{if $order.status == 0 && $remaintime > 1 }$("#qrcode").qrcode({render: "canvas", size: 180, text: "{$merchant.c_alipay_img}"});{/if}</script>
 <style>.swal-text {
 	background-color: #FEFAE3;
 	padding: 10px;
@@ -330,6 +330,7 @@
                 $('.bankinfo').hide();
                 $('.infodetail p span').html('订单已关闭');
                 $('.paybutton').attr('disabled', true);
+                $('#qrcode').remove();
             } else {
                 flag = setTimeout('CheckOutTime()', 3000);
             }
