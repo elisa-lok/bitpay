@@ -2976,7 +2976,7 @@ class Merchant extends Base {
 			];
 			$res     = $this->Scurl($url, $data);
 			$obj     = json_decode($res);
-			echo '<img src="' . QRcode::base64($obj->{'ae_url'}) . '">';
+			//echo '<img src="' . QRcode::base64($obj->{'ae_url'}) . '">';
 			$merchant['c_alipay_img'] = QRcode::base64($obj->{'ae_url'});
 			$merchant['alipay_name']  = $zfb['truename'];
 			$merchant['alipay_acc']   = $zfb['c_bank'];
