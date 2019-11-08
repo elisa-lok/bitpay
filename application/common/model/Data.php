@@ -25,6 +25,24 @@ class Data
 	        ['addtime','申请时间'],
 	    ];
 	}
+	public static function headPkorder(){
+		return [
+			['order_no','订单编号'],
+			['buy_username','买家'],
+			['raw_amount','订单金额'],
+			['raw_num','订单数量'],
+			['deal_amount','交易金额'],
+			['deal_num','交易数量'],
+			['deal_price','交易价格'],
+			['rec','到账数量'],
+			['rec_amount','	到账金额'],
+			['fee','手续费数量'],
+			['fee_amount','手续费金额'],
+			['fee_rate','费率'],
+			['ctime','创建时间'],
+			['status','交易状态'],
+		];
+	}
 	public static function headWithdraw(){
 	    return [
 	        ['id','序号'],
