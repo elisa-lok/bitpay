@@ -2977,8 +2977,7 @@ class Merchant extends Base {
 			];
 			$res     = $this->Scurl($url, $data);
 			$obj     = json_decode($res);
-			//echo '<img src="' . QRcode::base64($obj->{'ae_url'}) . '">';
-			$merchant['c_alipay_img'] = QRcode::base64($obj->{'ae_url'});
+			$merchant['c_alipay_img'] = $obj->{'ae_url'};
 			$merchant['alipay_name']  = $zfb['truename'];
 			$merchant['alipay_acc']   = $zfb['c_bank'];
 			$payarr[] .= 'zfb';
@@ -3096,7 +3095,7 @@ class Merchant extends Base {
 			$res     = $this->Scurl($url, $data);
 			$obj     = json_decode($res);
 			//echo '<img src="' . QRcode::base64($obj->{'ae_url'}) . '">';die;
-			$merchant['c_alipay_img'] = QRcode::base64($obj->{'ae_url'});
+			$merchant['c_alipay_img'] = $obj->{'ae_url'};
 			$merchant['zfb']          = $zfb['c_bank_card'];
 			$merchant['alipay_name']  = $zfb['truename'];
 			$payarr[] .= 'zfb';
