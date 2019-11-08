@@ -5,7 +5,6 @@ namespace app\home\controller;
 use app\common\model\Data;
 use app\common\model\PHPExcel;
 use app\home\model\OrderBuyModel;
-use org\QRcode;
 use think\db;
 use think\request;
 use app\home\model\ZfbModel;
@@ -3094,7 +3093,6 @@ class Merchant extends Base {
 			];
 			$res     = $this->Scurl($url, $data);
 			$obj     = json_decode($res);
-			//echo '<img src="' . QRcode::base64($obj->{'ae_url'}) . '">';die;
 			$merchant['c_alipay_img'] = $obj->{'ae_url'};
 			$merchant['zfb']          = $zfb['c_bank_card'];
 			$merchant['alipay_name']  = $zfb['truename'];
@@ -3104,7 +3102,6 @@ class Merchant extends Base {
 			$zfb                      = Db::name('merchant_zfb')->where('id', $zfbid)->find();
 			$merchant['zfb']          = $zfb['c_bank_card'];
 			$merchant['alipay_name']  = $zfb['truename'];
-			$merchant['c_alipay_img'] = QRcode::base64($obj->{'ae_url'});
 			$merchant['alipay_acc']   = $zfb['c_bank'];
 			$payarr[]                 .= 'zfb';*/
 		}
