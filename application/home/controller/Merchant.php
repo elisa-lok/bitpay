@@ -2966,7 +2966,7 @@ class Merchant extends Base {
 		}
 		if ($type == 'alipay' && $zfbid > 0) {
 			$zfb                      = Db::name('merchant_zfb')->where('id', $zfbid)->find();
-			//var_dump($zfb);die;
+			var_dump($zfb);die;
 			empty($zfb['alipay_id']) && $this->error('appid不存在');
 			$url     = 'https://api.uomg.com/api/long2dwz';
 			$longUrl = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] . '&amount=' . $order['deal_amount'] . '';
@@ -3026,22 +3026,7 @@ class Merchant extends Base {
 		return $this->fetch('paymobile');
 	}
 
-	public function Scurl($url, $data = []) {
-		//使用crul模拟
-		$ch = curl_init();
-		//禁用https
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		//允许请求以文件流的形式返回
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
-		curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 30);
-		curl_setopt($ch, CURLOPT_URL, $url);
-		$result = curl_exec($ch); //执行发送
-		curl_close($ch);
-		return $result;
-	}
+
 
 	public function pay() {
 		$id    = input('get.id');
@@ -3094,8 +3079,8 @@ class Merchant extends Base {
 			$res     = $this->Scurl($url, $data);
 			$obj     = json_decode($res);
 			$merchant['c_alipay_img'] = $obj->{'ae_url'};
-			$merchant['zfb']          = $zfb['c_bank_card'];
 			$merchant['alipay_name']  = $zfb['truename'];
+			$merchant['alipay_acc']   = $zfb['c_bank'];
 			$payarr[] .= 'zfb';
 			/*var_dump($bank);
 			die;
@@ -3137,6 +3122,22 @@ class Merchant extends Base {
 		$this->assign('second', $second);
 		return $this->fetch('paymobile');
 	}
+	public function Scurl($url, $data = []) {
+	//使用crul模拟
+	$ch = curl_init();
+	//禁用https
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+	//允许请求以文件流的形式返回
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+	curl_setopt($ch, CURLOPT_POST, 1);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
+	curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 30);
+	curl_setopt($ch, CURLOPT_URL, $url);
+	$result = curl_exec($ch); //执行发送
+	curl_close($ch);
+	return $result;
+}
 
 	public function CheckOutTime() {
 		$id    = input('post.id');
