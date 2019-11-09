@@ -48,6 +48,7 @@
 							<th>交易金额</th>
 							<th>时间</th>
 							<th>完成时间</th>
+							<th>校验码</th>
 							<th>申诉内容</th>
 							<th>状态</th>
 							<th>收款方式</th>
@@ -69,6 +70,7 @@
 								<td>{{d[i].deal_amount}}</td>
 								<td>{{d[i].ctime}}</td>
 								<td>{{d[i].finished_time}}</td>
+								<td>{{d[i].check_code}}</td>
 								<td>{{d[i].su_reason}}</td>
 								<td>
 									{{# if(d[i].status == 0){ }} 待付款 {{# }else if(d[i].status == 1){ }} 已付款 {{# }else if(d[i].status == 4){ }} 已完成 {{# }else if(d[i].status == 5){ }} 已关闭 {{# }else if(d[i].status == 6){ }} 申诉中 {{# }else if(d[i].status == 9){ }} 订单失败 {{# } }}
