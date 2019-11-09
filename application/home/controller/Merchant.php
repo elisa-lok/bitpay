@@ -3683,9 +3683,9 @@ class Merchant extends Base {
 			if ($orderinfo['status'] == 5) {
 				$this->error('该订单已经被取消');
 			}
-			if ($orderinfo['status'] == 0) {
+			/*if ($orderinfo['status'] == 0) {
 				$this->error('该订单已经被拍下，还未付款,不能申诉');
-			}
+			}*/
 			if ($orderinfo['status'] == 6) {
 				$this->error('该订单已经处于申诉状态，请耐心等待');
 			}
