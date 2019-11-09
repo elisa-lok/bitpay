@@ -2969,7 +2969,7 @@ class Merchant extends Base {
 			//var_dump($zfb);die;
 			//empty($zfb['alipay_id']) && $this->error('appid不存在');
 			$url     = 'https://api.uomg.com/api/long2dwz';
-			$longUrl = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo=&amount=' . $order['deal_amount'] . '';
+			$longUrl = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo='.$order['check_code'].'&amount=' . $order['deal_amount'] . '';
 			$data    = [
 				'dwzapi' => 'urlcn',
 				'url'    => $longUrl
@@ -3071,7 +3071,7 @@ class Merchant extends Base {
 			$zfb                      = Db::name('merchant_zfb')->where('id', $zfbid)->find();
 			//var_dump($zfb);die;
 			$url     = 'https://api.uomg.com/api/long2dwz';
-			$longUrl = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo=&amount=' . $order['deal_amount'] . '';
+			$longUrl = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo='.$order['check_code'].'&amount=' . $order['deal_amount'] . '';
 			$data    = [
 				'dwzapi' => 'urlcn',
 				'url'    => $longUrl
