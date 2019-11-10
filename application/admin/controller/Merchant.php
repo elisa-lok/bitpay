@@ -69,8 +69,8 @@ class Merchant extends Base {
 		$lists           = $member->getMerchantByWhere($map, $Nowpage, $limits);
 		foreach ($lists as $k => &$v) {
 			$v['total_usdt'] = $v['usdt'] + $v['usdtd'];
-			$v['addtime'] = getTime($v['addtime']);
-			$v['parent']  = $member->where('id', $v['pid'])->value('name');
+			$v['addtime']    = getTime($v['addtime']);
+			$v['parent']     = $member->where('id', $v['pid'])->value('name');
 		}
 		$this->assign('Nowpage', $Nowpage); //当前页
 		$this->assign('allpage', $allpage); //总页数
@@ -215,14 +215,12 @@ class Merchant extends Base {
 			return json(['code' => 0, 'msg' => '用户注册类型错误']);
 		}
 		if (Db::name('merchant')->where('id', $id)->update($update)) {
-		    if ($user['reg_type'] == 2){
-		        // 空
-                Db::name('merchant')->where('reg_type', 1)
-                    ->whereNull()->update(['pptrader' => $id]);
-		        // 非空
-                Db::name('merchant')->where('reg_type', 1)
-                    ->whereNotNull()->update(['pptrader' => Db::raw("CONCAT(pptrader, ',{$id}')")]);
-		    }
+			if ($user['reg_type'] == 2) {
+				// 空
+				Db::name('merchant')->where('reg_type', 1)->whereNull()->update(['pptrader' => $id]);
+				// 非空
+				Db::name('merchant')->where('reg_type', 1)->whereNotNull()->update(['pptrader' => Db::raw("CONCAT(pptrader, ',{$id}')")]);
+			}
 
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】审核用户:' . $id . '成功', 1);
 			return json(['code' => 1, 'msg' => '操作成功']);
@@ -270,7 +268,7 @@ class Merchant extends Base {
 	}
 
 	public function edit_merchant() {
-        $member = new MerchantModel();
+		$member = new MerchantModel();
 
 		if (request()->isAjax()) {
 			$param = input('post.');
@@ -852,13 +850,13 @@ class Merchant extends Base {
 			}
 
 			//新-结束
-			$deal_num            = Db::name('order_buy')->where(['sell_sid' => $v['id'], 'status' => ['neq', 5], 'status' => ['neq', 9]])->sum('deal_num');
-			$deal_num            = $deal_num ? $deal_num : 0;
-			$lists[$k]['deal']   = $deal_num;
+			$deal_num          = Db::name('order_buy')->where(['sell_sid' => $v['id'], 'status' => ['neq', 5], 'status' => ['neq', 9]])->sum('deal_num');
+			$deal_num          = $deal_num ? $deal_num : 0;
+			$lists[$k]['deal'] = $deal_num;
 			//$lists[$k]['remain'] = $v['amount'] - $lists[$k]['deal'];
-			$lists[$k]['remain'] = $v['remain_amount'];
+			$lists[$k]['remain']         = $v['remain_amount'];
 			$lists[$k]['trading_volume'] = $v['trading_volume'];
-			$lists[$k]['payway'] = $str;
+			$lists[$k]['payway']         = $str;
 		}
 		$this->assign('Nowpage', $Nowpage); //当前页
 		$this->assign('allpage', $allpage); //总页数
@@ -978,6 +976,9 @@ class Merchant extends Base {
 		}
 		$rs = Db::name('ad_sell')->update(['id' => $id, 'state' => 2]);
 		if ($rs) {
+			Db::name('merchant')->where('id', $find['userid'])->setInc('usdt', $find['remain_amount']);
+			Db::name('merchant')->where('id', $find['userid'])->setDec('usdtd', $find['remain_amount']);
+
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】下架挂单:' . $id . '成功', 1);
 			return json(['code' => 1, 'msg' => '下架成功']);
 		} else {
@@ -1008,13 +1009,22 @@ class Merchant extends Base {
 		if (empty($find)) {
 			return json(['code' => 0, 'msg' => '参数错误']);
 		}
-		$rs = Db::name('ad_sell')->update(['id' => $id, 'state' => 1]);
-		if ($rs) {
-			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】上架挂单:' . $id . '成功', 1);
-			return json(['code' => 1, 'msg' => '上架成功']);
-		} else {
+		$user = Db::name('merchant')->where('id', $find['userid'])->find();
+		if ($find['remain_amount'] > $user['usdt']) {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】上架挂单:' . $id . '失败', 0);
 			return json(['code' => 0, 'msg' => '上架失败']);
+		} else {
+			$rs = Db::name('ad_sell')->update(['id' => $id, 'state' => 1]);
+			if ($rs) {
+				Db::name('merchant')->where('id', $find['userid'])->setDec('usdt', $find['remain_amount']);
+				Db::name('merchant')->where('id', $find['userid'])->setInc('usdtd', $find['remain_amount']);
+
+				writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】上架挂单:' . $id . '成功', 1);
+				return json(['code' => 1, 'msg' => '上架成功']);
+			} else {
+				writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】上架挂单:' . $id . '失败', 0);
+				return json(['code' => 0, 'msg' => '上架失败']);
+			}
 		}
 	}
 
@@ -1284,15 +1294,27 @@ class Merchant extends Base {
 		}
 		Db::startTrans();
 		try {
-			$rs1 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $orderinfo['deal_num']);
-			$rs2 = Db::table('think_order_buy')->update(['id' => $orderinfo['id'], 'status' => 9, 'finished_time' => time()]);
-			$rs3 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $orderinfo['deal_num']);
+			//$rs1 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $orderinfo['deal_num']);
+			//$rs3 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $orderinfo['deal_num']);
+			$rs1 = Db::table('think_order_buy')->update(['id' => $orderinfo['id'], 'status' => 9, 'finished_time' => time()]);
+			// 回滚挂单
+			$rs2 = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])->setInc('remain_amount', $orderinfo['deal_num']);
+			$rs3 = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])->setDec('trading_volume', $orderinfo['deal_num']);
+			// 判断挂单是否已经下架
+			$sellInfo = Db::name('ad_sell')->where(['id' => $orderinfo['sell_sid'], 'state' => 2])->find();
+			$rs4      = $rs5 = 1;
+			if ($sellInfo) {
+				// 如果挂单已下架 回滚余额
+				$rs4 = Db::name('merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $orderinfo['deal_num']);
+				$rs5 = Db::name('merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $orderinfo['deal_num']);
+			}
+
 			//$rs4 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('transact', 1);
 			//$total = Db::table('think_order_buy')->field('sum(finished_time-dktime) as total')->where('sell_id', $orderinfo['sell_id'])->where('status', 4)->select();
 			//$tt = $total[0]['total'];
 			//$transact = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->value('transact');
 			//$rs5 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->update(['averge'=>intval($tt/$transact)]);
-			if ($rs1 && $rs2 && $rs3) {
+			if ($rs1 && $rs2 && $rs3 && $rs4 && $rs5) {
 				// 提交事务
 				Db::commit();
 				//请求回调接口
