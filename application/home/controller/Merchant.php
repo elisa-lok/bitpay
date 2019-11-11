@@ -1693,7 +1693,10 @@ class Merchant extends Base {
 		$usdt_price_min = Db::name('config')->where('name', 'usdt_price_min')->value('value');
 		$usdt_price_max = Db::name('config')->where('name', 'usdt_price_max')->value('value');
 		if ($usdt_price_way == 2) {
-			$pricelimit = getUsdtPrice() + config('usdt_price_add');
+			$currPrice = getUsdtPrice();
+			$addPrice  = $currPrice * (config('usdt_price_add') / 100);
+			// $pricelimit = getUsdtPrice() + config('usdt_price_add');
+			$pricelimit = $currPrice + $addPrice;
 		} else {
 			$pricelimit = 0;
 		}
@@ -2965,21 +2968,21 @@ class Merchant extends Base {
 			$payarr[]                = 'bank';
 		}
 		if ($type == 'alipay' && $zfbid > 0) {
-			$zfb                      = Db::name('merchant_zfb')->where('id', $zfbid)->find();
+			$zfb = Db::name('merchant_zfb')->where('id', $zfbid)->find();
 			//var_dump($zfb);die;
 			//empty($zfb['alipay_id']) && $this->error('appid不存在');
-			$url     = 'https://api.uomg.com/api/long2dwz';
-			$longUrl = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo='.$order['check_code'].'&amount=' . $order['deal_amount'] . '';
-			$data    = [
+			$url                      = 'https://api.uomg.com/api/long2dwz';
+			$longUrl                  = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] . '&amount=' . $order['deal_amount'] . '';
+			$data                     = [
 				'dwzapi' => 'urlcn',
 				'url'    => $longUrl
 			];
-			$res     = $this->Scurl($url, $data);
-			$obj     = json_decode($res);
+			$res                      = $this->Scurl($url, $data);
+			$obj                      = json_decode($res);
 			$merchant['c_alipay_img'] = $obj->{'ae_url'};
 			$merchant['alipay_name']  = $zfb['truename'];
 			$merchant['alipay_acc']   = $zfb['c_bank'];
-			$payarr[] .= 'zfb';
+			$payarr[]                 .= 'zfb';
 			/*$zfb                      = Db::name('merchant_zfb')->where('id', $zfbid)->find();
 			$merchant['zfb']          = $zfb['c_bank_card'];
 			$merchant['name']         = $zfb['truename'];
@@ -3026,8 +3029,6 @@ class Merchant extends Base {
 		return $this->fetch('paymobile');
 	}
 
-
-
 	public function pay() {
 		$id    = input('get.id');
 		$appid = input('get.appid');
@@ -3068,20 +3069,20 @@ class Merchant extends Base {
 		if ($zfbid > 0) {
 			//echo 111;die;
 			//$bank    = Db::name('merchant_bankcard')->where('id', $bankid)->find();
-			$zfb                      = Db::name('merchant_zfb')->where('id', $zfbid)->find();
+			$zfb = Db::name('merchant_zfb')->where('id', $zfbid)->find();
 			//var_dump($zfb);die;
-			$url     = 'https://api.uomg.com/api/long2dwz';
-			$longUrl = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo='.$order['check_code'].'&amount=' . $order['deal_amount'] . '';
-			$data    = [
+			$url                      = 'https://api.uomg.com/api/long2dwz';
+			$longUrl                  = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] . '&amount=' . $order['deal_amount'] . '';
+			$data                     = [
 				'dwzapi' => 'urlcn',
 				'url'    => $longUrl
 			];
-			$res     = $this->Scurl($url, $data);
-			$obj     = json_decode($res);
+			$res                      = $this->Scurl($url, $data);
+			$obj                      = json_decode($res);
 			$merchant['c_alipay_img'] = $obj->{'ae_url'};
 			$merchant['alipay_name']  = $zfb['truename'];
 			$merchant['alipay_acc']   = $zfb['c_bank'];
-			$payarr[] .= 'zfb';
+			$payarr[]                 .= 'zfb';
 			/*var_dump($bank);
 			die;
 			$zfb                      = Db::name('merchant_zfb')->where('id', $zfbid)->find();
@@ -3122,22 +3123,23 @@ class Merchant extends Base {
 		$this->assign('second', $second);
 		return $this->fetch('paymobile');
 	}
+
 	public function Scurl($url, $data = []) {
-	//使用crul模拟
-	$ch = curl_init();
-	//禁用https
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-	//允许请求以文件流的形式返回
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-	curl_setopt($ch, CURLOPT_POST, 1);
-	curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
-	curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 30);
-	curl_setopt($ch, CURLOPT_URL, $url);
-	$result = curl_exec($ch); //执行发送
-	curl_close($ch);
-	return $result;
-}
+		//使用crul模拟
+		$ch = curl_init();
+		//禁用https
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+		//允许请求以文件流的形式返回
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
+		curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 30);
+		curl_setopt($ch, CURLOPT_URL, $url);
+		$result = curl_exec($ch); //执行发送
+		curl_close($ch);
+		return $result;
+	}
 
 	public function CheckOutTime() {
 		$id    = input('post.id');
@@ -3531,6 +3533,7 @@ class Merchant extends Base {
 			//平台，承兑商代理，商户代理，承兑商，商户只能得到这么多，多的给平台
 			$moneyArr           = getMoneyByLevel($pkdec, $platformMoney, $traderParentMoney, $traderMParentMoney, $traderMoney);
 			$mum                = $mum - $pkdec;
+			$platformMoney      = $moneyArr[0];
 			$traderParentMoney  = $moneyArr[1];
 			$traderMParentMoney = $moneyArr[2];
 			$traderMoney        = $moneyArr[3];
@@ -3551,7 +3554,7 @@ class Merchant extends Base {
 				$transact = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->value('transact');
 				$rs5      = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->update(['averge' => intval($tt / $transact)]);
 				//承兑商卖单奖励
-				$rs6 = $rs7 = $rs8 = $rs9 = $rs10 = $rs11 = TRUE;
+				$rs6 = $rs7 = $rs8 = $rs9 = $rs10 = $rs11 = $res3 = TRUE;
 				if ($traderMoney > 0) {
 					$rs6 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $traderMoney);
 					$rs7 = Db::table('think_trader_reward')->insert(['uid' => $orderinfo['sell_id'], 'orderid' => $orderinfo['id'], 'amount' => $traderMoney, 'type' => 0, 'create_time' => time()]);
@@ -3568,7 +3571,12 @@ class Merchant extends Base {
 					$rs10  = $rsarr[0];
 					$rs11  = $rsarr[1];
 				}
-				if ($rs1 && $rs2 && $rs3 && $rs4 && $rs6 && $rs7 && $rs8 && $rs9 && $rs10 && $rs11) {
+				// 平台利润
+				if ($platformMoney > 0) {
+					$rsarr = agentReward(-1, 0, $platformMoney, 5);//5
+					$res3  = $rsarr[1];
+				}
+				if ($rs1 && $rs2 && $rs3 && $rs4 && $rs6 && $rs7 && $rs8 && $rs9 && $rs10 && $rs11 && $res3) {
 					// 提交事务
 					Db::commit();
 					financelog($orderinfo['buy_id'], $mum, '买入USDT_f1', 0, session('user.name'));//添加日志

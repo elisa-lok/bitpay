@@ -19,27 +19,37 @@
                     <table class="table table-bordered table-hover">
                         <thead>
                             <tr class="long-tr">
+                            	<th>编号</th>
                                 <th width="">平台利润</th>
-                                <th>商户代理奖励</th>
-                                <th>承兑商代理奖励</th>
+                                <th>代理商奖励</th>
+                                <th>承兑商奖励</th>
                                 <th>USDT总数量</th>
                                 <th>充值数量</th>
-                                <th>充值手续费</th>
                                 <th>提币数量</th>
-                                <th>提币手续费</th>
+                                <th>挂单出售笔数</th>
+                                <th>挂单出售USDT</th>
+								<th>求购笔数</th>
+								<th>求购数量</th>
+								<th>时间</th>
                             </tr>
                         </thead>
                         <script id="list-template" type="text/html">
+                            {{# for(var i=0;i<d.length;i++){  }}
                             <tr class="long-td">
-                                <td>{$platformMoney}</td>
-                                <td>{$traderMParentMoney}</td>
-                                <td>{$traderParentMoney}</td>
-                                <td>{$total_balance}</td>
-                                <td>{$recharge_num}</td>
-                                <td>{$recharge_fee}</td>
-                                <td>{$withdraw_num}</td>
-                                <td>{$withdraw_fee}</td>
+								<td>{{d[i].id}}</td>
+                                <td>{{d[i].platform_profit}}</td>
+                                <td>{{d[i].agent_reward}}</td>
+                                <td>{{d[i].trader_reward}}</td>
+                                <td>{{d[i].platform_usdt_amount}}</td>
+                                <td>{{d[i].recharge_total}}</td>
+								<td>{{d[i].withdraw_total}}</td>
+                                <td>{{d[i].ad_sell_on_total}}</td>
+                                <td>{{d[i].order_sell_amount}}</td>
+                                <td>{{d[i].ad_buy_on_total}}</td>
+                                <td>{{d[i].order_buy_amount}}</td>
+                                <td>{{d[i].create_time}}</td>
                             </tr>
+                            {{# } }}
                         </script>
                         <tbody id="list-content"></tbody>
                     </table>
