@@ -1791,37 +1791,44 @@ class Merchant extends Base {
 			}
 			// dump($isbank['name']);die;
 
-			$ad_no  = $this->getadvno();
-			$model2 = new AdModel();
-			$flag   = $model2->insertOne([
-				'userid'        => session('uid'),
-				'add_time'      => time(),
-				'coin'          => '0',
-				'min_limit'     => $min_limit,
-				'max_limit'     => $max_limit,
-				'pay_method'    => $_POST['bank'],
-				'pay_method2'   => $_POST['zfb'],
-				'pay_method3'   => $_POST['wx'],
-				'pay_method4'   => $_POST['ysf'],
-				'ad_no'         => $ad_no,
-				'amount'        => $amount,
-				'remain_amount' => $amount,
-				'price'         => $price,
-				'message'       => '',
-				'state'         => 1
-			]);
-
+			Db::startTrans();
 			// 减少余额 增加冻结余额
-			Db::name('merchant')->where('id', session('uid'))->setDec('usdt', $amount);
-			Db::name('merchant')->where('id', session('uid'))->setInc('usdtd', $amount);
+			$res1 = Db::name('merchant')->where('id', session('uid'))->setDec('usdt', $amount);
+			$res2 = Db::name('merchant')->where('id', session('uid'))->setInc('usdtd', $amount);
 
-			//增加在售挂单数
-			$count = $model2->where('userid', session('uid'))->where('state', 1)->where('amount', 'gt', 0)->count();
-			$model->updateOne(['id' => session('uid'), 'ad_on_sell' => $count]);
-			if ($flag['code'] == 1) {
-				$this->success($flag['msg']);
-			} else {
-				$this->error($flag['msg']);
+			if ($res1 && $res2) {
+				Db::commit();
+				$ad_no  = $this->getadvno();
+				$model2 = new AdModel();
+				$flag   = $model2->insertOne([
+					'userid'        => session('uid'),
+					'add_time'      => time(),
+					'coin'          => '0',
+					'min_limit'     => $min_limit,
+					'max_limit'     => $max_limit,
+					'pay_method'    => $_POST['bank'],
+					'pay_method2'   => $_POST['zfb'],
+					'pay_method3'   => $_POST['wx'],
+					'pay_method4'   => $_POST['ysf'],
+					'ad_no'         => $ad_no,
+					'amount'        => $amount,
+					'remain_amount' => $amount,
+					'price'         => $price,
+					'message'       => '',
+					'state'         => 1
+				]);
+
+				//增加在售挂单数
+				$count = $model2->where('userid', session('uid'))->where('state', 1)->where('amount', 'gt', 0)->count();
+				$model->updateOne(['id' => session('uid'), 'ad_on_sell' => $count]);
+				if ($flag['code'] == 1) {
+					$this->success($flag['msg']);
+				} else {
+					$this->error($flag['msg']);
+				}
+			}else {
+				Db::rollback();
+				$this->error("挂单失败,无法冻结余额。");
 			}
 		} else {
 			$this->assign('usdt_price_min', $usdt_price_min);
