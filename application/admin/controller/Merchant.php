@@ -1494,7 +1494,7 @@ class Merchant extends Base {
 				$samount = $orderinfo['deal_num'] - $oldNum;
 			}
 			if ($amount * 100 < $orderinfo['deal_amount'] * 100) {
-				$rs22    = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $oldNum - $orderinfo['deal_num']);
+				//$rs22    = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $oldNum - $orderinfo['deal_num']);
 				$samount = $oldNum - $orderinfo['deal_num'];
 			}
 			$rs3      = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->setInc('usdt', $mum);
