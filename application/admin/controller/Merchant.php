@@ -1470,6 +1470,7 @@ class Merchant extends Base {
 		//平台，承兑商代理，商户代理，承兑商，商户只能得到这么多，多的给平台
 		$moneyArr           = getMoneyByLevel($pkdec, $platformMoney, $traderParentMoney, $traderMParentMoney, $traderMoney);
 		$mum                = $mum - $pkdec;
+		$platformMoney      = $moneyArr[0];
 		$traderParentMoney  = $moneyArr[1];
 		$traderMParentMoney = $moneyArr[2];
 		$traderMoney        = $moneyArr[3];
@@ -1480,7 +1481,7 @@ class Merchant extends Base {
 			// 回滚
 			$res1 = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])->setInc('remain_amount', $backAmount);
 			$res2 = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])->setDec('trading_volume', $backAmount);
-			$rs1 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $backAmount);
+			$rs1  = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $backAmount);
 
 			// $rs1 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $oldNum);
 			if ($amount * 100 != $orderinfo['deal_amount'] * 100) {
@@ -1490,7 +1491,7 @@ class Merchant extends Base {
 			}
 			$rs22 = TRUE;
 			if ($amount * 100 > $orderinfo['deal_amount'] * 100) {
-				$rs22    = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdt', $orderinfo['deal_num'] - $oldNum);
+				//$rs22    = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdt', $orderinfo['deal_num'] - $oldNum);
 				$samount = $orderinfo['deal_num'] - $oldNum;
 			}
 			if ($amount * 100 < $orderinfo['deal_amount'] * 100) {
@@ -1504,7 +1505,7 @@ class Merchant extends Base {
 			$transact = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->value('transact');
 			$rs5      = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->update(['averge' => intval($tt / $transact)]);
 			//承兑商卖单奖励
-			$rs6 = $rs7 = $rs8 = $rs9 = $rs10 = $rs11 = TRUE;
+			$rs6 = $rs7 = $rs8 = $rs9 = $rs10 = $rs11 = $res3 = TRUE;
 			if ($traderMoney > 0) {
 				$rs6 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $traderMoney);
 				$rs7 = Db::table('think_trader_reward')->insert(['uid' => $orderinfo['sell_id'], 'orderid' => $orderinfo['id'], 'amount' => $traderMoney, 'type' => 0, 'create_time' => time()]);
@@ -1521,7 +1522,12 @@ class Merchant extends Base {
 				$rs10  = $rsarr[0];
 				$rs11  = $rsarr[1];
 			}
-			if ($rs1 && $rs2 && $rs3 && $rs4 && $rs5 && $rs6 && $rs7 && $rs8 && $rs9 && $rs10 && $rs11 && $rs22 && $res1 && $res2) {
+			// 平台利润
+			if ($platformMoney > 0) {
+				$rsarr = agentReward(-1, 0, $platformMoney, 5);//5
+				$res3  = $rsarr[1];
+			}
+			if ($rs1 && $rs2 && $rs3 && $rs4 && $rs5 && $rs6 && $rs7 && $rs8 && $rs9 && $rs10 && $rs11 && $rs22 && $res1 && $res2 && $res3) {
 				// 提交事务
 				Db::commit();
 				financelog($orderinfo['sell_id'], $mum, '卖出USDT_释放', 0, session('username'));//添加日志
@@ -1608,6 +1614,29 @@ class Merchant extends Base {
 			$auto = new Auto;
 			$auto->statistics();
 		}
+
+		// 获取以前平台利润
+		$statistics = Db::name('statistics')->order('id desc')->find();
+
+		// 获取USDT总数量
+		$total_usdt    = Db::name('merchant')->sum('usdt');
+		$total_usdtd   = Db::name('merchant')->sum('usdtd');
+		$total_balance = $total_usdt + $total_usdtd;
+		// 获取充值数量
+		$recharge_num = Db::name('merchant_recharge')->sum('num');
+		$recharge_fee = Db::name('merchant_recharge')->sum('fee');
+		// 获取提币数量
+		$withdraw_num = Db::name('merchant_withdraw')->where('status', 1)->sum('num');
+		$withdraw_fee = Db::name('merchant_withdraw')->where('status', 1)->sum('fee');
+		// 商户代理奖励
+		$traderMParentMoney = Db::name('agent_reward')->where('type', 4)->sum('amount');
+		// 承兑商代理奖励
+		$traderParentMoney = Db::name('agent_reward')->where('type', 3)->sum('amount');
+		// 平台利润
+		$platformMoney = Db::name('agent_reward')->where('type', 5)->sum('amount');
+		$platformMoney += $statistics['platform_profit'];
+
+		/*
 		$member  = new MerchantModel();
 		$Nowpage = input('get.page') ? input('get.page') : 1;
 		$limits  = config('list_rows');// 获取总条数
@@ -1620,9 +1649,24 @@ class Merchant extends Base {
 		}
 		$this->assign('Nowpage', $Nowpage); //当前页
 		$this->assign('allpage', $allpage); //总页数
+
 		if (input('get.page')) {
 			return json($lists);
 		}
+		*/
+
+		$this->assign('Nowpage', 1); //当前页
+		$this->assign('allpage', 1); //总页数
+
+		$this->assign('total_balance', $total_balance); //总USDT
+		$this->assign('withdraw_num', $withdraw_num); //总提币数量
+		$this->assign('withdraw_fee', $withdraw_fee); //总提币手续费
+		$this->assign('recharge_num', $recharge_num); //总充值数量
+		$this->assign('recharge_fee', $recharge_fee); //总充值手续费
+		$this->assign('traderMParentMoney', $traderMParentMoney); //商户代理奖励
+		$this->assign('traderParentMoney', $traderParentMoney); //承兑商代理奖励
+		$this->assign('platformMoney', $platformMoney); //平台利润
+
 		return $this->fetch();
 	}
 
