@@ -1738,8 +1738,11 @@ class Merchant extends Base {
 			//     }
 			// }
 			if ($usdt_price_way == 2) {
-				$pricelimit = floatval(getUsdtPrice() + config('usdt_price_add'));
-				$price      = floatval(getUsdtPrice() + config('usdt_price_add'));
+				$currPrice = getUsdtPrice();
+				$addPrice  = $currPrice * (config('usdt_price_add') / 100);
+				// $pricelimit = getUsdtPrice() + config('usdt_price_add');
+				$pricelimit = $currPrice + $addPrice;
+				$price      = $pricelimit;
 			}
 
 			// $pay_method = $_POST['pay_method'];
