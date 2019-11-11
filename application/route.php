@@ -49,3 +49,5 @@ Route::rule('auto/sellCountDown','home/auto/sellCountDown', 'GET');
 Route::rule('auto/buyCountDown','home/auto/buyCountDown', 'GET');
 Route::rule('auto/updateAdSellPrice','home/auto/updateAdSellPrice', 'GET');
 Route::rule('auto/updateAdBuyPrice','home/auto/updateAdBuyPrice', 'GET');
+
+Route::rule('go', 'api/redirect/go', 'GET');
