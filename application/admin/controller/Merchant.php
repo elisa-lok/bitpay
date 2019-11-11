@@ -1084,11 +1084,15 @@ class Merchant extends Base {
 		}
 		$rs = Db::name('ad_sell')->update(['id' => $id, 'state' => 2]);
 		if ($rs) {
+			// 解冻后是下架 所以回滚余额
+			Db::name('merchant')->where('id', $find['user_id'])->setInc('usdt', $find['remain_volume']);
+			Db::name('merchant')->where('id', $find['user_id'])->setDec('usdtd', $find['remain_volume']);
+
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】冻结挂单:' . $id . '成功', 1);
-			return json(['code' => 1, 'msg' => '冻结成功']);
+			return json(['code' => 1, 'msg' => '解冻成功']);
 		} else {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】冻结挂单:' . $id . '失败', 0);
-			return json(['code' => 0, 'msg' => '冻结失败']);
+			return json(['code' => 0, 'msg' => '解冻失败']);
 		}
 	}
 
@@ -1471,10 +1475,14 @@ class Merchant extends Base {
 		$traderMoney        = $moneyArr[3];
 		Db::startTrans();
 		try {
-			$res1 = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])->setInc('remain_amount', $amount);
-			$res2 = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])->setDec('trading_volume', $amount);
+			// $adInfo = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])->find();
+			$backAmount = $amount / $orderinfo['deal_price'];  // 返回的数量
+			// 回滚
+			$res1 = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])->setInc('remain_amount', $backAmount);
+			$res2 = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])->setDec('trading_volume', $backAmount);
+			$rs1 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $backAmount);
 
-			$rs1 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $oldNum);
+			// $rs1 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $oldNum);
 			if ($amount * 100 != $orderinfo['deal_amount'] * 100) {
 				$rs2 = Db::table('think_order_buy')->update(['id' => $orderinfo['id'], 'status' => 4, 'finished_time' => time(), 'platform_fee' => $moneyArr[0], 'deal_amount' => $amount, 'deal_num' => $orderinfo['deal_num']]);
 			} else {
