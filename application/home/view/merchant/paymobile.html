@@ -104,7 +104,7 @@
 							<p style="color:blue;margin-top: 20px;font-size:18px;">温馨提示:如果是手机操作请截取下面图片<br>打开支付扫一扫,选择相册相片识别二维码进行转账<br></p>
 							<div class="mt10" style="color: red;">
 								<p>1.打开支付宝，点击"扫一扫"</p>
-								<a href="alipays://platformapi/startapp?appId=20000067&url={$user.alipayToCard.Short_link}">
+								<a  id='alipay_link' href="">
 								<p id="qrcode"></p>点我打开支付宝付款</a>
 								<!--<p class="mt10">2.点击“转到支付宝账户”</p>
 								<p><img src="__IMG__/alipay/ali2.jpg"></p>
@@ -376,7 +376,7 @@
 		})
     }
     if(/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
-        $('#alipay_link').attr('href', 'alipays://platformapi/startapp?appId=20000067&url='+window.location.protocol+'//'+window.location.host+'/go/url/{$user.alipay.alipay_pay|base64_encode}');
+        $('#alipay_link').attr('href', 'alipays://platformapi/startapp?appId=20000067&url='+window.location.protocol+'//'+window.location.host+'/go/url/{$logUrl|base64_encode}');
         $('#alipay_click').text("点击打开支付宝");
     }
 	/*setTimeout(function () {

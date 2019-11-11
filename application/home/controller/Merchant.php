@@ -3012,6 +3012,7 @@ class Merchant extends Base {
 		}
 		//dump($merchant);die;
 		$this->assign('payarr', $payarr);
+		$this->assign('logUrl', $longUrl);
 		$this->assign('merchant', $merchant);
 		//平均确认时间
 		if (!$merchant['transact']) {
@@ -3121,6 +3122,7 @@ class Merchant extends Base {
 		}
 		$this->assign('min', $min);
 		$this->assign('second', $second);
+		$this->assign('logUrl', $longUrl);
 		return $this->fetch('paymobile');
 	}
 
