@@ -637,10 +637,13 @@ class Auto extends Base {
 		(PHP_SAPI != 'cli') && die('error');
 		$usdtPriceWay = Db::name('config')->where('name', 'usdt_price_way')->value('value');
 		($usdtPriceWay == 0) && die('price way error');
-		$addFee = $usdtPriceWay == 2 ? config('usdt_price_add') : 0;
+		// $addFee = $usdtPriceWay == 2 ? config('usdt_price_add') : 0;
+
 		// 只有支持加价模式的变动
 		Db::startTrans();
 		$usdtPrice = getUsdtPrice();
+		$addFee  = $usdtPrice * (config('usdt_price_add') / 100);
+
 		$res = Db::name('ad_sell')->where('state=1')->update(['price' => $usdtPrice + $addFee]);
 		$res ? Db::commit() : Db::rollback();
 		$msg = '【' . date('Y-m-d H:i:s') . '】 卖单加价价格更新'. ($res ? '成功' : '失败') . "更新模式:$usdtPriceWay, USDT价格:$usdtPrice \r\n";
