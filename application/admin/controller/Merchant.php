@@ -1633,8 +1633,9 @@ class Merchant extends Base {
 		// 承兑商代理奖励
 		$traderParentMoney = Db::name('agent_reward')->where('type', 3)->sum('amount');
 		// 平台利润
-		$platformMoney = Db::name('agent_reward')->where('type', 5)->sum('amount');
-		$platformMoney += $statistics['platform_profit'];
+		// $platformMoney = Db::name('agent_reward')->where('type', 5)->sum('amount');
+		// $platformMoney += $statistics['platform_profit'];
+		$platformMoney = $statistics['platform_profit'];
 
 		/*
 		$member  = new MerchantModel();
