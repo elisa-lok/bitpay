@@ -1693,7 +1693,10 @@ class Merchant extends Base {
 		$usdt_price_min = Db::name('config')->where('name', 'usdt_price_min')->value('value');
 		$usdt_price_max = Db::name('config')->where('name', 'usdt_price_max')->value('value');
 		if ($usdt_price_way == 2) {
-			$pricelimit = getUsdtPrice() + config('usdt_price_add');
+			$currPrice = getUsdtPrice();
+			$addPrice = $currPrice * (config('usdt_price_add') / 100);
+			// $pricelimit = getUsdtPrice() + config('usdt_price_add');
+			$pricelimit = $currPrice + $addPrice;
 		} else {
 			$pricelimit = 0;
 		}

@@ -1471,6 +1471,9 @@ class Merchant extends Base {
 		$traderMoney        = $moneyArr[3];
 		Db::startTrans();
 		try {
+			$res1 = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])->setInc('remain_amount', $amount);
+			$res2 = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])->setDec('trading_volume', $amount);
+
 			$rs1 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $oldNum);
 			if ($amount * 100 != $orderinfo['deal_amount'] * 100) {
 				$rs2 = Db::table('think_order_buy')->update(['id' => $orderinfo['id'], 'status' => 4, 'finished_time' => time(), 'platform_fee' => $moneyArr[0], 'deal_amount' => $amount, 'deal_num' => $orderinfo['deal_num']]);
@@ -1510,7 +1513,7 @@ class Merchant extends Base {
 				$rs10  = $rsarr[0];
 				$rs11  = $rsarr[1];
 			}
-			if ($rs1 && $rs2 && $rs3 && $rs4 && $rs5 && $rs6 && $rs7 && $rs8 && $rs9 && $rs10 && $rs11 && $rs22) {
+			if ($rs1 && $rs2 && $rs3 && $rs4 && $rs5 && $rs6 && $rs7 && $rs8 && $rs9 && $rs10 && $rs11 && $rs22 && $res1 && $res2) {
 				// 提交事务
 				Db::commit();
 				financelog($orderinfo['sell_id'], $mum, '卖出USDT_释放', 0, session('username'));//添加日志
