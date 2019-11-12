@@ -136,8 +136,21 @@ class MerchantModel extends Model{
         return Db::name('statistics')->where($map)->page($Nowpage, $limits)->order('id desc')->select();
     }
     public function getMerchantStatistics($map, $Nowpage, $limits, $order = ['id'=>'desc']){
-        //所属部门，手机号，usdt活动数量，usdt冻结数量，总数量，充值数量，提币数量，在售挂单数，挂买数，出售成功次数，求购成功次数，总出售usdt数量，总求购usdt数量
-        return $this->field('id, reg_type, mobile, usdt, usdtd, usdt+usdtd as usdtt, recharge_amount, withdraw_amount, ad_on_sell, ad_on_buy, order_sell_success_num, order_buy_success_num, order_sell_usdt_amount, order_buy_usdt_amount')->where($map)->page($Nowpage, $limits)->order($order)->select();
+    	// $join = [
+    	// 	// ['__MERCHANT_RECHARGE__ b', 'b.merchant_id=a.id', 'LEFT']
+    	// 	['__MERCHANT_WITHDRAW__ b', 'b.merchant_id=a.id', 'LEFT']
+		// ];
+    	return $this->field('id, reg_type, name, mobile, usdt+usdtd as usdtt, order_sell_usdt_amount')
+			->where($map)->page($Nowpage, $limits)->order($order)->select();
+        //所属部门，名称，手机号，usdt活动数量，usdt冻结数量，总数量，充值数量，提币数量，在售挂单数，挂买数，出售成功次数，求购成功次数，总出售usdt数量，总求购usdt数量
+        //return $this->field('id, reg_type, name, mobile, usdt, usdtd, usdt+usdtd as usdtt, recharge_amount, withdraw_amount, ad_on_sell, ad_on_buy, order_sell_success_num, order_buy_success_num, order_sell_usdt_amount, order_buy_usdt_amount')
+		//	->alias('a')->join($join)->where($map)->page($Nowpage, $limits)->order($order)->select();
     }
+    public function recharge(){
+    	return $this->hasMany(ChongBiModel::class, 'merchant_id', 'id');
+	}
+	public function orderSell(){
+    	return $this->hasMany(\app\home\model\OrderBuyModel::class, 'buy_id', 'id');
+	}
 }
 ?>

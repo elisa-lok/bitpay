@@ -36,15 +36,18 @@
                             <tr class="long-tr">
                             	<th>ID</th>
                                 <th width="">所属部门</th>
-                                <th>商户名称</th>
                                 <th>手机号</th>
-                                <th>总USDT</th>
-                                <th>总出售USDT</th>
-                                <th>充值笔数</th>
-                                <th>充值数量</th>
-                                <th>成功笔数</th>
-                                <th>成功数量</th>
-                                <th>成功率(%)</th>
+                                <th><a data-toggle="tooltip" title="usdt" data-placement="top">USDT活动数量</a></th>
+                                <th><a data-toggle="tooltip" title="usdtd" data-placement="top">USDT冻结数量</a></th>
+                                <th><a data-toggle="tooltip" title="usdtt" data-placement="top">总数量</a></th>
+                                <th><a data-toggle="tooltip" title="recharge_amount" data-placement="top">充值数量</a></th>
+                                <th><a data-toggle="tooltip" title="withdraw_amount" data-placement="top">提币数量</a></th>
+                                <th><a data-toggle="tooltip" title="ad_on_sell" data-placement="top">在售挂单数</a></th>
+								<th><a data-toggle="tooltip" title="ad_on_buy" data-placement="top">挂买数</a></th>
+								<th><a data-toggle="tooltip" title="order_sell_success_num" data-placement="top">出售成功次数</a></th>
+								<th><a data-toggle="tooltip" title="order_buy_success_num" data-placement="top">求购成功次数</a></th>
+								<th><a data-toggle="tooltip" title="order_sell_usdt_amount" data-placement="top">总出售USDT数量</a></th>
+								<th><a data-toggle="tooltip" title="order_buy_usdt_amount" data-placement="top">总求购USDT数量</a></th>
                             </tr>
                         </thead>
                         <script id="list-template" type="text/html">
@@ -52,23 +55,26 @@
                             <tr class="long-td">
 								<td>{{d[i].id}}</td>
                                 <td>
-                                {{# if(d[i].reg_type == 1){ }}
-                                    商户
-                                {{# }else if(d[i].reg_type == 2){ }}
-                                    承兑商
-                                {{# }else if(d[i].reg_type == 3){ }}
-                                    代理商
-                                {{# } }}
-                                </td>
-                                <td>{{d[i].name}}</td>
+{{# if(d[i].reg_type == 1){ }}
+	商户
+{{# }else if(d[i].reg_type == 2){ }}
+	承兑商
+{{# }else if(d[i].reg_type == 3){ }}
+	代理商
+{{# } }}
+</td>
                                 <td>{{d[i].mobile}}</td>
+                                <td>{{d[i].usdt}}</td>
+                                <td>{{d[i].usdtd}}</td>
                                 <td>{{d[i].usdtt}}</td>
+								<td>{{d[i].recharge_amount}}</td>
+                                <td>{{d[i].withdraw_amount}}</td>
+                                <td>{{d[i].ad_on_sell}}</td>
+                                <td>{{d[i].ad_on_buy}}</td>
+                                <td>{{d[i].order_sell_success_num}}</td>
+                                <td>{{d[i].order_buy_success_num}}</td>
                                 <td>{{d[i].order_sell_usdt_amount}}</td>
-                                <td>{{d[i].recharge_number}}</td>
-                                <td>{{d[i].recharge_amount}}</td>
-                                <td>{{d[i].success_number}}</td>
-                                <td>{{d[i].success_amount}}</td>
-                                <td>{{d[i].success_rate}}</td>
+                                <td>{{d[i].order_buy_usdt_amount}}</td>
                             </tr>
                             {{# } }}
                         </script>

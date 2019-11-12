@@ -1675,9 +1675,10 @@ class Merchant extends Base {
 	 * 商户统计
 	 */
 	public function merchantstatistics() {
-		$key       = input('key');
-		$order2    = input('order');
-		$map['id'] = ['gt', 0];
+		$key                            = input('key');
+		$order2                         = input('order');
+		$map['id']       = ['gt', 0];
+		$map['reg_type'] = ['eq', 1];  // new 只需要商户
 		if ($key && $key != '' && $order2 && $order2 != '') {
 			$order[$key] = $order2;
 		} else {
@@ -1693,6 +1694,20 @@ class Merchant extends Base {
 		$this->assign('allpage', $allpage); //总页数
 		$this->assign('val', $key);
 		$this->assign('order', $order2);
+		foreach ($lists as $key => $list){
+			$recharge_number = $list->recharge()->count('id');  // 充值笔数
+			$recharge_amount = $list->recharge()->sum('num');  // 充值数量
+			$success_number = $list->orderSell()->where('status', 4)->count('id');  // 成功笔数
+			$success_amount = $list->orderSell()->where('status', 4)->sum('deal_num');  // 成功数量
+			$buy_number = $list->orderSell()->count('id');  // 购买数量
+			$success_rate = ($success_number / $buy_number) * 100;  // 成功率
+
+			$lists[$key]['recharge_number'] = $recharge_number;
+			$lists[$key]['recharge_amount'] = $recharge_amount;
+			$lists[$key]['success_number'] = $success_number;
+			$lists[$key]['success_amount'] = $success_amount;
+			$lists[$key]['success_rate'] = $success_rate;
+		}
 		if (input('get.page')) {
 			return json($lists);
 		}
