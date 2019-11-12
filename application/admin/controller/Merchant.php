@@ -1695,10 +1695,10 @@ class Merchant extends Base {
 		$this->assign('val', $key);
 		$this->assign('order', $order2);
 		foreach ($lists as $key => $list) {
-			$recharge_number = $list->recharge()->count('id');  // 充值笔数
-			$recharge_amount = $list->recharge()->sum('num');  // 充值数量
+			$recharge_number = $list->orderSell()->count('id');  // 充值笔数
+			$recharge_amount = $list->orderSell()->sum('deal_amount');  // 充值数量
 			$success_number  = $list->orderSell()->where('status', 4)->count('id');  // 成功笔数
-			$success_amount  = $list->orderSell()->where('status', 4)->sum('deal_num');  // 成功数量
+			$success_amount  = $list->orderSell()->where('status', 4)->sum('deal_amount');  // 成功数量
 			$buy_number      = $list->orderSell()->count('id');  // 购买数量
 			if ($success_number == 0 || $buy_number == 0) $success_rate = 0; else $success_rate = ($success_number / $buy_number) * 100;  // 成功率
 
