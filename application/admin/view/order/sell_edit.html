@@ -1,0 +1,138 @@
+{include file="public/header" /}
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="ibox float-e-margins">
+				<div class="ibox-title">
+					<h5>编辑订单</h5>
+					<div class="ibox-tools">
+						<a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a> <a class="dropdown-toggle" data-toggle="dropdown" href="form_basic.html#"> <i class="fa fa-wrench"></i> </a> <a class="close-link"> <i class="fa fa-times"></i> </a>
+					</div>
+				</div>
+				<div class="ibox-content">
+					<form class="form-horizontal m-t" id="order_change">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">订单ID：</label>
+							<div class="input-group col-sm-4">
+								<input type="text" class="form-control" name="id" placeholder="订单ID" value="{$data.id}" readonly>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">编号：</label>
+							<div class="input-group col-sm-4">
+								<input type="text" class="form-control" name="order_no" placeholder="订单请求编号" value="{$data.order_no}" readonly>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">买家ID：</label>
+							<div class="input-group col-sm-4">
+								<input type="text" class="form-control" name="buy_id" placeholder="买家ID" value="{$data.buy_id}" readonly>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">卖家ID：</label>
+							<div class="input-group col-sm-4">
+								<input type="text" class="form-control" name="sell_id" placeholder="卖家ID" value="{$data.sell_id}" readonly>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">成交价格：</label>
+							<div class="input-group col-sm-4">
+								<input type="text" class="form-control" id="dealPrice" name="deal_price" placeholder="成交价格" value="{$data.deal_price}" readonly>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">成交总额：</label>
+							<div class="input-group col-sm-4">
+								<input type="text" class="form-control" id="dealAmt" name="deal_amount" placeholder="成交总额" value="{$data.deal_amount}" onkeyup="calcAmt()">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">成交数量：</label>
+							<div class="input-group col-sm-4">
+								<input type="text" class="form-control" id="dealNum" name="deal_num" placeholder="成交数量" value="{$data.deal_num}" readonly>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">订单状态：</label>
+							<div class="input-group col-sm-4">
+								<select class="form-control m-b chosen-select" name="status">
+									<option value="">--请选择--</option>
+									<option value="0" {eq name="data.status" value="0" }selected{/eq}>待付款</option>
+									<option value="1" {eq name="data.status" value="1" }selected{/eq}>待放行</option>
+									<option value="4" {eq name="data.status" value="4" }selected{/eq}>已完成</option>
+									<option value="5" {eq name="data.status" value="5" }selected{/eq}>已关闭</option>
+									<!--
+									<option value="6" {eq name="data.status" value="6" }selected{/eq}>申诉中</option>
+									<option value="9" {eq name="data.status" value="9" }selected{/eq}>订单失败</option>
+									-->
+								</select>
+							</div>
+						</div>
+						<!--
+						<div class="form-group">
+							<label class="col-sm-3 control-label">重构订单：</label>
+							<div class="col-sm-6">
+								<div class="radio i-checks">
+									<input type="radio" name='refactor' value="1"/>是&nbsp;&nbsp; <input type="radio" name='refactor' value="0" checked/>否
+								</div>
+							</div>
+						</div>
+						-->
+						<div class="form-group">
+							<label class="col-sm-3 control-label">延长60分钟：</label>
+							<div class="col-sm-6">
+								<div class="radio i-checks">
+									<input type="radio" name='timeout' value="1"/>是&nbsp;&nbsp; <input type="radio" name='timeout' value="0" checked/>否
+								</div>
+							</div>
+						</div>
+						<div class="hr-line-dashed"></div>
+						<div class="form-group">
+							<div class="col-sm-4 col-sm-offset-3">
+								<button class="btn btn-primary" type="button" onclick="pushForm()"><i class="fa fa-save"></i> 保存</button>&nbsp;&nbsp;&nbsp; <a class="btn btn-danger" href="javascript:history.go(-1);"><i class="fa fa-close"></i> 返回</a>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{include file="public/footer" /}
+<script>
+	function pushForm() {
+		$.ajax({
+			url:'',
+			type:'post',
+			data:$('#order_change').serialize(),
+			beforeSend:function(){
+				load = layer.load();
+			},
+			success: function (data) {
+				layer.close(load);
+				if (data.code == 1) {
+					layer.msg(data.msg, {icon: 1, time: 2000});
+					return false
+				} else {
+					layer.msg(data.msg, {icon: 2, time: 2000});
+					return false;
+				}
+			},
+			error: function (data) {
+				console.log(data);
+				layer.close(load);
+				layer.msg('服务器错误', {icon: 2, time: 2000});
+				return false;
+			}
+		})
+	}
+
+	function calcAmt() {
+		var c = parseFloat($("#dealAmt").val()) / parseFloat($("#dealPrice").val())
+		$("#dealNum").val(c.toFixed(8))
+	}
+</script>
+</body>
+</html>
