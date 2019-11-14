@@ -45,7 +45,7 @@ class Order extends Base {
 
 				$merchant    = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
 				$buymerchant = Db::name('merchant')->where('id', $orderInfo['buy_id'])->find();
-				if($merchant['usdtd'] < $orderInfo['deal_num']) showMsg('您的冻结不足，释放失败', 0);
+				if ($merchant['usdtd'] < $orderInfo['deal_num']) showMsg('您的冻结不足，释放失败', 0);
 
 				$nopay = ($orderInfo['status'] == 0) ? 1 : 0;
 				$sfee  = 0;
@@ -156,8 +156,7 @@ class Order extends Base {
 					Db::rollback();
 					showMsg('释放失败，参考信息：' . $e->getMessage(), 0);
 				}
-			}
-			else {
+			} else {
 				// 判断取消订单
 				if ($args['status'] == 5 && ($src_status == 0 || $src_status == 1)) {
 					// 减少挂卖单交易量和增加挂卖单剩余量
@@ -192,5 +191,87 @@ class Order extends Base {
 	public function sell($edit) {
 		$orderInfo = Db::name('order_sell')->where('id=' . $edit)->find();
 		!$orderInfo && $this->error('订单不存在');
+
+		if (request()->isPost()) {
+			$args = input('post.');
+
+			$src_status = $orderInfo['status'];
+
+			($orderInfo['status'] == $args['status']) && ($orderInfo['deal_amount'] == $args['deal_amount']) && showMsg('操作成功'); //状态未改变
+			$updateArr = ['status' => $args['status']];
+
+			if ($args['deal_amount'] != $orderInfo['deal_amount']) {
+				$updateArr['deal_amount'] = $args['deal_amount'];
+				$updateArr['deal_num']    = number_format($args['deal_amount'] / $orderInfo['deal_price'], 8, '.', '');
+			}
+			if ($args['timeout']) {
+				//计算延长时间
+				$updateArr['ltime']         = ((time() - $orderInfo['ctime']) / 60) + 61;//延长60分钟, 预留多一分钟
+				$updateArr['finished_time'] = 0;
+			}
+			Db::startTrans();
+			$res1 = Db::name('order_sell')->where('id=' . $edit)->update($updateArr); // 更新订单
+			$res2 = $res3 = TRUE;
+			// 判断完成
+			if (($args['status'] == 4) && ($src_status == 0 || $src_status == 1)) {
+				$merchant = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
+				if ($merchant['usdtd'] < $orderInfo['deal_num'] + $orderInfo['fee']) {
+					$this->error('您的冻结不足，释放失败');
+				}
+				$fee  = config('usdt_buy_trader_fee');
+				$fee  = $fee ? $fee : 0;
+				$sfee = $orderInfo['deal_num'] * $fee / 100;
+				$mum  = $orderInfo['deal_num'] - $sfee;
+				try {
+					$real_number = number_format($orderInfo['deal_num'] + $orderInfo['fee'], 8, '.', '');
+					// 减少商户冻结
+					$rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $real_number);
+					// 更新完成时间
+					$rs2 = Db::name('order_sell')->update(['id' => $orderInfo['id'], 'finished_time' => time(), 'buyer_fee' => $sfee]);
+					// 增加买家余额
+					$rs3 = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('usdt', $mum);
+					// 增加买家求购成功次数
+					$rs4 = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('transact_buy', 1);
+					// 查询平均打款时间
+					$total    = Db::name('order_sell')->field('sum(dktime-ctime) as total')->where('buy_id', $orderInfo['buy_id'])->where('status', 4)->select();
+					$tt       = $total[0]['total'];
+					$transact = Db::name('merchant')->where('id', $orderInfo['buy_id'])->value('transact_buy');
+					$rs5      = Db::name('merchant')->where('id', $orderInfo['buy_id'])->update(['averge_buy' => intval($tt / $transact)]);
+					if ($res1 && $rs1 && $rs2 && $rs3 && $rs4 && $rs5) {
+						// 提交事务
+						Db::commit();
+						financelog($orderInfo['buy_id'], $mum, '买入USDT_f2', 0, session('username'));//添加日志
+						financelog($orderInfo['sell_id'], $real_number, '卖出USDT_f2', 1, session('username'));//添加日志
+						getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $real_number, session('username'));
+						showMsg('操作成功', 1);
+					} else {
+						// 回滚事务
+						Db::rollback();
+						showMsg('操作失败', 0);
+					}
+
+				} catch (\think\Exception\DbException $e) {
+					// 回滚事务
+					Db::rollback();
+					showMsg('操作失败,参考信息:' . $e->getMessage(), 0);
+				}
+			} else {
+				// 判断取消
+				if (($args['status'] == 5) && ($src_status == 0 || $src_status == 1)) {
+					$real_number = number_format($orderInfo['deal_num'] + $orderInfo['fee'], 8, '.', '');
+					$res2        = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $real_number);
+					$res3        = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $real_number);
+				}
+				if ($res1 && $res2 && $res3) {
+					Db::commit();
+					showMsg('操作成功', 1);
+				} else {
+					Db::rollback();
+					showMsg('操作失败', 0);
+				}
+			}
+		}
+		$this->assign('data', $orderInfo);
+		return $this->fetch('order/sell_edit');
 	}
 }
