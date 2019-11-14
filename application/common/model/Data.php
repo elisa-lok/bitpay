@@ -83,7 +83,14 @@ class Data
 			['autoid'=>'7','school'=>'贵州师范大学','addr'=>'贵州省','type'=>'师范']
 			];
 	}
-	public static function adindex(){
-		return [];
+	public static function ordersell(){
+		return [
+			['order_no','订单编号'],
+			['deal_amount','交易金额'],
+			['deal_num','交易数量'],
+			['deal_price','交易价格'],
+			['ctime','创建时间'],
+			['status','交易状态'],
+			];
 	}
 }

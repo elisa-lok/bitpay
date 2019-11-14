@@ -1,5 +1,7 @@
 <?php
+
 namespace app\home\controller;
+
 use app\common\model\Data;
 use app\common\model\PHPExcel;
 use app\home\model\AdbuyModel;
@@ -112,7 +114,7 @@ class Merchant extends Base {
 			echo '订单信息错误';
 			die;
 		}
-		$ad = Db::name('ad_buy')->where('id', $order['buy_bid'])->find();
+		$ad   = Db::name('ad_buy')->where('id', $order['buy_bid'])->find();
 		$bank = new \app\home\model\BankModel();
 		$zfb  = new \app\home\model\ZfbModel();
 		$wx   = new \app\home\model\WxModel();
@@ -820,8 +822,8 @@ class Merchant extends Base {
 			$this->error('请登陆操作', url('home/login/login'));
 		}
 		$where['pid'] = session('uid');
-		$get   = input('get.');
-		$order = 'id desc';
+		$get          = input('get.');
+		$order        = 'id desc';
 		if (isset($_GET['order'])) {
 			$order = 'id ' . $_GET['order'];
 		}
@@ -1151,8 +1153,8 @@ class Merchant extends Base {
 			$param['merchant_id']       = session('uid');
 			$param['name']              = input('post.name');
 			$param['truename']          = input('post.truename');
-			$user = Db::name('merchant')->where('id', session('uid'))->find();
-			$ga   = explode('|', $user['ga']);
+			$user                       = Db::name('merchant')->where('id', session('uid'))->find();
+			$ga                         = explode('|', $user['ga']);
 			if (isset($ga[4]) && $ga[4]) {
 				$code = input('post.ga');
 				!$code && $this->error('请输入谷歌验证码');
@@ -2317,7 +2319,7 @@ class Merchant extends Base {
 				$price = getUsdtPrice();
 			}
 			$pay_method = $_POST['pay_method'];//dump($pay_method);die;
-			$user = $model->getUserByParam(session('uid'), 'id');
+			$user       = $model->getUserByParam(session('uid'), 'id');
 			if ($user['trader_check'] != 1) {
 				$this->error('您的承兑商资格未通过');
 			}
@@ -2423,7 +2425,7 @@ class Merchant extends Base {
 				$price = getUsdtPrice();
 			}
 			$pay_method = $_POST['pay_method'];//dump($pay_method);die;
-			$user = $model->getUserByParam(session('uid'), 'id');
+			$user       = $model->getUserByParam(session('uid'), 'id');
 			if ($user['trader_check'] != 1) {
 				$this->error('您的承兑商资格未通过');
 			}
@@ -2590,46 +2592,6 @@ class Merchant extends Base {
 		}
 		$this->assign('list', $list);
 		return $this->fetch();
-	}
-
-    public function outAdIndex(){
-		/* [
-        ['id','ID'],
-        ['username','类型'],
-        ['price','价格'],
-        ['amount','总量'],
-        ['remain_num','剩余'],
-        ['to_address','限额'],
-        ['name','承兑商'],
-        ['transact_buy','交易次数'],
-        ['averge_buy','平均打款时间'],
-        ['addtime','支付方式'],
-        ] */
-		if (!session('uid')) {
-			$this->error('请登陆操作');
-		}
-		$where['a.merchant_id'] = session('uid');
-		$order                  = 'a.id desc';
-		$model                  = new RechargeModel();
-		$data                   = $model->getAllByWhere($where, $order);
-		//文件名称
-		$Excel['fileName']   = "用户充值记录" . date('Y年m月d日-His', time());//or $xlsTitle
-		$Excel['cellName']   = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
-		$Excel['H']          = ['A' => 10, 'B' => 15, 'C' => 15, 'D' => 35, 'E' => 35, 'F' => 15, 'G' => 15, 'H' => 20, 'I' => 30];//横向水平宽度
-		$Excel['V']          = ['1' => 40, '2' => 26];//纵向垂直高度
-		$Excel['sheetTitle'] = "用户充值记录";//大标题，自定义
-		$Excel['xlsCell']    = \app\common\model\Data::head();
-		foreach ($data as $k => $v) {
-			if ($v['status'] == 0) {
-				$data[$k]['status'] = '生成充值订单';
-			} elseif ($v['status'] == 1) {
-				$data[$k]['status'] = '平台已收款';
-			} elseif ($v['status'] == 2) {
-				$data[$k]['status'] = '商户已收款';
-			}
-			$data[$k]['addtime'] = date("Y-m-d H:i:s", $v['addtime']);
-		}
-		\app\common\model\PHPExcel::excelPut($Excel, $data);
 	}
 
 	public function addetail() {
@@ -2880,6 +2842,46 @@ class Merchant extends Base {
 		return $this->fetch();
 	}
 
+	public function outOrderSell() {
+		/* [
+         ['order_no','订单编号'],
+         ['deal_amount','交易金额'],
+         ['deal_num','交易数量'],
+         ['deal_price','交易价格'],
+         ['ctime','创建时间'],
+         ['status','交易状态'],
+         ] */
+		if (!session('uid')) {
+			$this->error('请登陆操作', url('home/login/login'));
+		}
+		$where['sell_id'] = session('uid');
+		$data                 = Db::name('order_sell')->where($where)->order('id desc')->paginate(20, FALSE, ['query' => Request::instance()->param()]);
+		//文件名称
+		$Excel['fileName']   = "下发订单" . date('Y年m月d日-His', time());//or $xlsTitle
+		$Excel['cellName']   = ['A', 'B', 'C', 'D', 'E', 'F'];
+		$Excel['H']          = ['A' => 10, 'B' => 20, 'C' => 15, 'D' => 40, 'E' => 15, 'F' => 15];//横向水平宽度
+		$Excel['V']          = ['1' => 40, '2' => 26];//纵向垂直高度
+		$Excel['sheetTitle'] = "下发订单";//大标题，自定义
+		$Excel['xlsCell']    = \app\common\model\Data::ordersell();
+		foreach ($data as $k => $v) {
+			if ($v['status'] == 0) {
+				$data[$k]['status'] = '待付款';
+			} elseif ($v['status'] == 1) {
+				$data[$k]['status'] = '待放行';
+			} elseif ($v['status'] == 4) {
+				$data[$k]['status'] = '已完成';
+			} elseif ($v['status'] == 5) {
+				$data[$k]['status'] = '已关闭';
+			} elseif ($v['status'] == 6) {
+				$data[$k]['status'] = '申诉中';
+			} elseif ($v['status'] == 9) {
+				$data[$k]['status'] = '订单失败';
+			}
+			$data[$k]['ctime'] = date("Y-m-d H:i:s", $v['ctime']);
+		}
+		\app\common\model\PHPExcel::excelPut($Excel, $data);
+	}
+
 	public function pay_bak() {
 		$id    = input('get.id');
 		$appid = input('get.appid');
@@ -2951,7 +2953,7 @@ class Merchant extends Base {
 		$zfbid  = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method2');//5
 		$wxid   = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method3');//4
 		$ysfid  = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method4');//2
-		$arr = [];
+		$arr    = [];
 		$this->assign('id', $id);
 		$this->assign('order', $order);
 		$this->assign('appid', $appid);
@@ -3081,9 +3083,9 @@ class Merchant extends Base {
 			$res                      = $this->Scurl($url, $data);
 			$obj                      = json_decode($res);
 			$merchant['c_alipay_img'] = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/go/url/' . base64_encode($longUrl);;
-			$merchant['alipay_name']  = $zfb['truename'];
-			$merchant['alipay_acc']   = $zfb['c_bank'];
-			$payarr[]                 .= 'zfb';
+			$merchant['alipay_name'] = $zfb['truename'];
+			$merchant['alipay_acc']  = $zfb['c_bank'];
+			$payarr[]                .= 'zfb';
 			/*var_dump($bank);
 			die;
 			$zfb                      = Db::name('merchant_zfb')->where('id', $zfbid)->find();
@@ -3384,8 +3386,8 @@ class Merchant extends Base {
 			$this->error('请登录操作', url('home/login/login'));
 		}
 		$where['buy_id'] = session('uid');
-		$get   = input('get.');
-		$order = 'id desc';
+		$get             = input('get.');
+		$order           = 'id desc';
 		if (isset($_GET['order'])) {
 			$order = 'id ' . $_GET['order'];
 		}
@@ -3424,10 +3426,10 @@ class Merchant extends Base {
 	public function addgm() {
 		$price = input('post.amount');
 		!$price && $this->error("请输入金额");
-		$model   = new MerchantModel();
-		$user    = $model->getUserByParam(session('uid'), 'id');
-		$url     = 'http://zpays.com/api/merchant/requestTraderRechargeRmb';
-		$dataArr = [
+		$model           = new MerchantModel();
+		$user            = $model->getUserByParam(session('uid'), 'id');
+		$url             = 'http://zpays.com/api/merchant/requestTraderRechargeRmb';
+		$dataArr         = [
 			'amount'     => $price,
 			'address'    => '',
 			'username'   => $user['name'],
