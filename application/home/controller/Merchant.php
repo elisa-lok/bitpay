@@ -2855,7 +2855,8 @@ class Merchant extends Base {
 			$this->error('请登陆操作', url('home/login/login'));
 		}
 		$where['sell_id'] = session('uid');
-		$data                 = Db::name('order_sell')->where($where)->order('id desc')->paginate(20, FALSE, ['query' => Request::instance()->param()]);
+
+		$data                 = Db::name('order_sell')->where($where)->order('id desc')->select();
 		//文件名称
 		$Excel['fileName']   = "下发订单" . date('Y年m月d日-His', time());//or $xlsTitle
 		$Excel['cellName']   = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -2974,16 +2975,12 @@ class Merchant extends Base {
 			$zfb = Db::name('merchant_zfb')->where('id', $zfbid)->find();
 			//var_dump($zfb);die;
 			//empty($zfb['alipay_id']) && $this->error('appid不存在');
-			$url                      = 'https://api.uomg.com/api/long2dwz';
-			$longUrl                  = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] . '&amount=' . $order['deal_amount'] . '';
-			$data                     = [
-				'dwzapi' => 'urlcn',
-				'url'    => $longUrl
-			];
-			$res                      = $this->Scurl($url, $data);
-			$obj                      = json_decode($res);
-			$redirectUrl              = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/go/url/' . base64_encode($longUrl);
-			$merchant['c_alipay_img'] = $redirectUrl;
+			//$url                      = 'https://api.uomg.com/api/long2dwz';
+			//$longUrl                  = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] . '&amount=' . $order['deal_amount'] . '';
+			$longUrl                  = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s": "money","u":"'. $zfb['alipay_id'].'","a":"'.$order['deal_amount'].'","m":"'.$order['check_code'].'"}';
+			//var_dump($longUrl);die;
+			//$redirectUrl              = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/go/url/' . base64_encode($longUrl);
+			$merchant['c_alipay_img'] = $longUrl;
 			$merchant['alipay_name']  = $zfb['truename'];
 			$merchant['alipay_acc']   = $zfb['c_bank'];
 			$payarr[]                 .= 'zfb';
@@ -3074,15 +3071,18 @@ class Merchant extends Base {
 			//$bank    = Db::name('merchant_bankcard')->where('id', $bankid)->find();
 			$zfb = Db::name('merchant_zfb')->where('id', $zfbid)->find();
 			//var_dump($zfb);die;
-			$url                      = 'https://api.uomg.com/api/long2dwz';
-			$longUrl                  = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] . '&amount=' . $order['deal_amount'] . '';
-			$data                     = [
+			//$url                      = 'https://api.uomg.com/api/long2dwz';
+			//$longUrl                  = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] . '&amount=' . $order['deal_amount'] . '';
+			$longUrl                  = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s": "money","u":"'. $zfb['alipay_id'].'","a":"'.$order['deal_amount'].'","m":"'.$order['check_code'].'"}';
+			//var_dump($longUrl);die;
+			/*$data                     = [
 				'dwzapi' => 'urlcn',
 				'url'    => $longUrl
-			];
-			$res                      = $this->Scurl($url, $data);
-			$obj                      = json_decode($res);
-			$merchant['c_alipay_img'] = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/go/url/' . base64_encode($longUrl);;
+			];*/
+			//$res                      = $this->Scurl($url, $data);
+			//$obj                      = json_decode($res);
+			//$merchant['c_alipay_img'] = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/go/url/' . base64_encode($longUrl);;
+			$merchant['c_alipay_img'] = $longUrl;
 			$merchant['alipay_name'] = $zfb['truename'];
 			$merchant['alipay_acc']  = $zfb['c_bank'];
 			$payarr[]                .= 'zfb';
