@@ -40,11 +40,16 @@
                                 <th>手机号</th>
                                 <th>总USDT</th>
                                 <th>总出售USDT</th>
-                                <th>订单笔数</th>
-                                <th>订单金额</th>
-                                <th>成功笔数</th>
-                                <th>成功金额</th>
-                                <th>成功率(%)</th>
+                                <th>当天订单笔数</th>
+                                <th>当天订单金额</th>
+                                <th>当天成功笔数</th>
+                                <th>当天成功金额</th>
+                                <th>当天成功率(%)</th>
+                                <th>总订单笔数</th>
+                                <th>总订单金额</th>
+                                <th>总成功笔数</th>
+                                <th>总成功金额</th>
+                                <th>总成功率(%)</th>
                             </tr>
                         </thead>
                         <script id="list-template" type="text/html">
@@ -64,6 +69,13 @@
                                 <td>{{d[i].mobile}}</td>
                                 <td>{{d[i].usdtt}}</td>
                                 <td>{{d[i].order_sell_usdt_amount}}</td>
+
+                                <td>{{d[i].today_number}}</td>
+                                <td>{{d[i].today_amount}}</td>
+                                <td>{{d[i].today_success_number}}</td>
+                                <td>{{d[i].today_success_amount}}</td>
+                                <td>{{d[i].today_success_rate}}</td>
+
                                 <td>{{d[i].recharge_number}}</td>
                                 <td>{{d[i].recharge_amount}}</td>
                                 <td>{{d[i].success_number}}</td>
