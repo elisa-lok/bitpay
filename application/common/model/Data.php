@@ -83,4 +83,7 @@ class Data
 			['autoid'=>'7','school'=>'贵州师范大学','addr'=>'贵州省','type'=>'师范']
 			];
 	}
+	public static function adindex(){
+		return [];
+	}
 }

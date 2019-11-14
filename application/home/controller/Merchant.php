@@ -2592,6 +2592,46 @@ class Merchant extends Base {
 		return $this->fetch();
 	}
 
+    public function outAdIndex(){
+		/* [
+        ['id','ID'],
+        ['username','类型'],
+        ['price','价格'],
+        ['amount','总量'],
+        ['remain_num','剩余'],
+        ['to_address','限额'],
+        ['name','承兑商'],
+        ['transact_buy','交易次数'],
+        ['averge_buy','平均打款时间'],
+        ['addtime','支付方式'],
+        ] */
+		if (!session('uid')) {
+			$this->error('请登陆操作');
+		}
+		$where['a.merchant_id'] = session('uid');
+		$order                  = 'a.id desc';
+		$model                  = new RechargeModel();
+		$data                   = $model->getAllByWhere($where, $order);
+		//文件名称
+		$Excel['fileName']   = "用户充值记录" . date('Y年m月d日-His', time());//or $xlsTitle
+		$Excel['cellName']   = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
+		$Excel['H']          = ['A' => 10, 'B' => 15, 'C' => 15, 'D' => 35, 'E' => 35, 'F' => 15, 'G' => 15, 'H' => 20, 'I' => 30];//横向水平宽度
+		$Excel['V']          = ['1' => 40, '2' => 26];//纵向垂直高度
+		$Excel['sheetTitle'] = "用户充值记录";//大标题，自定义
+		$Excel['xlsCell']    = \app\common\model\Data::head();
+		foreach ($data as $k => $v) {
+			if ($v['status'] == 0) {
+				$data[$k]['status'] = '生成充值订单';
+			} elseif ($v['status'] == 1) {
+				$data[$k]['status'] = '平台已收款';
+			} elseif ($v['status'] == 2) {
+				$data[$k]['status'] = '商户已收款';
+			}
+			$data[$k]['addtime'] = date("Y-m-d H:i:s", $v['addtime']);
+		}
+		\app\common\model\PHPExcel::excelPut($Excel, $data);
+	}
+
 	public function addetail() {
 		$id        = input('get.id');
 		$adModel   = new AdbuyModel();
