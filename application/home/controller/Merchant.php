@@ -2855,7 +2855,8 @@ class Merchant extends Base {
 			$this->error('请登陆操作', url('home/login/login'));
 		}
 		$where['sell_id'] = session('uid');
-		$data                 = Db::name('order_sell')->where($where)->order('id desc')->paginate(20, FALSE, ['query' => Request::instance()->param()]);
+
+		$data                 = Db::name('order_sell')->where($where)->order('id desc')->select();
 		//文件名称
 		$Excel['fileName']   = "下发订单" . date('Y年m月d日-His', time());//or $xlsTitle
 		$Excel['cellName']   = ['A', 'B', 'C', 'D', 'E', 'F'];
