@@ -1707,13 +1707,12 @@ class Merchant extends Base {
 			else $success_rate = round(($success_number / $buy_number) * 100, 2);  // 成功率
 
 			// 获取当天笔数
-			$where['status'] = ['eq', 4];
 			$where['ctime']  = ['egt', $today];
 
 			$today_number         = $list->orderSell()->where($where)->count('id');  // 当天笔数
 			$today_amount         = $list->orderSell()->where($where)->sum('deal_amount');  // 当天数量
-			$today_success_number = $list->orderSell()->where($where)->count('id');  // 当天成功笔数
-			$today_success_amount = $list->orderSell()->where($where)->sum('deal_amount');  // 当天成功数量
+			$today_success_number = $list->orderSell()->where($where)->where('status', 4)->count('id');  // 当天成功笔数
+			$today_success_amount = $list->orderSell()->where($where)->where('status', 4)->sum('deal_amount');  // 当天成功数量
 			if ($today_success_number == 0 || $today_number == 0) $today_success_rate = 0;
 			else $today_success_rate = round(($today_success_number / $today_number) * 100, 2);  // 成功率
 
