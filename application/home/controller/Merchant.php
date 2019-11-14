@@ -3235,6 +3235,7 @@ class Merchant extends Base {
 	}
 
 	public function pkorder() {
+
 		if (!session('uid')) {
 			$this->error('请登录操作', url('home/login/login'));
 		}
@@ -3270,28 +3271,20 @@ class Merchant extends Base {
 				$agFeeRate = $mcModel->where('id', 'in', array_values($agentIds))->column('trader_parent_get', 'id');
 			}
 			$user = Db::name('merchant')->where('id', session('uid'))->find();
-			//盘口费率
-			$pkfee      = $user['merchant_pk_fee'];
-			$pkfee      = $pkfee ? $pkfee / 100 : 0;
-			$pricelimit = getUsdtPrice() + config('usdt_price_add_buy');
+
+			$currPrice = getUsdtPrice();
+			$dealerFee  = $currPrice * (config('usdt_price_add') / 100);
 
 			foreach ($list as $k => $v) {
 				$list[$k]['fee_amount'] = $list[$k]['fee'] = $list[$k]['rec_amount'] = $list[$k]['rec'] = $list[$k]['fee_rate'] = 0;
 				if ($v['status'] == 4) {
-
-					$list[$k]['fee']        = round($v['deal_num'] * $pkfee, 8);  // 手续费数量
-					$list[$k]['fee_amount'] = number_format($v['deal_amount'] * $pkfee, 8, '.', '');  // 手续费金额
-					$list[$k]['rec']        = number_format($v['deal_num'] - $list[$k]['fee'], 8, '.', '');  // 到账数量
-					$list[$k]['rec_amount'] = number_format($v['deal_num'] * (1 - $pkfee) * $pricelimit, 8, '.', '');  // 到账金额
-					$list[$k]['fee_rate']   = $pkfee * 100;
-
 					// 14.14427157	* 1 - 0.0193 * 7.07
 					$agentFeeRate = isset($agentIds[$v['sell_id']]) && isset($agFeeRate[$agentIds[$v['sell_id']]]) ? $agFeeRate[$agentIds[$v['sell_id']]] / 100 : 0;
-					// $list[$k]['fee_amount'] = $v['deal_amount'] - (($v['deal_num'] - $v['platform_fee'] - number_format($v['deal_num'] * $agentFeeRate, 8, '.', '')) * ($v['deal_price'] - $dealerFee)); //费用金额
-					// $list[$k]['fee']        = $list[$k]['fee_amount'] / $v['deal_price'];
-					// $list[$k]['rec_amount'] = $v['deal_amount'] - $list[$k]['fee_amount']; // 到账费用
-					// $list[$k]['rec']      = $v['deal_num'] - $list[$k]['fee']; // 到账数量
-					// $list[$k]['fee_rate'] = number_format($list[$k]['fee_amount'] * 100 / $v['deal_amount'], 1, '.', ''); // 到账数量
+					$list[$k]['fee_amount'] = $v['deal_amount'] - (($v['deal_num'] - $v['platform_fee'] - number_format($v['deal_num'] * $agentFeeRate, 8, '.', '')) * ($v['deal_price'] - $dealerFee)); //费用金额
+					$list[$k]['fee']        = $list[$k]['fee_amount'] / $v['deal_price'];
+					$list[$k]['rec_amount'] = $v['deal_amount'] - $list[$k]['fee_amount']; // 到账费用
+					$list[$k]['rec']      = $v['deal_num'] - $list[$k]['fee']; // 到账数量
+					$list[$k]['fee_rate'] = number_format($list[$k]['fee_amount'] * 100 / $v['deal_amount'], 1, '.', ''); // 到账数量
 				}
 			}
 		}
