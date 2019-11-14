@@ -3282,9 +3282,15 @@ class Merchant extends Base {
 
 					$list[$k]['fee_amount'] = $v['deal_amount'] * $pkfee / 100;
 
+					$currPrice = getUsdtPrice();
+					$addPrice  = $currPrice * (config('usdt_price_add') / 100);
+					$pricelimit = $currPrice + $addPrice;
+
+					// 14.14427157	* 1 - 0.0193 *
 					$agentFeeRate           = isset($agentIds[$v['sell_id']]) && isset($agFeeRate[$agentIds[$v['sell_id']]]) ? $agFeeRate[$agentIds[$v['sell_id']]] / 100 : 0;
 					// $list[$k]['fee_amount'] = $v['deal_amount'] - (($v['deal_num'] - $v['platform_fee'] - number_format($v['deal_num'] * $agentFeeRate, 8, '.', '')) * ($v['deal_price'] - $dealerFee)); //费用金额
-					$list[$k]['fee']        = $list[$k]['fee_amount'] / $v['deal_price'];
+					// $list[$k]['fee']        = $list[$k]['fee_amount'] / $v['deal_price'];
+					$list[$k]['fee']        = $list[$k]['fee_amount'] / $pricelimit;
 					$list[$k]['rec_amount'] = $v['deal_amount'] - $list[$k]['fee_amount']; // 到账费用
 					$list[$k]['rec']        = $v['deal_num'] - $list[$k]['fee']; // 到账数量
 					$list[$k]['fee_rate']   = number_format($list[$k]['fee_amount'] * 100 / $v['deal_amount'], 1, '.', ''); // 到账数量
