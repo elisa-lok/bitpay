@@ -3,6 +3,7 @@
 namespace app\admin\controller;
 
 use app\home\model\OrderModel;
+use think\cache\driver\Redis;
 use think\db;
 use app\admin\model\TibiModel;
 use app\admin\model\AddressModel;
@@ -1416,6 +1417,13 @@ class Merchant extends Base {
 		if ($amount == '' || ($amount * 100 > $orderinfo['deal_amount'] * 100)) {
 			return json(['code' => 0, 'msg' => '回调金额错误']);
 		}
+
+		// 锁定操作 代码执行完成前不可继续操作 60秒后可再次点击操作
+		$redis = new Redis();
+		$redis->get($id) && $this->error("不可重复操作，剩余时间：" . $redis->ttl($id) . "秒");
+		$lock = $redis->set($id, TRUE, 60);
+		!$lock && $this->error('锁定操作失败，请重试。');
+
 		$oldNum = $orderinfo['deal_num'];
 		if ($amount * 100 != $orderinfo['deal_amount'] * 100) {
 			$orderinfo['deal_num'] = round($amount / $orderinfo['deal_price'], 8);
@@ -1551,15 +1559,19 @@ class Merchant extends Base {
 				}
 				$data['status'] = $status;
 				$status && askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
+
+				$redis->rm($id);
 				$this->success('操作成功');
 			} else {
 				// 回滚事务
 				Db::rollback();
+				$redis->rm($id);
 				$this->error('操作失败');
 			}
 		} catch (\think\Exception\DbException $e) {
 			// 回滚事务
 			Db::rollback();
+			$redis->rm($id);
 			$this->error('操作失败，参考信息：' . $e->getMessage());
 		}
 	}
@@ -1703,18 +1715,16 @@ class Merchant extends Base {
 			$success_number  = $list->orderSell()->where('status', 4)->count('id');  // 成功笔数
 			$success_amount  = $list->orderSell()->where('status', 4)->sum('deal_amount');  // 成功数量
 			$buy_number      = $list->orderSell()->count('id');  // 购买数量
-			if ($success_number == 0 || $buy_number == 0) $success_rate = 0;
-			else $success_rate = round(($success_number / $buy_number) * 100, 2);  // 成功率
+			if ($success_number == 0 || $buy_number == 0) $success_rate = 0; else $success_rate = round(($success_number / $buy_number) * 100, 2);  // 成功率
 
 			// 获取当天笔数
-			$where['ctime']  = ['egt', $today];
+			$where['ctime'] = ['egt', $today];
 
 			$today_number         = $list->orderSell()->where($where)->count('id');  // 当天笔数
 			$today_amount         = $list->orderSell()->where($where)->sum('deal_amount');  // 当天数量
 			$today_success_number = $list->orderSell()->where($where)->where('status', 4)->count('id');  // 当天成功笔数
 			$today_success_amount = $list->orderSell()->where($where)->where('status', 4)->sum('deal_amount');  // 当天成功数量
-			if ($today_success_number == 0 || $today_number == 0) $today_success_rate = 0;
-			else $today_success_rate = round(($today_success_number / $today_number) * 100, 2);  // 成功率
+			if ($today_success_number == 0 || $today_number == 0) $today_success_rate = 0; else $today_success_rate = round(($today_success_number / $today_number) * 100, 2);  // 成功率
 
 			$lists[$key]['recharge_number'] = $recharge_number;
 			$lists[$key]['recharge_amount'] = $recharge_amount;
