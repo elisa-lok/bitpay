@@ -2601,13 +2601,23 @@ class Merchant extends Base {
 		$ad        = $adModel->getOne(['id' => $id]);
 		empty($ad) && $this->error('挂单不存在');
 		($ad['state'] != 1) && $this->error('挂单未上架');
-		$m               = new \app\home\model\BankModel();
-		$zfb             = new \app\home\model\ZfbModel();
-		$wx              = new \app\home\model\WxModel();
-		$ysf             = new \app\home\model\YsfModel();
-		$AdOwner         = $userModel->getUserByParam($ad['userid'], 'id');
-		$deal_num        = Db::name('order_sell')->where('buy_bid', $id)->where('status', 'neq', 5)->sum('deal_num');
+		$m         = new \app\home\model\BankModel();
+		$zfb       = new \app\home\model\ZfbModel();
+		$wx        = new \app\home\model\WxModel();
+		$ysf       = new \app\home\model\YsfModel();
+		$AdOwner   = $userModel->getUserByParam($ad['userid'], 'id');
+		$deal_num  = Db::name('order_sell')->where('buy_bid', $id)->where('status', 'neq', 5)->sum('deal_num');
+		$remainNum = $ad['amount'] - $deal_num;
+
+		$usdtPriceWay = config('usdt_price_way_buy');
+		$addFee       = $usdtPriceWay == 2 ? config('usdt_price_add_buy') : 0;
+		$max_limit    = (getUsdtPrice() + $addFee) * $remainNum;
+
+		$rs1 = Db::name('ad_buy')->where('id', $ad['id'])->update(['max_limit' => $max_limit]);
+		//!$rs1 && $this->error('交易限额更新失败');
+		$ad              = $adModel->getOne(['id' => $id]);
 		$ad['RemainNum'] = $ad['amount'] - $deal_num;
+
 		$this->assign('ad', $ad);
 		$this->assign('AdOwner', $AdOwner);
 		$banks = $m->where('merchant_id', session('uid'))->order('id desc')->select();
@@ -3273,18 +3283,18 @@ class Merchant extends Base {
 			$user = Db::name('merchant')->where('id', session('uid'))->find();
 
 			$currPrice = getUsdtPrice();
-			$dealerFee  = $currPrice * (config('usdt_price_add') / 100);
+			$dealerFee = $currPrice * (config('usdt_price_add') / 100);
 
 			foreach ($list as $k => $v) {
 				$list[$k]['fee_amount'] = $list[$k]['fee'] = $list[$k]['rec_amount'] = $list[$k]['rec'] = $list[$k]['fee_rate'] = 0;
 				if ($v['status'] == 4) {
 					// 14.14427157	* 1 - 0.0193 * 7.07
-					$agentFeeRate = isset($agentIds[$v['sell_id']]) && isset($agFeeRate[$agentIds[$v['sell_id']]]) ? $agFeeRate[$agentIds[$v['sell_id']]] / 100 : 0;
+					$agentFeeRate           = isset($agentIds[$v['sell_id']]) && isset($agFeeRate[$agentIds[$v['sell_id']]]) ? $agFeeRate[$agentIds[$v['sell_id']]] / 100 : 0;
 					$list[$k]['fee_amount'] = $v['deal_amount'] - (($v['deal_num'] - $v['platform_fee'] - number_format($v['deal_num'] * $agentFeeRate, 8, '.', '')) * ($v['deal_price'] - $dealerFee)); //费用金额
 					$list[$k]['fee']        = $list[$k]['fee_amount'] / $v['deal_price'];
 					$list[$k]['rec_amount'] = $v['deal_amount'] - $list[$k]['fee_amount']; // 到账费用
-					$list[$k]['rec']      = $v['deal_num'] - $list[$k]['fee']; // 到账数量
-					$list[$k]['fee_rate'] = number_format($list[$k]['fee_amount'] * 100 / $v['deal_amount'], 1, '.', ''); // 到账数量
+					$list[$k]['rec']        = $v['deal_num'] - $list[$k]['fee']; // 到账数量
+					$list[$k]['fee_rate']   = number_format($list[$k]['fee_amount'] * 100 / $v['deal_amount'], 1, '.', ''); // 到账数量
 				}
 			}
 		}

@@ -659,7 +659,7 @@ class Auto extends Base {
 		// 只有支持加价模式的变动
 		Db::startTrans();
 		$usdtPrice = getUsdtPrice();
-		$res = Db::name('ad_buy')->where('state=1')->update(['price' => getUsdtPrice() + $addFee]);
+		$res = Db::name('ad_buy')->where('state=1')->update(['price' => $usdtPrice + $addFee]);
 		$res ? Db::commit() : Db::rollback();
 		$msg = '【' . date('Y-m-d H:i:s') . '】 买单加价价格更新'. ($res ? '成功' : '失败') . ", 更新模式:$usdtPriceWay, USDT价格:$usdtPrice  \r\n";
 		file_put_contents(RUNTIME_PATH . 'data/cli_updateAdBuyPrice_' . date('ymd') . '.log', $msg, FILE_APPEND);
