@@ -1780,7 +1780,8 @@ class Merchant extends Base {
 			$where['userid'] = session('uid');
 			$list            = $model2->getAd($where, 'id desc');
 			foreach ($list as $k => $v) {
-				$deal_num           = Db::name('order_buy')->where(['sell_sid' => $v['id'], 'status' => ['neq', 5], 'status' => ['neq', 9]])->sum('deal_num');
+				//$deal_num           = Db::name('order_buy')->where(['sell_sid' => $v['id'], 'status' => ['neq', 5], 'status' => ['neq', 9]])->sum('deal_num');
+				$deal_num = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 7)->sum('deal_num');
 				$deal_num           = $deal_num ? $deal_num : 0;
 				$list[$k]['deal']   = $deal_num;
 				$list[$k]['remain'] = $v['amount'] - $list[$k]['deal'];
