@@ -541,3 +541,73 @@ function showMsg($msg = '', $code = 1, $data = [], $url = '#') {
 	header('Content-Type:application/json; charset=utf-8');
 	die(json_encode(['code' => $code, 'msg' => $msg, 'data' => $data, 'url' => $url], 320));
 }
+
+/**
+ * 变动金额
+ * @param bool   $enableTrans
+ * @param int    $uid
+ * @param float  $modAmt
+ * @param float  $fee
+ * @param float  $frozenModAmt
+ * @param float  $frozenFee
+ * @param int    $actType
+ * @param string $relateId
+ * @param string $memo
+ * @return bool|string
+ * @throws \think\Exception
+ * @throws \think\db\exception\DataNotFoundException
+ * @throws \think\db\exception\ModelNotFoundException
+ * @throws \think\exception\DbException
+ * @throws \think\exception\PDOException
+ */
+function balanceChange($enableTrans = TRUE, $uid = 0, float $modAmt = 0, float $fee = 0, float $frozenModAmt = 0, float $frozenFee = 0, $actType = 0, $relateId = '', $memo = '') {
+	if ($modAmt == 0 && $frozenModAmt == 0) {
+		return TRUE;
+	}
+	$enableTrans && Db::startTrans();
+	$userInfo = Db::name('merchant')->where('id', $uid)->lock(TRUE)->find();
+	if (!$userInfo) {
+		$enableTrans && Db::rollback();
+		return FALSE;
+	}
+	// 格式化数字
+	$modAmt       = (float)number_format($modAmt, 8, '.', '');
+	$fee          = (float)number_format($fee, 8, '.', '');
+	$frozenModAmt = (float)number_format($frozenModAmt, 8, '.', '');
+	$frozenFee    = (float)number_format($frozenFee, 8, '.', '');
+	// 溯源
+	$lastLogId = 0;
+	$lastLog   = Db::name('merchant_balance_log')->order('bal_log_id DESC')->find();
+	// TODO 如果记录存在, 更新记录
+	if ($lastLog) {
+		$lastLogId = $lastLog['bal_log_id'];
+		if ($lastLog['amt_after'] != $userInfo['usdt'] || $lastLog['frozen_amt_after'] != $userInfo['usdtd']) {
+			$log = $msg = '【' . date('Y-m-d H:i:s') . "】 资金记录异常: 用户ID: 【 $uid 】, 前记录ID: $lastLogId , 余额" . $lastLog['amt_after'] . ', 冻结:  ' . $lastLog['frozen_amt_after'] . ', 账户现有: 余额: ' . $userInfo['usdt'] . ', 冻结:' . $userInfo['usdt'] . " \r\n";
+			file_put_contents(RUNTIME_PATH . 'data/abnormal_flow.log', $log, FILE_APPEND);
+		}
+	}
+	$newLog = [
+		'last_bal_log_id'   => $lastLogId,
+		'merchant_id'       => $uid,
+		'amt_before'        => $userInfo['usdt'],
+		'amt_after'         => $userInfo['usdt'] + $modAmt,
+		'amt_change'        => $modAmt,
+		'amt_fee'           => $fee,
+		'frozen_amt_before' => $userInfo['usdtd'],
+		'frozen_amt_after'  => $userInfo['usdtd'] + $frozenModAmt,
+		'frozen_amt_change' => $frozenModAmt,
+		'frozen_amt_fee'    => $frozenFee,
+		'cur_code'          => 'usdt',
+		'action_type'       => $actType,
+		'relate_id'         => $relateId,
+		'memo'              => $memo,
+	];
+	$res1   = Db::name('merchant')->where('id', $uid)->update(['usdt' => $newLog['amt_after'], 'usdtd' => $newLog['frozen_amt_after']]);
+	$res2   = Db::name('merchant_balance_log')->insert($newLog);
+	if ($res1 && $res2) {
+		$enableTrans && Db::commit();
+		return TRUE;
+	}
+	$enableTrans && Db::rollback();
+	return FALSE;
+}

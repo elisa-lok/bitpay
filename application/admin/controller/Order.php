@@ -3,6 +3,7 @@
 namespace app\admin\controller;
 
 use app\admin\model\MerchantModel;
+use think\cache\driver\Redis;
 use think\Db;
 
 class Order extends Base {
@@ -26,6 +27,11 @@ class Order extends Base {
 				$updateArr['ltime']         = ((time() - $orderInfo['ctime']) / 60) + 61;//延长60分钟, 预留多一分钟
 				$updateArr['finished_time'] = 0;
 			}
+
+			$redis = new Redis();
+			$redis->get($orderInfo['id']) && showMsg('操作失败,'.$redis->ttl($orderInfo['id'])."秒后可操作", 0);
+			$redis->set($orderInfo['id'], TRUE, 60);
+
 			Db::startTrans();
 			$res1 = Db::name('order_buy')->where('id=' . $edit)->update($updateArr); // 更新订单
 			// 判断剩余额度
@@ -35,8 +41,9 @@ class Order extends Base {
 				!in_array($orderInfo['status'], ['5', '9']) && showMsg('该状态不能重建订单', 0);
 				//在余额里面进行扣钱
 				$realAmt = $orderInfo['deal_num'] + $orderInfo['fee'];
-				$res2    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec('usdt', $realAmt);
-				$res3    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdtd', $realAmt);
+				$res2 = balanceChange(TRUE, $orderInfo['sell_id'], -$orderInfo['deal_num'], $orderInfo['fee'], $orderInfo['deal_num'], $orderInfo['fee'], BAL_SYS, $orderInfo['id'], "重建订单");
+				//$res2    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec('usdt', $realAmt);
+				//$res3    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdtd', $realAmt);
 			}
 			// 判断完成
 			if (($args['status'] == 4) && ($src_status == 0 || $src_status == 1)) {
@@ -92,7 +99,8 @@ class Order extends Base {
 				$traderMoney        = $moneyArr[3];
 				// Db::startTrans();
 				try {
-					$rs1 = Db::table('think_merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num']);
+					$rs1 = balanceChange(TRUE, $orderInfo['sell_id'], 0, 0, -$orderInfo['deal_num'], 0, BAL_SOLD, $orderInfo['id'], "编辑修改状态->完成订单");
+					//$rs1 = Db::table('think_merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num']);
 					//20190830修改
 					if ($nopay == 1) {
 						$rs2 = Db::table('think_order_buy')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'dktime' => time(), 'platform_fee' => $moneyArr[0]]);
@@ -100,7 +108,8 @@ class Order extends Base {
 						$rs2 = Db::table('think_order_buy')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'platform_fee' => $moneyArr[0]]);
 					}
 					// $rs2 = Db::table('think_order_buy')->update(['id'=>$orderinfo['id'], 'status'=>4, 'finished_time'=>time(), 'platform_fee'=>$moneyArr[0]]);
-					$rs3      = Db::table('think_merchant')->where('id', $orderInfo['buy_id'])->setInc('usdt', $mum);
+					//$rs3      = Db::table('think_merchant')->where('id', $orderInfo['buy_id'])->setInc('usdt', $mum);
+					$rs3 = balanceChange(TRUE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], "编辑修改状态->完成订单");
 					$rs4      = Db::table('think_merchant')->where('id', $orderInfo['sell_id'])->setInc('transact', 1);
 					$total    = Db::table('think_order_buy')->field('sum(finished_time-dktime) as total')->where('sell_id', $orderInfo['sell_id'])->where('status', 4)->select();
 					$tt       = $total[0]['total'];
@@ -109,7 +118,8 @@ class Order extends Base {
 					//承兑商卖单奖励
 					$rs6 = $rs7 = $rs8 = $rs9 = $rs10 = $rs11 = $res3 = TRUE;
 					if ($traderMoney > 0) {
-						$rs6 = Db::table('think_merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $traderMoney);
+						$rs6 = balanceChange(TRUE, $orderInfo['sell_id'], $traderMoney, 0,0, 0, BAL_COMMISSION, $orderInfo['id'], "编辑修改状态->完成订单");
+						//$rs6 = Db::table('think_merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $traderMoney);
 						$rs7 = Db::table('think_trader_reward')->insert(['uid' => $orderInfo['sell_id'], 'orderid' => $orderInfo['id'], 'amount' => $traderMoney, 'type' => 0, 'create_time' => time()]);
 					}
 					//承兑商代理利润
@@ -167,8 +177,10 @@ class Order extends Base {
 					$sell = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->find();
 					if ($sell['state'] == 2) {
 						// 如果挂单已下架 回滚余额
-						$res6 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $real_number);
-						$res7 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $real_number);
+						$res6 = balanceChange(TRUE, $orderInfo['sell_id'], $orderInfo['deal_num'], $orderInfo['fee'], -$orderInfo['deal_num'], $orderInfo['fee'], BAL_CANCEL, $orderInfo['id'], "编辑修改状态->取消订单");
+
+						//$res6 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $real_number);
+						//$res7 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $real_number);
 					}
 					// 减少用户冻结余额和增加用户余额
 					//$res2    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdt', $orderInfo['deal_num']);

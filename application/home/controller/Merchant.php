@@ -17,6 +17,7 @@ use app\home\model\WithdrawModel;
 use app\home\model\WxModel;
 use app\home\model\YsfModel;
 use app\home\model\ZfbModel;
+use think\cache\driver\Redis;
 use think\db;
 use think\request;
 
@@ -656,8 +657,11 @@ class Merchant extends Base {
 			}
 			Db::startTrans();
 			try {
-				$rs1 = Db::table('think_merchant')->where('id', session('uid'))->setDec('usdt', $num);
-				$rs3 = Db::table('think_merchant')->where('id', session('uid'))->setInc('usdtd', $num);
+				$ordersn = createOrderNo(1, session('uid'));
+				$rs1 = balanceChange(TRUE, session('uid'), -$num, 0, $num, 0, BAL_WITHDRAW, $ordersn);
+
+				//$rs1 = Db::table('think_merchant')->where('id', session('uid'))->setDec('usdt', $num);
+				//$rs3 = Db::table('think_merchant')->where('id', session('uid'))->setInc('usdtd', $num);
 				$rs2 = Db::table('think_merchant_withdraw')->insert([
 					'merchant_id' => session('uid'),
 					'address'     => $address,
@@ -666,9 +670,9 @@ class Merchant extends Base {
 					'mum'         => $mum,
 					'note'        => $remark,
 					'addtime'     => time(),
-					'ordersn'     => createOrderNo(1, session('uid'))
+					'ordersn'     => $ordersn
 				]);
-				if ($rs1 && $rs2 && $rs3) {
+				if ($rs1 && $rs2) {
 					// 提交事务
 					Db::commit();
 					$this->success('提交成功，请等待审核', url('home/merchant/tibi'));
@@ -1663,6 +1667,7 @@ class Merchant extends Base {
 		if (!session('uid')) {
 			$this->error('请登陆操作', url('home/login/login'));
 		}
+
 		$usdt_price_way = Db::name('config')->where('name', 'usdt_price_way')->value('value');
 		$usdt_price_min = Db::name('config')->where('name', 'usdt_price_min')->value('value');
 		$usdt_price_max = Db::name('config')->where('name', 'usdt_price_max')->value('value');
@@ -1741,11 +1746,12 @@ class Merchant extends Base {
 			// dump($isbank['name']);die;
 			Db::startTrans();
 			// 减少余额 增加冻结余额
-			$res1 = Db::name('merchant')->where('id', session('uid'))->setDec('usdt', $amount);
-			$res2 = Db::name('merchant')->where('id', session('uid'))->setInc('usdtd', $amount);
-			if ($res1 && $res2) {
+			$ad_no = $this->getadvno();
+			$res1  = balanceChange(TRUE, session('uid'), -$amount, 0, $amount, 0, BAL_ENTRUST, $ad_no);
+			// $res1 = Db::name('merchant')->where('id', session('uid'))->setDec('usdt', $amount);
+			// $res2 = Db::name('merchant')->where('id', session('uid'))->setInc('usdtd', $amount);
+			if ($res1) {
 				Db::commit();
-				$ad_no  = $this->getadvno();
 				$model2 = new AdModel();
 				$flag   = $model2->insertOne([
 					'userid'        => session('uid'),
@@ -1781,7 +1787,7 @@ class Merchant extends Base {
 			$list            = $model2->getAd($where, 'id desc');
 			foreach ($list as $k => $v) {
 				//$deal_num           = Db::name('order_buy')->where(['sell_sid' => $v['id'], 'status' => ['neq', 5], 'status' => ['neq', 9]])->sum('deal_num');
-				$deal_num = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 7)->sum('deal_num');
+				$deal_num           = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 7)->sum('deal_num');
 				$deal_num           = $deal_num ? $deal_num : 0;
 				$list[$k]['deal']   = $deal_num;
 				$list[$k]['remain'] = $v['amount'] - $list[$k]['deal'];
@@ -2492,12 +2498,15 @@ class Merchant extends Base {
 			if (($ad_info['remain_amount'] + $haveadsum) * 1 > $merchant['usdt'] * 1) {
 				$this->error('开启失败：账户余额不足');
 			} else {
-				Db::name('merchant')->where('id', session('uid'))->setDec('usdt', $ad_info['remain_amount']);
-				Db::name('merchant')->where('id', session('uid'))->setInc('usdtd', $ad_info['remain_amount']);
+				balanceChange(TRUE, session('uid'), -$ad_info['remain_amount'], 0, $ad_info['remain_amount'], 0, BAL_ENTRUST, $id) && $this->error('开启失败：扣款失败');
+				// Db::name('merchant')->where('id', session('uid'))->setDec('usdt', $ad_info['remain_amount']);
+				// Db::name('merchant')->where('id', session('uid'))->setInc('usdtd', $ad_info['remain_amount']);
 			}
 		} elseif ($act == 2) {
-			Db::name('merchant')->where('id', session('uid'))->setInc('usdt', $ad_info['remain_amount']);
-			Db::name('merchant')->where('id', session('uid'))->setDec('usdtd', $ad_info['remain_amount']);
+			balanceChange(TRUE, session('uid'), $ad_info['remain_amount'], 0, -$ad_info['remain_amount'], 0, BAL_ENTRUST, $id) && $this->error('下架失败：退款失败');
+
+			//Db::name('merchant')->where('id', session('uid'))->setInc('usdt', $ad_info['remain_amount']);
+			//Db::name('merchant')->where('id', session('uid'))->setDec('usdtd', $ad_info['remain_amount']);
 		}
 		$result = $model->updateOne(['id' => $id, 'state' => $act]);
 		if ($result['code'] == 1) {
@@ -2753,8 +2762,9 @@ class Merchant extends Base {
 				Db::startTrans();
 				$rs1 = $id = Db::table('think_order_sell')->insertGetId($arr);
 				//卖家的btc需要冻结起来
-				$rs2 = Db::table('think_merchant')->where('id', session('uid'))->setDec($coin_name, $num + $fee);
-				$rs3 = Db::table('think_merchant')->where('id', session('uid'))->setInc($coin_name . 'd', $num + $fee);
+				$rs2 = balanceChange(TRUE, session('uid'), -$num, $fee, $num, $fee, BAL_SOLD, $arr['order_no'] , "商户出售");
+				//$rs2 = Db::table('think_merchant')->where('id', session('uid'))->setDec($coin_name, $num + $fee);
+				//$rs3 = Db::table('think_merchant')->where('id', session('uid'))->setInc($coin_name . 'd', $num + $fee);
 				if ($rs1 && $rs2 && $rs3) {
 					Db::commit();
 					financelog(session('uid'), ($num + $fee), '卖出USDT_冻结1', 1, session('user.name'));//添加日志
@@ -3483,6 +3493,13 @@ class Merchant extends Base {
 			$merchant    = $model2->getUserByParam(session('uid'), 'id');
 			$buymerchant = $model2->getUserByParam($orderinfo['buy_id'], 'id');
 			($merchant['usdtd'] < $orderinfo['deal_num']) && $this->error('您的冻结不足，释放失败');
+
+			// 锁定操作 代码执行完成前不可继续操作 60秒后可再次点击操作
+			$redis = new Redis();
+			$redis->get($id) && $this->error("不可重复操作，剩余时间：" . $redis->ttl($id) . "秒");
+			$lock = $redis->set($id, TRUE, 60);
+			!$lock && $this->error('锁定操作失败，请重试。');
+
 			$sfee = 0;
 			$mum  = $orderinfo['deal_num'] - $sfee;
 			//盘口费率
@@ -3527,7 +3544,8 @@ class Merchant extends Base {
 			$traderMoney        = $moneyArr[3];
 			Db::startTrans();
 			try {
-				$rs1 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $orderinfo['deal_num']);
+				$rs1 = balanceChange(TRUE, $orderinfo['sell_id'], 0, 0, -$orderinfo['deal_num'], 0, BAL_SOLD, $orderinfo['id']);
+				//$rs1 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $orderinfo['deal_num']);
 				//20190830修改
 				if ($nopay == 1) {
 					$rs2 = Db::table('think_order_buy')->update(['id' => $orderinfo['id'], 'status' => 4, 'finished_time' => time(), 'dktime' => time(), 'platform_fee' => $moneyArr[0]]);
@@ -3535,7 +3553,8 @@ class Merchant extends Base {
 					$rs2 = Db::table('think_order_buy')->update(['id' => $orderinfo['id'], 'status' => 4, 'finished_time' => time(), 'platform_fee' => $moneyArr[0]]);
 				}
 				//$rs2 = Db::table('think_order_buy')->update(['id'=>$orderinfo['id'], 'status'=>4, 'finished_time'=>time(), 'platform_fee'=>$moneyArr[0]]);
-				$rs3      = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->setInc('usdt', $mum);
+				//$rs3      = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->setInc('usdt', $mum);
+				$rs3 = balanceChange(TRUE, $orderinfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderinfo['id']);
 				$rs4      = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('transact', 1);
 				$total    = Db::table('think_order_buy')->field('sum(finished_time-dktime) as total')->where('sell_id', $orderinfo['sell_id'])->where('status', 4)->select();
 				$tt       = $total[0]['total'];
@@ -3544,7 +3563,9 @@ class Merchant extends Base {
 				//承兑商卖单奖励
 				$rs6 = $rs7 = $rs8 = $rs9 = $rs10 = $rs11 = $res3 = TRUE;
 				if ($traderMoney > 0) {
-					$rs6 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $traderMoney);
+					$rs6 = balanceChange(TRUE, $orderinfo['sell_id'], $traderMoney, 0, 0, 0, BAL_COMMISSION, $orderinfo['id']);
+
+					//$rs6 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $traderMoney);
 					$rs7 = Db::table('think_trader_reward')->insert(['uid' => $orderinfo['sell_id'], 'orderid' => $orderinfo['id'], 'amount' => $traderMoney, 'type' => 0, 'create_time' => time()]);
 				}
 				//承兑商代理利润
@@ -3579,15 +3600,19 @@ class Merchant extends Base {
 					$data['appid']   = $buymerchant['appid'];
 					$data['status']  = 1;
 					askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
+
+					$redis->rm($id);
 					$this->success('释放成功');
 				} else {
 					// 回滚事务
 					Db::rollback();
+					$redis->rm($id);
 					$this->error('释放失败,请稍后再试!');
 				}
 			} catch (\think\Exception\DbException $e) {
 				// 回滚事务
 				Db::rollback();
+				$redis->rm($id);
 				$this->error('释放失败，参考信息：' . $e->getMessage());
 			}
 		}
@@ -3633,9 +3658,11 @@ class Merchant extends Base {
 			$mum  = $orderinfo['deal_num'] - $sfee;
 			Db::startTrans();
 			try {
-				$rs1      = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $orderinfo['deal_num'] + $orderinfo['fee']);
+				$rs1 = balanceChange(TRUE, $orderinfo['sell_id'], 0, 0, -$orderinfo['deal_num'], $orderinfo['fee'], BAL_SOLD, $orderinfo['id']);
+				//$rs1      = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $orderinfo['deal_num'] + $orderinfo['fee']);
 				$rs2      = Db::table('think_order_sell')->update(['id' => $orderinfo['id'], 'status' => 4, 'finished_time' => time(), 'buyer_fee' => $sfee]);
-				$rs3      = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->setInc('usdt', $mum);
+				//$rs3      = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->setInc('usdt', $mum);
+				$rs3 = balanceChange(TRUE, $orderinfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderinfo['id']);
 				$rs4      = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->setInc('transact_buy', 1);
 				$total    = Db::table('think_order_sell')->field('sum(dktime-ctime) as total')->where('buy_id', $orderinfo['buy_id'])->where('status', 4)->select();
 				$tt       = $total[0]['total'];
