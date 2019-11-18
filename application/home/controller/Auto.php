@@ -586,16 +586,16 @@ class Auto extends Base {
 		$remain = Db::name('config')->where('name', 'ad_down_remain_amount')->value('value');//充值手续费
 		// dump($remain);
 		//挂卖下架
-		$sellids = Db::name('ad_sell')->field('id, amount, userid')->where('state', 1)->where('amount', 'gt', 0)->select();
-		foreach ($sellids as $k => $v) {
-			$total = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 7)->sum('deal_num');
-			if ($v['amount'] <= $total + $remain) {
-				//开始下架
-				Db::name('ad_sell')->where('id', $v['id'])->setField('state', 2);
-				$nowads = Db::name('ad_sell')->where('userid', $v['userid'])->where('state', 1)->where('amount', 'gt', 0)->count();
-				Db::name('merchant')->where('id', $v['userid'])->setField('ad_on_sell', $nowads ? $nowads : 0);
-			}
-		}
+		// $sellids = Db::name('ad_sell')->field('id, amount, userid')->where('state', 1)->where('amount', 'gt', 0)->select();
+		// foreach ($sellids as $k => $v) {
+		// 	$total = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 7)->sum('deal_num');
+		// 	if ($v['amount'] <= $total + $remain) {
+		// 		//开始下架
+		// 		Db::name('ad_sell')->where('id', $v['id'])->setField('state', 2);
+		// 		$nowads = Db::name('ad_sell')->where('userid', $v['userid'])->where('state', 1)->where('amount', 'gt', 0)->count();
+		// 		Db::name('merchant')->where('id', $v['userid'])->setField('ad_on_sell', $nowads ? $nowads : 0);
+		// 	}
+		// }
 		//购买挂单下架
 		$buyids = Db::name('ad_buy')->field('id, amount, userid')->where('state', 1)->where('amount', 'gt', 0)->select();
 		foreach ($buyids as $k => $v) {
@@ -659,7 +659,7 @@ class Auto extends Base {
 		// 只有支持加价模式的变动
 		Db::startTrans();
 		$usdtPrice = getUsdtPrice();
-		$res = Db::name('ad_buy')->where('state=1')->update(['price' => getUsdtPrice() + $addFee]);
+		$res = Db::name('ad_buy')->where('state=1')->update(['price' => $usdtPrice + $addFee]);
 		$res ? Db::commit() : Db::rollback();
 		$msg = '【' . date('Y-m-d H:i:s') . '】 买单加价价格更新'. ($res ? '成功' : '失败') . ", 更新模式:$usdtPriceWay, USDT价格:$usdtPrice  \r\n";
 		file_put_contents(RUNTIME_PATH . 'data/cli_updateAdBuyPrice_' . date('ymd') . '.log', $msg, FILE_APPEND);

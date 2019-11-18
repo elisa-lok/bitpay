@@ -126,6 +126,15 @@ class Redis extends Driver
         return $result;
     }
 
+	/**
+	 * 获取过期时间
+	 * @param $key
+	 * @return bool|int
+	 */
+    public function ttl($key){
+    	return $this->handler->ttl($key);
+	}
+
     /**
      * 自增缓存（针对数值缓存）
      * @access public
