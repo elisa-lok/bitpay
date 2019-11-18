@@ -2498,12 +2498,12 @@ class Merchant extends Base {
 			if (($ad_info['remain_amount'] + $haveadsum) * 1 > $merchant['usdt'] * 1) {
 				$this->error('开启失败：账户余额不足');
 			} else {
-				balanceChange(TRUE, session('uid'), -$ad_info['remain_amount'], 0, $ad_info['remain_amount'], 0, BAL_ENTRUST, $id) && $this->error('开启失败：扣款失败');
+				!balanceChange(TRUE, session('uid'), -$ad_info['remain_amount'], 0, $ad_info['remain_amount'], 0, BAL_ENTRUST, $id) && $this->error('开启失败：扣款失败');
 				// Db::name('merchant')->where('id', session('uid'))->setDec('usdt', $ad_info['remain_amount']);
 				// Db::name('merchant')->where('id', session('uid'))->setInc('usdtd', $ad_info['remain_amount']);
 			}
 		} elseif ($act == 2) {
-			balanceChange(TRUE, session('uid'), $ad_info['remain_amount'], 0, -$ad_info['remain_amount'], 0, BAL_ENTRUST, $id) && $this->error('下架失败：退款失败');
+			!balanceChange(TRUE, session('uid'), $ad_info['remain_amount'], 0, -$ad_info['remain_amount'], 0, BAL_REDEEM, $id) && $this->error('下架失败：退款失败');
 
 			//Db::name('merchant')->where('id', session('uid'))->setInc('usdt', $ad_info['remain_amount']);
 			//Db::name('merchant')->where('id', session('uid'))->setDec('usdtd', $ad_info['remain_amount']);
