@@ -2765,7 +2765,7 @@ class Merchant extends Base {
 				$rs2 = balanceChange(TRUE, session('uid'), -$num, $fee, $num, $fee, BAL_SOLD, $arr['order_no'] , "商户出售");
 				//$rs2 = Db::table('think_merchant')->where('id', session('uid'))->setDec($coin_name, $num + $fee);
 				//$rs3 = Db::table('think_merchant')->where('id', session('uid'))->setInc($coin_name . 'd', $num + $fee);
-				if ($rs1 && $rs2 && $rs3) {
+				if ($rs1 && $rs2) {
 					Db::commit();
 					financelog(session('uid'), ($num + $fee), '卖出USDT_冻结1', 1, session('user.name'));//添加日志
 					//todo:发送短信给买家
