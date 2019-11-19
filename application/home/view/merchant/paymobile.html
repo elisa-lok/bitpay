@@ -101,7 +101,7 @@
 								<p class='mt10 f14' style="color:red; font-size: 18px" id="copy_alipay_name" data-clipboard-target="#alipay_name">支付宝姓名：<em id="alipay_name">{gt name='remaintime' value='0'}{$merchant.alipay_name}{/gt}</em><a id="cp_alipay_name">&nbsp;(点击复制)</a></p>
 								<p class='mt10 f14' style="color:red;margin-top: 0.2rem;font-size: 18px" id="copy_alipay_acc" data-clipboard-target="#alipay_acc">支付宝账号：<em id="alipay_acc">{gt name='remaintime' value='0'}{$merchant.alipay_acc}{/gt}</em><a id="cp_alipay_acc">&nbsp;(点击复制)</a></p>
 							</div>
-							<p style="color:blue;margin-top: 20px;font-size:18px;">温馨提示:点击二维码跳转<br><br></p>
+							<p style="color:blue;margin-top: 20px;font-size:18px;">温馨提示:<br>如果扫码时出现支付宝风控,请勿担心,可以继续付款。如有问题请联系客服人员。<br></p>
 							<div class="mt10" style="color: red;">
 								<p>1.打开支付宝，点击"扫一扫"</p>
 								<a  id='alipay_link' href="">
@@ -193,7 +193,7 @@
 }</style>
 <script>
 
-    swal( {title:"你需支付¥{$money}元",text: "温馨提示：\n* 注意! 付错金额，重复支付，充值将不到账！\n* 支付完成后，请务必点击下方的\"我已付款\"按钮",icon:"warning"});
+    swal( {title:"你需支付¥{$money}元",text: "温馨提示：\n* 注意! 付错金额，重复支付，充值将不到账！\n* 支付完成后，请务必点击下方的\"我已付款\"按钮 \n*如果扫码时出现支付宝风控,请勿担心,可以继续付款。如有问题请联系客服人员。",icon:"warning"});
     var copy1T;
     var clipboard1 = new ClipboardJS('#copy1');
 	if (clipboard1){
