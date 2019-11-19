@@ -191,8 +191,8 @@ class Order extends Base {
 				// 关闭状态下改待付款或待放行
 				$real_number = $orderInfo['deal_num'] + $orderInfo['fee'];
 				// 如果挂单已下架则不允许修改
-				$sellInfo = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->where('state', 2)->find();
-				$sellInfo && showMsg('原挂单已下架，不允许修改订单状态。', 0);
+				$sellInfo = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->find();
+				($sellInfo['state'] == 2) && showMsg('原挂单已下架，不允许修改订单状态。', 0);
 				// 剩余数量不足
 				$sellInfo['remain_amount'] < $real_number && showMsg('挂单剩余数量不足，无法修改。', 0);
 				/*
