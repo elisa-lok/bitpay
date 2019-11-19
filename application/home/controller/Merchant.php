@@ -658,7 +658,7 @@ class Merchant extends Base {
 			Db::startTrans();
 			try {
 				$ordersn = createOrderNo(1, session('uid'));
-				$rs1 = balanceChange(TRUE, session('uid'), -$num, 0, $num, 0, BAL_WITHDRAW, $ordersn);
+				$rs1     = balanceChange(TRUE, session('uid'), -$num, 0, $num, 0, BAL_WITHDRAW, $ordersn);
 
 				//$rs1 = Db::table('think_merchant')->where('id', session('uid'))->setDec('usdt', $num);
 				//$rs3 = Db::table('think_merchant')->where('id', session('uid'))->setInc('usdtd', $num);
@@ -2762,7 +2762,7 @@ class Merchant extends Base {
 				Db::startTrans();
 				$rs1 = $id = Db::table('think_order_sell')->insertGetId($arr);
 				//卖家的btc需要冻结起来
-				$rs2 = balanceChange(TRUE, session('uid'), -$num, $fee, $num, $fee, BAL_SOLD, $arr['order_no'] , "商户出售");
+				$rs2 = balanceChange(TRUE, session('uid'), -$num, $fee, $num, $fee, BAL_SOLD, $arr['order_no'], "商户出售");
 				//$rs2 = Db::table('think_merchant')->where('id', session('uid'))->setDec($coin_name, $num + $fee);
 				//$rs3 = Db::table('think_merchant')->where('id', session('uid'))->setInc($coin_name . 'd', $num + $fee);
 				if ($rs1 && $rs2) {
@@ -2971,11 +2971,12 @@ class Merchant extends Base {
 			//var_dump($zfb);die;
 			//empty($zfb['alipay_id']) && $this->error('appid不存在');
 			//$url                      = 'https://api.uomg.com/api/long2dwz';
-			$longUrl                  = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] . '&amount=' . $order['deal_amount'] . '';
+			$longUrl = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] . '&amount=' . $order['deal_amount'] . '';
 			//$longUrl = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s": "money","u":"' . $zfb['alipay_id'] . '","a":"' . $order['deal_amount'] . '","m":"' . $order['check_code'] . '"}';
 			//var_dump($longUrl);die;
-			//$redirectUrl              = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/go/url/' . base64_encode($longUrl);
-			$merchant['c_alipay_img'] = $longUrl;
+			$redirectUrl              = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/go/url/' . base64_encode($longUrl);
+			//$merchant['c_alipay_img'] = $longUrl;
+			$merchant['c_alipay_img'] = $redirectUrl;
 			$merchant['alipay_name']  = $zfb['truename'];
 			$merchant['alipay_acc']   = $zfb['c_bank'];
 			$payarr[]                 .= 'zfb';
@@ -3067,7 +3068,7 @@ class Merchant extends Base {
 			$zfb = Db::name('merchant_zfb')->where('id', $zfbid)->find();
 			//var_dump($zfb);die;
 			//$url                      = 'https://api.uomg.com/api/long2dwz';
-			$longUrl                  = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] . '&amount=' . $order['deal_amount'] . '';
+			$longUrl = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] . '&amount=' . $order['deal_amount'] . '';
 			//$longUrl = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s": "money","u":"' . $zfb['alipay_id'] . '","a":"' . $order['deal_amount'] . '","m":"' . $order['check_code'] . '"}';
 			//var_dump($longUrl);die;
 			/*$data                     = [
@@ -3075,8 +3076,8 @@ class Merchant extends Base {
 				'url'    => $longUrl
 			];*/ //$res                      = $this->Scurl($url, $data);
 			//$obj                      = json_decode($res);
-			//$merchant['c_alipay_img'] = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/go/url/' . base64_encode($longUrl);;
-			$merchant['c_alipay_img'] = $longUrl;
+			$merchant['c_alipay_img'] = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/go/url/' . base64_encode($longUrl);;
+			//$merchant['c_alipay_img'] = $longUrl;
 			$merchant['alipay_name']  = $zfb['truename'];
 			$merchant['alipay_acc']   = $zfb['c_bank'];
 			$payarr[]                 .= 'zfb';
@@ -3554,7 +3555,7 @@ class Merchant extends Base {
 				}
 				//$rs2 = Db::table('think_order_buy')->update(['id'=>$orderinfo['id'], 'status'=>4, 'finished_time'=>time(), 'platform_fee'=>$moneyArr[0]]);
 				//$rs3      = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->setInc('usdt', $mum);
-				$rs3 = balanceChange(TRUE, $orderinfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderinfo['id']);
+				$rs3      = balanceChange(TRUE, $orderinfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderinfo['id']);
 				$rs4      = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('transact', 1);
 				$total    = Db::table('think_order_buy')->field('sum(finished_time-dktime) as total')->where('sell_id', $orderinfo['sell_id'])->where('status', 4)->select();
 				$tt       = $total[0]['total'];
@@ -3660,9 +3661,9 @@ class Merchant extends Base {
 			try {
 				$rs1 = balanceChange(TRUE, $orderinfo['sell_id'], 0, 0, -$orderinfo['deal_num'], $orderinfo['fee'], BAL_SOLD, $orderinfo['id']);
 				//$rs1      = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $orderinfo['deal_num'] + $orderinfo['fee']);
-				$rs2      = Db::table('think_order_sell')->update(['id' => $orderinfo['id'], 'status' => 4, 'finished_time' => time(), 'buyer_fee' => $sfee]);
+				$rs2 = Db::table('think_order_sell')->update(['id' => $orderinfo['id'], 'status' => 4, 'finished_time' => time(), 'buyer_fee' => $sfee]);
 				//$rs3      = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->setInc('usdt', $mum);
-				$rs3 = balanceChange(TRUE, $orderinfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderinfo['id']);
+				$rs3      = balanceChange(TRUE, $orderinfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderinfo['id']);
 				$rs4      = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->setInc('transact_buy', 1);
 				$total    = Db::table('think_order_sell')->field('sum(dktime-ctime) as total')->where('buy_id', $orderinfo['buy_id'])->where('status', 4)->select();
 				$tt       = $total[0]['total'];
