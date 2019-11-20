@@ -32,12 +32,71 @@
 						<h3 class="box-title"></h3>
 						<div class="pull-right">
 							<div class="btn-group pull-right" style="margin-right: 10px">
-								<a class="btn btn-sm btn-twitter" href="{:url('home/merchant/OutUserPkOrder')}"><i class="fa fa-download"></i> 导出</a>
+								<!--<a class="btn btn-sm btn-twitter" href="{:url('home/merchant/OutUserPkOrder')}"><i class="fa fa-download"></i> 导出</a>-->
+								<a data-href="" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#filter-modal1"><i class="fa  btn-twitter"></i>&nbsp;&nbsp;导出</a>
+
 							</div>
 							<div class="btn-group pull-right" style="margin-right: 10px">
-
 								<a data-href="" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#filter-modal"><i class="fa fa-filter"></i>&nbsp;&nbsp;筛选</a> <a href="/merchant/pkorder" class="btn btn-sm btn-facebook"><i class="fa fa-undo"></i>&nbsp;&nbsp;重置</a>
 							</div>
+							<div class="modal fade" id="filter-modal1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+								<div class="modal-dialog" role="document">
+									<div class="modal-content">
+										<div class="modal-header">
+											<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+												<span aria-hidden="true">×</span> <span class="sr-only">Close</span>
+											</button>
+											<h4 class="modal-title" id="myModalLabel1">筛选</h4>
+										</div>
+										<form action="/home/merchant/OutUserPkOrder" method="get" pjax-container="">
+											<div class="modal-body">
+												<div class="form">
+													<div class="form-group">
+														<!--<div class="form-group">
+															<label>订单号</label>
+															<div class="input-group">
+																<div class="input-group-addon">
+																	<i class="fa fa-pencil"></i>
+																</div>
+																<input type="text" class="form-control username" placeholder="输入订单号,可模糊查找" name="ordersn" value="">
+															</div>
+														</div>-->
+													</div>
+													<div class="form-group">
+														<div class="form-group">
+															<label>状态</label> <select class="form-control status select2-hidden-accessible" name="status" style="width: 100%;" tabindex="-1" aria-hidden="true">
+															<option></option>
+															<option value="0">待付款</option>
+															<option value="1">待放行</option>
+															<option value="4">已完成</option>
+															<option value="5">已关闭</option>
+															<option value="5">申诉中</option>
+														</select>
+														</div>
+													</div>
+													<div class="form-group">
+														<div class="form-group">
+															<label>订单时间</label>
+															<div class="input-group">
+																<div class="input-group-addon">
+																	<i class="fa fa-calendar"></i>
+																</div>
+																<input type="text" class="form-control" id="created_at_start" placeholder="起止时间" name="created_at[start]" value=""><span class="input-group-addon" style="border-left: 0; border-right: 0;">-</span>
+																<input type="text" class="form-control" id="created_at_end" placeholder="起止时间" name="created_at[end]" value="">
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="modal-footer">
+												<button type="submit" class="btn btn-primary submit">导出</button>
+												<button type="reset" class="btn btn-warning pull-left">重置</button>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+
 							<div class="modal fade" id="filter-modal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 								<div class="modal-dialog" role="document">
 									<div class="modal-content">
