@@ -2850,7 +2850,15 @@ class Merchant extends Base {
 			$this->error('请登陆操作', url('home/login/login'));
 		}
 		$where['sell_id'] = session('uid');
-
+		$status  = input('get.status');
+		if (isset($status) && $status > 0) {
+			$where['status'] = $status;
+		}
+		if (!empty($get['created_at']['start']) && !empty($get['created_at']['end'])) {
+			$start          = strtotime($get['created_at']['start']);
+			$end            = strtotime($get['created_at']['end']);
+			$where['ctime'] = ['between', [$start, $end]];
+		}
 		$data = Db::name('order_sell')->where($where)->order('id desc')->select();
 		//文件名称
 		$Excel['fileName']   = "下发订单" . date('Y年m月d日-His', time());//or $xlsTitle
@@ -3310,13 +3318,16 @@ class Merchant extends Base {
 		$get             = input('get.');
 		$order           = 'id desc';
 		$model           = new OrderBuyModel();
-		$list            = $model->getAllByWhere($where, $order);
-		//var_dump($list);die;
+		$status  = input('get.status');
+		if (isset($status) && $status > 0) {
+			$where['status'] = $status;
+		}
 		if (!empty($get['created_at']['start']) && !empty($get['created_at']['end'])) {
 			$start          = strtotime($get['created_at']['start']);
 			$end            = strtotime($get['created_at']['end']);
 			$where['ctime'] = ['between', [$start, $end]];
 		}
+		$list            = $model->getAllByWhere($where, $order);
 		if ($list) {
 			$usdtPriceWay = Db::name('config')->where('name', 'usdt_price_way')->value('value');
 			$dealerFee    = 0; //承兑商费用
