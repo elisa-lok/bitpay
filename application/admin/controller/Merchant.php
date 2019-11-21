@@ -1497,10 +1497,13 @@ class Merchant extends Base {
 		}
 		if ($buymerchant['pid']) {
 			$buymerchantP = $model2->getUserByParam($buymerchant['pid'], 'id');
-			if ($buymerchantP['agent_check'] == 1 && $buymerchantP['trader_merchant_parent_get']) {
+			$buymerchantP['enable_new_get'] == 0 ?
+				$traderMParentGet = $buymerchantP['trader_merchant_parent_get'] :
+				$traderMParentGet = $buymerchant['trader_merchant_parent_get_new'];
+			if ($buymerchantP['agent_check'] == 1 && $traderMParentGet) {
 				//商户代理利润
-				$mpexist            = 1;
-				$traderMParentGet   = $buymerchantP['trader_merchant_parent_get'];
+				$mpexist = 1;
+				//$traderMParentGet   = $buymerchantP['trader_merchant_parent_get'];
 				$traderMParentGet   = $traderMParentGet ? $traderMParentGet : 0;
 				$traderMParentMoney = $traderMParentGet * $orderinfo['deal_num'] / 100;
 			}
@@ -1519,7 +1522,7 @@ class Merchant extends Base {
 			// 回滚
 			$res1 = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])->setInc('remain_amount', $backAmount);
 			$res2 = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])->setDec('trading_volume', $backAmount);
-			$rs1 = balanceChange(TRUE, $orderinfo['sell_id'], 0, 0, -$backAmount, 0, BAL_BOUGHT, $orderinfo['id'], "申述失败操作");
+			$rs1  = balanceChange(TRUE, $orderinfo['sell_id'], 0, 0, -$backAmount, 0, BAL_BOUGHT, $orderinfo['id'], "申述失败操作");
 			//$rs1  = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $backAmount);
 
 			// $rs1 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $oldNum);
