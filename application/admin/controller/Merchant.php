@@ -1497,9 +1497,7 @@ class Merchant extends Base {
 		}
 		if ($buymerchant['pid']) {
 			$buymerchantP = $model2->getUserByParam($buymerchant['pid'], 'id');
-			$buymerchantP['enable_new_get'] == 0 ?
-				$traderMParentGet = $buymerchantP['trader_merchant_parent_get'] :
-				$traderMParentGet = $buymerchant['trader_merchant_parent_get_new'];
+			$buymerchantP['enable_new_get'] == 0 ? $traderMParentGet = $buymerchantP['trader_merchant_parent_get'] : $traderMParentGet = $buymerchant['trader_merchant_parent_get_new'];
 			if ($buymerchantP['agent_check'] == 1 && $traderMParentGet) {
 				//商户代理利润
 				$mpexist = 1;
@@ -1633,15 +1631,15 @@ class Merchant extends Base {
 		}
 		Db::startTrans();
 		try {
-			$rs1 = balanceChange(TRUE, $orderinfo['buy_id'], $orderinfo['deal_num'] + $orderinfo['fee'], 0, 0, 0, BAL_BOUGHT, $orderinfo['id'], "申述失败操作->buy");
+			$rs1 = TRUE;
+			//$rs1 = balanceChange(TRUE, $orderinfo['buy_id'], $orderinfo['deal_num'] + $orderinfo['fee'], 0, 0, 0, BAL_BOUGHT, $orderinfo['id'], "申述失败操作->buy");
 			//$rs1 = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->setDec('usdtd', $orderinfo['deal_num'] + $orderinfo['fee']);
 			$rs2 = Db::table('think_order_sell')->update(['id' => $orderinfo['id'], 'status' => 4, 'finished_time' => time()]);
 			//$rs3 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $orderinfo['deal_num'] + $orderinfo['fee']);
-			$rs3 = balanceChange(TRUE, $orderinfo['sell_id'], 0, 0, -$orderinfo['deal_num'], $orderinfo['fee'], BAL_BOUGHT, $orderinfo['id'], "申述失败操作->buy");
+			$rs3 = balanceChange(TRUE, $orderinfo['sell_id'], $orderinfo['deal_num'] + $orderinfo['fee'], 0, -$orderinfo['deal_num'], $orderinfo['fee'], BAL_BOUGHT, $orderinfo['id'], "申述失败操作->buy");
 
 			if ($rs1 && $rs2 && $rs3) {
-				financelog($orderinfo['sell_id'], ($orderinfo['deal_num'] + $orderinfo['fee']), '卖出USDT_释放_3', 1, session('username'));//添加日志
-				financelog($orderinfo['buy_id'], ($orderinfo['deal_num'] + $orderinfo['fee']), '买入USDT_3', 0, session('username'));//添加日志
+				financelog($orderinfo['sell_id'], ($orderinfo['deal_num'] + $orderinfo['fee']), '卖出USDT_取消', 1, session('username'));//添加日志
 				// 提交事务
 				Db::commit();
 				$this->success('操作成功');
