@@ -182,7 +182,23 @@
 								<input id="trader_merchant_parent_get" type="text" class="form-control" name="trader_merchant_parent_get" value="{$merchant.trader_merchant_parent_get}" placeholder="下级商户购买订单利润">%
 							</div>
 						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">是否开启商户代理购买订单利润：</label>
+							<div class="input-group col-sm-4">
+								<div class="radio i-checks">
+									<input type="radio" name='enable_new_get' value="1" {if condition="$merchant['enable_new_get'] eq 1 " }checked{/if}/>开启&nbsp;&nbsp;
+									<input type="radio" name='enable_new_get' value="0" {if condition="$merchant['enable_new_get'] eq 0 " }checked{/if}/>禁用&nbsp;&nbsp;
+								</div>
+							</div>
+						</div>
 						{/eq}
+						<div class="hr-line-dashed"></div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">商户代理利润：</label>
+							<div class="input-group col-sm-4">
+								<input id="trader_merchant_parent_get_new" type="text" class="form-control" name="trader_merchant_parent_get_new" value="{$merchant.trader_merchant_parent_get_new}" placeholder="商户代理购买订单利润">%
+							</div>
+						</div>
 						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">谷歌验证：</label>
@@ -196,7 +212,7 @@
 							<div class="input-group col-sm-9">
 								<div class="radio i-checks">
 									<input type="checkbox" name='pptrader'  value="1"/>选择所有
-								     <br>
+									<br>
 									{volist name="traders" id="vo"}
 									<input type="checkbox" name='pptraders[]' {eq name='vo.ispp' value='1'}checked{/eq} value="{$vo.id}"/>{$vo.name}&nbsp;&nbsp;
 									{/volist}
@@ -221,92 +237,92 @@
 {include file="public/footer" /}
 <script type="text/javascript" src="/static/admin/webupload/webuploader.min.js"></script>
 <script type="text/javascript">
-    var $list = $('#fileList');
-    //上传图片,初始化WebUploader
-    var uploader = WebUploader.create({
+	var $list = $('#fileList');
+	//上传图片,初始化WebUploader
+	var uploader = WebUploader.create({
 
-        auto     : true,// 选完文件后，是否自动上传。
-        swf      : '/static/admin/webupload/Uploader.swf',// swf文件路径
-        server   : "{:url('Upload/uploadidcard')}",// 文件接收服务端。
-        duplicate: true,// 重复上传图片，true为可重复false为不可重复
-        pick     : '#imgPicker',// 选择文件的按钮。可选。
+		auto     : true,// 选完文件后，是否自动上传。
+		swf      : '/static/admin/webupload/Uploader.swf',// swf文件路径
+		server   : "{:url('Upload/uploadidcard')}",// 文件接收服务端。
+		duplicate: true,// 重复上传图片，true为可重复false为不可重复
+		pick     : '#imgPicker',// 选择文件的按钮。可选。
 
-        accept: {
-            title     : 'Images',
-            extensions: 'gif,jpg,jpeg,bmp,png',
-            mimeTypes : 'image/jpg,image/jpeg,image/png'
-        },
+		accept: {
+			title     : 'Images',
+			extensions: 'gif,jpg,jpeg,bmp,png',
+			mimeTypes : 'image/jpg,image/jpeg,image/png'
+		},
 
-        'onUploadSuccess': function (file, data, response) {
-            $("#idcard_zheng").val(data._raw);
-            $("#img_data").attr('src', '/uploads/idcard/' + data._raw).show();
-        }
-    });
-    var $list = $('#fileList2');
-    //上传图片,初始化WebUploader
-    var uploader = WebUploader.create({
+		'onUploadSuccess': function (file, data, response) {
+			$("#idcard_zheng").val(data._raw);
+			$("#img_data").attr('src', '/uploads/idcard/' + data._raw).show();
+		}
+	});
+	var $list = $('#fileList2');
+	//上传图片,初始化WebUploader
+	var uploader = WebUploader.create({
 
-        auto     : true,// 选完文件后，是否自动上传。
-        swf      : '/static/admin/webupload/Uploader.swf',// swf文件路径
-        server   : "{:url('Upload/uploadidcard')}",// 文件接收服务端。
-        duplicate: true,// 重复上传图片，true为可重复false为不可重复
-        pick     : '#imgPicker2',// 选择文件的按钮。可选。
+		auto     : true,// 选完文件后，是否自动上传。
+		swf      : '/static/admin/webupload/Uploader.swf',// swf文件路径
+		server   : "{:url('Upload/uploadidcard')}",// 文件接收服务端。
+		duplicate: true,// 重复上传图片，true为可重复false为不可重复
+		pick     : '#imgPicker2',// 选择文件的按钮。可选。
 
-        accept: {
-            title     : 'Images',
-            extensions: 'gif,jpg,jpeg,bmp,png',
-            mimeTypes : 'image/jpg,image/jpeg,image/png'
-        },
+		accept: {
+			title     : 'Images',
+			extensions: 'gif,jpg,jpeg,bmp,png',
+			mimeTypes : 'image/jpg,image/jpeg,image/png'
+		},
 
-        'onUploadSuccess': function (file, data, response) {
-            $("#idcard_fan").val(data._raw);
-            $("#img_data2").attr('src', '/uploads/idcard/' + data._raw).show();
-        }
-    });
+		'onUploadSuccess': function (file, data, response) {
+			$("#idcard_fan").val(data._raw);
+			$("#img_data2").attr('src', '/uploads/idcard/' + data._raw).show();
+		}
+	});
 
-    uploader.on('fileQueued', function (file) {
-        $list.html('<div id="' + file.id + '" class="item">' +
-            '<h4 class="info">' + file.name + '</h4>' +
-            '<p class="state">正在上传...</p>' +
-            '</div>');
-    });
+	uploader.on('fileQueued', function (file) {
+		$list.html('<div id="' + file.id + '" class="item">' +
+			'<h4 class="info">' + file.name + '</h4>' +
+			'<p class="state">正在上传...</p>' +
+			'</div>');
+	});
 
-    // 文件上传成功
-    uploader.on('uploadSuccess', function (file) {
-        $('#' + file.id).find('p.state').text('上传成功！');
-    });
+	// 文件上传成功
+	uploader.on('uploadSuccess', function (file) {
+		$('#' + file.id).find('p.state').text('上传成功！');
+	});
 
-    // 文件上传失败，显示上传出错。
-    uploader.on('uploadError', function (file) {
-        $('#' + file.id).find('p.state').text('上传出错!');
-    });
-
-
+	// 文件上传失败，显示上传出错。
+	uploader.on('uploadError', function (file) {
+		$('#' + file.id).find('p.state').text('上传出错!');
+	});
 
 
-    //提交
-    $(function () {
-        $('#edit_member').ajaxForm({
-            beforeSubmit: checkForm,
-            success     : complete,
-            dataType    : 'json'
-        });
 
-        function checkForm() {
 
-        }
+	//提交
+	$(function () {
+		$('#edit_member').ajaxForm({
+			beforeSubmit: checkForm,
+			success     : complete,
+			dataType    : 'json'
+		});
 
-        function complete(data) {
-            if (data.code == 1) {
-                layer.msg(data.msg, {icon: 6, time: 1500, shade: 0.1}, function (index) {
-                    window.location.href = "{:url('merchant/index?reg_type='.$reg_type)}";
-                });
-            } else {
-                layer.msg(data.msg, {icon: 5, time: 1500, shade: 0.1});
-                return false;
-            }
-        }
-    });
+		function checkForm() {
+
+		}
+
+		function complete(data) {
+			if (data.code == 1) {
+				layer.msg(data.msg, {icon: 6, time: 1500, shade: 0.1}, function (index) {
+					window.location.href = "{:url('merchant/index?reg_type='.$reg_type)}";
+				});
+			} else {
+				layer.msg(data.msg, {icon: 5, time: 1500, shade: 0.1});
+				return false;
+			}
+		}
+	});
 
 </script>
 </body>

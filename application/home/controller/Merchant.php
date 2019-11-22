@@ -3539,6 +3539,17 @@ class Merchant extends Base {
 			}
 			if ($buymerchant['pid']) {
 				$buymerchantP = $model2->getUserByParam($buymerchant['pid'], 'id');
+				$buymerchantP['enable_new_get'] == 0 ?
+					$traderMParentGet = $buymerchantP['trader_merchant_parent_get'] :
+					$traderMParentGet = $buymerchant['trader_merchant_parent_get_new'];
+				if ($buymerchantP['agent_check'] == 1 && $traderMParentGet) {
+					//商户代理利润
+					$mpexist = 1;
+					//$traderMParentGet   = $buymerchantP['trader_merchant_parent_get'];
+					$traderMParentGet   = $traderMParentGet ? $traderMParentGet : 0;
+					$traderMParentMoney = $traderMParentGet * $orderinfo['deal_num'] / 100;
+				}
+				/*
 				if ($buymerchantP['agent_check'] == 1 && $buymerchantP['trader_merchant_parent_get']) {
 					//商户代理利润
 					$mpexist            = 1;
@@ -3546,6 +3557,7 @@ class Merchant extends Base {
 					$traderMParentGet   = $traderMParentGet ? $traderMParentGet : 0;
 					$traderMParentMoney = $traderMParentGet * $orderinfo['deal_num'] / 100;
 				}
+				*/
 			}
 			//平台，承兑商代理，商户代理，承兑商，商户只能得到这么多，多的给平台
 			$moneyArr           = getMoneyByLevel($pkdec, $platformMoney, $traderParentMoney, $traderMParentMoney, $traderMoney);
