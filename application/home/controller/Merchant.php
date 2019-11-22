@@ -2982,9 +2982,9 @@ class Merchant extends Base {
 			//$longUrl = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] . '&amount=';
 			$longUrl = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s": "money","u":"' . $zfb['alipay_id'] . '","a":"' . $order['deal_amount'] . '","m":"' . $order['check_code'] . '"}';
 			//var_dump($longUrl);die;
-			//$redirectUrl              = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/go/url/' . base64_encode($longUrl);
-			$merchant['c_alipay_img'] = $longUrl;
-			//$merchant['c_alipay_img'] = $redirectUrl;
+			$redirectUrl              = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/go/url/' . base64_encode($longUrl);
+			//$merchant['c_alipay_img'] = $longUrl;
+			$merchant['c_alipay_img'] = $redirectUrl;
 			$merchant['alipay_name']  = $zfb['truename'];
 			$merchant['alipay_acc']   = $zfb['c_bank'];
 			$payarr[]                 .= 'zfb';
@@ -3084,7 +3084,7 @@ class Merchant extends Base {
 				'url'    => $longUrl
 			];*/ //$res                      = $this->Scurl($url, $data);
 			//$obj                      = json_decode($res);
-			//$merchant['c_alipay_img'] = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/go/url/' . base64_encode($longUrl);;
+			$merchant['c_alipay_img'] = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/go/url/' . base64_encode($longUrl);;
 			$merchant['c_alipay_img'] = $longUrl;
 			$merchant['alipay_name']  = $zfb['truename'];
 			$merchant['alipay_acc']   = $zfb['c_bank'];
