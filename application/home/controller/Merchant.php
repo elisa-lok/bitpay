@@ -3086,7 +3086,7 @@ class Merchant extends Base {
 			//$obj                      = json_decode($res);
 			$merchant['c_alipay_img'] = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/go/url/' . base64_encode($longUrl);;
 			//$merchant['c_alipay_img'] = $longUrl;
-			$merchant['alipay_name']  = $zfb['truename'];
+			$merchant['alipay_name']  = substr_replace($zfb['truename'], '*', 3, 3);
 			$merchant['alipay_acc']   = $zfb['c_bank'];
 			$payarr[]                 .= 'zfb';
 			/*var_dump($bank);
