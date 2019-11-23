@@ -17,6 +17,7 @@ use app\home\model\WithdrawModel;
 use app\home\model\WxModel;
 use app\home\model\YsfModel;
 use app\home\model\ZfbModel;
+use think\Cache;
 use think\cache\driver\Redis;
 use think\db;
 use think\request;
@@ -2850,7 +2851,7 @@ class Merchant extends Base {
 			$this->error('请登陆操作', url('home/login/login'));
 		}
 		$where['sell_id'] = session('uid');
-		$status  = input('get.status');
+		$status           = input('get.status');
 		if (isset($status) && $status > 0) {
 			$where['status'] = $status;
 		}
@@ -2982,7 +2983,7 @@ class Merchant extends Base {
 			//$longUrl = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] . '&amount=';
 			$longUrl = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s": "money","u":"' . $zfb['alipay_id'] . '","a":"' . $order['deal_amount'] . '","m":"' . $order['check_code'] . '"}';
 			//var_dump($longUrl);die;
-			$redirectUrl              = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/go/url/' . base64_encode($longUrl);
+			$redirectUrl = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/go/url/' . base64_encode($longUrl);
 			//$merchant['c_alipay_img'] = $longUrl;
 			$merchant['c_alipay_img'] = $redirectUrl;
 			$merchant['alipay_name']  = $zfb['truename'];
@@ -3037,6 +3038,15 @@ class Merchant extends Base {
 
 	public function pay() {
 		$id    = input('get.id');
+		$ip    = getIp();
+		$limit = Cache::get($ip);
+		(count($limit) > 4) && !in_array($id, $limit) && $this->error('黑名单用户不允许访问');
+		if(!in_array($id, $limit)){
+			$limit[] = $id;
+			Cache::set($ip, $limit, 7200);
+		}
+
+		//$id    = input('get.id');
 		$appid = input('get.appid');
 		$type  = input('get.type');
 		$order = Db::name('order_buy')->where('id', $id)->find();
@@ -3086,9 +3096,9 @@ class Merchant extends Base {
 			//$obj                      = json_decode($res);
 			$merchant['c_alipay_img'] = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/go/url/' . base64_encode($longUrl);;
 			//$merchant['c_alipay_img'] = $longUrl;
-			$merchant['alipay_name']  = substr_replace($zfb['truename'], '*', 3, 3);
-			$merchant['alipay_acc']   = $zfb['c_bank'];
-			$payarr[]                 .= 'zfb';
+			$merchant['alipay_name'] = substr_replace($zfb['truename'], '*', 3, 3);
+			$merchant['alipay_acc']  = $zfb['c_bank'];
+			$payarr[]                .= 'zfb';
 			/*var_dump($bank);
 			die;
 			$zfb                      = Db::name('merchant_zfb')->where('id', $zfbid)->find();
@@ -3318,7 +3328,7 @@ class Merchant extends Base {
 		$get             = input('get.');
 		$order           = 'id desc';
 		$model           = new OrderBuyModel();
-		$status  = input('get.status');
+		$status          = input('get.status');
 		if (isset($status) && $status > 0) {
 			$where['status'] = $status;
 		}
@@ -3327,7 +3337,7 @@ class Merchant extends Base {
 			$end            = strtotime($get['created_at']['end']);
 			$where['ctime'] = ['between', [$start, $end]];
 		}
-		$list            = $model->getAllByWhere($where, $order);
+		$list = $model->getAllByWhere($where, $order);
 		if ($list) {
 			$usdtPriceWay = Db::name('config')->where('name', 'usdt_price_way')->value('value');
 			$dealerFee    = 0; //承兑商费用
@@ -3539,9 +3549,7 @@ class Merchant extends Base {
 			}
 			if ($buymerchant['pid']) {
 				$buymerchantP = $model2->getUserByParam($buymerchant['pid'], 'id');
-				$buymerchantP['enable_new_get'] == 0 ?
-					$traderMParentGet = $buymerchantP['trader_merchant_parent_get'] :
-					$traderMParentGet = $buymerchant['trader_merchant_parent_get_new'];
+				$buymerchantP['enable_new_get'] == 0 ? $traderMParentGet = $buymerchantP['trader_merchant_parent_get'] : $traderMParentGet = $buymerchant['trader_merchant_parent_get_new'];
 				if ($buymerchantP['agent_check'] == 1 && $traderMParentGet) {
 					//商户代理利润
 					$mpexist = 1;
