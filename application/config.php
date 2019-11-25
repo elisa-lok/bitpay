@@ -92,4 +92,5 @@ return [
 
 	//订单超时时间
 	'order_expire'               => 15,
+	'is_send_sms'                => TRUE,
 ];

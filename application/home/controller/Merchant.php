@@ -3198,14 +3198,14 @@ class Merchant extends Base {
 		}
 		$rs = Db::name('order_buy')->where('id', $id)->update(['status' => 1, 'dktime' => time()]);
 		if ($rs) {
-			/*$moble = Db::name('merchant')->where('id', $order['sell_id'])->value('mobile');
-			if (!empty($moble)) {
+			/*$mobile = Db::name('merchant')->where('id', $order['sell_id'])->value('mobile');
+			if (!empty($mobile)) {
 				$send_content = Db::table('think_config')->where('name', 'send_message_content')->value('value');
 				$content      = str_replace('{usdt}', round($order['deal_num'], 2), $send_content);
 				$content      = str_replace('{cny}', round($order['deal_amount'], 2), $content);
 				$content      = str_replace('{tx_id}', $order['orderid'], $content);
 				$content      = str_replace('{check_code}', $order['check_code'], $content);
-				sendSms($moble, $content);
+				sendSms($mobile, $content);
 			}*/
 			$this->success($order['return_url']);
 		} else {
@@ -3237,10 +3237,10 @@ class Merchant extends Base {
 		$rs = Db::name('order_sell')->where('id', $id)->update(['status' => 1, 'dktime' => time()]);
 		if ($rs) {
 			//todo:是否发送短信给商家即卖家
-			//$moble = Db::name('merchant')->where('id', $order['sell_id'])->value('mobile');
-			//if(!empty($moble)){
+			//$mobile = Db::name('merchant')->where('id', $order['sell_id'])->value('mobile');
+			//if(!empty($mobile)){
 			//    $content = str_replace('{usdt}',$order['deal_num'],config('send_message_content'));
-			//    sendSms($moble, $content);
+			//    sendSms($mobile, $content);
 			//}
 			$this->success('标记成功');
 		} else {

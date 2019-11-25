@@ -452,13 +452,16 @@ function getUsdtPrice_old() {
 	return $price;
 }
 
-function sendSms($moble, $content) {
+function sendSms($mobile, $content) {
+	if (!config('is_send_sms')) {
+		return TRUE;
+	}
 	$url        = Db::table('think_config')->where('name', 'mobile_url')->value('value');
 	$user       = Db::table('think_config')->where('name', 'mobile_user')->value('value');
 	$key        = Db::table('think_config')->where('name', 'mobile_pwd')->value('value');
 	$title      = Db::table('think_config')->where('name', 'web_site_title')->value('value');
 	$content    = '【' . $title . '】' . $content;
-	$params     = "appid=$user&to=$moble&content=$content&signature=$key";
+	$params     = "appid=$user&to=$mobile&content=$content&signature=$key";
 	$curlHandle = curl_init();
 	curl_setopt($curlHandle, CURLOPT_POST, 1);
 	curl_setopt($curlHandle, CURLOPT_URL, $url);
