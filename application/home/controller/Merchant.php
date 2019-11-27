@@ -850,6 +850,74 @@ class Merchant extends Base {
 		return $this->fetch();
 	}
 
+	public function shanghurecord() {
+		$order = 'id desc';
+		if (isset($_GET['order'])) {
+			$order = 'id ' . $_GET['order'];
+		}
+		$model = new MerchantModel();
+		if (!session('uid')) {
+			$this->error('请登陆操作', url('home/login/login'));
+		}
+		$where['pid']      = session('uid');
+		$where['reg_type'] = 1;
+		$get               = input('get.');
+		$order             = 'id desc';
+		if (isset($_GET['order'])) {
+			$order = 'id ' . $_GET['order'];
+		}
+		$orderid = input('get.orderid');
+		$ordersn = input('get.ordersn');
+		$status  = input('get.status');
+		if (!empty($orderid)) {
+			$where['id'] = ['like', '%' . $orderid . '%'];
+		}
+		if (!empty($ordersn)) {
+			$where['name'] = ['like', '%' . $ordersn . '%'];
+		}
+		if (!empty($get['created_at']['start']) && !empty($get['created_at']['end'])) {
+			$start            = strtotime($get['created_at']['start']);
+			$end              = strtotime($get['created_at']['end']);
+			$where['addtime'] = ['between', [$start, $end]];
+		}
+		$lists = $model->getMerchantStatistics($where, $order);
+
+		$today = strtotime(date('Y-m-d 00:00:00'));
+
+		foreach ($lists as $key => $list) {
+			$recharge_number = $list->orderSell()->count('id');  // 充值笔数
+			$recharge_amount = $list->orderSell()->sum('deal_amount');  // 充值数量
+			$success_number  = $list->orderSell()->where('status', 4)->count('id');  // 成功笔数
+			$success_amount  = $list->orderSell()->where('status', 4)->sum('deal_amount');  // 成功数量
+			$buy_number      = $list->orderSell()->count('id');  // 购买数量
+			if ($success_number == 0 || $buy_number == 0) $success_rate = 0; else $success_rate = round(($success_number / $buy_number) * 100, 2);  // 成功率
+
+			// 获取当天笔数
+			$where2['ctime'] = ['egt', $today];
+
+			$today_number         = $list->orderSell()->where($where2)->count('id');  // 当天笔数
+			$today_amount         = $list->orderSell()->where($where2)->sum('deal_amount');  // 当天数量
+			$today_success_number = $list->orderSell()->where($where2)->where('status', 4)->count('id');  // 当天成功笔数
+			$today_success_amount = $list->orderSell()->where($where2)->where('status', 4)->sum('deal_amount');  // 当天成功数量
+			if ($today_success_number == 0 || $today_number == 0) $today_success_rate = 0; else $today_success_rate = round(($today_success_number / $today_number) * 100, 2);  // 成功率
+
+			$lists[$key]['recharge_number'] = $recharge_number;
+			$lists[$key]['recharge_amount'] = $recharge_amount;
+			$lists[$key]['success_number']  = $success_number;
+			$lists[$key]['success_amount']  = $success_amount;
+			$lists[$key]['success_rate']    = $success_rate;
+
+			$lists[$key]['today_number']         = $today_number;
+			$lists[$key]['today_amount']         = $today_amount;
+			$lists[$key]['today_success_number'] = $today_success_number;
+			$lists[$key]['today_success_amount'] = $today_success_amount;
+			$lists[$key]['today_success_rate']   = $today_success_rate;
+		}
+
+		$this->assign('list', $lists);
+		return $this->fetch();
+	}
+
 	public function editdown() {
 		if (!session('uid')) {
 			$this->error('请登陆操作', url('home/login/login'));
@@ -3039,9 +3107,9 @@ class Merchant extends Base {
 	public function pay() {
 		$id    = input('get.id');
 		$ip    = getIp();
-		$limit = Cache::get($ip) ? Cache::get($ip) : array();
+		$limit = Cache::get($ip) ? Cache::get($ip) : [];
 		(count($limit) > 4) && !in_array($id, $limit) && $this->error('黑名单用户不允许访问');
-		if(!in_array($id, $limit)){
+		if (!in_array($id, $limit)) {
 			$limit[] = $id;
 			Cache::set($ip, $limit, 7200);
 		}
@@ -3881,5 +3949,3 @@ class Merchant extends Base {
 		return empty($advsell) ? $adv_no : $this->getadvno();
 	}
 }
-
-?>
