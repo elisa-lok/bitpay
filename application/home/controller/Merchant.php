@@ -3039,7 +3039,7 @@ class Merchant extends Base {
 	public function pay() {
 		$id    = input('get.id');
 		$ip    = getIp();
-		$limit = Cache::get($ip);
+		$limit = Cache::get($ip) ? Cache::get($ip) : array();
 		(count($limit) > 4) && !in_array($id, $limit) && $this->error('黑名单用户不允许访问');
 		if(!in_array($id, $limit)){
 			$limit[] = $id;
