@@ -3045,6 +3045,9 @@ class Merchant extends Base {
 		$merchant = Db::name('merchant')->where('id', $order['sell_id'])->find();
 		$bank     = [];
 		$payarr   = [];
+		// 防封域名
+		$domain = config('defend_domains');
+		shuffle($domain);
 		if ($type == 'bank' && $bankid > 0) {
 			$bank                    = Db::name('merchant_bankcard')->where('id', $bankid)->find();
 			$merchant['c_bank_card'] = $bank['c_bank_card'];
@@ -3059,8 +3062,8 @@ class Merchant extends Base {
 			//$url                      = 'https://api.uomg.com/api/long2dwz';
 			//$longUrl = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] . '&amount=';
 			$longUrl = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s": "money","u":"' . $zfb['alipay_id'] . '","a":"' . $order['deal_amount'] . '","m":"' . $order['check_code'] . '"}';
-			//var_dump($longUrl);die;
-			$redirectUrl = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/go/url/' . base64_encode($longUrl);
+			// 防封域名
+			$redirectUrl = $_SERVER['REQUEST_SCHEME'] . '://' . ($domain[0] ? $domain[0] : $_SERVER['SERVER_NAME']) . '/go/url/' . base64_encode($longUrl);
 			//$merchant['c_alipay_img'] = $longUrl;
 			$merchant['c_alipay_img'] = $redirectUrl;
 			$merchant['alipay_name']  = $zfb['truename'];
@@ -3107,7 +3110,7 @@ class Merchant extends Base {
 			$min     = intval(floor($average / 60));
 			$second  = $average % 60;
 		}
-		// dump($payarr);
+		$this->assign('domain', ($domain[0] ? $domain[0] : $_SERVER['SERVER_NAME']));
 		$this->assign('min', $min);
 		$this->assign('second', $second);
 		return $this->fetch('paymobile');
@@ -3150,6 +3153,9 @@ class Merchant extends Base {
 		$this->assign('no', $order['order_no']);
 		$merchant = Db::name('merchant')->where('id', $order['sell_id'])->find();
 		$payarr   = [];
+		// 防封域名
+		$domain = config('defend_domains');
+		shuffle($domain);
 		if ($bankid > 0) {
 			$bank                    = Db::name('merchant_bankcard')->where('id', $bankid)->find();
 			$merchant['c_bank_card'] = $bank['c_bank_card'];
@@ -3161,17 +3167,10 @@ class Merchant extends Base {
 			//echo 111;die;
 			//$bank    = Db::name('merchant_bankcard')->where('id', $bankid)->find();
 			$zfb = Db::name('merchant_zfb')->where('id', $zfbid)->find();
-			//var_dump($zfb);die;
 			//$url                      = 'https://api.uomg.com/api/long2dwz';
 			//$longUrl = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=YES&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] . '&amount=';
-			$longUrl = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s": "money","u":"' . $zfb['alipay_id'] . '","a":"' . $order['deal_amount'] . '","m":"' . $order['check_code'] . '"}';
-			//var_dump($longUrl);die;
-			/*$data                     = [
-				'dwzapi' => 'urlcn',
-				'url'    => $longUrl
-			];*/ //$res                      = $this->Scurl($url, $data);
-			//$obj                      = json_decode($res);
-			$merchant['c_alipay_img'] = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/go/url/' . base64_encode($longUrl);;
+			$longUrl                  = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s": "money","u":"' . $zfb['alipay_id'] . '","a":"' . $order['deal_amount'] . '","m":"' . $order['check_code'] . '"}';
+			$merchant['c_alipay_img'] = $_SERVER['REQUEST_SCHEME'] . '://' . ($domain[0] ? $domain[0] : $_SERVER['SERVER_NAME']) . '/go/url/' . base64_encode($longUrl);;
 			//$merchant['c_alipay_img'] = $longUrl;
 			$merchant['alipay_name'] = substr_replace($zfb['truename'], '*', 3, 3);
 			$merchant['alipay_acc']  = $zfb['c_bank'];
@@ -3213,6 +3212,7 @@ class Merchant extends Base {
 			$second  = $average % 60;
 		}
 		$this->assign('min', $min);
+		$this->assign('domain', ($domain[0] ? $domain[0] : $_SERVER['SERVER_NAME']));
 		$this->assign('second', $second);
 		$this->assign('logUrl', $longUrl);
 		return $this->fetch('paymobile');

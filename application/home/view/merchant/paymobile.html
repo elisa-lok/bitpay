@@ -376,7 +376,7 @@
 		})
     }
     if(/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
-        $('#alipay_link').attr('href', 'alipays://platformapi/startapp?appId=20000067&url='+window.location.protocol+'//'+window.location.host+'/go/url/{$logUrl|base64_encode}');
+        $('#alipay_link').attr('href', 'alipays://platformapi/startapp?appId=20000067&url='+window.location.protocol+'//{$domain}/go/url/{$logUrl|base64_encode}');
         $('#alipay_click').text("点击打开支付宝");
     }
 	/*setTimeout(function () {
