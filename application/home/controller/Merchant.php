@@ -2559,12 +2559,19 @@ class Merchant extends Base {
 				$this->error("此挂单已冻结禁止上下架操作！");
 			}
 		}
+		// 锁定操作 代码执行完成前不可继续操作 60秒后可再次点击操作
+		$redis = new Redis();
+		$redis->get($id) && $this->error("不可重复操作，剩余时间：" . $redis->ttl($id) . "秒");
+		$lock = $redis->set($id, TRUE, 60);
+		!$lock && $this->error('锁定操作失败，请重试。');
+
 		$merchant = $model2->getUserByParam(session('uid'), 'id');
 		if ($act == 1) {
 			// $haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->where('state', 1)->sum('amount');
 			// $haveadsum = $haveadsum ? $haveadsum : 0;
 			$haveadsum = 0;
 			if (($ad_info['remain_amount'] + $haveadsum) * 1 > $merchant['usdt'] * 1) {
+				$redis->rm($id);
 				$this->error('开启失败：账户余额不足');
 			} else {
 				!balanceChange(TRUE, session('uid'), -$ad_info['remain_amount'], 0, $ad_info['remain_amount'], 0, BAL_ENTRUST, $id) && $this->error('开启失败：扣款失败');
@@ -2581,8 +2588,10 @@ class Merchant extends Base {
 		if ($result['code'] == 1) {
 			$count = $model->where('userid', session('uid'))->where('state', 1)->where('amount', 'gt', 0)->count();
 			$model2->updateOne(['id' => session('uid'), 'ad_on_sell' => $count ? $count : 0]);
+			$redis->rm($id);
 			$this->success("操作成功");
 		} else {
+			$redis->rm($id);
 			$this->error("操作失败");
 		}
 	}
