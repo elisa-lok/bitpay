@@ -93,4 +93,5 @@ return [
 	//订单超时时间
 	'order_expire'               => 15,
 	'is_send_sms'                => TRUE,
+	'defend_domains'              => ['fpay.cc', 'ypay.cc', 'jpay.cc', 'ppay.cc']
 ];

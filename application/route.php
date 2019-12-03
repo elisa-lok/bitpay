@@ -15,6 +15,7 @@ Route::rule('merchant/applyAgent','home/merchant/applyAgent', 'GET|POST');
 Route::rule('merchant/applyTrader','home/merchant/applyTrader', 'GET|POST');
 Route::rule('merchant/traderrecharge','home/merchant/traderrecharge', 'GET|POST');
 Route::rule('merchant/downmerchant','home/merchant/downmerchant', 'GET|POST');
+Route::rule('merchant/shanghurecord','home/merchant/shanghurecord', 'GET|POST');
 Route::rule('merchant/editdown','home/merchant/editdown', 'GET|POST');
 Route::rule('merchant/downapilog','home/merchant/downapilog', 'GET|POST');
 Route::rule('merchant/agentreward','home/merchant/agentreward', 'GET|POST');

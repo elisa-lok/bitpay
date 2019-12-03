@@ -1,0 +1,189 @@
+{include file="Public:header_new"}
+<div class="content-wrapper" id="pjax-container" style="min-height: 706px;">
+    <section class="content-header">
+        <h1>
+            下级商户数据
+        </h1>
+    </section>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title"></h3>
+                        <div class="pull-right">
+                            <div class="btn-group pull-right" style="margin-right: 10px">
+                                <a data-href="" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#filter-modal"><i class="fa fa-filter"></i>&nbsp;&nbsp;筛选</a>
+                                <a href="/merchant/shanghurecord" class="btn btn-sm btn-facebook"><i class="fa fa-undo"></i>&nbsp;&nbsp;重置</a>
+                            </div>
+                            <div class="modal fade" id="filter-modal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                                <span class="sr-only">Close</span>
+                                            </button>
+                                            <h4 class="modal-title" id="myModalLabel">筛选</h4>
+                                        </div>
+                                        <form action="/merchant/shanghurecord" method="get" pjax-container="">
+                                            <div class="modal-body">
+                                                <div class="form">
+                                                    <div class="form-group">
+                                                        <div class="form-group">
+                                                            <label>用户ID</label>
+                                                            <div class="input-group">
+                                                                <div class="input-group-addon">
+                                                                    <i class="fa fa-pencil"></i>
+                                                                </div>
+                                                                <input type="number" class="form-control username" placeholder="输入用户ID,可模糊查找" name="orderid" value="">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="form-group">
+                                                            <label>用户名</label>
+                                                            <div class="input-group">
+                                                                <div class="input-group-addon">
+                                                                    <i class="fa fa-pencil"></i>
+                                                                </div>
+                                                                <input type="text" class="form-control username" placeholder="输入用户名,可模糊查找" name="ordersn" value="">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="form-group">
+                                                            <label>注册时间</label>
+                                                            <div class="input-group">
+                                                                <div class="input-group-addon">
+                                                                    <i class="fa fa-calendar"></i>
+                                                                </div>
+                                                                <input type="text" class="form-control" id="created_at_start" placeholder="起止时间" name="created_at[start]" value=""><span class="input-group-addon" style="border-left: 0; border-right: 0;">-</span>
+                                                                <input type="text" class="form-control" id="created_at_end" placeholder="起止时间" name="created_at[end]" value="">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-primary submit">提交</button>
+                                                <button type="reset" class="btn btn-warning pull-left">重置</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <span>
+                            <a class="btn btn-sm btn-primary grid-refresh"><i class="fa fa-refresh"></i> 刷新</a>
+                        </span>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body table-responsive no-padding">
+                        <table class="table table-hover">
+                            <tbody>
+                                <tr>
+                                    <th>ID<a class="fa fa-fw fa-sort" href="/merchant/downmerchant?order=asc"></a>
+                                    <th>商户名称</th>
+                                    <th>手机号</th>
+                                    <th>总USDT</th>
+                                    <th>总出售USDT</th>
+                                    <th>当天订单笔数</th>
+                                    <th>当天订单金额</th>
+                                    <th>当天成功笔数</th>
+                                    <th>当天成功金额</th>
+                                    <th>当天成功率(%)</th>
+                                    <th>总订单笔数</th>
+                                    <th>总订单金额</th>
+                                    <th>总成功笔数</th>
+                                    <th>总成功金额</th>
+                                    <th>总成功率(%)</th>
+                                </tr>
+                                {volist name="list" id="vo"}
+                                <tr>
+                                    <td>{$vo.id}</td>
+                                    <td>{$vo.name}</td>
+                                    <td>{$vo.mobile}</td>
+                                    <td>{$vo.usdtt}</td>
+                                    <td>{$vo.order_sell_usdt_amount}</td>
+                                    <td>{$vo.today_number}</td>
+                                    <td>{$vo.today_amount}</td>
+                                    <td>{$vo.today_success_number}</td>
+                                    <td>{$vo.today_success_amount}</td>
+                                    <td>{$vo.today_success_rate}</td>
+                                    <td>{$vo.recharge_number}</td>
+                                    <td>{$vo.recharge_amount}</td>
+                                    <td>{$vo.success_number}</td>
+                                    <td>{$vo.success_amount}</td>
+                                    <td>{$vo.success_rate}</td>
+                                </tr>
+                                {/volist}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="box-footer clearfix">
+                        {$list->render()}
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+            </div>
+        </div>
+    </section>
+    <script data-exec-on-popstate="">
+$(function() {
+        $('#created_at_start').datetimepicker({ "format": "YYYY-MM-DD HH:mm:ss", "locale": "zh_CN" });
+        $('#created_at_end').datetimepicker({ "format": "YYYY-MM-DD HH:mm:ss", "locale": "zh_CN", "useCurrent": false });
+        $("#created_at_start").on("dp.change", function(e) {
+            $('#created_at_end').data("DateTimePicker").minDate(e.date);
+        });
+        $("#created_at_end").on("dp.change", function(e) {
+            $('#created_at_start').data("DateTimePicker").maxDate(e.date);
+        });
+        $('#end_at_start').datetimepicker({ "format": "YYYY-MM-DD HH:mm:ss", "locale": "zh_CN" });
+        $('#end_at_end').datetimepicker({ "format": "YYYY-MM-DD HH:mm:ss", "locale": "zh_CN", "useCurrent": false });
+        $("#end_at_start").on("dp.change", function(e) {
+            $('#end_at_end').data("DateTimePicker").minDate(e.date);
+        });
+        $("#end_at_end").on("dp.change", function(e) {
+            $('#end_at_start').data("DateTimePicker").maxDate(e.date);
+        });
+
+        $("#filter-modal .submit").click(function() {
+            $("#filter-modal").modal('toggle');
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
+        });
+
+        $(".status").select2({
+            placeholder: "选择"
+        });
+
+
+        $('.export-selected').click(function(e) {
+            e.preventDefault();
+
+            var rows = selectedRows().join(',');
+            if (!rows) {
+                return false;
+            }
+
+            var href = $(this).attr('href').replace('__rows__', rows);
+            location.href = href;
+        });
+
+
+        $('.grid-refresh').on('click', function() {
+            //$.pjax.reload('#pjax-container');
+            //toastr.success('刷新成功 !');
+            window.location.reload();
+        });
+
+
+        $('.grid-per-pager').on("change", function(e) {
+            //$.pjax({url: this.value, container: '#pjax-container'});
+        });
+
+    });
+    </script>
+</div>
+{include file="Public:footer_new"/}
