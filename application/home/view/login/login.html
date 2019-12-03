@@ -50,7 +50,6 @@
         <img style="width: 104px;position:absolute;top:0;right:0;" src="{:url('home/login/verify')}" id="verify_img" alt="captcha" onclick="refreshVerify()"/>
         <div></div>
       </div>
-		<input type="text" name="device" onblur="getDeviceId()">
 	  <div class="form-group has-feedback 1" id="ga" style="display:none;">
 
 
@@ -108,6 +107,7 @@
   }
   function getDeviceId(){
       var id = android.getDeviceId();//获取设备号
+      alert(id);
   }
   function refreshVerify() {
       var ts = Date.parse(new Date())/1000;
