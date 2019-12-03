@@ -21,7 +21,7 @@ class app {
 	//获取对应消息（每隔一分钟调用）
 	public function getMessage() {
 		$params = json_decode(file_get_contents('php://input'));
-		$msg      = Db::name('msg')->where(['is_read' => 0, 'device' => $params['device']])->column('messtitle, msg');
+		$msg      = Db::name('msg')->where(['is_read' => 0, 'device' => $params['device']])->column('title AS messTitle, msg AS messContent');
 		if ($msg) {
 			Db::name('msg')->where(['is_read' => 0, 'device' => $params['device']])->update(['is_read' => 1]);
 			die(json_encode(['retmsg' => '成功', 'retcode' => 1, 'data' => $msg]));

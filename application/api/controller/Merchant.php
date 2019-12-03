@@ -265,6 +265,7 @@ class Merchant extends Controller {
 						$content = str_replace('{tx_id}', $data['orderid'], $content);
 						$content = str_replace('{check_code}', '' . $checkCode . '', $content);
 						sendSms($onlineAd['mobile'], $content);
+						sendNotice($onlineAd['id'],'你有订单已匹配, 请及时处理', $content);
 					}
 				}
 				$http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
@@ -434,6 +435,7 @@ class Merchant extends Controller {
 					$content      = str_replace('{tx_id}', $data['orderid'], $content);
 					$content      = str_replace('{check_code}', '' . $checkCode . '', $content);
 					sendSms($onlineAd['mobile'], $content);
+					sendNotice($onlineAd['id'],'你有订单已匹配, 请及时处理', $content);
 				}
 				$http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
 				if ($data['type'] != 'all') {

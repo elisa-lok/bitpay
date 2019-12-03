@@ -475,6 +475,13 @@ function sendSms($mobile, $content) {
 	return $resp;
 }
 
+function sendNotice($userId, $title, $msg){
+	$user = Db::name('merchant')->where($userId)->select();
+	if($user && $user['device']){
+		Db::name('msg')->insert(['device_id'=> $user['device'], 'title' =>$title, 'msg' =>  $msg]);
+	}
+}
+
 function askNotify($data, $url, $key) {
 	ksort($data);
 	$serverStr = '';
