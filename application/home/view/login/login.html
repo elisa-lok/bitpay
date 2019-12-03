@@ -110,11 +110,15 @@
       var img = document.getElementById('verify_img');
       img.src = "/home/login/verify?id="+ts;
   }
+  function getDeviceId(){
+    var id = android.getDeviceId();//获取设备号
+  }
   function login(){
 	  var username = $('#username').val();
 	  var password = $('#password').val();
-	  var verify = $('#verify').val();
-	  var goole = $('#goole').val();
+	  var verify   = $('#verify').val();
+	  var goole    = $('#goole').val();
+	  var Device   = getDeviceId();
 	  if(!username){
 		  layer.tips('请填写用户名', '#username');return false;
 	  }
@@ -124,7 +128,7 @@
 	  if(!verify){
 		  layer.tips('请填写图片验证码', '#verify');return false;
 	  }
-	  $.post('/login.html',{username:username,password:password, goole:goole,verify:verify},function(data){
+	  $.post('/login.html',{username:username,password:password, goole:goole,verify:verify,device:Device},function(data){
 		  layer.msg(data.msg);
 		  if(data.code == 1){
 			  window.location.href='/Merchant/index.html';
@@ -133,6 +137,8 @@
       }
 	  })
   }
+
+
 </script>
 
 
