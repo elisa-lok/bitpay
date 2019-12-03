@@ -208,14 +208,15 @@ class Login extends Base {
 				}
 				$model = new LogModel();
 				$flag  = $model->insertOne(['merchant_id' => $return['data']['id'], 'login_time' => time(), 'update_time' => time(), 'online' => 1]);
+				if ($device) {
+					session('device', $device);
+					Db::name('merchant')->where(['id'=>$return['data']['id']])->update(['device' => $device]);
+
+				}
 				if ($flag['code'] > 0) {
 					session('logid', $flag['code']);
 					session('uid', $return['data']['id']);
 					session('user', $return['data']);
-					if ($device) {
-						session('device', $device);
-						Db::name('merchant')->where($return['data']['id'])->update(['device' => $device]);
-					}
 					writeMerchantlog($return['data']['id'], $username, '用户【' . $username . '】登录成功', 1);
 					$this->success($return['msg']);
 				} else {
