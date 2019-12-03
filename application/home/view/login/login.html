@@ -50,6 +50,7 @@
         <img style="width: 104px;position:absolute;top:0;right:0;" src="{:url('home/login/verify')}" id="verify_img" alt="captcha" onclick="refreshVerify()"/>
         <div></div>
       </div>
+		<input type="hidden" name="device" onblur="getDeviceId()">
 	  <div class="form-group has-feedback 1" id="ga" style="display:none;">
 
 
@@ -105,13 +106,13 @@
           }
       }, "json");
   }
+  function getDeviceId(){
+      var id = android.getDeviceId();//获取设备号
+  }
   function refreshVerify() {
       var ts = Date.parse(new Date())/1000;
       var img = document.getElementById('verify_img');
       img.src = "/home/login/verify?id="+ts;
-  }
-  function getDeviceId(){
-    var id = android.getDeviceId();//获取设备号
   }
   function login(){
 	  var username = $('#username').val();
@@ -128,7 +129,7 @@
 	  if(!verify){
 		  layer.tips('请填写图片验证码', '#verify');return false;
 	  }
-	  $.post('/login.html',{username:username,password:password, goole:goole,verify:verify,device:Device},function(data){
+	  $.post('/login.html',{username:username,password:password, goole:goole,verify:verify},function(data){
 		  layer.msg(data.msg);
 		  if(data.code == 1){
 			  window.location.href='/Merchant/index.html';

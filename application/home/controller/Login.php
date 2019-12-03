@@ -176,11 +176,9 @@ class Login extends Base {
 			$username = input('post.username');
 			$password = input('post.password');
 			$verify   = input('post.verify');
-			$device   = input('post.device');
 			if (!captcha_check($verify)) {
 				$this->error('图片验证码错误');
 			}
-			var_dump($device);
 			$ga     = input('post.goole');
 			$model  = new MerchantModel();
 			$return = $model->login($username, $password);
