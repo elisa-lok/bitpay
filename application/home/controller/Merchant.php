@@ -3046,7 +3046,8 @@ class Merchant extends Base {
 		$bank     = [];
 		$payarr   = [];
 		// 防封域名
-		$domain = config('defend_domains');
+		$domain = Db::name('sys_domain')->where('state', 1)->field('domain')->select();
+		$domain = array_column($domain, 'domain');
 		shuffle($domain);
 		if ($type == 'bank' && $bankid > 0) {
 			$bank                    = Db::name('merchant_bankcard')->where('id', $bankid)->find();
@@ -3154,7 +3155,8 @@ class Merchant extends Base {
 		$merchant = Db::name('merchant')->where('id', $order['sell_id'])->find();
 		$payarr   = [];
 		// 防封域名
-		$domain = config('defend_domains');
+		$domain = Db::name('sys_domain')->where('state', 1)->field('domain')->select();
+		$domain = array_column($domain, 'domain');
 		shuffle($domain);
 		if ($bankid > 0) {
 			$bank                    = Db::name('merchant_bankcard')->where('id', $bankid)->find();
