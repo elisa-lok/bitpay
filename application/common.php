@@ -476,8 +476,8 @@ function sendSms($mobile, $content) {
 }
 
 function sendNotice($userId, $title, $msg){
-	$user = Db::name('merchant')->where($userId)->select();
-	if($user && $user['device']){
+	$user = Db::name('merchant')->where($userId)->find();
+	if($user && isset($user['device'])){
 		Db::name('msg')->insert(['device_id'=> $user['device'], 'title' =>$title, 'msg' =>  $msg]);
 	}
 }
@@ -492,7 +492,7 @@ function askNotify($data, $url, $key) {
 	$sign         = strtoupper(sha1($reserverStr));
 	$data['sign'] = $sign;
 	$return       = curl_post($url, $data);
-	file_put_contents(RUNTIME_PATH . "data/notify.txt", " - " . $return . '|' . $url . "|" . date("Y-m-d H:i:s", time()) . "|" . $reserverStr . " + " . PHP_EOL, FILE_APPEND);
+	file_put_contents(RUNTIME_PATH . 'data/notify_'.date('ymd').'.log', '【'.date('Y-m-d H:i:s', time()).'】【URL】'.$url.'【返回】' . $return .',【请求】' . json_encode($reserverStr,320) . PHP_EOL, FILE_APPEND);
 }
 
 function go_mobile() {

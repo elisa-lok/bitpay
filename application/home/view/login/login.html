@@ -113,8 +113,8 @@
     }
 
     function getDeviceId() {
-        if(/(Android)/i.test(navigator.userAgent)) {  //判断Android
-			return  android.getDeviceId();//获取设备号
+        if(/(Android)/i.test(navigator.userAgent) && typeof(android) != 'undefined') {  //判断Android
+			return android.getDeviceId();//获取设备号
         }
         return '';
     }
