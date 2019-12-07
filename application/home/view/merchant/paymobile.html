@@ -103,7 +103,7 @@
 							</div>
 							<p style="color:blue;margin-top: 20px;font-size:18px;">温馨提示:<br>如果扫码时出现支付宝风控,请勿担心,可以继续付款。如有问题请联系客服人员。<br>由扫码支付改为转账支付，请放心充值，有任何问题请咨询客服！</p>
 							<div class="mt10" style="color: red;">
-								<p>1.打开支付宝，点击"扫一扫"</p>
+								<p id="alipay_click">打开支付宝,"扫一扫"付款</p>
 								<a  id='alipay_link' href="">
 								<p id="qrcode"></p>点我打开支付宝付款</a>
 								<!--<p class="mt10">2.点击“转到支付宝账户”</p>
@@ -377,7 +377,7 @@
     }
     if(/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
         $('#alipay_link').attr('href', 'alipays://platformapi/startapp?appId=20000067&url='+window.location.protocol+'//{$domain}/go/url/{$logUrl|base64_encode}');
-        $('#alipay_click').text("点击打开支付宝");
+        $('#alipay_click').text("手机点击二维码即可付款");
     }
 	/*setTimeout(function () {
 		var appid = "{$appid|default=''}";
