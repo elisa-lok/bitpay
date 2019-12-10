@@ -238,7 +238,7 @@ class Merchant extends Base {
 			if (!empty($password)) {
 				$param['password'] = md5($password);
 			}
-			if (!empty($password)) {
+			if (!empty($paypassword)) {
 				$param['paypassword'] = md5($paypassword);
 			}
 			$param['name'] = $name;
