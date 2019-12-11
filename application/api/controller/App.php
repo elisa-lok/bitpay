@@ -37,4 +37,8 @@ class app {
 		}
 		die(json_encode(['msg' => '成功', 'code' => 200, 'data' => []], 320));
 	}
+
+	public function getUrl(){
+		die(json_encode(['msg' => '成功', 'code' => 200, 'data' => ['url'=> 'https://balaba.la/']], 320));
+	}
 }
