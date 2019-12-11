@@ -39,6 +39,6 @@ class app {
 	}
 
 	public function getUrl(){
-		die(json_encode(['msg' => '成功', 'code' => 200, 'data' => ['url'=> 'https://balaba.la/']], 320));
+		die(json_encode(['msg' => '成功', 'code' => 200, 'data' => ['url'=> 'http://zpay.cc/']], 320));
 	}
 }
