@@ -3063,9 +3063,10 @@ class Merchant extends Base {
 			//$url                      = 'https://api.uomg.com/api/long2dwz';
 			//$longUrl = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=NO&memo='. $order['check_code'].'&userId=' . $zfb['alipay_id'];
 			//$longUrl = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s": "money","u":"' . $zfb['alipay_id'] . '","a":"' . $order['deal_amount'] . '","m":"' . $order['check_code'] . '"}';
-			$longUrl ='https://ds.alipay.com/?from=mobilecodec&scheme='.urldecode('alipays://platformapi/startapp?appId=20000200&actionType=toAccount&account=&amount="' . $order['deal_amount'] . '"&userId="' . $zfb['alipay_id'] . '"&memo="' . $order['check_code'] . '"');
+			$longUrl ='https://ds.alipay.com/?from=mobilecodec&scheme='.urlencode('alipays://platformapi/startapp?appId=20000200&actionType=toAccount&account=&amount="' . $order['deal_amount'] . '"&userId="' . $zfb['alipay_id'] . '"&memo="' . $order['check_code'] . '"');
             var_dump($longUrl);
 			// 防封域名
+
 			//$redirectUrl = $_SERVER['REQUEST_SCHEME'] . '://' . ($domain[0] ? $domain[0] : $_SERVER['SERVER_NAME']) . '/go/url/' . base64_encode($longUrl);
 			$merchant['c_alipay_img'] = $longUrl;
 			//$merchant['c_alipay_img'] = $redirectUrl;
