@@ -2,16 +2,15 @@
 
 namespace app\admin\controller;
 
-use app\home\model\OrderModel;
-use think\cache\driver\Redis;
-use think\db;
-use app\admin\model\TibiModel;
 use app\admin\model\AddressModel;
-use app\admin\model\WithdrawModel;
-use app\admin\model\RechargeModel;
 use app\admin\model\MerchantModel;
+use app\admin\model\RechargeModel;
+use app\admin\model\TibiModel;
+use app\admin\model\WithdrawModel;
 use app\home\controller\Auto;
 use com\IpLocation;
+use think\cache\driver\Redis;
+use think\db;
 
 class Merchant extends Base {
 	public function log() {
@@ -1594,7 +1593,7 @@ class Merchant extends Base {
 					$status = 0;
 				}
 				$data['status'] = $status;
-				$status && askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
+				//$status && askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
 
 				$redis->rm($id);
 				$this->success('操作成功');
