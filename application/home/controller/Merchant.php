@@ -3065,22 +3065,21 @@ class Merchant extends Base {
 			/*固定码*/
 			//$longUrl = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s": "money","u":"' . $zfb['alipay_id'] . '","a":"' . $order['deal_amount'] . '","m":"' . $order['check_code'] . '"}';
 			/*转账码*/
-			$longUrl ='https://ds.alipay.com/?from=mobilecodec&scheme='.urlencode('alipays://platformapi/startapp?appId=20000200&actionType=toAccount&account=&amount=&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] .'');
+			//$longUrl ='https://ds.alipay.com/?from=mobilecodec&scheme='.urlencode('alipays://platformapi/startapp?appId=20000200&actionType=toAccount&account=&amount=&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] .'');
 			// 防封域名
-
 			//$redirectUrl = $_SERVER['REQUEST_SCHEME'] . '://' . ($domain[0] ? $domain[0] : $_SERVER['SERVER_NAME']) . '/go/url/' . base64_encode($longUrl);
-			$merchant['c_alipay_img'] = $longUrl;
+			/*$merchant['c_alipay_img'] = $longUrl;
 			//$merchant['c_alipay_img'] = $redirectUrl;
 			$merchant['alipay_name']  = $zfb['truename'];
 			$merchant['alipay_acc']   = $zfb['c_bank'];
-			$payarr[]                 .= 'zfb';
-			/*$zfb                      = Db::name('merchant_zfb')->where('id', $zfbid)->find();
+			$payarr[]                 .= 'zfb';*/
+
 			$merchant['zfb']          = $zfb['c_bank_card'];
 			$merchant['name']         = $zfb['truename'];
 			$merchant['c_alipay_img'] = $zfb['c_bank_detail'];
 			$merchant['alipay_name']  = $zfb['truename'];
 			$merchant['alipay_acc']   = $zfb['c_bank'];
-			$payarr[]                 .= 'zfb';*/
+			$payarr[]                 .= 'zfb';
 		}
 		if ($type == 'wxpay' && $wxid > 0) {
 
@@ -3175,19 +3174,19 @@ class Merchant extends Base {
 			/*固定码*/
 			//$longUrl                  = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s": "money","u":"' . $zfb['alipay_id'] . '","a":"' . $order['deal_amount'] . '","m":"' . $order['check_code'] . '"}';
 			/*转账码*/
-			$longUrl ='https://ds.alipay.com/?from=mobilecodec&scheme='.urlencode('alipays://platformapi/startapp?appId=20000200&actionType=toAccount&account=&amount=&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] .'');
+			//$longUrl ='https://ds.alipay.com/?from=mobilecodec&scheme='.urlencode('alipays://platformapi/startapp?appId=20000200&actionType=toAccount&account=&amount=&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] .'');
 			//$merchant['c_alipay_img'] = $_SERVER['REQUEST_SCHEME'] . '://' . ($domain[0] ? $domain[0] : $_SERVER['SERVER_NAME']) . '/go/url/' . base64_encode($longUrl);;
-			$merchant['c_alipay_img'] = $longUrl;
-			$merchant['alipay_name'] = substr_replace($zfb['truename'], '*', 3, 3);
-			$merchant['alipay_acc']  = $zfb['c_bank'];
-			$payarr[]                .= 'zfb';
-			/*var_dump($bank);
-			die;
-			$zfb                      = Db::name('merchant_zfb')->where('id', $zfbid)->find();
+			//$merchant['c_alipay_img'] = $longUrl;
+			//$merchant['alipay_name'] = substr_replace($zfb['truename'], '*', 3, 3);
+			//$merchant['alipay_acc']  = $zfb['c_bank'];
+			//$payarr[]                .= 'zfb';
+			/*商家码*/
 			$merchant['zfb']          = $zfb['c_bank_card'];
+			$merchant['name']         = $zfb['truename'];
+			$merchant['c_alipay_img'] = $zfb['c_bank_detail'];
 			$merchant['alipay_name']  = $zfb['truename'];
 			$merchant['alipay_acc']   = $zfb['c_bank'];
-			$payarr[]                 .= 'zfb';*/
+			$payarr[]                 .= 'zfb';
 		}
 		if ($wxid > 0) {
 			$wx                       = Db::name('merchant_wx')->where('id', $wxid)->find();
