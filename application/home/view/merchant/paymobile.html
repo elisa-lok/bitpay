@@ -102,7 +102,9 @@
 								<!--<p class='mt10 f14' style="color:red;margin-top: 0.2rem;font-size: 18px" id="copy_alipay_acc" data-clipboard-target="#alipay_acc">支付宝账号：<em id="alipay_acc">{gt name='remaintime' value='0'}{/gt}</em><a id="cp_alipay_acc">&nbsp;(点击复制)</a></p>-->
 							</div>
 							<p style="color:blue;margin-top: 20px;font-size:18px;">温馨提示:<br>如果扫码时出现支付宝风控,请勿担心,可以继续付款。如有问题请联系客服人员。<br>由扫码支付改为转账支付，请放心充值，有任何问题请咨询客服！</p>
-							<img src="/uploads/face/{$merchant.c_alipay_img}" style=''/>
+							<div class='mt10 payma'>
+								<img src="/uploads/face/{$merchant.c_alipay_img}" style=''/>
+							</div>
 							<div class="mt10" style="color: red;">
 								<p id="alipay_click">打开支付宝,"扫一扫"付款</p>
 								<a  id='alipay_link' href="">
@@ -181,7 +183,7 @@
 </body>
 <script src="https://cdn.staticfile.org/sweetalert/2.1.2/sweetalert.min.js"></script>
 <script type="text/javascript" src="__JS__/jquery.qrcode.min.js"></script>
-<script>{if $order.status == 0 && $remaintime > 1 }$("#qrcode").qrcode({render: "canvas", size: 180, text: '{$merchant.c_alipay_img}'});{/if}</script>
+<!--<script>{if $order.status == 0 && $remaintime > 1 }$("#qrcode").qrcode({render: "canvas", size: 180, text: '{$merchant.c_alipay_img}'});{/if}</script>-->
 <style>.swal-text {
 	background-color: #FEFAE3;
 	padding: 10px;
