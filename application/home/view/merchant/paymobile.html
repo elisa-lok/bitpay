@@ -106,9 +106,9 @@
 								<img src="/uploads/face/{$merchant.c_alipay_img}" style=''/>
 							</div>
 							<div class="mt10" style="color: red;">
-								<p id="alipay_click">打开支付宝,"扫一扫"付款</p>
+								<!--<p id="alipay_click">打开支付宝,"扫一扫"付款</p>
 								<a  id='alipay_link' href="">
-								<p id="qrcode"></p>点我打开支付宝付款</a>
+								<p id="qrcode"></p>点我打开支付宝付款</a>-->
 								<!--<p class="mt10">2.点击“转到支付宝账户”</p>
 								<p><img src="__IMG__/alipay/ali2.jpg"></p>
 								<p class="mt10">3.输入收款方手机号</p>
@@ -184,7 +184,8 @@
 <script src="https://cdn.staticfile.org/sweetalert/2.1.2/sweetalert.min.js"></script>
 <script type="text/javascript" src="__JS__/jquery.qrcode.min.js"></script>
 <!--<script>{if $order.status == 0 && $remaintime > 1 }$("#qrcode").qrcode({render: "canvas", size: 180, text: '{$merchant.c_alipay_img}'});{/if}</script>-->
-<style>.swal-text {
+<style>
+	.swal-text {
 	background-color: #FEFAE3;
 	padding: 10px;
 	border: 1px solid #F0E1A1;
