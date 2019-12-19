@@ -1,10 +1,9 @@
 <?php
-
-use think\Db;
-use Aliyun\Core\Config;
-use Aliyun\Core\Profile\DefaultProfile;
-use Aliyun\Core\DefaultAcsClient;
 use Aliyun\Api\Sms\Request\V20170525\SendSmsRequest;
+use Aliyun\Core\Config;
+use Aliyun\Core\DefaultAcsClient;
+use Aliyun\Core\Profile\DefaultProfile;
+use think\Db;
 
 /**
  * 字符串截取，支持中文和其他编码
@@ -460,7 +459,7 @@ function sendSms($mobile, $content) {
 	$user       = Db::table('think_config')->where('name', 'mobile_user')->value('value');
 	$key        = Db::table('think_config')->where('name', 'mobile_pwd')->value('value');
 	$title      = Db::table('think_config')->where('name', 'web_site_title')->value('value');
-	$content    = '【' . $title . '】' . $content;
+	$content    = '【THT】' . $content;
 	$params     = "appid=$user&to=$mobile&content=$content&signature=$key";
 	$curlHandle = curl_init();
 	curl_setopt($curlHandle, CURLOPT_POST, 1);
@@ -492,7 +491,7 @@ function askNotify($data, $url, $key) {
 	$sign         = strtoupper(sha1($reserverStr));
 	$data['sign'] = $sign;
 	$return       = curl_post($url, $data);
-	file_put_contents(RUNTIME_PATH . 'data/notify_'.date('ymd').'.log', '【'.date('Y-m-d H:i:s', time()).'】【URL】'.$url.'【返回】' . $return .',【请求】' . json_encode($reserverStr,320) . PHP_EOL, FILE_APPEND);
+	file_put_contents(RUNTIME_PATH . 'data/notify_'.date('ymd').'.log', '【'.date('Y-m-d H:i:s', time()).'】【URL】'.$url.'【返回】' . $return .',【请求】' . json_encode($data,320) . PHP_EOL, FILE_APPEND);
 }
 
 function go_mobile() {

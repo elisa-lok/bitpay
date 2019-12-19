@@ -262,7 +262,8 @@ class Merchant extends Controller {
 					if ($send_content) {
 						$content = str_replace('{usdt}', round($data['amount'], 2), $send_content);
 						$content = str_replace('{cny}', round($actualAmt, 2), $content);
-						$content = str_replace('{tx_id}', $data['orderid'], $content);
+						// $content = str_replace('{tx_id}', $data['orderid'], $content);
+						$content = str_replace('{tx_id}', '', $content);
 						$content = str_replace('{check_code}', '' . $checkCode . '', $content);
 						sendSms($onlineAd['mobile'], $content);
 						sendNotice($onlineAd['id'],'你有订单已匹配, 请及时处理', $content);
@@ -432,7 +433,8 @@ class Merchant extends Controller {
 					$send_content = Db::table('think_config')->where('name', 'send_sms_notify')->value('value');
 					$content      = str_replace('{usdt}', round($actualAmt, 2), $send_content);
 					$content      = str_replace('{cny}', round($data['amount'], 2), $content);
-					$content      = str_replace('{tx_id}', $data['orderid'], $content);
+					// $content      = str_replace('{tx_id}', $data['orderid'], $content);
+					$content      = str_replace('{tx_id}', '', $content);
 					$content      = str_replace('{check_code}', '' . $checkCode . '', $content);
 					sendSms($onlineAd['mobile'], $content);
 					sendNotice($onlineAd['id'],'你有订单已匹配, 请及时处理', $content);
