@@ -1,7 +1,5 @@
 <?php
-
 namespace app\home\controller;
-
 use app\common\model\Data;
 use app\common\model\PHPExcel;
 use app\home\model\AdbuyModel;
@@ -120,7 +118,7 @@ class Merchant extends Base {
 		$bank = new \app\home\model\BankModel();
 		$zfb  = new \app\home\model\ZfbModel();
 		$wx   = new \app\home\model\WxModel();
-		if ($order['buy_id'] == session('uid')) {//买家显示内容,显示卖家的收款信息
+		if ($order['buy_id'] == session('uid')) {                                    //买家显示内容,显示卖家的收款信息
 			$merchant = Db::name('merchant')->where('id', $order['sell_id'])->find();//查找卖家信息
 			if ($order['pay'] > 0) {
 				$where1['merchant_id']   = $order['sell_id'];
@@ -131,10 +129,12 @@ class Merchant extends Base {
 				$merchant['name']        = $isbank['truename'];
 			}
 			if ($order['pay2'] > 0) {
-				$where2['merchant_id']    = $order['sell_id'];
-				$where2['id']             = $order['pay2'];
-				$iszfb                    = $zfb->getOne($where2);
-				$merchant['c_alipay_img'] = str_replace("\\", "/", $iszfb['c_bank_detail']);
+				$where2['merchant_id']     = $order['sell_id'];
+				$where2['id']              = $order['pay2'];
+				$iszfb                     = $zfb->getOne($where2);
+				$merchant['c_alipay_acc']  = $iszfb['c_bank'];
+				$merchant['c_alipay_name'] = $iszfb['truename'];
+				$merchant['c_alipay_img']  = str_replace("\\", "/", $iszfb['c_bank_detail']);
 			}
 			if ($order['pay3'] > 0) {
 				$where3['merchant_id']    = $order['sell_id'];
@@ -143,12 +143,10 @@ class Merchant extends Base {
 				$merchant['c_wechat_img'] = str_replace("\\", "/", $iswx['c_bank_detail']);
 			}
 		}
-		if ($order['sell_id'] == session('uid')) {//卖家显示内容
+		if ($order['sell_id'] == session('uid')) {                                  //卖家显示内容
 			$merchant = Db::name('merchant')->where('id', $order['buy_id'])->find();//查找买家信息
 		}
-		// dump($order);
 		$this->assign('merchant', $merchant);
-		//dump($merchant['c_wechat_img']);
 		$this->assign('order', $order);
 		$this->assign('ad', $ad);
 		return $this->fetch();
@@ -188,7 +186,7 @@ class Merchant extends Base {
 			$merchant['c_wechat_img'] = str_replace("\\", "/", $iswx['c_bank_detail']);
 		}
 		// dump($isbank);
-		$this->assign('merchant', $merchant);//dump($merchant['c_wechat_img']);
+		$this->assign('merchant', $merchant);                                    //dump($merchant['c_wechat_img']);
 		$this->assign('order', $order);
 		$this->assign('ad', $ad);
 		return $this->fetch('payinfo');
@@ -288,8 +286,8 @@ class Merchant extends Base {
 		$Excel['fileName']   = "用户钱包地址" . date('Y年m月d日-His', time());//or $xlsTitle
 		$Excel['cellName']   = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
 		$Excel['H']          = ['A' => 10, 'B' => 15, 'C' => 40, 'D' => 30];//横向水平宽度
-		$Excel['V']          = ['1' => 40, '2' => 26];//纵向垂直高度
-		$Excel['sheetTitle'] = "用户钱包地址记录";//大标题，自定义
+		$Excel['V']          = ['1' => 40, '2' => 26];                      //纵向垂直高度
+		$Excel['sheetTitle'] = "用户钱包地址记录";                                  //大标题，自定义
 		$Excel['xlsCell']    = \app\common\model\Data::headAddress();
 		foreach ($data as $k => $v) {
 			$data[$k]['addtime'] = date("Y-m-d H:i:s", $v['addtime']);
@@ -406,8 +404,8 @@ class Merchant extends Base {
 		$Excel['fileName']   = "用户充值记录" . date('Y年m月d日-His', time());//or $xlsTitle
 		$Excel['cellName']   = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
 		$Excel['H']          = ['A' => 10, 'B' => 15, 'C' => 15, 'D' => 35, 'E' => 35, 'F' => 15, 'G' => 15, 'H' => 20, 'I' => 30];//横向水平宽度
-		$Excel['V']          = ['1' => 40, '2' => 26];//纵向垂直高度
-		$Excel['sheetTitle'] = "用户充值记录";//大标题，自定义
+		$Excel['V']          = ['1' => 40, '2' => 26];                                                                             //纵向垂直高度
+		$Excel['sheetTitle'] = "用户充值记录";                                                                                           //大标题，自定义
 		$Excel['xlsCell']    = \app\common\model\Data::head();
 		foreach ($data as $k => $v) {
 			if ($v['status'] == 0) {
@@ -489,8 +487,8 @@ class Merchant extends Base {
 		$Excel['fileName']   = "用户提币记录" . date('Y年m月d日-His', time());//or $xlsTitle
 		$Excel['cellName']   = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 		$Excel['H']          = ['A' => 10, 'B' => 20, 'C' => 15, 'D' => 40, 'E' => 15, 'F' => 15, 'G' => 50, 'H' => 10, 'I' => 20, 'J' => 20];//横向水平宽度
-		$Excel['V']          = ['1' => 40, '2' => 26];//纵向垂直高度
-		$Excel['sheetTitle'] = "用户提币记录";//大标题，自定义
+		$Excel['V']          = ['1' => 40, '2' => 26];                                                                                        //纵向垂直高度
+		$Excel['sheetTitle'] = "用户提币记录";                                                                                                      //大标题，自定义
 		$Excel['xlsCell']    = \app\common\model\Data::headWithdraw();
 		foreach ($data as $k => $v) {
 			if ($v['status'] == 0) {
@@ -570,8 +568,8 @@ class Merchant extends Base {
 		$Excel['fileName']   = "商户提币记录" . date('Y年m月d日-His', time());//or $xlsTitle
 		$Excel['cellName']   = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 		$Excel['H']          = ['A' => 10, 'B' => 20, 'C' => 15, 'D' => 40, 'E' => 15, 'F' => 15, 'G' => 50, 'H' => 10, 'I' => 20, 'J' => 20];//横向水平宽度
-		$Excel['V']          = ['1' => 40, '2' => 26];//纵向垂直高度
-		$Excel['sheetTitle'] = "用户提币记录";//大标题，自定义
+		$Excel['V']          = ['1' => 40, '2' => 26];                                                                                        //纵向垂直高度
+		$Excel['sheetTitle'] = "用户提币记录";                                                                                                      //大标题，自定义
 		$Excel['xlsCell']    = \app\common\model\Data::headTibi();
 		foreach ($data as $k => $v) {
 			if ($v['status'] == 0) {
@@ -660,7 +658,6 @@ class Merchant extends Base {
 			try {
 				$ordersn = createOrderNo(1, session('uid'));
 				$rs1     = balanceChange(TRUE, session('uid'), -$num, 0, $num, 0, BAL_WITHDRAW, $ordersn);
-
 				//$rs1 = Db::table('think_merchant')->where('id', session('uid'))->setDec('usdt', $num);
 				//$rs3 = Db::table('think_merchant')->where('id', session('uid'))->setInc('usdtd', $num);
 				$rs2 = Db::table('think_merchant_withdraw')->insert([
@@ -881,39 +878,32 @@ class Merchant extends Base {
 			$where['addtime'] = ['between', [$start, $end]];
 		}
 		$lists = $model->getMerchantStatistics($where, $order);
-
 		$today = strtotime(date('Y-m-d 00:00:00'));
-
 		foreach ($lists as $key => $list) {
-			$recharge_number = $list->orderSell()->count('id');  // 充值笔数
-			$recharge_amount = $list->orderSell()->sum('deal_amount');  // 充值数量
-			$success_number  = $list->orderSell()->where('status', 4)->count('id');  // 成功笔数
-			$success_amount  = $list->orderSell()->where('status', 4)->sum('deal_amount');  // 成功数量
-			$buy_number      = $list->orderSell()->count('id');  // 购买数量
+			$recharge_number = $list->orderSell()->count('id');                                                                                     // 充值笔数
+			$recharge_amount = $list->orderSell()->sum('deal_amount');                                                                              // 充值数量
+			$success_number  = $list->orderSell()->where('status', 4)->count('id');                                                                 // 成功笔数
+			$success_amount  = $list->orderSell()->where('status', 4)->sum('deal_amount');                                                          // 成功数量
+			$buy_number      = $list->orderSell()->count('id');                                                                                     // 购买数量
 			if ($success_number == 0 || $buy_number == 0) $success_rate = 0; else $success_rate = round(($success_number / $buy_number) * 100, 2);  // 成功率
-
 			// 获取当天笔数
 			$where2['ctime'] = ['egt', $today];
-
-			$today_number         = $list->orderSell()->where($where2)->count('id');  // 当天笔数
-			$today_amount         = $list->orderSell()->where($where2)->sum('deal_amount');  // 当天数量
-			$today_success_number = $list->orderSell()->where($where2)->where('status', 4)->count('id');  // 当天成功笔数
-			$today_success_amount = $list->orderSell()->where($where2)->where('status', 4)->sum('deal_amount');  // 当天成功数量
+			$today_number         = $list->orderSell()->where($where2)->count('id');                                                                                            // 当天笔数
+			$today_amount         = $list->orderSell()->where($where2)->sum('deal_amount');                                                                                     // 当天数量
+			$today_success_number = $list->orderSell()->where($where2)->where('status', 4)->count('id');                                                                        // 当天成功笔数
+			$today_success_amount = $list->orderSell()->where($where2)->where('status', 4)->sum('deal_amount');                                                                 // 当天成功数量
 			if ($today_success_number == 0 || $today_number == 0) $today_success_rate = 0; else $today_success_rate = round(($today_success_number / $today_number) * 100, 2);  // 成功率
-
 			$lists[$key]['recharge_number'] = $recharge_number;
 			$lists[$key]['recharge_amount'] = $recharge_amount;
 			$lists[$key]['success_number']  = $success_number;
 			$lists[$key]['success_amount']  = $success_amount;
 			$lists[$key]['success_rate']    = $success_rate;
-
 			$lists[$key]['today_number']         = $today_number;
 			$lists[$key]['today_amount']         = $today_amount;
 			$lists[$key]['today_success_number'] = $today_success_number;
 			$lists[$key]['today_success_amount'] = $today_success_amount;
 			$lists[$key]['today_success_rate']   = $today_success_rate;
 		}
-
 		$this->assign('list', $lists);
 		return $this->fetch();
 	}
@@ -1278,7 +1268,6 @@ class Merchant extends Base {
 	}
 
 	public function doalipay() {
-
 		if (request()->isPost()) {
 			if (!session('uid')) {
 				$this->error('请登陆操作', url('home/login/login'));
@@ -1736,7 +1725,6 @@ class Merchant extends Base {
 		if (!session('uid')) {
 			$this->error('请登陆操作', url('home/login/login'));
 		}
-
 		$usdt_price_way = Db::name('config')->where('name', 'usdt_price_way')->value('value');
 		$usdt_price_min = Db::name('config')->where('name', 'usdt_price_min')->value('value');
 		$usdt_price_max = Db::name('config')->where('name', 'usdt_price_max')->value('value');
@@ -2564,7 +2552,6 @@ class Merchant extends Base {
 		$redis->get($id) && $this->error("不可重复操作，剩余时间：" . $redis->ttl($id) . "秒");
 		$lock = $redis->set($id, TRUE, 60);
 		!$lock && $this->error('锁定操作失败，请重试。');
-
 		$merchant = $model2->getUserByParam(session('uid'), 'id');
 		if ($act == 1) {
 			// $haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->where('state', 1)->sum('amount');
@@ -2580,7 +2567,6 @@ class Merchant extends Base {
 			}
 		} elseif ($act == 2) {
 			!balanceChange(TRUE, session('uid'), $ad_info['remain_amount'], 0, -$ad_info['remain_amount'], 0, BAL_REDEEM, $id) && $this->error('下架失败：退款失败');
-
 			//Db::name('merchant')->where('id', session('uid'))->setInc('usdt', $ad_info['remain_amount']);
 			//Db::name('merchant')->where('id', session('uid'))->setDec('usdtd', $ad_info['remain_amount']);
 		}
@@ -2670,16 +2656,13 @@ class Merchant extends Base {
 		$AdOwner   = $userModel->getUserByParam($ad['userid'], 'id');
 		$deal_num  = Db::name('order_sell')->where('buy_bid', $id)->where('status', 'neq', 5)->sum('deal_num');
 		$remainNum = $ad['amount'] - $deal_num;
-
 		$usdtPriceWay = config('usdt_price_way_buy');
 		$addFee       = $usdtPriceWay == 2 ? config('usdt_price_add_buy') : 0;
 		$max_limit    = (getUsdtPrice() + $addFee) * $remainNum;
-
 		$rs1 = Db::name('ad_buy')->where('id', $ad['id'])->update(['max_limit' => $max_limit]);
 		//!$rs1 && $this->error('交易限额更新失败');
 		$ad              = $adModel->getOne(['id' => $id]);
 		$ad['RemainNum'] = $ad['amount'] - $deal_num;
-
 		$this->assign('ad', $ad);
 		$this->assign('AdOwner', $AdOwner);
 		$banks = $m->where('merchant_id', session('uid'))->order('id desc')->select();
@@ -2942,8 +2925,8 @@ class Merchant extends Base {
 		$Excel['fileName']   = "下发订单" . date('Y年m月d日-His', time());//or $xlsTitle
 		$Excel['cellName']   = ['A', 'B', 'C', 'D', 'E', 'F'];
 		$Excel['H']          = ['A' => 10, 'B' => 20, 'C' => 15, 'D' => 40, 'E' => 15, 'F' => 15];//横向水平宽度
-		$Excel['V']          = ['1' => 40, '2' => 26];//纵向垂直高度
-		$Excel['sheetTitle'] = "下发订单";//大标题，自定义
+		$Excel['V']          = ['1' => 40, '2' => 26];                                            //纵向垂直高度
+		$Excel['sheetTitle'] = "下发订单";                                                            //大标题，自定义
 		$Excel['xlsCell']    = \app\common\model\Data::ordersell();
 		foreach ($data as $k => $v) {
 			if ($v['status'] == 0) {
@@ -3062,10 +3045,8 @@ class Merchant extends Base {
 			//empty($zfb['alipay_id']) && $this->error('appid不存在');
 			//$url                      = 'https://api.uomg.com/api/long2dwz';
 			//$longUrl = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=NO&memo='. $order['check_code'].'&userId=' . $zfb['alipay_id'];
-			/*固定码*/
-			//$longUrl = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s": "money","u":"' . $zfb['alipay_id'] . '","a":"' . $order['deal_amount'] . '","m":"' . $order['check_code'] . '"}';
-			/*转账码*/
-			//$longUrl ='https://ds.alipay.com/?from=mobilecodec&scheme='.urlencode('alipays://platformapi/startapp?appId=20000200&actionType=toAccount&account=&amount=&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] .'');
+			/*固定码*/ //$longUrl = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s": "money","u":"' . $zfb['alipay_id'] . '","a":"' . $order['deal_amount'] . '","m":"' . $order['check_code'] . '"}';
+			/*转账码*/ //$longUrl ='https://ds.alipay.com/?from=mobilecodec&scheme='.urlencode('alipays://platformapi/startapp?appId=20000200&actionType=toAccount&account=&amount=&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] .'');
 			// 防封域名
 			//$redirectUrl = $_SERVER['REQUEST_SCHEME'] . '://' . ($domain[0] ? $domain[0] : $_SERVER['SERVER_NAME']) . '/go/url/' . base64_encode($longUrl);
 			/*$merchant['c_alipay_img'] = $longUrl;
@@ -3073,7 +3054,6 @@ class Merchant extends Base {
 			$merchant['alipay_name']  = $zfb['truename'];
 			$merchant['alipay_acc']   = $zfb['c_bank'];
 			$payarr[]                 .= 'zfb';*/
-
 			$merchant['zfb']          = $zfb['c_bank_card'];
 			$merchant['name']         = $zfb['truename'];
 			$merchant['c_alipay_img'] = $zfb['c_bank_detail'];
@@ -3082,7 +3062,6 @@ class Merchant extends Base {
 			$payarr[]                 .= 'zfb';
 		}
 		if ($type == 'wxpay' && $wxid > 0) {
-
 			$wx                       = Db::name('merchant_wx')->where('id', $wxid)->find();
 			$merchant['wx']           = $wx['c_bank_card'];
 			$merchant['name']         = $wx['truename'];
@@ -3129,7 +3108,6 @@ class Merchant extends Base {
 			$limit[] = $id;
 			Cache::set($ip, $limit, 7200);
 		}
-
 		//$id    = input('get.id');
 		$appid = input('get.appid');
 		$type  = input('get.type');
@@ -3171,10 +3149,8 @@ class Merchant extends Base {
 		if ($zfbid > 0) {
 			$zfb = Db::name('merchant_zfb')->where('id', $zfbid)->find();
 			//$longUrl = 'alipays://platformapi/startapp?appId=20000116&actionType=toAccount&goBack=NO&userId=' . $zfb['alipay_id'] . '&memo='. $order['check_code'].'';
-			/*固定码*/
-			//$longUrl                  = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s": "money","u":"' . $zfb['alipay_id'] . '","a":"' . $order['deal_amount'] . '","m":"' . $order['check_code'] . '"}';
-			/*转账码*/
-			//$longUrl ='https://ds.alipay.com/?from=mobilecodec&scheme='.urlencode('alipays://platformapi/startapp?appId=20000200&actionType=toAccount&account=&amount=&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] .'');
+			/*固定码*/ //$longUrl                  = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s": "money","u":"' . $zfb['alipay_id'] . '","a":"' . $order['deal_amount'] . '","m":"' . $order['check_code'] . '"}';
+			/*转账码*/ //$longUrl ='https://ds.alipay.com/?from=mobilecodec&scheme='.urlencode('alipays://platformapi/startapp?appId=20000200&actionType=toAccount&account=&amount=&userId=' . $zfb['alipay_id'] . '&memo=' . $order['check_code'] .'');
 			//$merchant['c_alipay_img'] = $_SERVER['REQUEST_SCHEME'] . '://' . ($domain[0] ? $domain[0] : $_SERVER['SERVER_NAME']) . '/go/url/' . base64_encode($longUrl);;
 			//$merchant['c_alipay_img'] = $longUrl;
 			//$merchant['alipay_name'] = substr_replace($zfb['truename'], '*', 3, 3);
@@ -3331,7 +3307,6 @@ class Merchant extends Base {
 	}
 
 	public function pkorder() {
-
 		if (!session('uid')) {
 			$this->error('请登录操作', url('home/login/login'));
 		}
@@ -3367,10 +3342,8 @@ class Merchant extends Base {
 				$agFeeRate = $mcModel->where('id', 'in', array_values($agentIds))->column('trader_parent_get', 'id');
 			}
 			$user = Db::name('merchant')->where('id', session('uid'))->find();
-
 			$currPrice = getUsdtPrice();
 			$dealerFee = $currPrice * (config('usdt_price_add') / 100);
-
 			foreach ($list as $k => $v) {
 				$list[$k]['fee_amount'] = $list[$k]['fee'] = $list[$k]['rec_amount'] = $list[$k]['rec'] = $list[$k]['fee_rate'] = 0;
 				if ($v['status'] == 4) {
@@ -3378,8 +3351,8 @@ class Merchant extends Base {
 					$agentFeeRate           = isset($agentIds[$v['sell_id']]) && isset($agFeeRate[$agentIds[$v['sell_id']]]) ? $agFeeRate[$agentIds[$v['sell_id']]] / 100 : 0;
 					$list[$k]['fee_amount'] = $v['deal_amount'] - (($v['deal_num'] - $v['platform_fee'] - number_format($v['deal_num'] * $agentFeeRate, 8, '.', '')) * ($v['deal_price'] - $dealerFee)); //费用金额
 					$list[$k]['fee']        = $list[$k]['fee_amount'] / $v['deal_price'];
-					$list[$k]['rec_amount'] = $v['deal_amount'] - $list[$k]['fee_amount']; // 到账费用
-					$list[$k]['rec']        = $v['deal_num'] - $list[$k]['fee']; // 到账数量
+					$list[$k]['rec_amount'] = $v['deal_amount'] - $list[$k]['fee_amount'];                                  // 到账费用
+					$list[$k]['rec']        = $v['deal_num'] - $list[$k]['fee'];                                            // 到账数量
 					$list[$k]['fee_rate']   = number_format($list[$k]['fee_amount'] * 100 / $v['deal_amount'], 1, '.', ''); // 到账数量
 				}
 			}
@@ -3438,8 +3411,8 @@ class Merchant extends Base {
 					($usdtPriceWay == 2) && ($dealerFee = (strpos($addFee, '%') !== FALSE ? $v['deal_price'] * (((float)$addFee) / 100) : $addFee));
 					$list[$k]['fee_amount'] = $v['deal_amount'] - (($v['deal_num'] - $v['platform_fee'] - number_format($v['deal_num'] * $agentFeeRate, 8, '.', '')) * ($v['deal_price'] - $dealerFee)); //费用金额
 					$list[$k]['fee']        = $list[$k]['fee_amount'] / $v['deal_price'];
-					$list[$k]['rec_amount'] = $v['deal_amount'] - $list[$k]['fee_amount']; // 到账费用
-					$list[$k]['rec']        = $v['deal_num'] - $list[$k]['fee']; // 到账数量
+					$list[$k]['rec_amount'] = $v['deal_amount'] - $list[$k]['fee_amount'];                                  // 到账费用
+					$list[$k]['rec']        = $v['deal_num'] - $list[$k]['fee'];                                            // 到账数量
 					$list[$k]['fee_rate']   = number_format($list[$k]['fee_amount'] * 100 / $v['deal_amount'], 1, '.', ''); // 到账数量
 				}
 				isset($statusArr[$v['status']]) && ($list[$k]['status'] = $statusArr[$v['status']]);
@@ -3451,8 +3424,8 @@ class Merchant extends Base {
 		$Excel['fileName']   = "订单列表" . date('Y年m月d日-His', time());//or $xlsTitle
 		$Excel['cellName']   = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'];
 		$Excel['H']          = ['A' => 10, 'B' => 15, 'C' => 15, 'D' => 35, 'E' => 35, 'F' => 15, 'G' => 15, 'H' => 20, 'I' => 30, 'J' => 20, 'K' => 15, 'L' => 20, 'M' => 15, 'N' => 20];//横向水平宽度
-		$Excel['V']          = ['1' => 40, '2' => 26];                                                                             //纵向垂直高度
-		$Excel['sheetTitle'] = "订单列表";                                                                                  //大标题，自定义
+		$Excel['V']          = ['1' => 40, '2' => 26];                                                                                                                                    //纵向垂直高度
+		$Excel['sheetTitle'] = "订单列表";                                                                                                                                                    //大标题，自定义
 		$Excel['xlsCell']    = Data::headPkorder();
 		PHPExcel::excelPut($Excel, $data);
 	}
@@ -3597,13 +3570,11 @@ class Merchant extends Base {
 			$merchant    = $model2->getUserByParam(session('uid'), 'id');
 			$buymerchant = $model2->getUserByParam($orderinfo['buy_id'], 'id');
 			($merchant['usdtd'] < $orderinfo['deal_num']) && $this->error('您的冻结不足，释放失败');
-
 			// 锁定操作 代码执行完成前不可继续操作 60秒后可再次点击操作
 			$redis = new Redis();
 			$redis->get($id) && $this->error("不可重复操作，剩余时间：" . $redis->ttl($id) . "秒");
 			$lock = $redis->set($id, TRUE, 60);
 			!$lock && $this->error('锁定操作失败，请重试。');
-
 			$sfee = 0;
 			$mum  = $orderinfo['deal_num'] - $sfee;
 			//盘口费率
@@ -3678,7 +3649,6 @@ class Merchant extends Base {
 				$rs6 = $rs7 = $rs8 = $rs9 = $rs10 = $rs11 = $res3 = TRUE;
 				if ($traderMoney > 0) {
 					$rs6 = balanceChange(TRUE, $orderinfo['sell_id'], $traderMoney, 0, 0, 0, BAL_COMMISSION, $orderinfo['id']);
-
 					//$rs6 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $traderMoney);
 					$rs7 = Db::table('think_trader_reward')->insert(['uid' => $orderinfo['sell_id'], 'orderid' => $orderinfo['id'], 'amount' => $traderMoney, 'type' => 0, 'create_time' => time()]);
 				}
@@ -3714,7 +3684,6 @@ class Merchant extends Base {
 					$data['appid']   = $buymerchant['appid'];
 					$data['status']  = 1;
 					askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
-
 					$redis->rm($id);
 					$this->success('释放成功');
 				} else {
