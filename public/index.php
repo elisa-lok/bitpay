@@ -19,7 +19,7 @@ define('RUNTIME_PATH', __DIR__ . '/../runtime/');
 // 开启调试模式
 define('APP_DEBUG', false);
 
-define('ADMIN_KEY', '123poiASDMNB');
+define('ADMIN_KEY', '123Abc');
 error_reporting(0);
 ini_set('display_errors', '0');
 if(APP_DEBUG){
