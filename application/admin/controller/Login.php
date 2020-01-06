@@ -2,10 +2,9 @@
 
 namespace app\admin\controller;
 use app\admin\model\UserType;
+use org\Verify;
 use think\Controller;
 use think\Db;
-use org\Verify;
-use com\Geetestlib;
 
 class Login extends Controller{
 
@@ -60,7 +59,6 @@ class Login extends Controller{
         if(empty($hasUser)){
             return json(['code' => -1, 'url' => '', 'msg' => '管理员不存在']);
         }
-		// dump(md5(md5($password) . config('auth_key')));die;
         if(md5(md5($password) . config('auth_key')) != $hasUser['password']){
             writelog($hasUser['id'],$username,'用户【'.$username.'】登录失败：密码错误',2);
             return json(['code' => -2, 'url' => '', 'msg' => '账号或密码错误']);

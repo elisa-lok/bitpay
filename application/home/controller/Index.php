@@ -1,14 +1,11 @@
 <?php
 namespace app\home\controller;
 use app\home\model\IndexModel;
-use think\Db;
 
 class Index extends Base
 {
 
     public function index(){
-        //echo config('logo');
-        $list = Db::name('member')->limit(3,1)->select();//dump($list);
         $key = input('key');
         $cate_id = input('param.cate_id');
         $map = [];

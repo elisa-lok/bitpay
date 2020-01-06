@@ -1,8 +1,6 @@
 <?php
 
 namespace app\admin\controller;
-use think\Config;
-use think\Loader;
 use think\Db;
 
 class Index extends Base{
@@ -242,11 +240,11 @@ class Index extends Base{
                     }
                 }
             }
-			$base_address = Db::table('think_config')->where('name', 'base_address')->value('value');
+			$base_address = Db::name('config')->where('name', 'base_address')->value('value');
             //$baseusdt = $model->index('getbalance', '$1PnhPBJ6JiAFuw5HFSpjuugci7SJjo179U', $money = null, $index=null, $count=null, $skip=null);
 			$baseusdt = $model->index('getbalance', $base_address, $money = null, $index=null, $count=null, $skip=null);
             Db::name('coin_log')->insert(['admin_id'=>session('adminuid'), 'balance'=>$usdt+$baseusdt['data'], 'create_time'=>time()]);
-			//$base_address = Db::table('think_config')->where('name', 'base_address')->value('value');
+			//$base_address = Db::name('config')->where('name', 'base_address')->value('value');
             $this->success($usdt+$baseusdt['data']);
         }
     }

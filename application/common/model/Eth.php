@@ -1,7 +1,6 @@
 <?php
 
 namespace app\common\model;
-use think\Model;
 use think\Db;
 
 class Eth {
@@ -12,7 +11,7 @@ class Eth {
 
    public function __construct()
     {
-        $this->host = Db::table('think_config')->where('name', 'ethip')->value('value');
+        $this->host = Db::name('config')->where('name', 'ethip')->value('value');
         $this->version = "2.0";
     }
 

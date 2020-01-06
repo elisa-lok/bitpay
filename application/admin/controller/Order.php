@@ -3,7 +3,6 @@
 namespace app\admin\controller;
 
 use app\admin\model\MerchantModel;
-use think\cache\driver\Redis;
 use think\Db;
 
 class Order extends Base {
@@ -28,9 +27,9 @@ class Order extends Base {
 				$updateArr['finished_time'] = 0;
 			}
 
-			$redis = new Redis();
-			$redis->get($orderInfo['id']) && showMsg('操作失败,' . $redis->ttl($orderInfo['id']) . "秒后可操作", 0);
-			$redis->set($orderInfo['id'], TRUE, 30);
+
+			Cache::has($orderInfo['id']) && showMsg('操作频繁', 0);
+			Cache::set($orderInfo['id'], TRUE, 30);
 
 			Db::startTrans();
 			$res1 = Db::name('order_buy')->where('id=' . $edit)->update($updateArr); // 更新订单
@@ -41,7 +40,7 @@ class Order extends Base {
 				!in_array($orderInfo['status'], ['5', '9']) && showMsg('该状态不能重建订单', 0);
 				//在余额里面进行扣钱
 				$realAmt = $orderInfo['deal_num'] + $orderInfo['fee'];
-				$res2    = balanceChange(TRUE, $orderInfo['sell_id'], -$orderInfo['deal_num'], $orderInfo['fee'], $orderInfo['deal_num'], $orderInfo['fee'], BAL_SYS, $orderInfo['id'], "重建订单");
+				$res2    = balanceChange(false, $orderInfo['sell_id'], -$orderInfo['deal_num'], $orderInfo['fee'], $orderInfo['deal_num'], $orderInfo['fee'], BAL_SYS, $orderInfo['id'], "重建订单");
 				//$res2    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec('usdt', $realAmt);
 				//$res3    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdtd', $realAmt);
 			}
@@ -90,7 +89,7 @@ class Order extends Base {
 						$mpexist = 1;
 						//$traderMParentGet   = $buymerchantP['trader_merchant_parent_get'];
 						$traderMParentGet   = $traderMParentGet ? $traderMParentGet : 0;
-						$traderMParentMoney = $traderMParentGet * $orderinfo['deal_num'] / 100;
+						$traderMParentMoney = $traderMParentGet * $orderInfo['deal_num'] / 100;
 					}
 					/*
 					if ($buymerchantP['agent_check'] == 1 && $buymerchantP['trader_merchant_parent_get']) {
@@ -109,47 +108,47 @@ class Order extends Base {
 				$traderParentMoney  = $moneyArr[1];
 				$traderMParentMoney = $moneyArr[2];
 				$traderMoney        = $moneyArr[3];
-				// Db::startTrans();
+				Db::startTrans();
 				try {
 					$rs1 = balanceChange(TRUE, $orderInfo['sell_id'], 0, 0, -$orderInfo['deal_num'], 0, BAL_SOLD, $orderInfo['id'], "编辑修改状态->完成订单");
-					//$rs1 = Db::table('think_merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num']);
+					//$rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num']);
 					//20190830修改
 					if ($nopay == 1) {
-						$rs2 = Db::table('think_order_buy')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'dktime' => time(), 'platform_fee' => $moneyArr[0]]);
+						$rs2 = Db::name('order_buy')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'dktime' => time(), 'platform_fee' => $moneyArr[0]]);
 					} else {
-						$rs2 = Db::table('think_order_buy')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'platform_fee' => $moneyArr[0]]);
+						$rs2 = Db::name('order_buy')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'platform_fee' => $moneyArr[0]]);
 					}
-					// $rs2 = Db::table('think_order_buy')->update(['id'=>$orderinfo['id'], 'status'=>4, 'finished_time'=>time(), 'platform_fee'=>$moneyArr[0]]);
-					//$rs3      = Db::table('think_merchant')->where('id', $orderInfo['buy_id'])->setInc('usdt', $mum);
-					$rs3      = balanceChange(TRUE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], "编辑修改状态->完成订单");
-					$rs4      = Db::table('think_merchant')->where('id', $orderInfo['sell_id'])->setInc('transact', 1);
-					$total    = Db::table('think_order_buy')->field('sum(finished_time-dktime) as total')->where('sell_id', $orderInfo['sell_id'])->where('status', 4)->select();
+					// $rs2 = Db::name('order_buy')->update(['id'=>$orderInfo['id'], 'status'=>4, 'finished_time'=>time(), 'platform_fee'=>$moneyArr[0]]);
+					//$rs3      = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('usdt', $mum);
+					$rs3      = balanceChange(false, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], "编辑修改状态->完成订单");
+					$rs4      = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('transact', 1);
+					$total    = Db::name('order_buy')->field('sum(finished_time-dktime) as total')->where('sell_id', $orderInfo['sell_id'])->where('status', 4)->select();
 					$tt       = $total[0]['total'];
-					$transact = Db::table('think_merchant')->where('id', $orderInfo['sell_id'])->value('transact');
-					$rs5      = Db::table('think_merchant')->where('id', $orderInfo['sell_id'])->update(['averge' => intval($tt / $transact)]);
+					$transact = Db::name('merchant')->where('id', $orderInfo['sell_id'])->value('transact');
+					$rs5      = Db::name('merchant')->where('id', $orderInfo['sell_id'])->update(['averge' => intval($tt / $transact)]);
 					//承兑商卖单奖励
 					$rs6 = $rs7 = $rs8 = $rs9 = $rs10 = $rs11 = $res3 = TRUE;
 					if ($traderMoney > 0) {
-						$rs6 = balanceChange(TRUE, $orderInfo['sell_id'], $traderMoney, 0, 0, 0, BAL_COMMISSION, $orderInfo['id'], "编辑修改状态->完成订单");
-						//$rs6 = Db::table('think_merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $traderMoney);
-						$rs7 = Db::table('think_trader_reward')->insert(['uid' => $orderInfo['sell_id'], 'orderid' => $orderInfo['id'], 'amount' => $traderMoney, 'type' => 0, 'create_time' => time()]);
+						$rs6 = balanceChange(false, $orderInfo['sell_id'], $traderMoney, 0, 0, 0, BAL_COMMISSION, $orderInfo['id'], "编辑修改状态->完成订单");
+						//$rs6 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $traderMoney);
+						$rs7 = Db::name('trader_reward')->insert(['uid' => $orderInfo['sell_id'], 'orderid' => $orderInfo['id'], 'amount' => $traderMoney, 'type' => 0, 'create_time' => time()]);
 					}
 					//承兑商代理利润
 					if ($traderParentMoney > 0 && $tpexist) {
-						$rsarr = agentReward($merchant['pid'], $orderInfo['sell_id'], $traderParentMoney, 3);//3
-						$rs8   = $rsarr[0];
-						$rs9   = $rsarr[1];
+						$rsArr = agentReward($merchant['pid'], $orderInfo['sell_id'], $traderParentMoney, 3);//3
+						$rs8   = $rsArr[0];
+						$rs9   = $rsArr[1];
 					}
 					//商户代理利润
 					if ($traderMParentMoney > 0 && $mpexist) {
-						$rsarr = agentReward($buymerchant['pid'], $orderInfo['buy_id'], $traderMParentMoney, 4);//4
-						$rs10  = $rsarr[0];
-						$rs11  = $rsarr[1];
+						$rsArr = agentReward($buymerchant['pid'], $orderInfo['buy_id'], $traderMParentMoney, 4);//4
+						$rs10  = $rsArr[0];
+						$rs11  = $rsArr[1];
 					}
 					// 平台利润
 					if ($platformMoney > 0) {
-						$rsarr = agentReward(-1, 0, $platformMoney, 5);//5
-						$res3  = $rsarr[1];
+						$rsArr = agentReward(-1, 0, $platformMoney, 5);//5
+						$res3  = $rsArr[1];
 					}
 					if ($rs1 && $rs2 && $rs3 && $rs4 && $rs6 && $rs7 && $rs8 && $rs9 && $rs10 && $rs11 && $res3) {
 						// 提交事务
@@ -222,11 +221,11 @@ class Order extends Base {
 			}
 			if ($res1 && $res2 && $res3 && $res4 && $res5 && $res6 && $res7) {
 				Db::commit();
-				$redis->rm($orderInfo['id']);
+				Cache::rm($orderInfo['id']);
 				showMsg('操作成功', 1);
 			} else {
 				Db::rollback();
-				$redis->rm($orderInfo['id']);
+				Cache::rm($orderInfo['id']);
 				showMsg('操作失败', 0);
 			}
 		}

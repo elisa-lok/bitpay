@@ -167,8 +167,8 @@ class Merchant extends Controller {
 		empty($data['notify_url']) && $this->myerror('异步回调页面地址错误');
 		$find = Db::name('order_buy')->where('orderid', $data['orderid'])->find();
 		!empty($find) && $this->myerror('订单号已存在，请勿重复提交');
-		$pk_num       = Db::table('think_config')->where('name', 'pk_waiting_finished_num')->value('value');//盘口订单限制
-		$trader_limit = Db::table('think_config')->where('name', 'trader_pp_max_unfinished_order')->value('value');
+		$pk_num       = Db::name('config')->where('name', 'pk_waiting_finished_num')->value('value');//盘口订单限制
+		$trader_limit = Db::name('config')->where('name', 'trader_pp_max_unfinished_order')->value('value');
 		if ($pk_num > 0) {
 			$count = Db::name('order_buy')->where('buy_id', $this->merchant['id'])->where('status', 'in', [0, 1])->count();
 			if ($count >= $pk_num) {
@@ -228,13 +228,13 @@ class Merchant extends Controller {
 		Db::startTrans();
 		try {
 			$checkCode = $this->check_code();
-			$rs1       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setDec('usdt', $data['amount']);
-			$rs3       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setInc('usdtd', $data['amount']);
-			$rs4       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setInc('pp_amount', 1);
-            //$rs6       = Db::table('think_ad_sell')->where('id', $onlineAd['id'])-> setDec('remain_amount', $data['amount']);
-            //$rs7       = Db::table('think_ad_sell')->where('id', $onlineAd['id'])-> setInc('trading_volume', $data['amount']);
+			$rs1       = Db::name('merchant')->where('id', $onlineAd['traderid'])->setDec('usdt', $data['amount']);
+			$rs3       = Db::name('merchant')->where('id', $onlineAd['traderid'])->setInc('usdtd', $data['amount']);
+			$rs4       = Db::name('merchant')->where('id', $onlineAd['traderid'])->setInc('pp_amount', 1);
+            //$rs6       = Db::name('ad_sell')->where('id', $onlineAd['id'])-> setDec('remain_amount', $data['amount']);
+            //$rs7       = Db::name('ad_sell')->where('id', $onlineAd['id'])-> setInc('trading_volume', $data['amount']);
 
-            $rs2       = Db::table('think_order_buy')->insertGetId([
+            $rs2       = Db::name('order_buy')->insertGetId([
 				'buy_id'       => $this->merchant['id'],//接口请求时,返回商户的id,放行时增加商户的USDT,有疑问?!
 				// 'buy_id'=>'',//暂时改成空
 				'sell_id'      => $onlineAd['traderid'],
@@ -258,7 +258,7 @@ class Merchant extends Controller {
 				Db::commit();
 				//todo 发送短信给承兑商
 				if (!empty($onlineAd['mobile'])) {
-					$send_content = Db::table('think_config')->where('name', 'send_sms_notify')->value('value');
+					$send_content = Db::name('config')->where('name', 'send_sms_notify')->value('value');
 					if ($send_content) {
 						$content = str_replace('{usdt}', round($data['amount'], 2), $send_content);
 						$content = str_replace('{cny}', round($actualAmt, 2), $content);
@@ -307,8 +307,8 @@ class Merchant extends Controller {
 		(empty($data['type']) || !in_array($data['type'], ['wxpay', 'alipay', 'unionpay', 'bank', 'all'])) && $this->myerror('支付方式不正确');
 		$find = Db::name('order_buy')->where('orderid', $data['orderid'])->find();
 		!empty($find) && $this->myerror('订单号已存在，请勿重复提交');
-		$pk_num       = Db::table('think_config')->where('name', 'pk_waiting_finished_num')->value('value');
-		$trader_limit = Db::table('think_config')->where('name', 'trader_pp_max_unfinished_order')->value('value');
+		$pk_num       = Db::name('config')->where('name', 'pk_waiting_finished_num')->value('value');
+		$trader_limit = Db::name('config')->where('name', 'trader_pp_max_unfinished_order')->value('value');
 		if ($pk_num > 0) {
 			$count = Db::name('order_buy')->where('buy_id', $this->merchant['id'])->where('status', 'in', [0, 1])->count();
 			($count >= $pk_num) && $this->myerror('您有未完成的订单');
@@ -397,13 +397,13 @@ class Merchant extends Controller {
 		Db::startTrans();
 		try {
 			$checkCode = $this->check_code();
-			//$rs1       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setDec('usdt', $actualAmt);
-			//$rs3       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setInc('usdtd', $actualAmt);
-			$rs4       = Db::table('think_merchant')->where('id', $onlineAd['traderid'])->setInc('pp_amount', 1);
-			$rs6       = Db::table('think_ad_sell')->where('id', $onlineAd['id'])-> setDec('remain_amount', $actualAmt);
-			$rs7       = Db::table('think_ad_sell')->where('id', $onlineAd['id'])-> setInc('trading_volume', $actualAmt);
+			//$rs1       = Db::name('merchant')->where('id', $onlineAd['traderid'])->setDec('usdt', $actualAmt);
+			//$rs3       = Db::name('merchant')->where('id', $onlineAd['traderid'])->setInc('usdtd', $actualAmt);
+			$rs4       = Db::name('merchant')->where('id', $onlineAd['traderid'])->setInc('pp_amount', 1);
+			$rs6       = Db::name('ad_sell')->where('id', $onlineAd['id'])-> setDec('remain_amount', $actualAmt);
+			$rs7       = Db::name('ad_sell')->where('id', $onlineAd['id'])-> setInc('trading_volume', $actualAmt);
 			$rs5       = Db::name('merchant')->where('id', $onlineAd['traderid'])->update(['match_time' => time()]);
-			$rs2       = Db::table('think_order_buy')->insertGetId([
+			$rs2       = Db::name('order_buy')->insertGetId([
 				'buy_id'       => $this->merchant['id'],//接口请求时,返回商户的id,放行时增加商户的USDT,有疑问?!
 				// 'buy_id'=>'',//暂时改成空
 				'sell_id'      => $onlineAd['traderid'],
@@ -430,7 +430,7 @@ class Merchant extends Controller {
 				//发送短信给承兑商
 
 				if (!empty($onlineAd['mobile'])) {
-					$send_content = Db::table('think_config')->where('name', 'send_sms_notify')->value('value');
+					$send_content = Db::name('config')->where('name', 'send_sms_notify')->value('value');
 					$content      = str_replace('{usdt}', round($actualAmt, 2), $send_content);
 					$content      = str_replace('{cny}', round($data['amount'], 2), $content);
 					// $content      = str_replace('{tx_id}', $data['orderid'], $content);

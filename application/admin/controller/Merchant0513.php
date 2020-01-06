@@ -327,22 +327,22 @@ class Merchant extends Base{
 			$merchant = Db::name('merchant')->where('id', $find['merchant_id'])->find();
             Db::startTrans();
             try{
-                $rs1 = Db::table('think_merchant')->where('id', $find['merchant_id'])->setDec('usdtd', $find['num']);//0
+                $rs1 = Db::name('merchant')->where('id', $find['merchant_id'])->setDec('usdtd', $find['num']);//0
                 $rs2 = $model->editWithdraw(['id'=>$id, 'status'=>1, 'endtime'=>time(), 'txid'=>$return['data'], 'type'=>$type]);
 				//商户提币
                 $fee = config('agent_tibi_fee');
                 if($merchant['pid'] && $find['fee'] && $fee){
                     //$fee = round($fee*$find['fee']/100, 8);
-                    $rsarr = agentReward($merchant['pid'], $find['merchant_id'], $fee, 0);
+                    $rsArr = agentReward($merchant['pid'], $find['merchant_id'], $fee, 0);
                 }else{
-                    $rsarr[0] = 1;
-                    $rsarr[1] = 1;
+                    $rsArr[0] = 1;
+                    $rsArr[1] = 1;
                 }
-                if($rs1 && $rs2['code'] == 1 && $rsarr[0] && $rsarr[1]){
+                if($rs1 && $rs2['code'] == 1 && $rsArr[0] && $rsArr[1]){
                     // 提交事务
                     Db::commit();
 					//统计商户提币数量
-					Db::table('think_merchant')->where('id', $find['merchant_id'])->setInc('withdraw_amount', $find['num']);
+					Db::name('merchant')->where('id', $find['merchant_id'])->setInc('withdraw_amount', $find['num']);
                     return ['code'=>1, 'data'=>'', 'msg'=>'转账成功'];
                 }else{
                     // 回滚事务
@@ -516,22 +516,22 @@ class Merchant extends Base{
 			$merchant = Db::name('merchant')->where('id', $find['merchant_id'])->find();
             Db::startTrans();
             try{
-                $rs1 = Db::table('think_merchant')->where('id', $find['merchant_id'])->setDec('usdt', $find['num']);//0
+                $rs1 = Db::name('merchant')->where('id', $find['merchant_id'])->setDec('usdt', $find['num']);//0
                 $rs2 = $model->editWithdraw(['id'=>$id, 'status'=>1, 'endtime'=>time(), 'txid'=>$return['data'], 'fee'=>$sfee, 'mum'=>$mum, 'type'=>$type]);
 				//商户提币
                 $feemy = config('agent_withdraw_fee');
                 if($merchant['pid'] && $sfee && $feemy){
                     $feemy = round($feemy*$sfee/100, 8);
-                    $rsarr = agentReward($merchant['pid'], $find['merchant_id'], $feemy, 1);
+                    $rsArr = agentReward($merchant['pid'], $find['merchant_id'], $feemy, 1);
                 }else{
-                    $rsarr[0] = 1;
-                    $rsarr[1] = 1;
+                    $rsArr[0] = 1;
+                    $rsArr[1] = 1;
                 }
-                if($rs1 && $rs2['code'] == 1 && $rsarr[0] && $rsarr[1]){
+                if($rs1 && $rs2['code'] == 1 && $rsArr[0] && $rsArr[1]){
                     // 提交事务
                     Db::commit();
 					//统计商户提币数量
-					Db::table('think_merchant')->where('id', $find['merchant_id'])->setInc('withdraw_amount', $find['num']);
+					Db::name('merchant')->where('id', $find['merchant_id'])->setInc('withdraw_amount', $find['num']);
                     return ['code'=>1, 'data'=>'', 'msg'=>'转账成功'];
                 }else{
                     // 回滚事务
@@ -930,38 +930,38 @@ class Merchant extends Base{
     public function sssuccess(){
         $id = input('post.id');
         $type = input('post.type');
-        $orderinfo = Db::name('order_buy')->where('id', $id)->find();
-        if(!$orderinfo){
+        $orderInfo = Db::name('order_buy')->where('id', $id)->find();
+        if(!$orderInfo){
             return json(['code'=>0, 'msg'=>'订单不存在']);
         }
-        if($orderinfo['status'] == 4){
+        if($orderInfo['status'] == 4){
             //return json(['code'=>0, 'msg'=>'订单已完成，请刷新']);
         }
         if($type != 1 && $type != 2){
             return json(['code'=>0, 'msg'=>'回调选择错误']);
         }
-        $buymerchant = Db::name('merchant')->where('id', $orderinfo['buy_id'])->find();
-        $trader = Db::name('merchant')->where('id', $orderinfo['sell_id'])->find();
-        if($trader['usdtd'] < $orderinfo['deal_num']){
+        $buymerchant = Db::name('merchant')->where('id', $orderInfo['buy_id'])->find();
+        $trader = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
+        if($trader['usdtd'] < $orderInfo['deal_num']){
             return json(['code'=>0, 'msg'=>'承兑商冻结不足']);
         }
         Db::startTrans();
         try{
-            $rs1 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $orderinfo['deal_num']);
-            $rs2 = Db::table('think_order_buy')->update(['id'=>$orderinfo['id'], 'status'=>9, 'finished_time'=>time()]);
-            $rs3 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $orderinfo['deal_num']);
-            //$rs4 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('transact', 1);
-			//$total = Db::table('think_order_buy')->field('sum(finished_time-dktime) as total')->where('sell_id', $orderinfo['sell_id'])->where('status', 4)->select();
+            $rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num']);
+            $rs2 = Db::name('order_buy')->update(['id'=>$orderInfo['id'], 'status'=>9, 'finished_time'=>time()]);
+            $rs3 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $orderInfo['deal_num']);
+            //$rs4 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('transact', 1);
+			//$total = Db::name('order_buy')->field('sum(finished_time-dktime) as total')->where('sell_id', $orderInfo['sell_id'])->where('status', 4)->select();
             //$tt = $total[0]['total'];
-            //$transact = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->value('transact');
-            //$rs5 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->update(['averge'=>intval($tt/$transact)]);
+            //$transact = Db::name('merchant')->where('id', $orderInfo['sell_id'])->value('transact');
+            //$rs5 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->update(['averge'=>intval($tt/$transact)]);
             if($rs1 && $rs2 && $rs3){
                 // 提交事务
                 Db::commit();
                 //请求回调接口
-				$data['rmb'] = $orderinfo['deal_amount'];
-                $data['amount'] = $orderinfo['deal_num'];
-                $data['orderid'] = $orderinfo['orderid'];
+				$data['rmb'] = $orderInfo['deal_amount'];
+                $data['amount'] = $orderInfo['deal_num'];
+                $data['orderid'] = $orderInfo['orderid'];
                 $data['appid'] = $buymerchant['appid'];
                 if($type == 1){
                     $status = 1;
@@ -969,7 +969,7 @@ class Merchant extends Base{
                     $status = 0;
                 }
                 $data['status'] = $status;
-                askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
+                askNotify($data, $orderInfo['notify_url'], $buymerchant['key']);
                 $this->success('操作成功');
             }else{
                 // 回滚事务
@@ -988,36 +988,36 @@ class Merchant extends Base{
      */
     public function sssuccessbuy(){
         $id = input('post.id');
-        $orderinfo = Db::name('order_sell')->where('id', $id)->find();
-        if(!$orderinfo){
+        $orderInfo = Db::name('order_sell')->where('id', $id)->find();
+        if(!$orderInfo){
             return json(['code'=>0, 'msg'=>'订单不存在']);
         }
-        if($orderinfo['status'] == 4){
+        if($orderInfo['status'] == 4){
             return json(['code'=>0, 'msg'=>'订单已完成，请刷新']);
         }
-        $buymerchant = Db::name('merchant')->where('id', $orderinfo['buy_id'])->find();
-        $trader = Db::name('merchant')->where('id', $orderinfo['sell_id'])->find();
-        if($trader['usdtd'] < $orderinfo['deal_num']+$orderinfo['fee']){
+        $buymerchant = Db::name('merchant')->where('id', $orderInfo['buy_id'])->find();
+        $trader = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
+        if($trader['usdtd'] < $orderInfo['deal_num']+$orderInfo['fee']){
             return json(['code'=>0, 'msg'=>'商户冻结不足']);
         }
         $fee = config('usdt_buy_trader_fee');
         $fee = $fee ? $fee : 0;
-        $sfee = $orderinfo['deal_num']*$fee/100;
-        $mum = $orderinfo['deal_num'] - $sfee;
+        $sfee = $orderInfo['deal_num']*$fee/100;
+        $mum = $orderInfo['deal_num'] - $sfee;
         Db::startTrans();
         try{
-            $rs1 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $orderinfo['deal_num']+$orderinfo['fee']);
-            $rs2 = Db::table('think_order_sell')->update(['id'=>$orderinfo['id'], 'status'=>4, 'finished_time'=>time(), 'buyer_fee'=>$sfee]);
-            $rs3 = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->setInc('usdt', $mum);
-            $rs4 = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->setInc('transact_buy', 1);
-            $total = Db::table('think_order_sell')->field('sum(dktime-ctime) as total')->where('buy_id', $orderinfo['buy_id'])->where('status', 4)->select();
+            $rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num']+$orderInfo['fee']);
+            $rs2 = Db::name('order_sell')->update(['id'=>$orderInfo['id'], 'status'=>4, 'finished_time'=>time(), 'buyer_fee'=>$sfee]);
+            $rs3 = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('usdt', $mum);
+            $rs4 = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('transact_buy', 1);
+            $total = Db::name('order_sell')->field('sum(dktime-ctime) as total')->where('buy_id', $orderInfo['buy_id'])->where('status', 4)->select();
             $tt = $total[0]['total'];
-            $transact = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->value('transact_buy');
-            $rs5 = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->update(['averge_buy'=>intval($tt/$transact)]);
+            $transact = Db::name('merchant')->where('id', $orderInfo['buy_id'])->value('transact_buy');
+            $rs5 = Db::name('merchant')->where('id', $orderInfo['buy_id'])->update(['averge_buy'=>intval($tt/$transact)]);
             if($rs1 && $rs2 && $rs3 && $rs4 && $rs5){
                 // 提交事务
                 Db::commit();
-				getStatisticsOfOrder($orderinfo['buy_id'], $orderinfo['sell_id'], $mum, $orderinfo['deal_num']+$orderinfo['fee']);
+				getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $orderInfo['deal_num']+$orderInfo['fee']);
                 $this->success('操作成功');
             }else{
                 // 回滚事务
@@ -1033,11 +1033,11 @@ class Merchant extends Base{
     public function ssfail(){
         $id = input('post.id');
         $type = input('post.type');
-        $orderinfo = Db::name('order_buy')->where('id', $id)->find();
-        if(!$orderinfo){
+        $orderInfo = Db::name('order_buy')->where('id', $id)->find();
+        if(!$orderInfo){
             return json(['code'=>0, 'msg'=>'订单不存在']);
         }
-        if($orderinfo['status'] == 4){
+        if($orderInfo['status'] == 4){
             //return json(['code'=>0, 'msg'=>'订单已完成，请刷新']);
         }
         if($type != 1 && $type != 2){
@@ -1045,26 +1045,26 @@ class Merchant extends Base{
         }
         //$fee = config('trader_merchant_fee');
         //$fee = $fee ? $fee : 0;
-        //$sfee = $orderinfo['deal_num']*$fee/100;
+        //$sfee = $orderInfo['deal_num']*$fee/100;
 		$sfee = 0;
-        $mum = $orderinfo['deal_num'] - $sfee;
-        $buymerchant = Db::name('merchant')->where('id', $orderinfo['buy_id'])->find();
-        $trader = Db::name('merchant')->where('id', $orderinfo['sell_id'])->find();
-        if($trader['usdtd'] < $orderinfo['deal_num']){
+        $mum = $orderInfo['deal_num'] - $sfee;
+        $buymerchant = Db::name('merchant')->where('id', $orderInfo['buy_id'])->find();
+        $trader = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
+        if($trader['usdtd'] < $orderInfo['deal_num']){
             return json(['code'=>0, 'msg'=>'承兑商冻结不足']);
         }
 		//盘口费率
         $pkfee = $buymerchant['merchant_pk_fee'];
         $pkfee = $pkfee ? $pkfee : 0;
-        $pkdec = $orderinfo['deal_num']*$pkfee/100;
+        $pkdec = $orderInfo['deal_num']*$pkfee/100;
 		//平台利润
         $platformGet = config('trader_platform_get');
         $platformGet = $platformGet ? $platformGet : 0;
-        $platformMoney = $platformGet*$orderinfo['deal_num']/100;
+        $platformMoney = $platformGet*$orderInfo['deal_num']/100;
         //承兑商卖单奖励
         $traderGet = $trader['trader_trader_get'];
         $traderGet = $traderGet ? $traderGet : 0;
-        $traderMoney = $traderGet*$orderinfo['deal_num']/100;
+        $traderMoney = $traderGet*$orderInfo['deal_num']/100;
         $traderParentMoney = $traderMParentMoney = $tpexist = $mpexist = 0;
 		$model2 = new MerchantModel();
         if($trader['pid']){
@@ -1074,7 +1074,7 @@ class Merchant extends Base{
 				$tpexist = 1;
                 $traderParentGet = $traderP['trader_parent_get'];
                 $traderParentGet = $traderParentGet ? $traderParentGet : 0;
-                $traderParentMoney = $traderParentGet*$orderinfo['deal_num']/100;
+                $traderParentMoney = $traderParentGet*$orderInfo['deal_num']/100;
             }
         }
         if($buymerchant['pid']){
@@ -1084,7 +1084,7 @@ class Merchant extends Base{
 				$mpexist = 1;
                 $traderMParentGet = $buymerchantP['trader_merchant_parent_get'];
                 $traderMParentGet = $traderMParentGet ? $traderMParentGet : 0;
-                $traderMParentMoney = $traderMParentGet*$orderinfo['deal_num']/100;
+                $traderMParentMoney = $traderMParentGet*$orderInfo['deal_num']/100;
             }
         }
         //平台，承兑商代理，商户代理，承兑商，商户只能得到这么多，多的给平台
@@ -1095,38 +1095,38 @@ class Merchant extends Base{
         $traderMoney = $moneyArr[3];
         Db::startTrans();
         try{
-            $rs1 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $orderinfo['deal_num']);
-            $rs2 = Db::table('think_order_buy')->update(['id'=>$orderinfo['id'], 'status'=>4, 'finished_time'=>time(), 'platform_fee'=>$moneyArr[0]]);
-            $rs3 = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->setInc('usdt', $mum);
-            $rs4 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('transact', 1);
-			$total = Db::table('think_order_buy')->field('sum(finished_time-dktime) as total')->where('sell_id', $orderinfo['sell_id'])->where('status', 4)->select();
+            $rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num']);
+            $rs2 = Db::name('order_buy')->update(['id'=>$orderInfo['id'], 'status'=>4, 'finished_time'=>time(), 'platform_fee'=>$moneyArr[0]]);
+            $rs3 = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('usdt', $mum);
+            $rs4 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('transact', 1);
+			$total = Db::name('order_buy')->field('sum(finished_time-dktime) as total')->where('sell_id', $orderInfo['sell_id'])->where('status', 4)->select();
             $tt = $total[0]['total'];
-            $transact = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->value('transact');
-            $rs5 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->update(['averge'=>intval($tt/$transact)]);
+            $transact = Db::name('merchant')->where('id', $orderInfo['sell_id'])->value('transact');
+            $rs5 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->update(['averge'=>intval($tt/$transact)]);
 			//承兑商卖单奖励
             $rs6 = $rs7 = $rs8 = $rs9 = $rs10 = $rs11 = true;
             if($traderMoney > 0){
-                $rs6 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $traderMoney);
-                $rs7 = Db::table('think_trader_reward')->insert(['uid'=>$orderinfo['sell_id'], 'orderid'=>$orderinfo['id'], 'amount'=>$traderMoney, 'type'=>0, 'create_time'=>time()]);
+                $rs6 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $traderMoney);
+                $rs7 = Db::name('trader_reward')->insert(['uid'=>$orderInfo['sell_id'], 'orderid'=>$orderInfo['id'], 'amount'=>$traderMoney, 'type'=>0, 'create_time'=>time()]);
             }
             //承兑商代理利润
             if($traderParentMoney > 0 && $tpexist){
-                $rsarr = agentReward($trader['pid'], $orderinfo['sell_id'], $traderParentMoney, 3);//3
-                $rs8 = $rsarr[0];$rs9 = $rsarr[1];
+                $rsArr = agentReward($trader['pid'], $orderInfo['sell_id'], $traderParentMoney, 3);//3
+                $rs8 = $rsArr[0];$rs9 = $rsArr[1];
             }
             //商户代理利润
             if($traderMParentMoney > 0 && $mpexist){
-                $rsarr = agentReward($buymerchant['pid'], $orderinfo['buy_id'], $traderMParentMoney, 4);//4
-                $rs10 = $rsarr[0];$rs11 = $rsarr[1];
+                $rsArr = agentReward($buymerchant['pid'], $orderInfo['buy_id'], $traderMParentMoney, 4);//4
+                $rs10 = $rsArr[0];$rs11 = $rsArr[1];
             }
             if($rs1 && $rs2 && $rs3 && $rs4 && $rs5 && $rs6 && $rs7 && $rs8 && $rs9 && $rs10 && $rs11){
                 // 提交事务
                 Db::commit();
-				getStatisticsOfOrder($orderinfo['buy_id'], $orderinfo['sell_id'], $mum, $orderinfo['deal_num']);
+				getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $orderInfo['deal_num']);
                 //请求回调接口
-                $data['amount'] = $orderinfo['deal_num'];
-				$data['rmb'] = $orderinfo['deal_amount'];
-                $data['orderid'] = $orderinfo['orderid'];
+                $data['amount'] = $orderInfo['deal_num'];
+				$data['rmb'] = $orderInfo['deal_amount'];
+                $data['orderid'] = $orderInfo['orderid'];
                 $data['appid'] = $buymerchant['appid'];
                 if($type == 1){
                     $status = 1;
@@ -1134,7 +1134,7 @@ class Merchant extends Base{
                     $status = 0;
                 }
                 $data['status'] = $status;
-                //askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
+                //askNotify($data, $orderInfo['notify_url'], $buymerchant['key']);
                 $this->success('操作成功');
             }else{
                 // 回滚事务
@@ -1153,23 +1153,23 @@ class Merchant extends Base{
      */
 	public function ssfailbuy(){
         $id = input('post.id');
-        $orderinfo = Db::name('order_sell')->where('id', $id)->find();
-        if(!$orderinfo){
+        $orderInfo = Db::name('order_sell')->where('id', $id)->find();
+        if(!$orderInfo){
             return json(['code'=>0, 'msg'=>'订单不存在']);
         }
-        if($orderinfo['status'] == 4){
+        if($orderInfo['status'] == 4){
             return json(['code'=>0, 'msg'=>'订单已完成，请刷新']);
         }
-        $buymerchant = Db::name('merchant')->where('id', $orderinfo['buy_id'])->find();
-        $trader = Db::name('merchant')->where('id', $orderinfo['sell_id'])->find();
-        if($trader['usdtd'] < $orderinfo['deal_num']+$orderinfo['fee']){
+        $buymerchant = Db::name('merchant')->where('id', $orderInfo['buy_id'])->find();
+        $trader = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
+        if($trader['usdtd'] < $orderInfo['deal_num']+$orderInfo['fee']){
             return json(['code'=>0, 'msg'=>'商家冻结不足']);
         }
         Db::startTrans();
         try{
-            $rs1 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $orderinfo['deal_num']+$orderinfo['fee']);
-            $rs2 = Db::table('think_order_sell')->update(['id'=>$orderinfo['id'], 'status'=>4, 'finished_time'=>time()]);
-            $rs3 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $orderinfo['deal_num']+$orderinfo['fee']);
+            $rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num']+$orderInfo['fee']);
+            $rs2 = Db::name('order_sell')->update(['id'=>$orderInfo['id'], 'status'=>4, 'finished_time'=>time()]);
+            $rs3 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $orderInfo['deal_num']+$orderInfo['fee']);
             if($rs1 && $rs2 && $rs3){
                 // 提交事务
                 Db::commit();

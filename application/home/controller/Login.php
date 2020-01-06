@@ -2,11 +2,9 @@
 
 namespace app\home\controller;
 
-use think\db;
-use think\File;
-use think\Request;
-use app\home\model\MerchantModel;
 use app\home\model\LogModel;
+use app\home\model\MerchantModel;
+use think\db;
 
 class Login extends Base {
 	public function test22222222() {
@@ -112,7 +110,7 @@ class Login extends Base {
 			if(empty($idcard_zheng) || empty($idcard_fan)){
 				$this->error('请上传照片');
 			}*/
-			for (; TRUE;) {
+			while (true) {
 				$appid = generate_password();
 				if ($model->getOneByParam($appid, 'appid')) {
 					break;

@@ -2,10 +2,8 @@
 
 namespace app\home\controller;
 
-use think\console\Command;
 use think\console\Input;
 use think\console\Output;
-use think\Debug;
 use think\db;
 
 class Cron extends Base {
@@ -99,29 +97,29 @@ class Cron extends Base {
 						continue;
 					}
 					Db::startTrans();
-					$rsarr    = [];
-					$rsarr[0] = 1;
-					$rsarr[1] = 1;
+					$rsArr    = [];
+					$rsArr[0] = 1;
+					$rsArr[1] = 1;
 					$valid    = $v2['valid'];
-					if ($res = Db::table('think_merchant_user_recharge')->where(['txid' => $v2['txid']])->find()) {
+					if ($res = Db::name('merchant_user_recharge')->where(['txid' => $v2['txid']])->find()) {
 						if ($res['status'] != 1 && $valid) {
-							$rs1 = Db::table('think_merchant')->where(['id' => $v['merchant_id']])->setInc('usdt', $v2['amount'] - $sfee);
-							$rs2 = Db::table('think_merchant_user_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 1, 'confirmations' => $v2['confirmations']]);
+							$rs1 = Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('usdt', $v2['amount'] - $sfee);
+							$rs2 = Db::name('merchant_user_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 1, 'confirmations' => $v2['confirmations']]);
 							//增加充值数量统计，不算手续费
-							Db::table('think_merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
+							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
 							if ($pid && $sfee && $feemy) {
 								$feemy = round($feemy * $sfee / 100, 8);
-								$rsarr = agentReward($pid, $v['merchant_id'], $feemy, 2);
+								$rsArr = agentReward($pid, $v['merchant_id'], $feemy, 2);
 							}
 						}
 						if (!$valid && $res['status'] != 5) {
 							$rs1 = TRUE;
-							$rs2 = Db::table('think_merchant_user_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 5, 'confirmations' => $v2['confirmations']]);
+							$rs2 = Db::name('merchant_user_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 5, 'confirmations' => $v2['confirmations']]);
 						}
 					} else {
 						if ($valid) {
-							$rs1 = Db::table('think_merchant')->where(['id' => $v['merchant_id']])->setInc('usdt', $v2['amount'] - $sfee);
-							$rs2 = Db::table('think_merchant_user_recharge')->insert([
+							$rs1 = Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('usdt', $v2['amount'] - $sfee);
+							$rs2 = Db::name('merchant_user_recharge')->insert([
 								'merchant_id'   => $v['merchant_id'],
 								'from_address'  => $v2['sendingaddress'],
 								'to_address'    => $v['address'],
@@ -135,14 +133,14 @@ class Cron extends Base {
 								'confirmations' => $v2['confirmations']
 							]);
 							//增加充值数量统计，不算手续费
-							Db::table('think_merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
+							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
 							if ($pid && $sfee && $feemy) {
 								$feemy = round($feemy * $sfee / 100, 8);
-								$rsarr = agentReward($pid, $v['merchant_id'], $feemy, 2);
+								$rsArr = agentReward($pid, $v['merchant_id'], $feemy, 2);
 							}
 						} else {
 							$rs1 = TRUE;
-							$rs2 = Db::table('think_merchant_user_recharge')->insert([
+							$rs2 = Db::name('merchant_user_recharge')->insert([
 								'merchant_id'   => $v['merchant_id'],
 								'from_address'  => $v2['sendingaddress'],
 								'to_address'    => $v['address'],
@@ -243,21 +241,21 @@ class Cron extends Base {
 					}
 					Db::startTrans();
 					$valid = $v2['valid'];
-					if ($res = Db::table('think_merchant_recharge')->where(['txid' => $v2['txid']])->find()) {
+					if ($res = Db::name('merchant_recharge')->where(['txid' => $v2['txid']])->find()) {
 						if ($res['status'] != 1 && $valid) {
-							$rs1 = Db::table('think_merchant')->where(['id' => $v['merchant_id']])->setInc('usdt', $v2['amount'] - $sfee);
-							$rs2 = Db::table('think_merchant_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 1, 'confirmations' => $v2['confirmations']]);
+							$rs1 = Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('usdt', $v2['amount'] - $sfee);
+							$rs2 = Db::name('merchant_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 1, 'confirmations' => $v2['confirmations']]);
 							//增加充值数量统计，不算手续费
-							Db::table('think_merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
+							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
 						}
 						if (!$valid && $res['status'] != 5) {
 							$rs1 = TRUE;
-							$rs2 = Db::table('think_merchant_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 5, 'confirmations' => $v2['confirmations']]);
+							$rs2 = Db::name('merchant_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 5, 'confirmations' => $v2['confirmations']]);
 						}
 					} else {
 						if ($valid) {
-							$rs1 = Db::table('think_merchant')->where(['id' => $v['merchant_id']])->setInc('usdt', $v2['amount'] - $sfee);
-							$rs2 = Db::table('think_merchant_recharge')->insert([
+							$rs1 = Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('usdt', $v2['amount'] - $sfee);
+							$rs2 = Db::name('merchant_recharge')->insert([
 								'merchant_id'   => $v['merchant_id'],
 								'from_address'  => $v2['sendingaddress'],
 								'to_address'    => $v['address'],
@@ -271,10 +269,10 @@ class Cron extends Base {
 								'confirmations' => $v2['confirmations']
 							]);
 							//增加充值数量统计，不算手续费
-							Db::table('think_merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
+							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
 						} else {
 							$rs1 = TRUE;
-							$rs2 = Db::table('think_merchant_recharge')->insert([
+							$rs2 = Db::name('merchant_recharge')->insert([
 								'merchant_id'   => $v['merchant_id'],
 								'from_address'  => $v2['sendingaddress'],
 								'to_address'    => $v['address'],
@@ -312,24 +310,24 @@ class Cron extends Base {
 		}
 		foreach ($list as $key => $vv) {
 			Db::startTrans();
-			$orderinfo = [];
-			$orderinfo = Db::table('think_order_buy')->where(['id' => $vv['id']])->find();
+			$orderInfo = [];
+			$orderInfo = Db::name('order_buy')->where(['id' => $vv['id']])->find();
 			$coin_name = 'usdt';
-			//$seller = Db::table('think_merchant')->where(array('id'=>$vv['sell_id']))->find();
-			$buymerchant = Db::table('think_merchant')->where(['id' => $vv['buy_id']])->find();
+			//$seller = Db::name('merchant')->where(array('id'=>$vv['sell_id']))->find();
+			$buymerchant = Db::name('merchant')->where(['id' => $vv['buy_id']])->find();
 			//$table = "movesay_".$coin_name."_log";
-			$rs1         = Db::table('think_order_buy')->update(['status' => 5, 'id' => $vv['id']]);
-			$real_number = $orderinfo['deal_num'] + $orderinfo['fee'];
-			$rs2         = Db::table('think_merchant')->where(['id' => $orderinfo['sell_id']])->setDec($coin_name . 'd', $real_number);
-			$rs3         = Db::table('think_merchant')->where(['id' => $orderinfo['sell_id']])->setInc($coin_name, $real_number);
+			$rs1         = Db::name('order_buy')->update(['status' => 5, 'id' => $vv['id']]);
+			$real_number = $orderInfo['deal_num'] + $orderInfo['fee'];
+			$rs2         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec($coin_name . 'd', $real_number);
+			$rs3         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc($coin_name, $real_number);
 			if ($rs1 && $rs2 && $rs3) {
 				Db::commit();
 				//请求回调接口,失败
-				$data['amount']  = $orderinfo['deal_num'];
-				$data['orderid'] = $orderinfo['orderid'];
+				$data['amount']  = $orderInfo['deal_num'];
+				$data['orderid'] = $orderInfo['orderid'];
 				$data['appid']   = $buymerchant['appid'];
 				$data['status']  = 0;
-				askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
+				askNotify($data, $orderInfo['notify_url'], $buymerchant['key']);
 			} else {
 				Db::rollback();
 				$msg = '【' . date('Y-m-d H:i:s') . '】 订单' . $vv['id'] . '回滚失败, 买家ID: ' . $vv['buy_id'] . ' , 卖家ID: ' . $vv['sell_id'] . ", 失败步骤: $rs1,$rs2,$rs3";
@@ -345,21 +343,21 @@ class Cron extends Base {
 		}
 		foreach ($list as $key => $vv) {
 			Db::startTrans();
-			$orderinfo   = [];
-			$orderinfo   = Db::table('think_order_sell')->where(['id' => $vv['id']])->find();
-			$buymerchant = Db::table('think_merchant')->where(['id' => $vv['buy_id']])->find();
+			$orderInfo   = [];
+			$orderInfo   = Db::name('order_sell')->where(['id' => $vv['id']])->find();
+			$buymerchant = Db::name('merchant')->where(['id' => $vv['buy_id']])->find();
 			$coin_name   = 'usdt';
-			$rs1         = Db::table('think_order_sell')->update(['status' => 5, 'id' => $vv['id']]);
-			$real_number = $orderinfo['deal_num'] + $orderinfo['fee'];
-			$rs2         = Db::table('think_merchant')->where(['id' => $orderinfo['sell_id']])->setDec($coin_name . 'd', $real_number);
-			$rs3         = Db::table('think_merchant')->where(['id' => $orderinfo['sell_id']])->setInc($coin_name, $real_number);
+			$rs1         = Db::name('order_sell')->update(['status' => 5, 'id' => $vv['id']]);
+			$real_number = $orderInfo['deal_num'] + $orderInfo['fee'];
+			$rs2         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec($coin_name . 'd', $real_number);
+			$rs3         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc($coin_name, $real_number);
 			if ($rs1 && $rs2 && $rs3) {
 				Db::commit();
-				$data['amount']  = $orderinfo['deal_num'];
-				$data['orderid'] = $orderinfo['orderid'];
+				$data['amount']  = $orderInfo['deal_num'];
+				$data['orderid'] = $orderInfo['orderid'];
 				$data['appid']   = $buymerchant['appid'];
 				$data['status']  = 0;
-				askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
+				askNotify($data, $orderInfo['notify_url'], $buymerchant['key']);
 			} else {
 				Db::rollback();
 				$msg = '【' . date('Y-m-d H:i:s') . '】 订单' . $vv['id'] . '回滚失败, 买家ID: ' . $vv['buy_id'] . ' , 卖家ID: ' . $vv['sell_id'] . ", 失败步骤: $rs1,$rs2,$rs3";
@@ -411,7 +409,7 @@ class Cron extends Base {
 		$dealbuy_nums = Db::name('order_sell')->where('buy_bid', 'in', $adbuyids)->where('status', 'neq', 5)->sum('deal_num');
 		//求购总数量，计算所有挂买的剩余数量
 		$orderBuySum = $adbuytotal - $dealbuy_nums;
-		$rs          = Db::table('think_statistics')->insert([
+		$rs          = Db::name('statistics')->insert([
 			'platform_profit'      => $feePlatform,
 			'agent_reward'         => $feeAgent,
 			'trader_reward'        => $feeTrader,

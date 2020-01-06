@@ -1,8 +1,8 @@
 <?php
 
 namespace app\common\model;
-use think\Model;
 use think\Db;
+
 // require './extend/com/easybitcoin.php';
 // require './extend/com/cls_json.php';
 
@@ -24,11 +24,11 @@ define('PROPERTY_ID', 31);
 
 class Usdt {
 	public function __construct(){
-        $rpc_user = Db::table('think_config')->where('name', 'rpc_user')->value('value');
-        $rpc_pwd = Db::table('think_config')->where('name', 'rpc_pwd')->value('value');
-        $rpc_url = Db::table('think_config')->where('name', 'rpc_url')->value('value');
-        $rpc_port = Db::table('think_config')->where('name', 'rpc_port')->value('value');
-        $base_address = Db::table('think_config')->where('name', 'base_address')->value('value');
+        $rpc_user = Db::name('config')->where('name', 'rpc_user')->value('value');
+        $rpc_pwd = Db::name('config')->where('name', 'rpc_pwd')->value('value');
+        $rpc_url = Db::name('config')->where('name', 'rpc_url')->value('value');
+        $rpc_port = Db::name('config')->where('name', 'rpc_port')->value('value');
+        $base_address = Db::name('config')->where('name', 'base_address')->value('value');
         define('RPC_USER', $rpc_user);
         define('RPC_PWD', $rpc_pwd);
         define('RPC_URL', $rpc_url);

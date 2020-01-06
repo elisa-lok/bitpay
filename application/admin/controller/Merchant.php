@@ -1,16 +1,15 @@
 <?php
-
 namespace app\admin\controller;
-
 use app\admin\model\AddressModel;
 use app\admin\model\MerchantModel;
 use app\admin\model\RechargeModel;
 use app\admin\model\TibiModel;
 use app\admin\model\WithdrawModel;
+use app\common\model\Usdt;
 use app\home\controller\Auto;
 use com\IpLocation;
-use think\cache\driver\Redis;
 use think\db;
+use think\Exception\DbException;
 
 class Merchant extends Base {
 	public function log() {
@@ -21,7 +20,7 @@ class Merchant extends Base {
 			$map['admin_id'] = $uid;
 		}
 		$Nowpage = input('get.page') ? input('get.page') : 1;
-		$limits  = config('list_rows');// 获取总条数
+		$limits  = config('list_rows');                           // 获取总条数
 		$count   = Db::name('merchant_log')->where($map)->count();//计算总页面
 		$allpage = intval(ceil($count / $limits));
 		$lists   = Db::name('merchant_log')->field('ml.*, m.name, m.reg_type')->alias('ml')->join('merchant m', 'ml.admin_id=m.id', 'left')->where($map)->page($Nowpage, $limits)->order('add_time desc')->select();
@@ -34,9 +33,7 @@ class Merchant extends Base {
 		$this->assign('allpage', $allpage); //总页数
 		$this->assign('count', $count);
 		$this->assign('val', $key);
-		if (input('get.page')) {
-			return json($lists);
-		}
+		(input('get.page')) && showJson($lists);
 		return $this->fetch();
 	}
 
@@ -45,12 +42,11 @@ class Merchant extends Base {
 		$rs = Db::name('merchant_log')->where('log_id', $id)->delete();
 		if ($rs) {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】删除登录日志:' . $id . '成功', 1);
-			return json(['code' => 1, 'data' => '', 'msg' => '删除成功']);
+			showJson(['code' => 1, 'data' => '', 'msg' => '删除成功']);
 		} else {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】删除登录日志:' . $id . '失败', 0);
-			return json(['code' => 0, 'data' => '', 'msg' => '删除失败']);
+			showJson(['code' => 0, 'data' => '', 'msg' => '删除失败']);
 		}
-
 	}
 
 	public function index() {
@@ -63,7 +59,7 @@ class Merchant extends Base {
 		$map['reg_type'] = $reg_type;
 		$member          = new MerchantModel();
 		$Nowpage         = input('get.page') ? input('get.page') : 1;
-		$limits          = config('list_rows');// 获取总条数
+		$limits          = config('list_rows');       // 获取总条数
 		$count           = $member->getAllCount($map);//计算总页面
 		$allpage         = intval(ceil($count / $limits));
 		$lists           = $member->getMerchantByWhere($map, $Nowpage, $limits);
@@ -76,9 +72,7 @@ class Merchant extends Base {
 		$this->assign('allpage', $allpage); //总页数
 		$this->assign('val', $key);
 		$this->assign('reg_type', $reg_type);
-		if (input('get.page')) {
-			return json($lists);
-		}
+		(input('get.page')) && showJson($lists);
 		return $this->fetch();
 	}
 
@@ -91,7 +85,7 @@ class Merchant extends Base {
 		}
 		$member  = new MerchantModel();
 		$Nowpage = input('get.page') ? input('get.page') : 1;
-		$limits  = config('list_rows');// 获取总条数
+		$limits  = config('list_rows');            // 获取总条数
 		$count   = $member->getAllCountAgent($map);//计算总页面
 		$allpage = intval(ceil($count / $limits));
 		$lists   = $member->getRewardByWhere($map, $Nowpage, $limits);
@@ -101,9 +95,7 @@ class Merchant extends Base {
 		$this->assign('Nowpage', $Nowpage); //当前页
 		$this->assign('allpage', $allpage); //总页数
 		$this->assign('val', $key);
-		if (input('get.page')) {
-			return json($lists);
-		}
+		(input('get.page')) && showJson($lists);
 		return $this->fetch();
 	}
 
@@ -116,7 +108,7 @@ class Merchant extends Base {
 		}
 		$member  = new MerchantModel();
 		$Nowpage = input('get.page') ? input('get.page') : 1;
-		$limits  = config('list_rows');// 获取总条数
+		$limits  = config('list_rows');            // 获取总条数
 		$count   = $member->getAllCountAgent($map);//计算总页面
 		$allpage = intval(ceil($count / $limits));
 		$lists   = $member->getTraderRewardByWhere($map, $Nowpage, $limits);
@@ -126,9 +118,7 @@ class Merchant extends Base {
 		$this->assign('Nowpage', $Nowpage); //当前页
 		$this->assign('allpage', $allpage); //总页数
 		$this->assign('val', $key);
-		if (input('get.page')) {
-			return json($lists);
-		}
+		(input('get.page')) && showJson($lists);
 		return $this->fetch();
 	}
 
@@ -140,7 +130,7 @@ class Merchant extends Base {
 		}
 		$member  = new MerchantModel();
 		$Nowpage = input('get.page') ? input('get.page') : 1;
-		$limits  = config('list_rows');// 获取总条数
+		$limits  = config('list_rows');           // 获取总条数
 		$count   = $member->getAllCountUsdt($map);//计算总页面
 		$allpage = intval(ceil($count / $limits));
 		$lists   = $member->getUsdtByWhere($map, $Nowpage, $limits);
@@ -150,9 +140,7 @@ class Merchant extends Base {
 		$this->assign('Nowpage', $Nowpage); //当前页
 		$this->assign('allpage', $allpage); //总页数
 		$this->assign('val', $key);
-		if (input('get.page')) {
-			return json($lists);
-		}
+		(input('get.page')) && showJson($lists);
 		return $this->fetch();
 	}
 
@@ -164,7 +152,7 @@ class Merchant extends Base {
 		}
 		$member  = new MerchantModel();
 		$Nowpage = input('get.page') ? input('get.page') : 1;
-		$limits  = config('list_rows');// 获取总条数
+		$limits  = config('list_rows');           // 获取总条数
 		$count   = $member->getAllCountUsdt($map);//计算总页面
 		$allpage = intval(ceil($count / $limits));
 		$lists   = $member->getUsdtByWhere($map, $Nowpage, $limits);
@@ -174,9 +162,7 @@ class Merchant extends Base {
 		$this->assign('Nowpage', $Nowpage); //当前页
 		$this->assign('allpage', $allpage); //总页数
 		$this->assign('val', $key);
-		if (input('get.page')) {
-			return json($lists);
-		}
+		(input('get.page')) && showJson($lists);
 		return $this->fetch();
 	}
 
@@ -186,11 +172,11 @@ class Merchant extends Base {
 		if ($status == 1) {
 			$flag = Db::name('merchant')->where('id', $id)->setField(['status' => 0]);
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】禁用商户:' . $id . '成功', 1);
-			return json(['code' => 1, 'data' => $flag['data'], 'msg' => '已禁止']);
+			showJson(['code' => 1, 'data' => $flag['data'], 'msg' => '已禁止']);
 		} else {
 			$flag = Db::name('merchant')->where('id', $id)->setField(['status' => 1]);
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】启用商户:' . $id . '成功', 1);
-			return json(['code' => 0, 'data' => $flag['data'], 'msg' => '已开启']);
+			showJson(['code' => 0, 'data' => $flag['data'], 'msg' => '已开启']);
 		}
 	}
 
@@ -212,7 +198,7 @@ class Merchant extends Base {
 			}
 			$update = ['reg_check' => $check, 'agent_check' => $check == 1 ? 1 : 2, 'invite' => $tradeno];
 		} else {
-			return json(['code' => 0, 'msg' => '用户注册类型错误']);
+			showJson(['code' => 0, 'msg' => '用户注册类型错误']);
 		}
 		if (Db::name('merchant')->where('id', $id)->update($update)) {
 			if ($user['reg_type'] == 2) {
@@ -221,12 +207,11 @@ class Merchant extends Base {
 				// 非空
 				Db::name('merchant')->where('reg_type', 1)->whereNotNull()->update(['pptrader' => Db::raw("CONCAT(pptrader, ',{$id}')")]);
 			}
-
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】审核用户:' . $id . '成功', 1);
-			return json(['code' => 1, 'msg' => '操作成功']);
+			showJson(['code' => 1, 'msg' => '操作成功']);
 		} else {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】审核用户:' . $id . '失败', 0);
-			return json(['code' => 0, 'msg' => '操作失败']);
+			showJson(['code' => 0, 'msg' => '操作失败']);
 		}
 	}
 
@@ -236,7 +221,6 @@ class Merchant extends Base {
 		if ($check == 1) {
 			for (; TRUE;) {
 				$tradeno = tradenoa();
-
 				if (!Db::name('merchant')->where('invite', $tradeno)->find()) {
 					break;
 				}
@@ -247,10 +231,10 @@ class Merchant extends Base {
 		}
 		if ($flag) {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】审核用户:' . $id . '成功', 1);
-			return json(['code' => 1, 'msg' => '操作成功']);
+			showJson(['code' => 1, 'msg' => '操作成功']);
 		} else {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】审核用户:' . $id . '失败', 0);
-			return json(['code' => 0, 'msg' => '操作失败']);
+			showJson(['code' => 0, 'msg' => '操作失败']);
 		}
 	}
 
@@ -260,16 +244,15 @@ class Merchant extends Base {
 		$flag  = Db::name('merchant')->where('id', $id)->setField(['trader_check' => $check]);
 		if ($flag) {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】审核用户:' . $id . '成功', 1);
-			return json(['code' => 1, 'msg' => '操作成功']);
+			showJson(['code' => 1, 'msg' => '操作成功']);
 		} else {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】审核用户:' . $id . '失败', 0);
-			return json(['code' => 0, 'msg' => '操作失败']);
+			showJson(['code' => 0, 'msg' => '操作失败']);
 		}
 	}
 
 	public function edit_merchant() {
 		$member = new MerchantModel();
-
 		if (request()->isAjax()) {
 			$param = input('post.');
 			if (empty($param['password'])) {
@@ -281,7 +264,6 @@ class Merchant extends Base {
 				$traders_id = $member->where('trader_check', 1)->order('id asc')->column('id');
 				shuffle($traders_id);
 				$param['pptrader'] = implode(',', $traders_id);
-
 			} elseif (!empty($param['pptraders']) && is_array($param['pptraders'])) {
 				$param['pptrader'] = implode(',', $param['pptraders']);
 			} else {
@@ -309,11 +291,9 @@ class Merchant extends Base {
 				}
 				financelog($param['id'], $amount, '后台修改USDT冻结余额', $type, session('username'));//添加日志
 			}
-
 			$flag = $member->editMerchant($param);
-			return json(['code' => $flag['code'], 'data' => $flag['data'], 'msg' => $flag['msg']]);
+			showJson(['code' => $flag['code'], 'data' => $flag['data'], 'msg' => $flag['msg']]);
 		}
-
 		$id       = input('param.id');
 		$reg_type = input('param.reg_type');
 		$minfo    = $member->getOneByWhere($id, 'id');
@@ -346,7 +326,7 @@ class Merchant extends Base {
 		$member = new MerchantModel();
 		$flag   = $member->delMerchant($id);
 		writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】删除用户:' . $id . '成功', 1);
-		return json(['code' => $flag['code'], 'data' => $flag['data'], 'msg' => $flag['msg']]);
+		showJson(['code' => $flag['code'], 'data' => $flag['data'], 'msg' => $flag['msg']]);
 	}
 
 	public function tibi() {
@@ -359,7 +339,7 @@ class Merchant extends Base {
 		}
 		$member  = new TibiModel();
 		$Nowpage = input('get.page') ? input('get.page') : 1;
-		$limits  = config('list_rows');// 获取总条数
+		$limits  = config('list_rows');       // 获取总条数
 		$count   = $member->getAllCount($map);//计算总页面
 		$allpage = intval(ceil($count / $limits));
 		$lists   = $member->getTibiByWhere($map, $Nowpage, $limits);
@@ -370,9 +350,7 @@ class Merchant extends Base {
 		$this->assign('Nowpage', $Nowpage); //当前页
 		$this->assign('allpage', $allpage); //总页数
 		$this->assign('val', $key);
-		if (input('get.page')) {
-			return json($lists);
-		}
+		(input('get.page')) && showJson($lists);
 		return $this->fetch();
 	}
 
@@ -380,29 +358,20 @@ class Merchant extends Base {
 	public function passTibi() {
 		$id    = input('id');
 		$model = new TibiModel();
-		if (empty($id)) {
-			return json(['code' => 0, 'msg' => '参数错误']);
-		}
+		(empty($id)) && showJson(['code' => 0, 'msg' => '参数错误']);
 		$find = $model->getOneByWhere($id, 'id');
-		if (empty($find)) {
-			return json(['code' => 0, 'msg' => '参数错误']);
-		}
-		if ($find['status'] != 0) {
-			return json(['code' => 0, 'msg' => '状态错误：不是待审核']);
-		}
+		(empty($find)) && showJson(['code' => 0, 'msg' => '参数错误']);
+		($find['status'] != 0) && showJson(['code' => 0, 'msg' => '状态错误：不是待审核']);
 		$type = input('type');//1走钱包,2不走钱包
-		if ($type != 1 && $type != 2) {
-			return json(['code' => 0, 'msg' => '请选择方式']);
-		}
+		($type != 1 && $type != 2) && showJson(['code' => 0, 'msg' => '请选择方式']);
 		if ($type == 1) {
 			if (config('wallettype') == 'omni') {
-				$model2 = new \app\common\model\Usdt();
+				$model2 = new Usdt();
 				$return = $model2->index('send', $find['address'], $find['mum'], $index = NULL, $count = NULL, $skip = NULL);
 			}
 			if (config('wallettype') == 'erc') {//20190828增加erc提币审核
 				die('1');
 			}
-
 		} else {
 			$return['code'] = 1;
 			$return['data'] = '';
@@ -411,38 +380,35 @@ class Merchant extends Base {
 		if ($return['code'] == 1) {
 			/* $dbreturn = $model->editWithdraw(['id'=>$id, 'status'=>1, 'endtime'=>time(), 'txid'=>$return['data']]);
             if($dbreturn['code'] == 0){
-                return json(['code'=>0, 'msg'=>'转账成功，修改订单状态失败：'.$dbreturn['msg'], 'data'=>'']);
+                showJson(['code'=>0, 'msg'=>'转账成功，修改订单状态失败：'.$dbreturn['msg'], 'data'=>'']);
             }else{
                 $rs = Db::name('merchant')->where('id', $find['merchant_id'])->setDec('usdtd', $find['num']);
                 if(!$rs){
-                    return json(['code'=>0, 'msg'=>'转账成功，扣除冻结失败', 'data'=>'']);
+                    showJson(['code'=>0, 'msg'=>'转账成功，扣除冻结失败', 'data'=>'']);
                 }else{
-                    return json(['code'=>0, 'msg'=>'转账成功', 'data'=>'']);
+                    showJson(['code'=>0, 'msg'=>'转账成功', 'data'=>'']);
                 }
             } */
 			$merchant = Db::name('merchant')->where('id', $find['merchant_id'])->find();
 			Db::startTrans();
 			try {
-				$rs1 = balanceChange(TRUE, $find['merchant_id'], 0, 0, -$find['num'], 0, BAL_WITHDRAW, $id, "审核通过提币");
-
-				//$rs1 = Db::table('think_merchant')->where('id', $find['merchant_id'])->setDec('usdtd', $find['num']);//0
+				$rs1 = balanceChange(FALSE, $find['merchant_id'], 0, 0, -$find['num'], 0, BAL_WITHDRAW, $id, "审核通过提币");
+				//$rs1 = Db::name('merchant')->where('id', $find['merchant_id'])->setDec('usdtd', $find['num']);//0
 				$rs2 = $model->editWithdraw(['id' => $id, 'status' => 1, 'endtime' => time(), 'txid' => $return['data'], 'type' => $type]);
 				//商户提币
 				$fee = config('agent_tibi_fee');
 				if ($merchant['pid'] && $find['fee'] && $fee) {
 					//$fee = round($fee*$find['fee']/100, 8);
-					$rsarr = agentReward($merchant['pid'], $find['merchant_id'], $fee, 0);
+					$rsArr = agentReward($merchant['pid'], $find['merchant_id'], $fee, 0);
 				} else {
-					$rsarr[0] = 1;
-					$rsarr[1] = 1;
+					$rsArr[0] = 1;
+					$rsArr[1] = 1;
 				}
-				if ($rs1 && $rs2['code'] == 1 && $rsarr[0] && $rsarr[1]) {
-
-
+				if ($rs1 && $rs2['code'] == 1 && $rsArr[0] && $rsArr[1]) {
 					// 提交事务
 					Db::commit();
 					//统计商户提币数量
-					Db::table('think_merchant')->where('id', $find['merchant_id'])->setInc('withdraw_amount', $find['num']);
+					Db::name('merchant')->where('id', $find['merchant_id'])->setInc('withdraw_amount', $find['num']);
 					writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】审核提币:' . $find['merchant_id'] . '成功', 1);
 					financelog($find['merchant_id'], $find['num'], '提币_1', 1, session('username'));//添加日志
 					return ['code' => 1, 'data' => '', 'msg' => '转账成功'];
@@ -452,13 +418,13 @@ class Merchant extends Base {
 					writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】审核提币:' . $find['merchant_id'] . '失败', 0);
 					return ['code' => 0, 'data' => '', 'msg' => '转账成功，数据库修改操作失败'];
 				}
-			} catch (\think\Exception\DbException $e) {
+			} catch (DbException $e) {
 				// 回滚事务
 				Db::rollback();
 				return ['code' => 0, 'data' => '', 'msg' => '转账成功，数据库修改操作失败:' . $e->getMessage()];
 			}
 		} else {
-			return json($return);
+			showJson($return);
 		}
 	}
 
@@ -466,24 +432,17 @@ class Merchant extends Base {
 	public function refuseTibi() {
 		$id    = input('id');
 		$model = new TibiModel();
-		if (empty($id)) {
-			return json(['code' => 0, 'msg' => '参数错误']);
-		}
+		(empty($id)) && showJson(['code' => 0, 'msg' => '参数错误']);
 		$find = $model->getOneByWhere($id, 'id');
-		if (empty($find)) {
-			return json(['code' => 0, 'msg' => '参数错误']);
-		}
-		if ($find['status'] != 0) {
-			return json(['code' => 0, 'msg' => '状态错误：不是待审核']);
-		}
+		(empty($find)) && showJson(['code' => 0, 'msg' => '参数错误']);
+		($find['status'] != 0) && showJson(['code' => 0, 'msg' => '状态错误：不是待审核']);
 		$return = $model->cancel($id);
 		writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】拒绝提币:' . $id . '成功', 1);
-		return json($return);
+		showJson($return);
 	}
 
 	public function merchantSet() {
 		if (request()->isPost()) {
-
 		} else {
 			return $this->fetch();
 		}
@@ -492,13 +451,11 @@ class Merchant extends Base {
 	public function addresslist() {
 		$key  = input('key');
 		$type = input('addresstype');
-
 		if ($key && $key !== "") {
 			$where['name|mobile'] = $key;
 			$id                   = Db::name('merchant')->where($where)->value('id');
 			$map['uid']           = $id;
 		}
-
 		$Nowpage = input('get.page') ? input('get.page') : 1;
 		$limits  = config('list_rows');// 获取总条数
 		if ($type == 0) {
@@ -511,7 +468,6 @@ class Merchant extends Base {
 			$map['status'] = ['neq', 3];
 		}
 		// dump($map);
-
 		$count   = Db::name('address')->where($map)->count();
 		$allpage = intval(ceil($count / $limits));
 		$lists   = Db::name('address')->where($map)->page($Nowpage, $limits)->order('id desc')->select();
@@ -523,16 +479,12 @@ class Merchant extends Base {
 			$v['username'] = ($user['name'] == NULL ? '未分配' : $user['name']);
 			$v['type']     = strtoupper($v['type']);
 			$v['status']   = ($v['status'] == 0 ? '未分配' : '已分配');
-
 		}
-
 		$this->assign('Nowpage', $Nowpage); //当前页
 		$this->assign('allpage', $allpage); //总页数
 		$this->assign('val', $key);
 		$this->assign('type', $type);
-		if (input('get.page')) {
-			return json($lists);
-		}
+		(input('get.page')) && showJson($lists);
 		return $this->fetch();
 	}
 
@@ -569,9 +521,7 @@ class Merchant extends Base {
 		$this->assign('allpage', $allpage); //总页数
 		$this->assign('val', $key);
 		$this->assign('type', $type);
-		if (input('get.page')) {
-			return json($lists);
-		}
+		(input('get.page')) && showJson($lists);
 		return $this->fetch();
 	}
 
@@ -593,7 +543,7 @@ class Merchant extends Base {
 		}
 		$member  = new WithdrawModel();
 		$Nowpage = input('get.page') ? input('get.page') : 1;
-		$limits  = config('list_rows');// 获取总条数
+		$limits  = config('list_rows');       // 获取总条数
 		$count   = $member->getAllCount($map);//计算总页面
 		$allpage = intval(ceil($count / $limits));
 		$lists   = $member->getWithdrawByWhere($map, $Nowpage, $limits);
@@ -605,9 +555,7 @@ class Merchant extends Base {
 		$this->assign('val', $key);
 		$this->assign('valuser', $keyuser);
 		$this->assign('status', $status);
-		if (input('get.page')) {
-			return json($lists);
-		}
+		(input('get.page')) && showJson($lists);
 		return $this->fetch();
 	}
 
@@ -615,20 +563,12 @@ class Merchant extends Base {
 	public function passWithdraw() {
 		$id    = input('id');
 		$model = new WithdrawModel();
-		if (empty($id)) {
-			return json(['code' => 0, 'msg' => '参数错误']);
-		}
+		(empty($id)) && showJson(['code' => 0, 'msg' => '参数错误']);
 		$find = $model->getOneByWhere($id, 'id');
-		if (empty($find)) {
-			return json(['code' => 0, 'msg' => '参数错误']);
-		}
-		if ($find['status'] != 0) {
-			return json(['code' => 0, 'msg' => '状态错误：不是待审核']);
-		}
+		(empty($find)) && showJson(['code' => 0, 'msg' => '参数错误']);
+		($find['status'] != 0) && showJson(['code' => 0, 'msg' => '状态错误：不是待审核']);
 		$type = input('type');
-		if ($type != 1 && $type != 2) {
-			return json(['code' => 0, 'msg' => '请选择方式']);
-		}
+		($type != 1 && $type != 2) && showJson(['code' => 0, 'msg' => '请选择方式']);
 		$merchant = Db::name('merchant')->where('id', $find['merchant_id'])->find();
 		$mum      = $find['num'];
 		$fee1     = config('user_tibi_fee');
@@ -637,20 +577,15 @@ class Merchant extends Base {
 		if (empty($fee2)) {
 			$fee = $fee1;
 		}
-		if (empty($fee)) {
-			return json(['code' => 0, 'msg' => '用户提币手续费未设置']);
-		}
+		(empty($fee)) && showJson(['code' => 0, 'msg' => '用户提币手续费未设置']);
 		$sfee = 0;
 		if ($fee) {
 			$sfee = $find['num'] * $fee / 100;
 			$mum  = $find['num'] - $sfee;
 		}
-
-		if ($merchant['usdt'] * 100000000 < $mum * 100000000) {
-			return json(['code' => 0, 'msg' => '商户余额不足']);
-		}
+		($merchant['usdt'] * 100000000 < $mum * 100000000) && showJson(['code' => 0, 'msg' => '商户余额不足']);
 		if ($type == 1) {
-			$model2 = new \app\common\model\Usdt();
+			$model2 = new Usdt();
 			$return = $model2->index('send', $find['address'], $mum, $index = NULL, $count = NULL, $skip = NULL);
 		} else {
 			$return['code'] = 1;
@@ -659,35 +594,35 @@ class Merchant extends Base {
 		if ($return['code'] == 1) {
 			/* $dbreturn = $model->editWithdraw(['id'=>$id, 'status'=>1, 'endtime'=>time(), 'txid'=>$return['data']]);
              if($dbreturn['code'] == 0){
-             return json(['code'=>0, 'msg'=>'转账成功，修改订单状态失败：'.$dbreturn['msg'], 'data'=>'']);
+             showJson(['code'=>0, 'msg'=>'转账成功，修改订单状态失败：'.$dbreturn['msg'], 'data'=>'']);
              }else{
              $rs = Db::name('merchant')->where('id', $find['merchant_id'])->setDec('usdtd', $find['num']);
              if(!$rs){
-             return json(['code'=>0, 'msg'=>'转账成功，扣除冻结失败', 'data'=>'']);
+             showJson(['code'=>0, 'msg'=>'转账成功，扣除冻结失败', 'data'=>'']);
              }else{
-             return json(['code'=>0, 'msg'=>'转账成功', 'data'=>'']);
+             showJson(['code'=>0, 'msg'=>'转账成功', 'data'=>'']);
              }
              } */
 			$merchant = Db::name('merchant')->where('id', $find['merchant_id'])->find();
 			Db::startTrans();
 			try {
-				$rs1 = balanceChange(TRUE, $find['merchant_id'], -$find['num'], 0, 0, 0, BAL_WITHDRAW, $id, "审核通过提币");
-				//$rs1 = Db::table('think_merchant')->where('id', $find['merchant_id'])->setDec('usdt', $find['num']);//0
+				$rs1 = balanceChange(FALSE, $find['merchant_id'], -$find['num'], 0, 0, 0, BAL_WITHDRAW, $id, "审核通过提币");
+				//$rs1 = Db::name('merchant')->where('id', $find['merchant_id'])->setDec('usdt', $find['num']);//0
 				$rs2 = $model->editWithdraw(['id' => $id, 'status' => 1, 'endtime' => time(), 'txid' => $return['data'], 'fee' => $sfee, 'mum' => $mum, 'type' => $type]);
 				//商户提币
 				$feemy = config('agent_withdraw_fee');
 				if ($merchant['pid'] && $sfee && $feemy) {
 					$feemy = round($feemy * $sfee / 100, 8);
-					$rsarr = agentReward($merchant['pid'], $find['merchant_id'], $feemy, 1);
+					$rsArr = agentReward($merchant['pid'], $find['merchant_id'], $feemy, 1);
 				} else {
-					$rsarr[0] = 1;
-					$rsarr[1] = 1;
+					$rsArr[0] = 1;
+					$rsArr[1] = 1;
 				}
-				if ($rs1 && $rs2['code'] == 1 && $rsarr[0] && $rsarr[1]) {
+				if ($rs1 && $rs2['code'] == 1 && $rsArr[0] && $rsArr[1]) {
 					// 提交事务
 					Db::commit();
 					//统计商户提币数量
-					Db::table('think_merchant')->where('id', $find['merchant_id'])->setInc('withdraw_amount', $find['num']);
+					Db::name('merchant')->where('id', $find['merchant_id'])->setInc('withdraw_amount', $find['num']);
 					writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】审核提币:' . $find['merchant_id'] . '成功', 1);
 					financelog($find['merchant_id'], $find['num'], '提币_1', 1, session('username'));//添加日志
 					return ['code' => 1, 'data' => '', 'msg' => '转账成功'];
@@ -697,13 +632,13 @@ class Merchant extends Base {
 					writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】审核提币:' . $find['merchant_id'] . '失败', 0);
 					return ['code' => 0, 'data' => '', 'msg' => '转账成功，数据库修改操作失败'];
 				}
-			} catch (\think\Exception\DbException $e) {
+			} catch (DbException $e) {
 				// 回滚事务
 				Db::rollback();
 				return ['code' => 0, 'data' => '', 'msg' => '转账成功，数据库修改操作失败:' . $e->getMessage()];
 			}
 		} else {
-			return json($return);
+			showJson($return);
 		}
 	}
 
@@ -711,19 +646,13 @@ class Merchant extends Base {
 	public function refuseWithdraw() {
 		$id    = input('id');
 		$model = new WithdrawModel();
-		if (empty($id)) {
-			return json(['code' => 0, 'msg' => '参数错误']);
-		}
+		(empty($id)) && showJson(['code' => 0, 'msg' => '参数错误']);
 		$find = $model->getOneByWhere($id, 'id');
-		if (empty($find)) {
-			return json(['code' => 0, 'msg' => '参数错误']);
-		}
-		if ($find['status'] != 0) {
-			return json(['code' => 0, 'msg' => '状态错误：不是待审核']);
-		}
+		(empty($find)) && showJson(['code' => 0, 'msg' => '参数错误']);
+		($find['status'] != 0) && showJson(['code' => 0, 'msg' => '状态错误：不是待审核']);
 		$return = $model->editWithdraw(['id' => $id, 'status' => 2, 'endtime' => time()]);
 		writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】拒绝提币:' . $id . '成功', 1);
-		return json($return);
+		showJson($return);
 	}
 
 	public function rechargelist() {
@@ -746,7 +675,7 @@ class Merchant extends Base {
 		}
 		$member  = new RechargeModel();
 		$Nowpage = input('get.page') ? input('get.page') : 1;
-		$limits  = config('list_rows');// 获取总条数
+		$limits  = config('list_rows');       // 获取总条数
 		$count   = $member->getAllCount($map);//计算总页面
 		$allpage = intval(ceil($count / $limits));
 		$lists   = $member->getRechargeByWhere($map, $Nowpage, $limits);
@@ -758,9 +687,7 @@ class Merchant extends Base {
 		$this->assign('val', $key);
 		$this->assign('valuser', $keyuser);
 		$this->assign('status', $status);
-		if (input('get.page')) {
-			return json($lists);
-		}
+		(input('get.page')) && showJson($lists);
 		return $this->fetch();
 	}
 
@@ -783,7 +710,7 @@ class Merchant extends Base {
 		}
 		$member  = new MerchantModel();
 		$Nowpage = input('get.page') ? input('get.page') : 1;
-		$limits  = config('list_rows');// 获取总条数
+		$limits  = config('list_rows');         // 获取总条数
 		$count   = $member->getAllCountTr($map);//计算总页面
 		$allpage = intval(ceil($count / $limits));
 		$lists   = $member->getTraderRechargeByWhere($map, $Nowpage, $limits);
@@ -795,9 +722,7 @@ class Merchant extends Base {
 		$this->assign('val', $key);
 		$this->assign('oid', $oid);
 		$this->assign('status', $status);
-		if (input('get.page')) {
-			return json($lists);
-		}
+		(input('get.page')) && showJson($lists);
 		return $this->fetch();
 	}
 
@@ -820,7 +745,7 @@ class Merchant extends Base {
 		}
 		$member  = new MerchantModel();
 		$Nowpage = input('get.page') ? input('get.page') : 1;
-		$limits  = config('list_rows');// 获取总条数
+		$limits  = config('list_rows');         // 获取总条数
 		$count   = $member->getAllCountAd($map);//计算总页面
 		$allpage = intval(ceil($count / $limits));
 		$lists   = $member->getAdByWhere($map, $Nowpage, $limits);
@@ -837,7 +762,6 @@ class Merchant extends Base {
 			// if(in_array(4, $temp)){
 			//     $str.='|微信支付';
 			// }
-
 			//20190817新
 			if ($v['pay_method'] > 0) {
 				$str .= '银行卡';
@@ -851,7 +775,6 @@ class Merchant extends Base {
 			if ($v['pay_method4'] > 0) {
 				$str .= '|云闪付';
 			}
-
 			//新-结束
 			$deal_num          = Db::name('order_buy')->where(['sell_sid' => $v['id'], 'status' => ['neq', 5], 'status' => ['neq', 9]])->sum('deal_num');
 			$deal_num          = $deal_num ? $deal_num : 0;
@@ -869,9 +792,7 @@ class Merchant extends Base {
 		$this->assign('val', $key);
 		$this->assign('oid', $oid);
 		$this->assign('status', $status);
-		if (input('get.page')) {
-			return json($lists);
-		}
+		(input('get.page')) && showJson($lists);
 		return $this->fetch();
 	}
 
@@ -894,7 +815,7 @@ class Merchant extends Base {
 		}
 		$member  = new MerchantModel();
 		$Nowpage = input('get.page') ? input('get.page') : 1;
-		$limits  = config('list_rows');// 获取总条数
+		$limits  = config('list_rows');            // 获取总条数
 		$count   = $member->getAllCountAdBuy($map);//计算总页面
 		$allpage = intval(ceil($count / $limits));
 		$lists   = $member->getAdBuyByWhere($map, $Nowpage, $limits);
@@ -902,7 +823,6 @@ class Merchant extends Base {
 			$lists[$k]['add_time'] = date("Y/m/d H:i:s", $v['add_time']);
 			// $temp = explode(',', $v['pay_method']);
 			$str = '';
-
 			// if(in_array(2, $temp) || $temp[0] > 4){
 			//     $str.='|银行转账';
 			// }
@@ -925,7 +845,6 @@ class Merchant extends Base {
 			if ($v['pay_method4'] > 0) {
 				$str .= '|云闪付';
 			}
-
 			//新-结束
 			$deal_num            = Db::name('order_sell')->where(['buy_bid' => $v['id'], 'status' => ['neq', 5]])->sum('deal_num');
 			$deal_num            = $deal_num ? $deal_num : 0;
@@ -938,102 +857,86 @@ class Merchant extends Base {
 		$this->assign('val', $key);
 		$this->assign('oid', $oid);
 		$this->assign('status', $status);
-		if (input('get.page')) {
-			return json($lists);
-		}
+		(input('get.page')) && showJson($lists);
 		return $this->fetch();
 	}
 
 	public function deletead() {
 		$id   = input('id');
 		$find = Db::name('ad_sell')->where('id', $id)->find();
-		if (empty($find)) {
-			return json(['code' => 0, 'msg' => '参数错误']);
-		}
+		(empty($find)) && showJson(['code' => 0, 'msg' => '参数错误']);
 		$rs = Db::name('ad_sell')->delete($id);
 		if ($rs) {
-			return json(['code' => 1, 'msg' => '删除成功']);
+			showJson(['code' => 1, 'msg' => '删除成功']);
 		} else {
-			return json(['code' => 0, 'msg' => '删除失败']);
+			showJson(['code' => 0, 'msg' => '删除失败']);
 		}
 	}
 
 	public function deletebuyad() {
 		$id   = input('id');
 		$find = Db::name('ad_buy')->where('id', $id)->find();
-		if (empty($find)) {
-			return json(['code' => 0, 'msg' => '参数错误']);
-		}
+		(empty($find)) && showJson(['code' => 0, 'msg' => '参数错误']);
 		$rs = Db::name('ad_buy')->delete($id);
 		if ($rs) {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】删除挂单:' . $id . '成功', 1);
-			return json(['code' => 1, 'msg' => '删除成功']);
+			showJson(['code' => 1, 'msg' => '删除成功']);
 		} else {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】删除:' . $id . '失败', 0);
-			return json(['code' => 0, 'msg' => '删除失败']);
+			showJson(['code' => 0, 'msg' => '删除失败']);
 		}
 	}
 
 	public function downad() {
 		$id   = input('id');
 		$find = Db::name('ad_sell')->where('id', $id)->find();
-		if (empty($find)) {
-			return json(['code' => 0, 'msg' => '参数错误']);
-		}
+		(empty($find)) && showJson(['code' => 0, 'msg' => '参数错误']);
 		$rs = Db::name('ad_sell')->update(['id' => $id, 'state' => 2]);
 		if ($rs) {
-			if (!balanceChange(TRUE, $find['userid'], $find['remain_amount'], 0, -$find['remain_amount'], 0, BAL_REDEEM, $find['id'], "后台下架")) return json(['code' => 0, 'msg' => '下架失败']);
-
+			if (!balanceChange(TRUE, $find['userid'], $find['remain_amount'], 0, -$find['remain_amount'], 0, BAL_REDEEM, $find['id'], "后台下架")) showJson(['code' => 0, 'msg' => '下架失败']);
 			//Db::name('merchant')->where('id', $find['userid'])->setInc('usdt', $find['remain_amount']);
 			//Db::name('merchant')->where('id', $find['userid'])->setDec('usdtd', $find['remain_amount']);
-
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】下架挂单:' . $id . '成功', 1);
-			return json(['code' => 1, 'msg' => '下架成功']);
+			showJson(['code' => 1, 'msg' => '下架成功']);
 		} else {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】下架挂单:' . $id . '失败', 0);
-			return json(['code' => 0, 'msg' => '下架失败']);
+			showJson(['code' => 0, 'msg' => '下架失败']);
 		}
 	}
 
 	public function downbuyad() {
 		$id   = input('id');
 		$find = Db::name('ad_buy')->where('id', $id)->find();
-		if (empty($find)) {
-			return json(['code' => 0, 'msg' => '参数错误']);
-		}
+		(empty($find)) && showJson(['code' => 0, 'msg' => '参数错误']);
 		$rs = Db::name('ad_buy')->update(['id' => $id, 'state' => 2]);
 		if ($rs) {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】下架挂单:' . $id . '成功', 1);
-			return json(['code' => 1, 'msg' => '下架成功']);
+			showJson(['code' => 1, 'msg' => '下架成功']);
 		} else {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】下架挂单:' . $id . '失败', 0);
-			return json(['code' => 0, 'msg' => '下架失败']);
+			showJson(['code' => 0, 'msg' => '下架失败']);
 		}
 	}
 
 	public function upad() {
 		$id   = input('id');
 		$find = Db::name('ad_sell')->where('id', $id)->find();
-		if (empty($find)) {
-			return json(['code' => 0, 'msg' => '参数错误']);
-		}
+		(empty($find)) && showJson(['code' => 0, 'msg' => '参数错误']);
 		$user = Db::name('merchant')->where('id', $find['userid'])->find();
 		if ($find['remain_amount'] > $user['usdt']) {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】上架挂单:' . $id . '失败', 0);
-			return json(['code' => 0, 'msg' => '上架失败']);
+			showJson(['code' => 0, 'msg' => '上架失败']);
 		} else {
 			$rs = Db::name('ad_sell')->update(['id' => $id, 'state' => 1]);
 			if ($rs) {
-				if (!balanceChange(TRUE, $find['userid'], -$find['remain_amount'], 0, $find['remain_amount'], 0, BAL_ENTRUST, $find['id'], "后台上架")) return json(['code' => 0, 'msg' => '上架失败']);
-
+				if (!balanceChange(TRUE, $find['userid'], -$find['remain_amount'], 0, $find['remain_amount'], 0, BAL_ENTRUST, $find['id'], "后台上架")) showJson(['code' => 0, 'msg' => '上架失败']);
 				//Db::name('merchant')->where('id', $find['userid'])->setDec('usdt', $find['remain_amount']);
 				//Db::name('merchant')->where('id', $find['userid'])->setInc('usdtd', $find['remain_amount']);
-
 				writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】上架挂单:' . $id . '成功', 1);
-				return json(['code' => 1, 'msg' => '上架成功']);
+				showJson(['code' => 1, 'msg' => '上架成功']);
 			} else {
 				writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】上架挂单:' . $id . '失败', 0);
-				return json(['code' => 0, 'msg' => '上架失败']);
+				showJson(['code' => 0, 'msg' => '上架失败']);
 			}
 		}
 	}
@@ -1041,86 +944,74 @@ class Merchant extends Base {
 	public function upbuyad() {
 		$id   = input('id');
 		$find = Db::name('ad_buy')->where('id', $id)->find();
-		if (empty($find)) {
-			return json(['code' => 0, 'msg' => '参数错误']);
-		}
+		(empty($find)) && showJson(['code' => 0, 'msg' => '参数错误']);
 		$rs = Db::name('ad_buy')->update(['id' => $id, 'state' => 1]);
 		if ($rs) {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】上架挂单:' . $id . '成功', 1);
-			return json(['code' => 1, 'msg' => '上架成功']);
+			showJson(['code' => 1, 'msg' => '上架成功']);
 		} else {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】上架挂单:' . $id . '失败', 0);
-			return json(['code' => 0, 'msg' => '上架失败']);
+			showJson(['code' => 0, 'msg' => '上架失败']);
 		}
 	}
 
 	public function frozenad() {
 		$id   = input('id');
 		$find = Db::name('ad_sell')->where('id', $id)->find();
-		if (empty($find)) {
-			return json(['code' => 0, 'msg' => '参数错误']);
-		}
+		(empty($find)) && showJson(['code' => 0, 'msg' => '参数错误']);
 		$rs = Db::name('ad_sell')->update(['id' => $id, 'state' => 4]);
 		if ($rs) {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】冻结挂单:' . $id . '成功', 1);
-			return json(['code' => 1, 'msg' => '冻结成功']);
+			showJson(['code' => 1, 'msg' => '冻结成功']);
 		} else {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】冻结挂单:' . $id . '失败', 0);
-			return json(['code' => 0, 'msg' => '冻结失败']);
+			showJson(['code' => 0, 'msg' => '冻结失败']);
 		}
 	}
 
 	public function frozenbuyad() {
 		$id   = input('id');
 		$find = Db::name('ad_buy')->where('id', $id)->find();
-		if (empty($find)) {
-			return json(['code' => 0, 'msg' => '参数错误']);
-		}
+		(empty($find)) && showJson(['code' => 0, 'msg' => '参数错误']);
 		$rs = Db::name('ad_buy')->update(['id' => $id, 'state' => 4]);
 		if ($rs) {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】冻结挂单:' . $id . '成功', 1);
-			return json(['code' => 1, 'msg' => '冻结成功']);
+			showJson(['code' => 1, 'msg' => '冻结成功']);
 		} else {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】冻结挂单:' . $id . '失败', 0);
-			return json(['code' => 0, 'msg' => '冻结失败']);
+			showJson(['code' => 0, 'msg' => '冻结失败']);
 		}
 	}
 
 	public function unfrozenad() {
 		$id   = input('id');
 		$find = Db::name('ad_sell')->where('id', $id)->find();
-		if (empty($find)) {
-			return json(['code' => 0, 'msg' => '参数错误']);
-		}
+		(empty($find)) && showJson(['code' => 0, 'msg' => '参数错误']);
 		$rs = Db::name('ad_sell')->update(['id' => $id, 'state' => 2]);
 		if ($rs) {
 			// 解冻后是下架 所以回滚余额
-			if (!balanceChange(TRUE, $find['user_id'], $find['remain_amount'], 0, -$find['remain_amount'], 0, BAL_REDEEM, $find['id'], "后台解冻")) return json(['code' => 0, 'msg' => '解冻失败']);
-
+			if (!balanceChange(TRUE, $find['user_id'], $find['remain_amount'], 0, -$find['remain_amount'], 0, BAL_REDEEM, $find['id'], "后台解冻")) showJson(['code' => 0, 'msg' => '解冻失败']);
 			//Db::name('merchant')->where('id', $find['user_id'])->setInc('usdt', $find['remain_volume']);
 			//Db::name('merchant')->where('id', $find['user_id'])->setDec('usdtd', $find['remain_volume']);
-
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】冻结挂单:' . $id . '成功', 1);
-			return json(['code' => 1, 'msg' => '解冻成功']);
+			showJson(['code' => 1, 'msg' => '解冻成功']);
 		} else {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】冻结挂单:' . $id . '失败', 0);
-			return json(['code' => 0, 'msg' => '解冻失败']);
+			showJson(['code' => 0, 'msg' => '解冻失败']);
 		}
 	}
 
 	public function unfrozenbuyad() {
 		$id   = input('id');
 		$find = Db::name('ad_buy')->where('id', $id)->find();
-		if (empty($find)) {
-			return json(['code' => 0, 'msg' => '参数错误']);
-		}
+		(empty($find)) && showJson(['code' => 0, 'msg' => '参数错误']);
 		$rs = Db::name('ad_buy')->update(['id' => $id, 'state' => 2]);
 		if ($rs) {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】冻结挂单:' . $id . '成功', 1);
-			return json(['code' => 1, 'msg' => '冻结成功']);
+			showJson(['code' => 1, 'msg' => '冻结成功']);
 		} else {
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】冻结挂单:' . $id . '失败', 0);
-			return json(['code' => 0, 'msg' => '冻结失败']);
+			showJson(['code' => 0, 'msg' => '冻结失败']);
 		}
 	}
 
@@ -1144,7 +1035,7 @@ class Merchant extends Base {
 		// dump($map);
 		$member  = new MerchantModel();
 		$Nowpage = input('get.page') ? input('get.page') : 1;
-		$limits  = config('list_rows');// 获取总条数
+		$limits  = config('list_rows');            // 获取总条数
 		$count   = $member->getAllCountOrder($map);//计算总页面
 		$allpage = intval(ceil($count / $limits));
 		$lists   = $member->getOrderByWhere($map, $Nowpage, $limits);
@@ -1155,7 +1046,6 @@ class Merchant extends Base {
 		foreach ($lists as $k => $v) {
 			$user    = Db::name('merchant')->where(['id' => $v['sell_id']])->find();
 			$accuser = Db::name('merchant')->where(['id' => $user['pid']])->find();
-
 			$lists[$k]['accuser'] = $accuser['name'] . '/' . $accuser['mobile'];
 			$lists[$k]['name']    = $buyerUsername[$lists[$k]['buy_id']];
 			$lists[$k]['ctime']   = date("Y/m/d H:i:s", $v['ctime']);
@@ -1186,20 +1076,16 @@ class Merchant extends Base {
 				$wx                   = Db::name('merchant_ysf')->where(['id' => $sorder['pay_method4']])->find();
 				$lists[$k]['ysfinfo'] = '/uploads/face/' . $wx['c_bank_detail'];
 			}
-
 			// dump($str);
 			// $lists[$k]['payway'] = $str;
-
 		}
 		// dump($lists);
-		$this->assign('Nowpage', $Nowpage); //当前页
-		$this->assign('allpage', $allpage); //总页数
+		$this->assign('Nowpage', $Nowpage);        //当前页
+		$this->assign('allpage', $allpage);        //总页数
 		$this->assign('val', $key);
 		$this->assign('oid', $oid);
 		$this->assign('status', $status);
-		if (input('get.page')) {
-			return json($lists);
-		}
+		(input('get.page')) && showJson($lists);
 		return $this->fetch();
 	}
 
@@ -1225,7 +1111,7 @@ class Merchant extends Base {
 		}
 		$member  = new MerchantModel();
 		$Nowpage = input('get.page') ? input('get.page') : 1;
-		$limits  = config('list_rows');// 获取总条数
+		$limits  = config('list_rows');               // 获取总条数
 		$count   = $member->getAllCountOrderBuy($map);//计算总页面
 		$allpage = intval(ceil($count / $limits));
 		$lists   = $member->getOrderBuyByWhere($map, $Nowpage, $limits);
@@ -1254,30 +1140,26 @@ class Merchant extends Base {
 			}
 		}
 		// dump($lists);
-		$this->assign('Nowpage', $Nowpage); //当前页
-		$this->assign('allpage', $allpage); //总页数
+		$this->assign('Nowpage', $Nowpage);           //当前页
+		$this->assign('allpage', $allpage);           //总页数
 		$this->assign('val', $key);
 		$this->assign('oid', $oid);
 		$this->assign('status', $status);
 		$this->assign('reg_type', $reg_type);
-		if (input('get.page')) {
-			return json($lists);
-		}
+		(input('get.page')) && showJson($lists);
 		return $this->fetch();
 	}
 
 	public function huitiao() {
 		$id        = input('post.id');
 		$type      = input('post.type');
-		$orderinfo = Db::name('order_buy')->where('id', $id)->find();
-		if (!$orderinfo) {
-			return json(['code' => 0, 'msg' => '订单不存在']);
-		}
-		$buymerchant = Db::name('merchant')->where('id', $orderinfo['buy_id'])->find();
+		$orderInfo = Db::name('order_buy')->where('id', $id)->find();
+		(!$orderInfo) && showJson(['code' => 0, 'msg' => '订单不存在']);
+		$buymerchant = Db::name('merchant')->where('id', $orderInfo['buy_id'])->find();
 		//请求回调接口
-		$data['rmb']     = $orderinfo['deal_amount'];
-		$data['amount']  = $orderinfo['deal_num'];
-		$data['orderid'] = $orderinfo['orderid'];
+		$data['rmb']     = $orderInfo['deal_amount'];
+		$data['amount']  = $orderInfo['deal_num'];
+		$data['orderid'] = $orderInfo['orderid'];
 		$data['appid']   = $buymerchant['appid'];
 		if ($type == 1) {
 			$status = 1;
@@ -1285,67 +1167,55 @@ class Merchant extends Base {
 			$status = 0;
 		}
 		$data['status'] = $status;
-		askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
+		askNotify($data, $orderInfo['notify_url'], $buymerchant['key']);
 		$this->success('操作成功');
-
 	}
 
 	public function sssuccess() {
 		$id        = input('post.id');
 		$type      = input('post.type');
-		$orderinfo = Db::name('order_buy')->where('id', $id)->find();
-		if (!$orderinfo) {
-			return json(['code' => 0, 'msg' => '订单不存在']);
+		$orderInfo = Db::name('order_buy')->where('id', $id)->find();
+		(!$orderInfo) && showJson(['code' => 0, 'msg' => '订单不存在']);
+		if ($orderInfo['status'] == 4) {
+			//showJson(['code'=>0, 'msg'=>'订单已完成，请刷新']);
 		}
-		if ($orderinfo['status'] == 4) {
-			//return json(['code'=>0, 'msg'=>'订单已完成，请刷新']);
-		}
-		if ($type != 1 && $type != 2) {
-			return json(['code' => 0, 'msg' => '回调选择错误']);
-		}
-		$buymerchant = Db::name('merchant')->where('id', $orderinfo['buy_id'])->find();
-		$trader      = Db::name('merchant')->where('id', $orderinfo['sell_id'])->find();
-		if ($trader['usdtd'] < $orderinfo['deal_num']) {
-			return json(['code' => 0, 'msg' => '承兑商冻结不足']);
-		}
-
+		($type != 1 && $type != 2) && showJson(['code' => 0, 'msg' => '回调选择错误']);
+		$buymerchant = Db::name('merchant')->where('id', $orderInfo['buy_id'])->find();
+		$trader      = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
+		($trader['usdtd'] < $orderInfo['deal_num']) && showJson(['code' => 0, 'msg' => '承兑商冻结不足']);
 		// 锁定操作 代码执行完成前不可继续操作 60秒后可再次点击操作
-		$redis = new Redis();
-		$redis->get($id) && $this->error("不可重复操作，剩余时间：" . $redis->ttl($id) . "秒");
-		$lock = $redis->set($id, TRUE, 60);
+		Cache::has($id) && $this->error('操作频繁,请稍后重试');
+		$lock = Cache::set($id, TRUE, 60);
 		!$lock && $this->error('锁定操作失败，请重试。');
-
 		Db::startTrans();
 		try {
-
-			//$rs1 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $orderinfo['deal_num']);
-			//$rs3 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $orderinfo['deal_num']);
-			$rs1 = Db::table('think_order_buy')->update(['id' => $orderinfo['id'], 'status' => 9, 'finished_time' => time()]);
+			//$rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num']);
+			//$rs3 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $orderInfo['deal_num']);
+			$rs1 = Db::name('order_buy')->update(['id' => $orderInfo['id'], 'status' => 9, 'finished_time' => time()]);
 			// 回滚挂单
-			$rs2 = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])->setInc('remain_amount', $orderinfo['deal_num']);
-			$rs3 = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])->setDec('trading_volume', $orderinfo['deal_num']);
+			$rs2 = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->setInc('remain_amount', $orderInfo['deal_num']);
+			$rs3 = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->setDec('trading_volume', $orderInfo['deal_num']);
 			// 判断挂单是否已经下架
-			$sellInfo = Db::name('ad_sell')->where(['id' => $orderinfo['sell_sid'], 'state' => 2])->find();
+			$sellInfo = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid'], 'state' => 2])->find();
 			$rs4      = $rs5 = 1;
 			if ($sellInfo) {
 				// 如果挂单已下架 回滚余额
-				$rs4 = balanceChange(TRUE, $orderinfo['sell_id'], $orderinfo['deal_num'], 0, -$orderinfo['deal_num'], 0, BAL_CANCEL, $orderinfo['id'], "申述成功");
-				// $rs4 = Db::name('merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $orderinfo['deal_num']);
-				// $rs5 = Db::name('merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $orderinfo['deal_num']);
+				$rs4 = balanceChange(FALSE, $orderInfo['sell_id'], $orderInfo['deal_num'], 0, -$orderInfo['deal_num'], 0, BAL_CANCEL, $orderInfo['id'], "申述成功");
+				// $rs4 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num']);
+				// $rs5 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $orderInfo['deal_num']);
 			}
-
-			//$rs4 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('transact', 1);
-			//$total = Db::table('think_order_buy')->field('sum(finished_time-dktime) as total')->where('sell_id', $orderinfo['sell_id'])->where('status', 4)->select();
+			//$rs4 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('transact', 1);
+			//$total = Db::name('order_buy')->field('sum(finished_time-dktime) as total')->where('sell_id', $orderInfo['sell_id'])->where('status', 4)->select();
 			//$tt = $total[0]['total'];
-			//$transact = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->value('transact');
-			//$rs5 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->update(['averge'=>intval($tt/$transact)]);
+			//$transact = Db::name('merchant')->where('id', $orderInfo['sell_id'])->value('transact');
+			//$rs5 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->update(['averge'=>intval($tt/$transact)]);
 			if ($rs1 && $rs2 && $rs3 && $rs4 && $rs5) {
 				// 提交事务
 				Db::commit();
 				//请求回调接口
-				$data['rmb']     = $orderinfo['deal_amount'];
-				$data['amount']  = $orderinfo['deal_num'];
-				$data['orderid'] = $orderinfo['orderid'];
+				$data['rmb']     = $orderInfo['deal_amount'];
+				$data['amount']  = $orderInfo['deal_num'];
+				$data['orderid'] = $orderInfo['orderid'];
 				$data['appid']   = $buymerchant['appid'];
 				if ($type == 1) {
 					$status = 0;
@@ -1353,24 +1223,21 @@ class Merchant extends Base {
 					$status = 0;
 				}
 				$data['status'] = $status;
-				//askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
-				writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】申诉订单:' . $orderinfo['id'] . '成功', 1);
-
-				$redis->rm($id);
+				//askNotify($data, $orderInfo['notify_url'], $buymerchant['key']);
+				writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】申诉订单:' . $orderInfo['id'] . '成功', 1);
+				Cache::rm($id);
 				$this->success('操作成功');
 			} else {
 				// 回滚事务
 				Db::rollback();
-				writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】申诉订单:' . $orderinfo['id'] . '失败', 0);
-
-				$redis->rm($id);
+				writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】申诉订单:' . $orderInfo['id'] . '失败', 0);
+				Cache::rm($id);
 				$this->error('操作失败');
 			}
-		} catch (\think\Exception\DbException $e) {
+		} catch (DbException $e) {
 			// 回滚事务
 			Db::rollback();
-
-			$redis->rm($id);
+			Cache::rm($id);
 			$this->error('操作失败，参考信息：' . $e->getMessage());
 		}
 	}
@@ -1381,48 +1248,41 @@ class Merchant extends Base {
 	 */
 	public function sssuccessbuy() {
 		$id        = input('post.id');
-		$orderinfo = Db::name('order_sell')->where('id', $id)->find();
-		if (!$orderinfo) {
-			return json(['code' => 0, 'msg' => '订单不存在']);
-		}
-		if ($orderinfo['status'] == 4) {
-			return json(['code' => 0, 'msg' => '订单已完成，请刷新']);
-		}
-		$buymerchant = Db::name('merchant')->where('id', $orderinfo['buy_id'])->find();
-		$trader      = Db::name('merchant')->where('id', $orderinfo['sell_id'])->find();
-		if ($trader['usdtd'] < $orderinfo['deal_num'] + $orderinfo['fee']) {
-			return json(['code' => 0, 'msg' => '商户冻结不足']);
-		}
+		$orderInfo = Db::name('order_sell')->where('id', $id)->find();
+		(!$orderInfo) && showJson(['code' => 0, 'msg' => '订单不存在']);
+		($orderInfo['status'] == 4) && showJson(['code' => 0, 'msg' => '订单已完成，请刷新']);
+		$buymerchant = Db::name('merchant')->where('id', $orderInfo['buy_id'])->find();
+		$trader      = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
+		($trader['usdtd'] < $orderInfo['deal_num'] + $orderInfo['fee']) && showJson(['code' => 0, 'msg' => '商户冻结不足']);
 		$fee  = config('usdt_buy_trader_fee');
 		$fee  = $fee ? $fee : 0;
-		$sfee = $orderinfo['deal_num'] * $fee / 100;
-		$mum  = $orderinfo['deal_num'] - $sfee;
+		$sfee = $orderInfo['deal_num'] * $fee / 100;
+		$mum  = $orderInfo['deal_num'] - $sfee;
 		Db::startTrans();
 		try {
-			$rs1 = balanceChange(TRUE, $orderinfo['sell_id'], 0, 0, -$orderinfo['deal_num'], 0, BAL_SOLD, $orderinfo['id'], "申述成功->buy");
-			// $rs1 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $orderinfo['deal_num'] + $orderinfo['fee']);
-			$rs2 = Db::table('think_order_sell')->update(['id' => $orderinfo['id'], 'status' => 4, 'finished_time' => time(), 'buyer_fee' => $sfee]);
-			// $rs3      = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->setInc('usdt', $mum);
-			$rs3 = balanceChange(TRUE, $orderinfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderinfo['id'], "申述成功->buy");
-
-			$rs4      = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->setInc('transact_buy', 1);
-			$total    = Db::table('think_order_sell')->field('sum(dktime-ctime) as total')->where('buy_id', $orderinfo['buy_id'])->where('status', 4)->select();
+			$rs1 = balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$orderInfo['deal_num'], 0, BAL_SOLD, $orderInfo['id'], "申述成功->buy");
+			// $rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num'] + $orderInfo['fee']);
+			$rs2 = Db::name('order_sell')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'buyer_fee' => $sfee]);
+			// $rs3      = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('usdt', $mum);
+			$rs3 = balanceChange(FALSE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], "申述成功->buy");
+			$rs4      = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('transact_buy', 1);
+			$total    = Db::name('order_sell')->field('sum(dktime-ctime) as total')->where('buy_id', $orderInfo['buy_id'])->where('status', 4)->select();
 			$tt       = $total[0]['total'];
-			$transact = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->value('transact_buy');
-			$rs5      = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->update(['averge_buy' => intval($tt / $transact)]);
+			$transact = Db::name('merchant')->where('id', $orderInfo['buy_id'])->value('transact_buy');
+			$rs5      = Db::name('merchant')->where('id', $orderInfo['buy_id'])->update(['averge_buy' => intval($tt / $transact)]);
 			if ($rs1 && $rs2 && $rs3 && $rs4 && $rs5) {
 				// 提交事务
 				Db::commit();
-				financelog($orderinfo['sell_id'], ($orderinfo['deal_num'] + $orderinfo['fee']), '卖出USDT_释放_1', 1, session('username'));//添加日志
-				financelog($orderinfo['buy_id'], $mum, '买入USDT_1', 0, session('username'));//添加日志
-				getStatisticsOfOrder($orderinfo['buy_id'], $orderinfo['sell_id'], $mum, $orderinfo['deal_num'] + $orderinfo['fee']);
+				financelog($orderInfo['sell_id'], ($orderInfo['deal_num'] + $orderInfo['fee']), '卖出USDT_释放_1', 1, session('username'));//添加日志
+				financelog($orderInfo['buy_id'], $mum, '买入USDT_1', 0, session('username'));                                            //添加日志
+				getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $orderInfo['deal_num'] + $orderInfo['fee']);
 				$this->success('操作成功');
 			} else {
 				// 回滚事务
 				Db::rollback();
 				$this->error('操作失败');
 			}
-		} catch (\think\Exception\DbException $e) {
+		} catch (DbException $e) {
 			// 回滚事务
 			Db::rollback();
 			$this->error('操作失败，参考信息：' . $e->getMessage());
@@ -1433,55 +1293,40 @@ class Merchant extends Base {
 		$id        = input('post.id');
 		$type      = input('post.type');
 		$amount    = input('post.amount');
-		$orderinfo = Db::name('order_buy')->where('id', $id)->find();
-		if (!$orderinfo) {
-			return json(['code' => 0, 'msg' => '订单不存在']);
-		}
-		if ($orderinfo['status'] == 4) {
-			//return json(['code'=>0, 'msg'=>'订单已完成，请刷新']);
-		}
-		if ($type != 1 && $type != 2) {
-			return json(['code' => 0, 'msg' => '回调选择错误']);
-		}
-		if ($amount == '' || ($amount * 100 > $orderinfo['deal_amount'] * 100)) {
-			return json(['code' => 0, 'msg' => '回调金额错误']);
-		}
-
+		$orderInfo = Db::name('order_buy')->where('id', $id)->find();
+		(!$orderInfo) && showJson(['code' => 0, 'msg' => '订单不存在']);
+		//($orderInfo['status'] == 4) && showJson(['code'=>0, 'msg'=>'订单已完成，请刷新']);
+		($type != 1 && $type != 2) && showJson(['code' => 0, 'msg' => '回调选择错误']);
+		($amount == '' || ($amount * 100 > $orderInfo['deal_amount'] * 100)) && showJson(['code' => 0, 'msg' => '回调金额错误']);
 		// 锁定操作 代码执行完成前不可继续操作 60秒后可再次点击操作
-		$redis = new Redis();
-		$redis->get($id) && $this->error("不可重复操作，剩余时间：" . $redis->ttl($id) . "秒");
-		$lock = $redis->set($id, TRUE, 60);
+		Cache::has($id) && $this->error('操作频繁,请稍后重试');
+		$lock = Cache::set($id, TRUE, 60);
 		!$lock && $this->error('锁定操作失败，请重试。');
-
-		$oldNum = $orderinfo['deal_num'];
-		if ($amount * 100 != $orderinfo['deal_amount'] * 100) {
-			$orderinfo['deal_num'] = round($amount / $orderinfo['deal_price'], 8);
+		$oldNum = $orderInfo['deal_num'];
+		if ($amount * 100 != $orderInfo['deal_amount'] * 100) {
+			$orderInfo['deal_num'] = round($amount / $orderInfo['deal_price'], 8);
 		}
 		//$fee = config('trader_merchant_fee');
 		//$fee = $fee ? $fee : 0;
-		//$sfee = $orderinfo['deal_num']*$fee/100;
+		//$sfee = $orderInfo['deal_num']*$fee/100;
 		$sfee        = 0;
-		$mum         = $orderinfo['deal_num'] - $sfee;
-		$buymerchant = Db::name('merchant')->where('id', $orderinfo['buy_id'])->find();
-		$trader      = Db::name('merchant')->where('id', $orderinfo['sell_id'])->find();
-		if ($trader['usdtd'] < $oldNum) {
-			return json(['code' => 0, 'msg' => '承兑商冻结不足']);
-		}
-		if ($amount * 100 > $orderinfo['deal_amount'] * 100 && $trader['usdt'] < ($orderinfo['deal_num'] - $oldNum)) {
-			return json(['code' => 0, 'msg' => '承兑商余额不足']);
-		}
+		$mum         = $orderInfo['deal_num'] - $sfee;
+		$buymerchant = Db::name('merchant')->where('id', $orderInfo['buy_id'])->find();
+		$trader      = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
+		($trader['usdtd'] < $oldNum) && showJson(['code' => 0, 'msg' => '承兑商冻结不足']);
+		($amount * 100 > $orderInfo['deal_amount'] * 100 && $trader['usdt'] < ($orderInfo['deal_num'] - $oldNum)) && showJson(['code' => 0, 'msg' => '承兑商余额不足']);
 		//盘口费率
 		$pkfee = $buymerchant['merchant_pk_fee'];
 		$pkfee = $pkfee ? $pkfee : 0;
-		$pkdec = $orderinfo['deal_num'] * $pkfee / 100;
+		$pkdec = $orderInfo['deal_num'] * $pkfee / 100;
 		//平台利润
 		$platformGet   = config('trader_platform_get');
 		$platformGet   = $platformGet ? $platformGet : 0;
-		$platformMoney = $platformGet * $orderinfo['deal_num'] / 100;
+		$platformMoney = $platformGet * $orderInfo['deal_num'] / 100;
 		//承兑商卖单奖励
 		$traderGet         = $trader['trader_trader_get'];
 		$traderGet         = $traderGet ? $traderGet : 0;
-		$traderMoney       = $traderGet * $orderinfo['deal_num'] / 100;
+		$traderMoney       = $traderGet * $orderInfo['deal_num'] / 100;
 		$traderParentMoney = $traderMParentMoney = $tpexist = $mpexist = 0;
 		$model2            = new MerchantModel();
 		if ($trader['pid']) {
@@ -1491,7 +1336,7 @@ class Merchant extends Base {
 				$tpexist           = 1;
 				$traderParentGet   = $traderP['trader_parent_get'];
 				$traderParentGet   = $traderParentGet ? $traderParentGet : 0;
-				$traderParentMoney = $traderParentGet * $orderinfo['deal_num'] / 100;
+				$traderParentMoney = $traderParentGet * $orderInfo['deal_num'] / 100;
 			}
 		}
 		if ($buymerchant['pid']) {
@@ -1502,7 +1347,7 @@ class Merchant extends Base {
 				$mpexist = 1;
 				//$traderMParentGet   = $buymerchantP['trader_merchant_parent_get'];
 				$traderMParentGet   = $traderMParentGet ? $traderMParentGet : 0;
-				$traderMParentMoney = $traderMParentGet * $orderinfo['deal_num'] / 100;
+				$traderMParentMoney = $traderMParentGet * $orderInfo['deal_num'] / 100;
 			}
 		}
 		//平台，承兑商代理，商户代理，承兑商，商户只能得到这么多，多的给平台
@@ -1514,78 +1359,75 @@ class Merchant extends Base {
 		$traderMoney        = $moneyArr[3];
 		Db::startTrans();
 		try {
-			// $adInfo = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])->find();
-			$backAmount = $amount / $orderinfo['deal_price'];  // 返回的数量
+			// $adInfo = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->find();
+			$backAmount = $amount / $orderInfo['deal_price'];  // 返回的数量
 			// 回滚
-			$res1 = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])->setInc('remain_amount', $backAmount);
-			$res2 = Db::name('ad_sell')->where('id', $orderinfo['sell_sid'])->setDec('trading_volume', $backAmount);
-			$rs1  = balanceChange(TRUE, $orderinfo['sell_id'], 0, 0, -$backAmount, 0, BAL_BOUGHT, $orderinfo['id'], "申述失败操作");
-			//$rs1  = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $backAmount);
-
-			// $rs1 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdtd', $oldNum);
-			if ($amount * 100 != $orderinfo['deal_amount'] * 100) {
-				$rs2 = Db::table('think_order_buy')->update(['id' => $orderinfo['id'], 'status' => 4, 'finished_time' => time(), 'platform_fee' => $moneyArr[0], 'deal_amount' => $amount, 'deal_num' => $orderinfo['deal_num']]);
+			$res1 = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->setInc('remain_amount', $backAmount);
+			$res2 = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->setDec('trading_volume', $backAmount);
+			$rs1  = balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$backAmount, 0, BAL_BOUGHT, $orderInfo['id'], "申述失败操作");
+			//$rs1  = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $backAmount);
+			// $rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $oldNum);
+			if ($amount * 100 != $orderInfo['deal_amount'] * 100) {
+				$rs2 = Db::name('order_buy')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'platform_fee' => $moneyArr[0], 'deal_amount' => $amount, 'deal_num' => $orderInfo['deal_num']]);
 			} else {
-				$rs2 = Db::table('think_order_buy')->update(['id' => $orderinfo['id'], 'status' => 4, 'finished_time' => time(), 'platform_fee' => $moneyArr[0]]);
+				$rs2 = Db::name('order_buy')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'platform_fee' => $moneyArr[0]]);
 			}
 			$rs22 = TRUE;
-			if ($amount * 100 > $orderinfo['deal_amount'] * 100) {
-				//$rs22    = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setDec('usdt', $orderinfo['deal_num'] - $oldNum);
-				$samount = $orderinfo['deal_num'] - $oldNum;
+			if ($amount * 100 > $orderInfo['deal_amount'] * 100) {
+				//$rs22    = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdt', $orderInfo['deal_num'] - $oldNum);
+				$samount = $orderInfo['deal_num'] - $oldNum;
 			}
-			if ($amount * 100 < $orderinfo['deal_amount'] * 100) {
-				//$rs22    = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $oldNum - $orderinfo['deal_num']);
-				$samount = $oldNum - $orderinfo['deal_num'];
+			if ($amount * 100 < $orderInfo['deal_amount'] * 100) {
+				//$rs22    = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $oldNum - $orderInfo['deal_num']);
+				$samount = $oldNum - $orderInfo['deal_num'];
 			}
-			//$rs3      = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->setInc('usdt', $mum);
-			$rs3 = balanceChange(TRUE, $orderinfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderinfo['id'], "申述失败操作");
-
-			$rs4      = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('transact', 1);
-			$total    = Db::table('think_order_buy')->field('sum(finished_time-dktime) as total')->where('sell_id', $orderinfo['sell_id'])->where('status', 4)->select();
+			//$rs3      = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('usdt', $mum);
+			$rs3 = balanceChange(FALSE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], "申述失败操作");
+			$rs4      = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('transact', 1);
+			$total    = Db::name('order_buy')->field('sum(finished_time-dktime) as total')->where('sell_id', $orderInfo['sell_id'])->where('status', 4)->select();
 			$tt       = $total[0]['total'];
-			$transact = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->value('transact');
-			$rs5      = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->update(['averge' => intval($tt / $transact)]);
+			$transact = Db::name('merchant')->where('id', $orderInfo['sell_id'])->value('transact');
+			$rs5      = Db::name('merchant')->where('id', $orderInfo['sell_id'])->update(['averge' => intval($tt / $transact)]);
 			//承兑商卖单奖励
 			$rs6 = $rs7 = $rs8 = $rs9 = $rs10 = $rs11 = $res3 = TRUE;
 			if ($traderMoney > 0) {
-				// $rs6 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $traderMoney);
-				$rs6 = balanceChange(TRUE, $orderinfo['sell_id'], $traderMoney, 0, 0, 0, BAL_COMMISSION, $orderinfo['id'], "申述失败操作");
-
-				$rs7 = Db::table('think_trader_reward')->insert(['uid' => $orderinfo['sell_id'], 'orderid' => $orderinfo['id'], 'amount' => $traderMoney, 'type' => 0, 'create_time' => time()]);
+				// $rs6 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $traderMoney);
+				$rs6 = balanceChange(FALSE, $orderInfo['sell_id'], $traderMoney, 0, 0, 0, BAL_COMMISSION, $orderInfo['id'], "申述失败操作");
+				$rs7 = Db::name('trader_reward')->insert(['uid' => $orderInfo['sell_id'], 'orderid' => $orderInfo['id'], 'amount' => $traderMoney, 'type' => 0, 'create_time' => time()]);
 			}
 			//承兑商代理利润
 			if ($traderParentMoney > 0 && $tpexist) {
-				$rsarr = agentReward($trader['pid'], $orderinfo['sell_id'], $traderParentMoney, 3);//3
-				$rs8   = $rsarr[0];
-				$rs9   = $rsarr[1];
+				$rsArr = agentReward($trader['pid'], $orderInfo['sell_id'], $traderParentMoney, 3);//3
+				$rs8   = $rsArr[0];
+				$rs9   = $rsArr[1];
 			}
 			//商户代理利润
 			if ($traderMParentMoney > 0 && $mpexist) {
-				$rsarr = agentReward($buymerchant['pid'], $orderinfo['buy_id'], $traderMParentMoney, 4);//4
-				$rs10  = $rsarr[0];
-				$rs11  = $rsarr[1];
+				$rsArr = agentReward($buymerchant['pid'], $orderInfo['buy_id'], $traderMParentMoney, 4);//4
+				$rs10  = $rsArr[0];
+				$rs11  = $rsArr[1];
 			}
 			// 平台利润
 			if ($platformMoney > 0) {
-				$rsarr = agentReward(-1, 0, $platformMoney, 5);//5
-				$res3  = $rsarr[1];
+				$rsArr = agentReward(-1, 0, $platformMoney, 5);//5
+				$res3  = $rsArr[1];
 			}
 			if ($rs1 && $rs2 && $rs3 && $rs4 && $rs5 && $rs6 && $rs7 && $rs8 && $rs9 && $rs10 && $rs11 && $rs22 && $res1 && $res2 && $res3) {
 				// 提交事务
 				Db::commit();
-				financelog($orderinfo['sell_id'], $mum, '卖出USDT_释放', 0, session('username'));//添加日志
-				financelog($orderinfo['buy_id'], $mum, '买入USDT_2', 0, session('username'));//添加日志
-				financelog($orderinfo['sell_id'], $traderMoney, '卖出USDT_承兑商卖单奖励_2', 1, session('username'));//添加日志
-				// financelog($orderinfo['buy_id'],$mum,'买入USDT',0);//添加日志
-				getStatisticsOfOrder($orderinfo['buy_id'], $orderinfo['sell_id'], $mum, $orderinfo['deal_num']);
+				financelog($orderInfo['sell_id'], $mum, '卖出USDT_释放', 0, session('username'));               //添加日志
+				financelog($orderInfo['buy_id'], $mum, '买入USDT_2', 0, session('username'));                 //添加日志
+				financelog($orderInfo['sell_id'], $traderMoney, '卖出USDT_承兑商卖单奖励_2', 1, session('username'));//添加日志
+				// financelog($orderInfo['buy_id'],$mum,'买入USDT',0);//添加日志
+				getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $orderInfo['deal_num']);
 				//请求回调接口
-				$data['amount'] = $orderinfo['deal_num'];
-				if ($amount * 100 != $orderinfo['deal_amount'] * 100) {
+				$data['amount'] = $orderInfo['deal_num'];
+				if ($amount * 100 != $orderInfo['deal_amount'] * 100) {
 					$data['rmb'] = $amount;
 				} else {
-					$data['rmb'] = $orderinfo['deal_amount'];
+					$data['rmb'] = $orderInfo['deal_amount'];
 				}
-				$data['orderid'] = $orderinfo['orderid'];
+				$data['orderid'] = $orderInfo['orderid'];
 				$data['appid']   = $buymerchant['appid'];
 				if ($type == 1) {
 					$status = 1;
@@ -1593,20 +1435,19 @@ class Merchant extends Base {
 					$status = 0;
 				}
 				$data['status'] = $status;
-				//$status && askNotify($data, $orderinfo['notify_url'], $buymerchant['key']);
-
-				$redis->rm($id);
+				//$status && askNotify($data, $orderInfo['notify_url'], $buymerchant['key']);
+				Cache::rm($id);
 				$this->success('操作成功');
 			} else {
 				// 回滚事务
 				Db::rollback();
-				$redis->rm($id);
+				Cache::rm($id);
 				$this->error('操作失败');
 			}
-		} catch (\think\Exception\DbException $e) {
+		} catch (DbException $e) {
 			// 回滚事务
 			Db::rollback();
-			$redis->rm($id);
+			Cache::rm($id);
 			$this->error('操作失败，参考信息：' . $e->getMessage());
 		}
 	}
@@ -1616,29 +1457,22 @@ class Merchant extends Base {
 	 */
 	public function ssfailbuy() {
 		$id        = input('post.id');
-		$orderinfo = Db::name('order_sell')->where('id', $id)->find();
-		if (!$orderinfo) {
-			return json(['code' => 0, 'msg' => '订单不存在']);
-		}
-		if ($orderinfo['status'] == 4) {
-			return json(['code' => 0, 'msg' => '订单已完成，请刷新']);
-		}
-		$buymerchant = Db::name('merchant')->where('id', $orderinfo['buy_id'])->find();
-		$trader      = Db::name('merchant')->where('id', $orderinfo['sell_id'])->find();
-		if ($trader['usdtd'] < $orderinfo['deal_num'] + $orderinfo['fee']) {
-			return json(['code' => 0, 'msg' => '商家冻结不足']);
-		}
+		$orderInfo = Db::name('order_sell')->where('id', $id)->find();
+		(!$orderInfo) && showJson(['code' => 0, 'msg' => '订单不存在']);
+		($orderInfo['status'] == 4) && showJson(['code' => 0, 'msg' => '订单已完成，请刷新']);
+		$buymerchant = Db::name('merchant')->where('id', $orderInfo['buy_id'])->find();
+		$trader      = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
+		($trader['usdtd'] < $orderInfo['deal_num'] + $orderInfo['fee']) && showJson(['code' => 0, 'msg' => '商家冻结不足']);
 		Db::startTrans();
 		try {
 			$rs1 = TRUE;
-			//$rs1 = balanceChange(TRUE, $orderinfo['buy_id'], $orderinfo['deal_num'] + $orderinfo['fee'], 0, 0, 0, BAL_BOUGHT, $orderinfo['id'], "申述失败操作->buy");
-			//$rs1 = Db::table('think_merchant')->where('id', $orderinfo['buy_id'])->setDec('usdtd', $orderinfo['deal_num'] + $orderinfo['fee']);
-			$rs2 = Db::table('think_order_sell')->update(['id' => $orderinfo['id'], 'status' => 4, 'finished_time' => time()]);
-			//$rs3 = Db::table('think_merchant')->where('id', $orderinfo['sell_id'])->setInc('usdt', $orderinfo['deal_num'] + $orderinfo['fee']);
-			$rs3 = balanceChange(TRUE, $orderinfo['sell_id'], $orderinfo['deal_num'] + $orderinfo['fee'], 0, -$orderinfo['deal_num'], $orderinfo['fee'], BAL_BOUGHT, $orderinfo['id'], "申述失败操作->buy");
-
+			//$rs1 = balanceChange(false, $orderInfo['buy_id'], $orderInfo['deal_num'] + $orderInfo['fee'], 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], "申述失败操作->buy");
+			//$rs1 = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setDec('usdtd', $orderInfo['deal_num'] + $orderInfo['fee']);
+			$rs2 = Db::name('order_sell')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time()]);
+			//$rs3 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $orderInfo['deal_num'] + $orderInfo['fee']);
+			$rs3 = balanceChange(FALSE, $orderInfo['sell_id'], $orderInfo['deal_num'] + $orderInfo['fee'], 0, -$orderInfo['deal_num'], $orderInfo['fee'], BAL_BOUGHT, $orderInfo['id'], "申述失败操作->buy");
 			if ($rs1 && $rs2 && $rs3) {
-				financelog($orderinfo['sell_id'], ($orderinfo['deal_num'] + $orderinfo['fee']), '卖出USDT_取消', 1, session('username'));//添加日志
+				financelog($orderInfo['sell_id'], ($orderInfo['deal_num'] + $orderInfo['fee']), '卖出USDT_取消', 1, session('username'));//添加日志
 				// 提交事务
 				Db::commit();
 				$this->success('操作成功');
@@ -1647,7 +1481,7 @@ class Merchant extends Base {
 				Db::rollback();
 				$this->error('操作失败');
 			}
-		} catch (\think\Exception\DbException $e) {
+		} catch (DbException $e) {
 			// 回滚事务
 			Db::rollback();
 			$this->error('操作失败，参考信息：' . $e->getMessage());
@@ -1664,10 +1498,8 @@ class Merchant extends Base {
 			$auto = new Auto;
 			$auto->statistics();
 		}
-
 		// 获取以前平台利润
 		$statistics = Db::name('statistics')->order('id desc')->find();
-
 		// 获取USDT总数量
 		$total_usdt    = Db::name('merchant')->sum('usdt');
 		$total_usdtd   = Db::name('merchant')->sum('usdtd');
@@ -1686,7 +1518,6 @@ class Merchant extends Base {
 		// $platformMoney = Db::name('agent_reward')->where('type', 5)->sum('amount');
 		// $platformMoney += $statistics['platform_profit'];
 		$platformMoney = $statistics['platform_profit'];
-
 		/*
 		$member  = new MerchantModel();
 		$Nowpage = input('get.page') ? input('get.page') : 1;
@@ -1701,23 +1532,18 @@ class Merchant extends Base {
 		$this->assign('Nowpage', $Nowpage); //当前页
 		$this->assign('allpage', $allpage); //总页数
 
-		if (input('get.page')) {
-			return json($lists);
-		}
+		(input('get.page'))  && showJson($lists);
 		*/
-
 		$this->assign('Nowpage', 1); //当前页
 		$this->assign('allpage', 1); //总页数
-
-		$this->assign('total_balance', $total_balance); //总USDT
-		$this->assign('withdraw_num', $withdraw_num); //总提币数量
-		$this->assign('withdraw_fee', $withdraw_fee); //总提币手续费
-		$this->assign('recharge_num', $recharge_num); //总充值数量
-		$this->assign('recharge_fee', $recharge_fee); //总充值手续费
+		$this->assign('total_balance', $total_balance);           //总USDT
+		$this->assign('withdraw_num', $withdraw_num);             //总提币数量
+		$this->assign('withdraw_fee', $withdraw_fee);             //总提币手续费
+		$this->assign('recharge_num', $recharge_num);             //总充值数量
+		$this->assign('recharge_fee', $recharge_fee);             //总充值手续费
 		$this->assign('traderMParentMoney', $traderMParentMoney); //商户代理奖励
-		$this->assign('traderParentMoney', $traderParentMoney); //承兑商代理奖励
-		$this->assign('platformMoney', $platformMoney); //平台利润
-
+		$this->assign('traderParentMoney', $traderParentMoney);   //承兑商代理奖励
+		$this->assign('platformMoney', $platformMoney);           //平台利润
 		return $this->fetch();
 	}
 
@@ -1736,7 +1562,7 @@ class Merchant extends Base {
 		}
 		$member  = new MerchantModel();
 		$Nowpage = input('get.page') ? input('get.page') : 1;
-		$limits  = config('list_rows');// 获取总条数
+		$limits  = config('list_rows');       // 获取总条数
 		$count   = $member->getAllCount($map);//计算总页面
 		$allpage = intval(ceil($count / $limits));
 		$lists   = $member->getMerchantStatistics($map, $Nowpage, $limits, $order);
@@ -1744,41 +1570,33 @@ class Merchant extends Base {
 		$this->assign('allpage', $allpage); //总页数
 		$this->assign('val', $key);
 		$this->assign('order', $order2);
-
 		$today = strtotime(date('Y-m-d 00:00:00'));
-
 		foreach ($lists as $key => $list) {
-			$recharge_number = $list->orderSell()->count('id');  // 充值笔数
-			$recharge_amount = $list->orderSell()->sum('deal_amount');  // 充值数量
-			$success_number  = $list->orderSell()->where('status', 4)->count('id');  // 成功笔数
-			$success_amount  = $list->orderSell()->where('status', 4)->sum('deal_amount');  // 成功数量
-			$buy_number      = $list->orderSell()->count('id');  // 购买数量
-			if ($success_number == 0 || $buy_number == 0) $success_rate = 0; else $success_rate = round(($success_number / $buy_number) * 100, 2);  // 成功率
-
+			$recharge_number = $list->orderSell()->count('id');                                                                   // 充值笔数
+			$recharge_amount = $list->orderSell()->sum('deal_amount');                                                            // 充值数量
+			$success_number  = $list->orderSell()->where('status', 4)->count('id');                                               // 成功笔数
+			$success_amount  = $list->orderSell()->where('status', 4)->sum('deal_amount');                                        // 成功数量
+			$buy_number      = $list->orderSell()->count('id');                                                                   // 购买数量
+			$success_rate    = ($success_number == 0 || $buy_number == 0) ? 0 : round(($success_number / $buy_number) * 100, 2);  // 成功率
 			// 获取当天笔数
 			$where['ctime'] = ['egt', $today];
-
-			$today_number         = $list->orderSell()->where($where)->count('id');  // 当天笔数
-			$today_amount         = $list->orderSell()->where($where)->sum('deal_amount');  // 当天数量
-			$today_success_number = $list->orderSell()->where($where)->where('status', 4)->count('id');  // 当天成功笔数
-			$today_success_amount = $list->orderSell()->where($where)->where('status', 4)->sum('deal_amount');  // 当天成功数量
+			$today_number         = $list->orderSell()->where($where)->count('id');                                                                                             // 当天笔数
+			$today_amount         = $list->orderSell()->where($where)->sum('deal_amount');                                                                                      // 当天数量
+			$today_success_number = $list->orderSell()->where($where)->where('status', 4)->count('id');                                                                         // 当天成功笔数
+			$today_success_amount = $list->orderSell()->where($where)->where('status', 4)->sum('deal_amount');                                                                  // 当天成功数量
 			if ($today_success_number == 0 || $today_number == 0) $today_success_rate = 0; else $today_success_rate = round(($today_success_number / $today_number) * 100, 2);  // 成功率
-
 			$lists[$key]['recharge_number'] = $recharge_number;
 			$lists[$key]['recharge_amount'] = $recharge_amount;
 			$lists[$key]['success_number']  = $success_number;
 			$lists[$key]['success_amount']  = $success_amount;
 			$lists[$key]['success_rate']    = $success_rate;
-
 			$lists[$key]['today_number']         = $today_number;
 			$lists[$key]['today_amount']         = $today_amount;
 			$lists[$key]['today_success_number'] = $today_success_number;
 			$lists[$key]['today_success_amount'] = $today_success_amount;
 			$lists[$key]['today_success_rate']   = $today_success_rate;
 		}
-		if (input('get.page')) {
-			return json($lists);
-		}
+		input('get.page') && showJson($lists);
 		return $this->fetch();
 	}
 
@@ -1806,7 +1624,7 @@ class Merchant extends Base {
 		// dump($map);
 		$member  = new MerchantModel();
 		$Nowpage = input('get.page') ? input('get.page') : 1;
-		$limits  = config('list_rows');// 获取总条数
+		$limits  = config('list_rows');            // 获取总条数
 		$count   = $member->getAllCountOrder($map);//计算总页面
 		$allpage = intval(ceil($count / $limits));
 		$lists   = $member->getOrderByWhere($map, $Nowpage, $limits);
@@ -1826,14 +1644,12 @@ class Merchant extends Base {
 		}
 		//dump($lists);die;
 		// dump($lists);
-		$this->assign('Nowpage', $Nowpage); //当前页
-		$this->assign('allpage', $allpage); //总页数
+		$this->assign('Nowpage', $Nowpage);        //当前页
+		$this->assign('allpage', $allpage);        //总页数
 		$this->assign('val', $key);
 		$this->assign('oid', $oid);
 		$this->assign('status', $status);
-		if (input('get.page')) {
-			return json($lists);
-		}
+		(input('get.page')) && showJson($lists);
 		return $this->fetch();
 	}
 }

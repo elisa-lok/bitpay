@@ -1,7 +1,8 @@
 <?php 
 namespace app\admin\model;
-use think\Model;
 use think\db;
+use think\Model;
+
 class TibiModel extends Model{
     protected $name = 'merchant_withdraw';
     protected $createTime = 'addtime';
@@ -39,8 +40,8 @@ class TibiModel extends Model{
         }
         Db::startTrans();
         try{
-            $rs1 = Db::table('think_merchant')->where('id', $find['merchant_id'])->setInc('usdt', $find['num']);//0
-            $rs3 = Db::table('think_merchant')->where('id', $find['merchant_id'])->setDec('usdtd', $find['num']);//0
+            $rs1 = Db::name('merchant')->where('id', $find['merchant_id'])->setInc('usdt', $find['num']);//0
+            $rs3 = Db::name('merchant')->where('id', $find['merchant_id'])->setDec('usdtd', $find['num']);//0
             $rs2 = $this->where('id', $id)->update(array('status'=>2, 'endtime'=>time()));
             if($rs1 && $rs2 && $rs3){
                 // 提交事务

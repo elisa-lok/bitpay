@@ -397,8 +397,8 @@ function tradenoa() {
 
 function agentReward($uid, $duid, $amount, $type) {
 	$rs    = [];
-	$rs[0] = Db::table('think_merchant')->where('id', $uid)->setInc('usdt', $amount);
-	$rs[1] = Db::table('think_agent_reward')->insert(['uid' => $uid, 'duid' => $duid, 'amount' => $amount, 'type' => $type, 'create_time' => time()]);
+	$rs[0] = Db::name('merchant')->where('id', $uid)->setInc('usdt', $amount);
+	$rs[1] = Db::name('agent_reward')->insert(['uid' => $uid, 'duid' => $duid, 'amount' => $amount, 'type' => $type, 'create_time' => time()]);
 	return $rs;
 }
 
@@ -455,10 +455,10 @@ function sendSms($mobile, $content) {
 	if (!config('is_send_sms')) {
 		return TRUE;
 	}
-	$url        = Db::table('think_config')->where('name', 'mobile_url')->value('value');
-	$user       = Db::table('think_config')->where('name', 'mobile_user')->value('value');
-	$key        = Db::table('think_config')->where('name', 'mobile_pwd')->value('value');
-	$title      = Db::table('think_config')->where('name', 'web_site_title')->value('value');
+	$url        = Db::name('config')->where('name', 'mobile_url')->value('value');
+	$user       = Db::name('config')->where('name', 'mobile_user')->value('value');
+	$key        = Db::name('config')->where('name', 'mobile_pwd')->value('value');
+	$title      = Db::name('config')->where('name', 'web_site_title')->value('value');
 	$content    = '【THT】' . $content;
 	$params     = "appid=$user&to=$mobile&content=$content&signature=$key";
 	$curlHandle = curl_init();
@@ -519,7 +519,7 @@ function checkName($name) {
 function financelog($uid, $amount, $note, $status, $op) {
 
 	$user = Db::name('merchant')->where('id', $uid)->find();
-	$rs   = Db::table('think_financelog')->insert(['uid' => $uid, 'user' => $user['name'], 'note' => $note, 'amount' => $amount, 'status' => $status, 'add_time' => time(), 'op' => $op]);
+	$rs   = Db::name('financelog')->insert(['uid' => $uid, 'user' => $user['name'], 'note' => $note, 'amount' => $amount, 'status' => $status, 'add_time' => time(), 'op' => $op]);
 	return $rs ? $rs : '记录失败';
 }
 
@@ -549,6 +549,12 @@ function getStatisticsOfOrder($buyerid, $sellerid, $buyamount, $sellamount) {
 function showMsg($msg = '', $code = 1, $data = [], $url = '#') {
 	header('Content-Type:application/json; charset=utf-8');
 	die(json_encode(['code' => $code, 'msg' => $msg, 'data' => $data, 'url' => $url], 320));
+}
+
+function showJson($data = [], $code = 200, $header = [], $options = []) {
+	header('Content-Type:application/json; charset=utf-8');
+	header('HTTP/2.0 ' . $code);
+	die(json_encode($data, 320));
 }
 
 /**
@@ -621,6 +627,78 @@ function balanceChange($enableTrans = TRUE, $uid = 0, float $modAmt = 0, float $
 	return FALSE;
 }
 
+
+/**
+ * * 修改金额, 直接填入输入后的金额
+ * @param bool   $enableTrans    是否启动事务
+ * @param int    $uid            用户ID
+ * @param float  $afterAmt       变动后金额
+ * @param float  $fee            手续费
+ * @param float  $afterFrozenAmt 变动后冻结金额
+ * @param float  $frozenFee
+ * @param int    $actType
+ * @param string $relateId       对应订单ID
+ * @param string $memo           备注
+ * @return bool|string
+ * @throws \think\Exception
+ * @throws \think\db\exception\DataNotFoundException
+ * @throws \think\db\exception\ModelNotFoundException
+ * @throws \think\exception\DbException
+ * @throws \think\exception\PDOException
+ */
+function balanceMod($enableTrans = TRUE, $uid = 0, float $afterAmt = 0, float $fee = 0, float $afterFrozenAmt = 0, float $frozenFee = 0, $actType = 0, $relateId = '', $memo = '') {
+	$enableTrans && Db::startTrans();
+	$userInfo = Db::name('merchant')->where('id', $uid)->lock(TRUE)->find();
+	if (!$userInfo) {
+		$enableTrans && Db::rollback();
+		return FALSE;
+	}
+	// 格式化数字,保留8位小数
+	$afterAmt       = (float)number_format($afterAmt, 8, '.', '');
+	$afterFrozenAmt = (float)number_format($afterFrozenAmt, 8, '.', '');
+	if ($afterAmt == $userInfo['usdt'] && $afterFrozenAmt == $userInfo['usdtd']) {
+		$enableTrans && Db::rollback();
+		return TRUE;
+	}
+	$modAmt       = $afterAmt - $userInfo['usdt'];
+	$frozenModAmt = $afterFrozenAmt - $userInfo['usdtd'];
+	// 溯源
+	$lastLogId = 0;
+	$lastLog   = Db::name('merchant_balance_log')->order('bal_log_id DESC')->find();
+	// TODO 如果记录存在, 更新记录
+	if ($lastLog) {
+		$lastLogId = $lastLog['bal_log_id'];
+		if ($lastLog['amt_after'] != $userInfo['usdt'] || $lastLog['frozen_amt_after'] != $userInfo['usdtd']) {
+			$log = $msg = '【' . date('Y-m-d H:i:s') . "】 资金记录异常: 用户ID: 【 $uid 】, 前记录ID: $lastLogId , 余额" . $lastLog['amt_after'] . ', 冻结:  ' . $lastLog['frozen_amt_after'] . ', 账户现有: 余额: ' . $userInfo['usdt'] . ', 冻结:' . $userInfo['usdt'] . " \r\n";
+			file_put_contents(RUNTIME_PATH . 'data/abnormal_flow.log', $log, FILE_APPEND);
+		}
+	}
+	$newLog = [
+		'last_bal_log_id'   => $lastLogId,
+		'merchant_id'       => $uid,
+		'amt_before'        => $userInfo['usdt'],
+		'amt_after'         => $afterAmt,
+		'amt_change'        => $modAmt,
+		'amt_fee'           => $fee,
+		'frozen_amt_before' => $userInfo['usdtd'],
+		'frozen_amt_after'  => $afterFrozenAmt,
+		'frozen_amt_change' => $frozenModAmt,
+		'frozen_amt_fee'    => $frozenFee,
+		'cur_code'          => 'usdt',
+		'action_type'       => $actType,
+		'relate_id'         => $relateId,
+		'memo'              => $memo,
+	];
+	$res1   = Db::name('merchant')->where('id', $uid)->update(['usdt' => $newLog['amt_after'], 'usdtd' => $newLog['frozen_amt_after']]);
+	$res2   = Db::name('merchant_balance_log')->insert($newLog);
+	if ($res1 && $res2) {
+		$enableTrans && Db::commit();
+		return TRUE;
+	}
+	$enableTrans && Db::rollback();
+	return FALSE;
+}
+
 function getIp() {
 	//strcasecmp 比较两个字符，不区分大小写。返回0，>0，<0。
 	if (getenv('HTTP_CLIENT_IP') && strcasecmp(getenv('HTTP_CLIENT_IP'), 'unknown')) {
@@ -634,6 +712,4 @@ function getIp() {
 	}
 	$res = preg_match('/[\d\.]{7,15}/', $ip, $matches) ? $matches [0] : '';
 	return $res;
-	//echo $res;
-	//dump(phpinfo());//所有PHP配置信息
 }
