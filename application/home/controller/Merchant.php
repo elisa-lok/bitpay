@@ -28,16 +28,16 @@ class Merchant extends Base {
 	//商户首页
 	public function index() {
 		// echo session('user.name');die;
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
 		$model = new MerchantModel();
-		$this->assign('merchant', $model->getUserByParam(session('uid'), 'id'));
-		$myinfo = $model->getUserByParam(session('uid'), 'id');
+		$this->assign('merchant', $model->getUserByParam($this->uid, 'id'));
+		$myinfo = $model->getUserByParam($this->uid, 'id');
 		$this->assign('myacc', $model->getUserByParam($myinfo['pid'], 'id'));
 		$ids  = Db::name('article_cate')->field('id, name')->order('orderby asc')->select();
 		$list = Db::name('article_cate')->field('a.name, b.id, b.title, b.cate_id, b.create_time')->alias('a')->join('article b', 'a.id=b.cate_id')->where('a.status', 1)->select();
-		//$haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->where('state', 1)->sum('amount');
-		$haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->sum('remain_amount');
-		$haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->sum('remain_amount');
+		//$haveadsum = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->sum('amount');
+		$haveadsum = Db::name('ad_sell')->where('userid', $this->uid)->sum('remain_amount');
+		$haveadsum = Db::name('ad_sell')->where('userid', $this->uid)->sum('remain_amount');
 		foreach ($ids as $k => $v) {
 			foreach ($list as $kk => $vv) {
 				if ($v['id'] == $vv['cate_id']) {
@@ -57,7 +57,7 @@ class Merchant extends Base {
 			$password = input('post.paypassword');
 			(empty($password)) && $this->error('请输入交易密码');
 			$model = new MerchantModel();
-			$user  = $model->getUserByParam(session('uid'), 'id');
+			$user  = $model->getUserByParam($this->uid, 'id');
 			if ($user['paypassword'] != md5($password)) {
 				$this->error('交易密码错误');
 			} else {
@@ -87,7 +87,7 @@ class Merchant extends Base {
 
 	public function payinfo_bak() {
 		$id    = input('post.id');
-		$order = Db::name('order_sell')->where('id', $id)->where('buy_id', session('uid'))->find();
+		$order = Db::name('order_sell')->where('id', $id)->where('buy_id', $this->uid)->find();
 		if (empty($order)) {
 			echo '订单信息错误';
 			die;
@@ -118,7 +118,7 @@ class Merchant extends Base {
 		$bank = new BankModel();
 		$zfb  = new ZfbModel();
 		$wx   = new WxModel();
-		if ($order['buy_id'] == session('uid')) {                                    //买家显示内容,显示卖家的收款信息
+		if ($order['buy_id'] == $this->uid) {                                    //买家显示内容,显示卖家的收款信息
 			$merchant = Db::name('merchant')->where('id', $order['sell_id'])->find();//查找卖家信息
 			if ($order['pay'] > 0) {
 				$where1['merchant_id']   = $order['sell_id'];
@@ -143,7 +143,7 @@ class Merchant extends Base {
 				$merchant['c_wechat_img'] = str_replace("\\", "/", $iswx['c_bank_detail']);
 			}
 		}
-		if ($order['sell_id'] == session('uid')) {                                  //卖家显示内容
+		if ($order['sell_id'] == $this->uid) {                                  //卖家显示内容
 			$merchant = Db::name('merchant')->where('id', $order['buy_id'])->find();//查找买家信息
 		}
 		$this->assign('merchant', $merchant);
@@ -154,8 +154,7 @@ class Merchant extends Base {
 
 	public function payinfo2() {
 		$id    = input('post.id');
-		$order = Db::name('order_sell')->where('id', $id)->where('buy_id', session('uid'))->find();
-		// dump(session('uid'));die;
+		$order = Db::name('order_sell')->where('id', $id)->where('buy_id', $this->uid)->find();
 		if (empty($order)) {
 			echo '订单信息错误';
 			die;
@@ -194,7 +193,7 @@ class Merchant extends Base {
 
 	public function dosetting() {
 		if (request()->isPost()) {
-			!session('uid') && $this->error('请登陆操作', url('home/login/login'));
+			!$this->uid && $this->error('请登陆操作', url('home/login/login'));
 			$file = request()->file('avatar');
 			if ($file) {
 				$info = $file->validate(['size' => 3145728, 'ext' => 'jpg,png'])->move(ROOT_PATH . 'public' . DS . 'uploads/face');
@@ -222,7 +221,7 @@ class Merchant extends Base {
 			/*if ($smscode != session($mobile . '_mcode')) {
 				$this->error('短信验证码错误!');
 			}*/
-			$param['id'] = session('uid');
+			$param['id'] = $this->uid;
 			if (!empty($password)) {
 				$param['password'] = md5($password);
 			}
@@ -233,7 +232,7 @@ class Merchant extends Base {
 			$model         = new MerchantModel();
 			$return        = $model->updateOne($param);
 			if ($return['code'] == 1) {
-				$user = $model->where('id', session('uid'))->find();
+				$user = $model->where('id', $this->uid)->find();
 				session('user', $user);
 				$this->success($return['msg']);
 			} else {
@@ -249,8 +248,8 @@ class Merchant extends Base {
 			$order = 'id ' . $_GET['order'];
 		}
 		$model = new AddressModel();
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
-		$where['merchant_id'] = session('uid');
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
+		$where['merchant_id'] = $this->uid;
 		$this->assign('list', $model->getAddress($where, $order));
 		return $this->fetch();
 	}
@@ -263,8 +262,8 @@ class Merchant extends Base {
          ['address','地址'],
          ['addtime','申请时间'],
          ] */
-		(!session('uid')) && $this->error('请登陆操作');
-		$where['merchant_id'] = session('uid');
+		!$this->uid && $this->error('请登陆操作');
+		$where['merchant_id'] = $this->uid;
 		$order                = 'id desc';
 		$model                = new AddressModel();
 		$data                 = $model->getAllByWhere($where, $order);
@@ -283,9 +282,9 @@ class Merchant extends Base {
 
 	public function RechargeAmount() {
 		$post = input('post.');
-		(!session('uid')) && $this->error('请登录操作！');
+		!$this->uid && $this->error('请登录操作！');
 		$model = new MerchantModel();
-		$this->assign('merchant', $model->getUserByParam(session('uid'), 'id'));
+		$this->assign('merchant', $model->getUserByParam($this->uid, 'id'));
 		if ($post) {
 			ini_set('display_errors', '1');
 			error_reporting(-1);
@@ -327,7 +326,7 @@ class Merchant extends Base {
 	//商户用户充值记录
 	public function recharge() {
 		$get = input('get.');
-		(!session('uid')) && $this->error('请登陆操作！');
+		!$this->uid && $this->error('请登陆操作！');
 		$order = 'a.id desc';
 		if (isset($_GET['order'])) {
 			$order = 'a.id ' . $_GET['order'];
@@ -355,7 +354,7 @@ class Merchant extends Base {
 		/* if(!empty($get['buy_amount']['end'])){
             $where['num'] = array('elt', $get['buy_amount']['end']);
         } */
-		$where['a.merchant_id'] = session('uid');//dump($where);
+		$where['a.merchant_id'] = $this->uid;//dump($where);
 		$model                  = new RechargeModel();
 		$this->assign('list', $model->getRecharge($where, $order));
 		return $this->fetch();
@@ -375,8 +374,8 @@ class Merchant extends Base {
         ['status','状态'],
         ['addtime','日期'],
         ] */
-		(!session('uid')) && $this->error('请登陆操作');
-		$where['a.merchant_id'] = session('uid');
+		!$this->uid && $this->error('请登陆操作');
+		$where['a.merchant_id'] = $this->uid;
 		$order                  = 'a.id desc';
 		$model                  = new RechargeModel();
 		$data                   = $model->getAllByWhere($where, $order);
@@ -402,8 +401,8 @@ class Merchant extends Base {
 
 	//商户用户提币记录
 	public function withdraw() {
-		(!session('uid')) && $this->error('请登陆操作');
-		$where['merchant_id'] = session('uid');
+		!$this->uid && $this->error('请登陆操作');
+		$where['merchant_id'] = $this->uid;
 		$get                  = input('get.');
 		$order                = 'id desc';
 		if (isset($_GET['order'])) {
@@ -452,8 +451,8 @@ class Merchant extends Base {
          ['addtime','创建日期'],
          ['endtime','审核日期'],
          ] */
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
-		$where['merchant_id'] = session('uid');
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
+		$where['merchant_id'] = $this->uid;
 		$order                = 'id desc';
 		$model                = new WithdrawModel();
 		$data                 = $model->getAllByWhere($where, $order);
@@ -482,8 +481,8 @@ class Merchant extends Base {
 
 	//商户提币记录
 	public function tibi() {
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
-		$where['merchant_id'] = session('uid');
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
+		$where['merchant_id'] = $this->uid;
 		$get                  = input('get.');
 		$order                = 'id desc';
 		if (isset($_GET['order'])) {
@@ -527,8 +526,8 @@ class Merchant extends Base {
          ['addtime','创建日期'],
          ['endtime','审核日期'],
          ] */
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
-		$where['merchant_id'] = session('uid');
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
+		$where['merchant_id'] = $this->uid;
 		$order                = 'id desc';
 		$model                = new TibiModel();
 		$data                 = $model->getAllByWhere($where, $order);
@@ -567,7 +566,7 @@ class Merchant extends Base {
 			$fee1     = getConfig('merchant_tibi_fee');
 			$tibi_min = getConfig('merchant_tibi_min');
 			$tibi_max = getConfig('merchant_tibi_max');
-			$user     = $model->getUserByParam(session('uid'), 'id');
+			$user     = $model->getUserByParam($this->uid, 'id');
 			$fee2     = $user['merchant_tibi_fee'];
 			$fee      = $fee2;
 			if (empty($fee2)) {
@@ -608,12 +607,12 @@ class Merchant extends Base {
 			}
 			Db::startTrans();
 			try {
-				$ordersn = createOrderNo(1, session('uid'));
-				$rs1     = balanceChange(FALSE, session('uid'), -$num, 0, $num, 0, BAL_WITHDRAW, $ordersn);
-				//$rs1 = Db::name('merchant')->where('id', session('uid'))->setDec('usdt', $num);
-				//$rs3 = Db::name('merchant')->where('id', session('uid'))->setInc('usdtd', $num);
+				$ordersn = createOrderNo(1, $this->uid);
+				$rs1     = balanceChange(FALSE, $this->uid, -$num, 0, $num, 0, BAL_WITHDRAW, $ordersn);
+				//$rs1 = Db::name('merchant')->where('id', $this->uid)->setDec('usdt', $num);
+				//$rs3 = Db::name('merchant')->where('id', $this->uid)->setInc('usdtd', $num);
 				$rs2 = Db::name('merchant_withdraw')->insert([
-					'merchant_id' => session('uid'),
+					'merchant_id' => $this->uid,
 					'address'     => $address,
 					'num'         => $num,
 					'fee'         => $feenum,
@@ -637,8 +636,8 @@ class Merchant extends Base {
 				$this->error('提交失败，参考信息：' . $e->getMessage());
 			}
 		} else {
-			!session('uid') && $this->error('请登陆操作', url('home/login/login'));
-			$user = $model->getUserByParam(session('uid'), 'id');
+			!$this->uid && $this->error('请登陆操作', url('home/login/login'));
+			$user = $model->getUserByParam($this->uid, 'id');
 			$show = 0;
 			if (!empty($user['ga'])) {
 				$arr         = explode('|', $user['ga']);
@@ -667,10 +666,10 @@ class Merchant extends Base {
 	}
 
 	public function merchantSet() {
-		(!session('uid')) && $this->error('请登陆操作');
+		!$this->uid && $this->error('请登陆操作');
 		$model = new MerchantModel();
 		if (request()->isPost()) {
-			!session('uid') && $this->error('登录已经失效,请重新登录!');
+			!$this->uid && $this->error('登录已经失效,请重新登录!');
 			$delete      = '';
 			$gacode      = trim(input('post.ga'));
 			$type        = trim(input('post.type'));
@@ -683,7 +682,7 @@ class Merchant extends Base {
 				$secret = session('secret');
 				!$secret && $this->error('验证码已经失效,请刷新网页!');
 			} elseif (($type == 'updat') || ($type == 'delet')) {
-				$user = $model->getUserByParam(session('uid'), 'id');;
+				$user = $model->getUserByParam($this->uid, 'id');;
 				!$user['ga'] && $this->error('还未设置谷歌验证码!');
 				$arr    = explode('|', $user['ga']);
 				$secret = $arr[0];
@@ -694,13 +693,13 @@ class Merchant extends Base {
 			$ga = new GoogleAuthenticator();
 			if ($ga->verifyCode($secret, $gacode, 1)) {
 				$ga_val = ($delete == '' ? $secret . '|' . $ga_login . '|' . $ga_transfer . '|' . $ga_trust . '|' . $ga_binding : '');
-				$rs     = $model->updateOne(['id' => session('uid'), 'ga' => $ga_val]);
+				$rs     = $model->updateOne(['id' => $this->uid, 'ga' => $ga_val]);
 				$rs ? $this->success('操作成功') : $this->error('操作失败');
 			} else {
 				$this->error('验证失败');
 			}
 		} else {
-			$user  = $model->getUserByParam(session('uid'), 'id');
+			$user  = $model->getUserByParam($this->uid, 'id');
 			$is_ga = ($user['ga'] ? 1 : 0);
 			$this->assign('is_ga', $is_ga);
 			if (!$is_ga) {
@@ -727,11 +726,11 @@ class Merchant extends Base {
 	}
 
 	public function applyAgent() {
-		(!session('uid')) && $this->error('登录已经失效,请重新登录!');
+		!$this->uid && $this->error('登录已经失效,请重新登录!');
 		$model    = new MerchantModel();
-		$merchant = $model->getUserByParam(session('uid'), 'id');
+		$merchant = $model->getUserByParam($this->uid, 'id');
 		($merchant['agent_check'] != 0) && $this->error('请勿重复申请');
-		$flag = $model->updateOne(['id' => session('uid'), 'agent_check' => 3]);
+		$flag = $model->updateOne(['id' => $this->uid, 'agent_check' => 3]);
 		if ($flag['code'] == 1) {
 			$this->success('申请成功，请等待审核');
 		} else {
@@ -740,11 +739,11 @@ class Merchant extends Base {
 	}
 
 	public function applyTrader() {
-		(!session('uid')) && $this->error('登录已经失效,请重新登录!');
+		!$this->uid && $this->error('登录已经失效,请重新登录!');
 		$model    = new MerchantModel();
-		$merchant = $model->getUserByParam(session('uid'), 'id');
+		$merchant = $model->getUserByParam($this->uid, 'id');
 		($merchant['trader_check'] != 0) && $this->error('请勿重复申请');
-		$flag = $model->updateOne(['id' => session('uid'), 'trader_check' => 3]);
+		$flag = $model->updateOne(['id' => $this->uid, 'trader_check' => 3]);
 		if ($flag['code'] == 1) {
 			$this->success('申请成功，请等待审核');
 		} else {
@@ -758,8 +757,8 @@ class Merchant extends Base {
 			$order = 'id ' . $_GET['order'];
 		}
 		$model = new MerchantModel();
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
-		$where['pid'] = session('uid');
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
+		$where['pid'] = $this->uid;
 		$get          = input('get.');
 		$order        = 'id desc';
 		if (isset($_GET['order'])) {
@@ -787,8 +786,8 @@ class Merchant extends Base {
 			$order = 'id ' . $_GET['order'];
 		}
 		$model = new MerchantModel();
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
-		$where['pid']      = session('uid');
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
+		$where['pid']      = $this->uid;
 		$where['reg_type'] = 1;
 		$get               = input('get.');
 		$order             = 'id desc';
@@ -839,7 +838,7 @@ class Merchant extends Base {
 	}
 
 	public function editdown() {
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
 		$model = new MerchantModel();
 		if (request()->isPost()) {
 			$id                = input('post.id');
@@ -856,7 +855,7 @@ class Merchant extends Base {
 			$id = $_GET['id'];
 			(!$id) && $this->error('参数错误');
 			$merchant = $model->getUserByParam($id, 'id');
-			(empty($merchant) || $merchant['pid'] != session('uid')) && $this->error('商户不存在');
+			(empty($merchant) || $merchant['pid'] != $this->uid) && $this->error('商户不存在');
 			$this->assign('merchant', $merchant);
 			return $this->fetch();
 		}
@@ -869,7 +868,7 @@ class Merchant extends Base {
 		$check    = $type;
 		$m        = new MerchantModel();
 		$merchant = $m->getUserByParam($id, 'id');
-		(empty($merchant) || $merchant['pid'] != session('uid')) && $this->error('下级商户不存在');
+		(empty($merchant) || $merchant['pid'] != $this->uid) && $this->error('下级商户不存在');
 		($merchant['reg_check'] != 0) && $this->error('用户已审核');
 		if ($merchant['reg_type'] == 1) {
 			$update = ['reg_check' => $check];
@@ -900,8 +899,8 @@ class Merchant extends Base {
 			$order = 'a.id ' . $_GET['order'];
 		}
 		$model = new MerchantModel();
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
-		$where['uid'] = session('uid');
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
+		$where['uid'] = $this->uid;
 		$username     = input('get.username');
 		$get          = input('get.');
 		if (!empty($username)) {
@@ -923,8 +922,8 @@ class Merchant extends Base {
 			$order = 'a.id ' . $_GET['order'];
 		}
 		$model = new MerchantModel();
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
-		$where['uid'] = session('uid');
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
+		$where['uid'] = $this->uid;
 		$username     = input('get.username');
 		$get          = input('get.');
 		if (!empty($username)) {
@@ -941,9 +940,9 @@ class Merchant extends Base {
 	}
 
 	public function traderrecharge() {
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
 		$model    = new MerchantModel();
-		$merchant = $model->getUserByParam(session('uid'), 'id');
+		$merchant = $model->getUserByParam($this->uid, 'id');
 		($merchant['trader_check'] != 1) && $this->error('请先申请承兑商', url('home/merchant/index'));
 		// dump(config('wallettype'));
 		$qianbao1 = $merchant['usdtb'];
@@ -953,13 +952,13 @@ class Merchant extends Base {
 			if (!$qianbao1) {
 				$address = Db::name('address')->where(['status' => 0, 'type' => 'btc'])->find();
 				(!$address) && $this->error('系统可用地址池错误');
-				$rs = $model->updateOne(['id' => session('uid'), 'usdtb' => $address['address']]);
+				$rs = $model->updateOne(['id' => $this->uid, 'usdtb' => $address['address']]);
 				if ($rs['code'] == 1) {
 					$mp['status'] = 1;
-					$mp['uid']    = session('uid');
+					$mp['uid']    = $this->uid;
 					Db::name('address')->where('address', $address['address'])->update($mp);
 					$qianbao1 = $address['address'];
-					$rs       = Db::name('merchant_user_address')->insert(['merchant_id' => session('uid'), 'username' => session('username'), 'address' => $qianbao1, 'addtime' => time()]);
+					$rs       = Db::name('merchant_user_address')->insert(['merchant_id' => $this->uid, 'username' => session('username'), 'address' => $qianbao1, 'addtime' => time()]);
 				} else {
 					$this->error($rs['msg']);
 				}
@@ -971,13 +970,13 @@ class Merchant extends Base {
 			if (!$qianbao2) {
 				$address = Db::name('address')->where(['status' => 0, 'type' => 'eth'])->find();
 				(!$address) && $this->error('系统可用地址池错误');
-				$rs = $model->updateOne(['id' => session('uid'), 'usdte' => $address['address']]);
+				$rs = $model->updateOne(['id' => $this->uid, 'usdte' => $address['address']]);
 				if ($rs['code'] == 1) {
 					$mp['status'] = 1;
-					$mp['uid']    = session('uid');
+					$mp['uid']    = $this->uid;
 					Db::name('address')->where('address', $address['address'])->update($mp);
 					$qianbao2 = $address['address'];
-					$rs       = Db::name('merchant_user_address')->insert(['merchant_id' => session('uid'), 'username' => session('username'), 'address' => $qianbao2, 'addtime' => time()]);
+					$rs       = Db::name('merchant_user_address')->insert(['merchant_id' => $this->uid, 'username' => session('username'), 'address' => $qianbao2, 'addtime' => time()]);
 				} else {
 					$this->error($rs['msg']);
 				}
@@ -989,10 +988,10 @@ class Merchant extends Base {
 			if (!$qianbao1) {
 				$address = Db::name('address')->where(['status' => 0, 'type' => 'btc'])->find();
 				(!$address) && $this->error('系统可用地址池错误');
-				$rs = $model->updateOne(['id' => session('uid'), 'usdtb' => $address['address']]);
+				$rs = $model->updateOne(['id' => $this->uid, 'usdtb' => $address['address']]);
 				if ($rs['code'] == 1) {
 					$mp['status'] = 1;
-					$mp['uid']    = session('uid');
+					$mp['uid']    = $this->uid;
 					Db::name('address')->where('address', $address['address'])->update($mp);
 					$qianbao1 = $address['address'];
 				} else {
@@ -1003,10 +1002,10 @@ class Merchant extends Base {
 			if (!$qianbao2) {
 				$address = Db::name('address')->where(['status' => 0, 'type' => 'eth'])->find();
 				(!$address) && $this->error('系统可用地址池错误');
-				$rs = $model->updateOne(['id' => session('uid'), 'usdtb' => $address['address']]);
+				$rs = $model->updateOne(['id' => $this->uid, 'usdtb' => $address['address']]);
 				if ($rs['code'] == 1) {
 					$mp['status'] = 1;
-					$mp['uid']    = session('uid');
+					$mp['uid']    = $this->uid;
 					Db::name('address')->where('address', $address['address'])->update($mp);
 					$qianbao2 = $address['address'];
 				} else {
@@ -1020,10 +1019,10 @@ class Merchant extends Base {
 		//     if(!$address){
 		//          $this->error('系统可用地址池错误');
 		//     }
-		//     $rs = $model->updateOne(['id'=>session('uid'), 'usdtb'=>$address['address']]);
+		//     $rs = $model->updateOne(['id'=>$this->uid, 'usdtb'=>$address['address']]);
 		//         if($rs['code'] == 1){
 		//             $mp['status']=1;
-		//             $mp['uid']=session('uid');
+		//             $mp['uid']=$this->uid;
 		//             Db::name('address')->where('address',$address['address'])->update($mp);
 		//             $qianbao =$address['address'];
 		//         }else{
@@ -1037,7 +1036,7 @@ class Merchant extends Base {
             $return = $model2->index('getnewaddress', $addr = null, $mum = null, $index=null, $count=null,$skip=null);
             if($return['code'] == 1 && !empty($return['data'])){
              //   $rs = Db::name('merchant_user_address')->insert(['merchant_id'=>$this->merchant['id'], 'username'=>$data['username'], 'address'=>$return['data'], 'addtime'=>time()]);
-                $rs = $model->updateOne(['id'=>session('uid'), 'usdtb'=>$return['data']]);
+                $rs = $model->updateOne(['id'=>$this->uid, 'usdtb'=>$return['data']]);
                 if($rs['code'] == 1){
                     $qianbao = $return['data'];
                 }else{
@@ -1051,24 +1050,24 @@ class Merchant extends Base {
 		// $this->assign('qianbao2', $qianbao2);
 		$confirms = Db::name('config')->where('name', 'usdt_confirms')->value('value');
 		$this->assign('confirms', $confirms);
-		$list = Db::name('merchant_recharge')->where(['merchant_id' => session('uid')])->order('id desc')->paginate(20);
+		$list = Db::name('merchant_recharge')->where(['merchant_id' => $this->uid])->order('id desc')->paginate(20);
 		$this->assign('list', $list);
 		return $this->fetch();
 	}
 
 	public function payset() {
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
-		$user = Db::name('merchant')->where(['id' => session('uid')])->find();
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
+		$user = Db::name('merchant')->where(['id' => $this->uid])->find();
 		$this->assign('user', $user);
 		$bankModel = new BankModel();
 		$zfb       = new ZfbModel();
 		$wx        = new WxModel();
 		$ysf       = new YsfModel();
 		$this->assign('generate_alipayid', 'https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id=2016110502555511&redirect_uri=https%3A%2F%2Fwww.dedemao.com%2Falipay%2Fauthorize.php%3Fscope%3Dauth_base&scope=auth_base&state=STATE');
-		$this->assign('list', $bankModel->getBank(['merchant_id' => session('uid')], 'id desc'));
-		$this->assign('list2', $zfb->getBank(['merchant_id' => session('uid')], 'id desc'));
-		$this->assign('list3', $wx->getBank(['merchant_id' => session('uid')], 'id desc'));
-		$this->assign('list4', $ysf->getBank(['merchant_id' => session('uid')], 'id desc'));
+		$this->assign('list', $bankModel->getBank(['merchant_id' => $this->uid], 'id desc'));
+		$this->assign('list2', $zfb->getBank(['merchant_id' => $this->uid], 'id desc'));
+		$this->assign('list3', $wx->getBank(['merchant_id' => $this->uid], 'id desc'));
+		$this->assign('list4', $ysf->getBank(['merchant_id' => $this->uid], 'id desc'));
 		$ga = explode('|', $user['ga']);
 		$this->assign('ga', ($ga['4'] ?? 0));
 		return $this->fetch();
@@ -1077,34 +1076,34 @@ class Merchant extends Base {
 	public function delBank() {
 		$id = input('param.id');
 		$m  = new BankModel();
-		$rs = $m->delOne(['id' => $id, 'merchant_id' => session('uid')]);
+		$rs = $m->delOne(['id' => $id, 'merchant_id' => $this->uid]);
 		return json($rs);
 	}
 
 	public function delZfb() {
 		$id = input('param.id');
 		$m  = new ZfbModel();
-		$rs = $m->delOne(['id' => $id, 'merchant_id' => session('uid')]);
+		$rs = $m->delOne(['id' => $id, 'merchant_id' => $this->uid]);
 		return json($rs);
 	}
 
 	public function delWx() {
 		$id = input('param.id');
 		$m  = new WxModel();
-		$rs = $m->delOne(['id' => $id, 'merchant_id' => session('uid')]);
+		$rs = $m->delOne(['id' => $id, 'merchant_id' => $this->uid]);
 		return json($rs);
 	}
 
 	public function delYsf() {
 		$id = input('param.id');
 		$m  = new YsfModel();
-		$rs = $m->delOne(['id' => $id, 'merchant_id' => session('uid')]);
+		$rs = $m->delOne(['id' => $id, 'merchant_id' => $this->uid]);
 		return json($rs);
 	}
 
 	public function doaccount() {
 		if (request()->isPost()) {
-			!session('uid') && $this->error('请登陆操作', url('home/login/login'));
+			!$this->uid && $this->error('请登陆操作', url('home/login/login'));
 			$c_bank                     = input('post.c_bank');
 			$c_bank_detail              = input('post.c_bank_detail');
 			$c_bank_card                = input('post.c_bank_card');
@@ -1115,10 +1114,10 @@ class Merchant extends Base {
 			$param['c_bank_detail']     = $c_bank_detail;
 			$param['c_bank_card']       = $c_bank_card;
 			$param['c_bank_card_again'] = $c_bank_card_again;
-			$param['merchant_id']       = session('uid');
+			$param['merchant_id']       = $this->uid;
 			$param['name']              = input('post.name');
 			$param['truename']          = input('post.truename');
-			$user                       = Db::name('merchant')->where('id', session('uid'))->find();
+			$user                       = Db::name('merchant')->where('id', $this->uid)->find();
 			$ga                         = explode('|', $user['ga']);
 			if (isset($ga[4]) && $ga[4]) {
 				$code = input('post.ga');
@@ -1134,7 +1133,7 @@ class Merchant extends Base {
 			}
 			($rs['code'] == 1) ? $this->success($rs['msg']) : $this->error($rs['msg']);
 			// TODO ?????????? 为什么没往下写?
-			$param['id']            = session('uid');
+			$param['id']            = $this->uid;
 			$param['c_bank']        = $c_bank;
 			$param['c_bank_detail'] = $c_bank_detail;
 			$param['c_bank_card']   = $c_bank_card;
@@ -1144,7 +1143,7 @@ class Merchant extends Base {
 			(strlen($c_bank_card) < 16 || strlen($c_bank_card) > 22) && $this->error('请输入正确的银行卡号');
 			(!$c_bank) && $this->error('请输入开户银行');
 			(!$c_bank_detail) && $this->error('请输入开户支行');
-			$param['id']            = session('uid');
+			$param['id']            = $this->uid;
 			$param['c_bank']        = $c_bank;
 			$param['c_bank_detail'] = $c_bank_detail;
 			$param['c_bank_card']   = $c_bank_card;
@@ -1161,8 +1160,8 @@ class Merchant extends Base {
 
 	public function doalipay() {
 		if (request()->isPost()) {
-			!session('uid') && $this->error('请登陆操作', url('home/login/login'));
-			$user = Db::name('merchant')->where('id', session('uid'))->find();
+			!$this->uid && $this->error('请登陆操作', url('home/login/login'));
+			$user = Db::name('merchant')->where('id', $this->uid)->find();
 			$ga   = explode('|', $user['ga']);
 			if (isset($ga[4]) && $ga[4]) {
 				$code = input('post.ga');
@@ -1192,7 +1191,7 @@ class Merchant extends Base {
 					$param['c_alipay_img'] = $last_img;
 				}
 			}
-			$param['id']               = session('uid');
+			$param['id']               = $this->uid;
 			$param['c_alipay_account'] = $alipay_account;
 			$param['name']             = $name;
 			$model                     = new MerchantModel();
@@ -1207,8 +1206,8 @@ class Merchant extends Base {
 
 	public function dowechat() {
 		if (request()->isPost()) {
-			!session('uid') && $this->error('请登陆操作', url('home/login/login'));
-			$user = Db::name('merchant')->where('id', session('uid'))->find();
+			!$this->uid && $this->error('请登陆操作', url('home/login/login'));
+			$user = Db::name('merchant')->where('id', $this->uid)->find();
 			$ga   = explode('|', $user['ga']);
 			if (isset($ga[4]) && $ga[4]) {
 				$code = input('post.ga');
@@ -1238,7 +1237,7 @@ class Merchant extends Base {
 			}
 			$wechat_account = input('post.wechat_account');
 			(!$wechat_account) && $this->error('请输入微信账户');
-			$param['id']               = session('uid');
+			$param['id']               = $this->uid;
 			$param['c_wechat_account'] = $wechat_account;
 			$param['name']             = $name;
 			$model                     = new MerchantModel();
@@ -1253,8 +1252,8 @@ class Merchant extends Base {
 
 	public function doalipaynew() {
 		if (request()->isPost()) {
-			!session('uid') && $this->error('请登陆操作', url('home/login/login'));
-			$user = Db::name('merchant')->where('id', session('uid'))->find();
+			!$this->uid && $this->error('请登陆操作', url('home/login/login'));
+			$user = Db::name('merchant')->where('id', $this->uid)->find();
 			$ga   = explode('|', $user['ga']);
 			if (isset($ga[4]) && $ga[4]) {
 				$code = input('post.ga');
@@ -1290,7 +1289,7 @@ class Merchant extends Base {
 					$param['c_bank_detail'] = $last_img;
 				}
 			}
-			$param['merchant_id'] = session('uid');
+			$param['merchant_id'] = $this->uid;
 			$param['c_bank']      = $alipay_account;
 			$param['truename']    = $truename;
 			$param['name']        = $name;
@@ -1307,7 +1306,7 @@ class Merchant extends Base {
 
 	public function dowechatnew() {
 		if (request()->isPost()) {
-			!session('uid') && $this->error('请登陆操作', url('home/login/login'));
+			!$this->uid && $this->error('请登陆操作', url('home/login/login'));
 			$truename       = input('post.wxtruename');
 			$name           = input('post.wxname');
 			$wechat_account = input('post.wechat_account');
@@ -1332,7 +1331,7 @@ class Merchant extends Base {
 					$param['c_bank_detail'] = $last_img;
 				}
 			}
-			$param['merchant_id'] = session('uid');
+			$param['merchant_id'] = $this->uid;
 			$param['c_bank']      = $wechat_account;
 			$param['truename']    = $truename;
 			$param['name']        = $name;
@@ -1348,7 +1347,7 @@ class Merchant extends Base {
 
 	public function doysfnew() {
 		if (request()->isPost()) {
-			!session('uid') && $this->error('请登陆操作', url('home/login/login'));
+			!$this->uid && $this->error('请登陆操作', url('home/login/login'));
 			$truename = input('post.ysftruename');
 			$name     = input('post.ysfname');
 			(empty($truename)) && $this->error('请填写真实姓名');
@@ -1366,7 +1365,7 @@ class Merchant extends Base {
 				(empty($last_img)) && $this->error('请上传微信收款码');
 				$param['c_bank_detail'] = $last_img;
 			}
-			$param['merchant_id'] = session('uid');
+			$param['merchant_id'] = $this->uid;
 			// $param['c_bank'] = $wechat_account;
 			$param['truename'] = $truename;
 			$param['name']     = $name;
@@ -1381,7 +1380,7 @@ class Merchant extends Base {
 	}
 
 	public function newad() {
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
 		$usdt_price_way = Db::name('config')->where('name', 'usdt_price_way')->value('value');
 		$usdt_price_min = Db::name('config')->where('name', 'usdt_price_min')->value('value');
 		$usdt_price_max = Db::name('config')->where('name', 'usdt_price_max')->value('value');
@@ -1430,27 +1429,27 @@ class Merchant extends Base {
 			// $pay_method = $_POST['pay_method'];
 			// dump($pay_method);die;
 			$model = new MerchantModel();
-			$user  = $model->getUserByParam(session('uid'), 'id');
+			$user  = $model->getUserByParam($this->uid, 'id');
 			($user['trader_check'] != 1) && $this->error('您的承兑商资格未通过');
-			//$haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->where('state', 1)->sum('amount');
+			//$haveadsum = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->sum('amount');
 			$haveadsum = 0;
 			($user['usdt'] < $amount + $haveadsum) && $this->error('账户余额不足');
 			(empty($_POST['bank']) && empty($_POST['zfb']) && empty($_POST['wx']) && empty($_POST['ysf'])) && $this->error('请选择收款方式');
 			$codes = ['zfb' => (int)$_POST['zfb'], 'bank' => (int)$_POST['bank'], 'wx' => (int)$_POST['wx'], 'ysf' => (int)$_POST['ysf']];
 			//查询用户的银行卡信息
-			$where1['merchant_id'] = session('uid');
+			$where1['merchant_id'] = $this->uid;
 			$where1['id']          = $codes['bank'];
 			$isbank                = $m->getOne($where1);
 			//查询用户的支付宝信息
-			$where2['merchant_id'] = session('uid');
+			$where2['merchant_id'] = $this->uid;
 			$where2['id']          = (int)$codes['zfb'];
 			$iszfb                 = $zfb->getOne($where2);
 			//查询用户的微信信息
-			$where3['merchant_id'] = session('uid');
+			$where3['merchant_id'] = $this->uid;
 			$where3['id']          = $codes['wx'];
 			$iswx                  = $wx->getOne($where3);
 			//查询用户的云闪付信息
-			$where4['merchant_id'] = session('uid');
+			$where4['merchant_id'] = $this->uid;
 			$where4['id']          = $codes['ysf'];
 			$isysf                 = $ysf->getOne($where4);
 			($codes['bank'] && !$isbank) && $this->error('请先设置您的银行卡账户信息');
@@ -1461,14 +1460,14 @@ class Merchant extends Base {
 			Db::startTrans();
 			// 减少余额 增加冻结余额
 			$ad_no = $this->getAdvNo();
-			$res1  = balanceChange(FALSE, session('uid'), -$amount, 0, $amount, 0, BAL_ENTRUST, $ad_no);
-			// $res1 = Db::name('merchant')->where('id', session('uid'))->setDec('usdt', $amount);
-			// $res2 = Db::name('merchant')->where('id', session('uid'))->setInc('usdtd', $amount);
+			$res1  = balanceChange(FALSE, $this->uid, -$amount, 0, $amount, 0, BAL_ENTRUST, $ad_no);
+			// $res1 = Db::name('merchant')->where('id', $this->uid)->setDec('usdt', $amount);
+			// $res2 = Db::name('merchant')->where('id', $this->uid)->setInc('usdtd', $amount);
 			if ($res1) {
 				Db::commit();
 				$model2 = new AdModel();
 				$flag   = $model2->insertOne([
-					'userid'        => session('uid'),
+					'userid'        => $this->uid,
 					'add_time'      => time(),
 					'coin'          => '0',
 					'min_limit'     => $min_limit,
@@ -1485,8 +1484,8 @@ class Merchant extends Base {
 					'state'         => 1
 				]);
 				//增加在售挂单数
-				$count = $model2->where('userid', session('uid'))->where('state', 1)->where('amount', 'gt', 0)->count();
-				$model->updateOne(['id' => session('uid'), 'ad_on_sell' => $count]);
+				$count = $model2->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
+				$model->updateOne(['id' => $this->uid, 'ad_on_sell' => $count]);
 				($flag['code'] == 1) ? $this->success($flag['msg']) : $this->error($flag['msg']);
 			} else {
 				Db::rollback();
@@ -1497,7 +1496,7 @@ class Merchant extends Base {
 			$this->assign('usdt_price_max', $usdt_price_max);
 			$this->assign('usdt_price_way', $usdt_price_way);
 			$model2          = new AdModel();
-			$where['userid'] = session('uid');
+			$where['userid'] = $this->uid;
 			$list            = $model2->getAd($where, 'id desc');
 			foreach ($list as $k => $v) {
 				//$deal_num           = Db::name('order_buy')->where(['sell_sid' => $v['id'], 'status' => ['neq', 5], 'status' => ['neq', 9]])->sum('deal_num');
@@ -1508,17 +1507,17 @@ class Merchant extends Base {
 			}
 			$this->assign('list', $list);
 			$this->assign('pricelimit', $pricelimit);
-			$banks = $m->where('merchant_id', session('uid'))->order('id desc')->select();
-			$this->assign('zfb', $zfb->getBank(['merchant_id' => session('uid')], 'id desc'));
-			$this->assign('wx', $wx->getBank(['merchant_id' => session('uid')], 'id desc'));
-			$this->assign('ysf', $ysf->getBank(['merchant_id' => session('uid')], 'id desc'));
+			$banks = $m->where('merchant_id', $this->uid)->order('id desc')->select();
+			$this->assign('zfb', $zfb->getBank(['merchant_id' => $this->uid], 'id desc'));
+			$this->assign('wx', $wx->getBank(['merchant_id' => $this->uid], 'id desc'));
+			$this->assign('ysf', $ysf->getBank(['merchant_id' => $this->uid], 'id desc'));
 			$this->assign('banks', $banks);
 			return $this->fetch();
 		}
 	}
 
 	public function newadbuy() {
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
 		$usdt_price_way = Db::name('config')->where('name', 'usdt_price_way_buy')->value('value');
 		$usdt_price_min = Db::name('config')->where('name', 'usdt_price_min_buy')->value('value');
 		$usdt_price_max = Db::name('config')->where('name', 'usdt_price_max_buy')->value('value');
@@ -1567,28 +1566,28 @@ class Merchant extends Base {
 			}
 			// $pay_method = $codes['pay_method'];//dump($pay_method);die;
 			$model = new MerchantModel();
-			$user  = $model->getUserByParam(session('uid'), 'id');
+			$user  = $model->getUserByParam($this->uid, 'id');
 			($user['trader_check'] != 1) && $this->error('您的承兑商资格未通过');
-			$haveadsum = Db::name('ad_buy')->where('userid', session('uid'))->where('state', 1)->count();
+			$haveadsum = Db::name('ad_buy')->where('userid', $this->uid)->where('state', 1)->count();
 			$haveadsum = $haveadsum ? $haveadsum : 0;
 			($haveadsum > 20) && $this->error('挂买最多发布20个');
 			(empty($_POST['bank']) && empty($_POST['zfb']) && empty($_POST['wx']) && empty($_POST['ysf'])) && $this->error('请选择收款方式');
 			$codes = ['zfb' => (int)$_POST['zfb'], 'bank' => (int)$_POST['bank'], 'wx' => (int)$_POST['wx'], 'ysf' => (int)$_POST['ysf']];
 			// dump($codes);die;
 			//查询用户的银行卡信息
-			$where1['merchant_id'] = session('uid');
+			$where1['merchant_id'] = $this->uid;
 			$where1['id']          = $codes['bank'];
 			$isbank                = $m->getOne($where1);
 			//查询用户的支付宝信息
-			$where2['merchant_id'] = session('uid');
+			$where2['merchant_id'] = $this->uid;
 			$where2['id']          = $codes['zfb'];
 			$iszfb                 = $zfb->getOne($where2);
 			//查询用户的微信信息
-			$where3['merchant_id'] = session('uid');
+			$where3['merchant_id'] = $this->uid;
 			$where3['id']          = $codes['wx'];
 			$iswx                  = $wx->getOne($where3);
 			//查询用户的云闪付信息
-			$where4['merchant_id'] = session('uid');
+			$where4['merchant_id'] = $this->uid;
 			$where4['id']          = $codes['ysf'];
 			$isysf                 = $ysf->getOne($where4);
 			($codes['bank'] && !$isbank) && $this->error('请先设置您的银行卡账户信息');
@@ -1598,7 +1597,7 @@ class Merchant extends Base {
 			$ad_no  = $this->getAdvNo();
 			$model2 = new AdbuyModel();
 			$flag   = $model2->insertOne([
-				'userid'      => session('uid'),
+				'userid'      => $this->uid,
 				'add_time'    => time(),
 				'coin'        => 'usdt',
 				'min_limit'   => $min_limit,
@@ -1613,8 +1612,8 @@ class Merchant extends Base {
 				'state'       => 1
 			]);
 			//增加挂买数
-			$count = $model2->where('userid', session('uid'))->where('state', 1)->where('amount', 'gt', 0)->count();
-			$model->updateOne(['id' => session('uid'), 'ad_on_buy' => $count]);
+			$count = $model2->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
+			$model->updateOne(['id' => $this->uid, 'ad_on_buy' => $count]);
 			if ($flag['code'] == 1) {
 				$this->success($flag['msg']);
 			} else {
@@ -1625,7 +1624,7 @@ class Merchant extends Base {
 			$this->assign('usdt_price_max', $usdt_price_max);
 			$this->assign('usdt_price_way', $usdt_price_way);
 			$model2          = new AdbuyModel();
-			$where['userid'] = session('uid');
+			$where['userid'] = $this->uid;
 			$list            = $model2->getAd($where, 'id desc');
 			foreach ($list as $k => $v) {
 				$deal_num           = Db::name('order_sell')->where(['buy_bid' => $v['id'], 'status' => ['neq', 5]])->sum('deal_num');
@@ -1636,17 +1635,17 @@ class Merchant extends Base {
 			$this->assign('list', $list);
 			$this->assign('pricelimit', $pricelimit);
 			// $m = new \app\home\model\BankModel();
-			$banks = $m->where('merchant_id', session('uid'))->order('id desc')->select();
-			$this->assign('zfb', $zfb->getBank(['merchant_id' => session('uid')], 'id desc'));
-			$this->assign('wx', $wx->getBank(['merchant_id' => session('uid')], 'id desc'));
-			$this->assign('ysf', $ysf->getBank(['merchant_id' => session('uid')], 'id desc'));
+			$banks = $m->where('merchant_id', $this->uid)->order('id desc')->select();
+			$this->assign('zfb', $zfb->getBank(['merchant_id' => $this->uid], 'id desc'));
+			$this->assign('wx', $wx->getBank(['merchant_id' => $this->uid], 'id desc'));
+			$this->assign('ysf', $ysf->getBank(['merchant_id' => $this->uid], 'id desc'));
 			$this->assign('banks', $banks);
 			return $this->fetch();
 		}
 	}
 
 	public function editad() {
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
 		$usdt_price_way = Db::name('config')->where('name', 'usdt_price_way')->value('value');
 		$usdt_price_min = Db::name('config')->where('name', 'usdt_price_min')->value('value');
 		$usdt_price_max = Db::name('config')->where('name', 'usdt_price_max')->value('value');
@@ -1664,7 +1663,7 @@ class Merchant extends Base {
 			$model           = new MerchantModel();
 			$model2          = new AdModel();
 			$where['id']     = $id;
-			$where['userid'] = session('uid');
+			$where['userid'] = $this->uid;
 			$ad              = $model2->getOne($where);
 			(empty($ad)) && $this->error('挂单标识错误');
 			$order = Db::name('order_buy')->where(['sell_sid' => $id])->find();
@@ -1703,27 +1702,27 @@ class Merchant extends Base {
 				$price      = floatval(getUsdtPrice() + config('usdt_price_add'));
 			}
 			// $pay_method = $_POST['pay_method'];//dump($pay_method);die;
-			$user = $model->getUserByParam(session('uid'), 'id');
+			$user = $model->getUserByParam($this->uid, 'id');
 			($user['trader_check'] != 1) && $this->error('您的承兑商资格未通过');
-			$haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->where('state', 1)->sum('amount');
+			$haveadsum = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->sum('amount');
 			$haveadsum = $haveadsum ? $haveadsum : 0;
 			($user['usdt'] < $amount + $haveadsum) && $this->error('账户余额不足');
 			(empty($_POST['bank']) && empty($_POST['zfb']) && empty($_POST['wx']) && empty($_POST['ysf'])) && $this->error('请选择收款方式');
 			// dump($_POST);die;
 			//查询用户的银行卡信息
-			$where1['merchant_id'] = session('uid');
+			$where1['merchant_id'] = $this->uid;
 			$where1['id']          = $_POST['bank'];
 			$isbank                = $m->getOne($where1);
 			//查询用户的支付宝信息
-			$where2['merchant_id'] = session('uid');
+			$where2['merchant_id'] = $this->uid;
 			$where2['id']          = $_POST['zfb'];
 			$iszfb                 = $zfb->getOne($where2);
 			//查询用户的微信信息
-			$where3['merchant_id'] = session('uid');
+			$where3['merchant_id'] = $this->uid;
 			$where3['id']          = $_POST['wx'];
 			$iswx                  = $wx->getOne($where3);
 			//查询用户的云闪付信息
-			$where4['merchant_id'] = session('uid');
+			$where4['merchant_id'] = $this->uid;
 			$where4['id']          = $_POST['ysf'];
 			$isysf                 = $ysf->getOne($where4);
 			($_POST['bank'] && !$isbank) && $this->error('请先设置您的银行卡账户信息');
@@ -1745,8 +1744,8 @@ class Merchant extends Base {
 				'state'       => 1
 			]);
 			if ($flag['code'] == 1) {
-				$count = $model2->where('userid', session('uid'))->where('state', 1)->where('amount', 'gt', 0)->count();
-				$model->updateOne(['id' => session('uid'), 'ad_on_sell' => $count]);
+				$count = $model2->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
+				$model->updateOne(['id' => $this->uid, 'ad_on_sell' => $count]);
 				$this->success($flag['msg'], '/merchant/newad/');
 			} else {
 				$this->error($flag['msg']);
@@ -1754,7 +1753,7 @@ class Merchant extends Base {
 		}
 		$id              = input('get.id');
 		$where['id']     = $id;
-		$where['userid'] = session('uid');
+		$where['userid'] = $this->uid;
 		$model           = new AdModel();
 		$ad              = $model->getOne($where);
 		(empty($ad)) && $this->error('挂单标识错误');
@@ -1764,16 +1763,16 @@ class Merchant extends Base {
 		$this->assign('usdt_price_max', $usdt_price_max);
 		$this->assign('usdt_price_way', $usdt_price_way);
 		// $m = new \app\home\model\BankModel();
-		$banks = $m->where('merchant_id', session('uid'))->order('id desc')->select();
-		$this->assign('zfb', $zfb->getBank(['merchant_id' => session('uid')], 'id desc'));
-		$this->assign('wx', $wx->getBank(['merchant_id' => session('uid')], 'id desc'));
-		$this->assign('ysf', $ysf->getBank(['merchant_id' => session('uid')], 'id desc'));
+		$banks = $m->where('merchant_id', $this->uid)->order('id desc')->select();
+		$this->assign('zfb', $zfb->getBank(['merchant_id' => $this->uid], 'id desc'));
+		$this->assign('wx', $wx->getBank(['merchant_id' => $this->uid], 'id desc'));
+		$this->assign('ysf', $ysf->getBank(['merchant_id' => $this->uid], 'id desc'));
 		$this->assign('banks', $banks);
 		return $this->fetch();
 	}
 
 	public function editadbuy() {
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
 		$usdt_price_way = Db::name('config')->where('name', 'usdt_price_way_buy')->value('value');
 		$usdt_price_min = Db::name('config')->where('name', 'usdt_price_min_buy')->value('value');
 		$usdt_price_max = Db::name('config')->where('name', 'usdt_price_max_buy')->value('value');
@@ -1791,7 +1790,7 @@ class Merchant extends Base {
 			$model           = new MerchantModel();
 			$model2          = new AdbuyModel();
 			$where['id']     = $id;
-			$where['userid'] = session('uid');
+			$where['userid'] = $this->uid;
 			$ad              = $model2->getOne($where);
 			(empty($ad)) && $this->error('挂单标识错误');
 			$order = Db::name('order_sell')->where(['buy_bid' => $id])->find();
@@ -1823,27 +1822,27 @@ class Merchant extends Base {
 				$price = floatval(getUsdtPrice() + config('usdt_price_add'));
 			}
 			// $pay_method = $_POST['pay_method'];//dump($pay_method);die;
-			$user = $model->getUserByParam(session('uid'), 'id');
+			$user = $model->getUserByParam($this->uid, 'id');
 			($user['trader_check'] != 1) && $this->error('您的承兑商资格未通过');
-			$haveadsum = Db::name('ad_buy')->where('userid', session('uid'))->where('state', 1)->count();
+			$haveadsum = Db::name('ad_buy')->where('userid', $this->uid)->where('state', 1)->count();
 			$haveadsum = $haveadsum ? $haveadsum : 0;
 			($haveadsum > 20) && $this->error('购买挂单最多发布20个');
 			(empty($_POST['bank']) && empty($_POST['zfb']) && empty($_POST['wx'])) && $this->error('请选择收款方式');
 			// dump($_POST);die;
 			//查询用户的银行卡信息
-			$where1['merchant_id'] = session('uid');
+			$where1['merchant_id'] = $this->uid;
 			$where1['id']          = $_POST['bank'];
 			$isbank                = $m->getOne($where1);
 			//查询用户的支付宝信息
-			$where2['merchant_id'] = session('uid');
+			$where2['merchant_id'] = $this->uid;
 			$where2['id']          = $_POST['zfb'];
 			$iszfb                 = $zfb->getOne($where2);
 			//查询用户的微信信息
-			$where3['merchant_id'] = session('uid');
+			$where3['merchant_id'] = $this->uid;
 			$where3['id']          = $_POST['wx'];
 			$iswx                  = $wx->getOne($where3);
 			//查询用户的云闪付信息
-			$where4['merchant_id'] = session('uid');
+			$where4['merchant_id'] = $this->uid;
 			$where4['id']          = $_POST['ysf'];
 			$isysf                 = $ysf->getOne($where4);
 			($_POST['bank'] && !$isbank) && $this->error('请先设置您的银行卡账户信息');
@@ -1853,8 +1852,8 @@ class Merchant extends Base {
 			$ad_no = $this->getAdvNo();
 			$flag  = $model2->updateOne(['id' => $id, 'min_limit' => $min_limit, 'max_limit' => $max_limit, 'pay_method' => $_POST['bank'], 'pay_method2' => $_POST['zfb'], 'pay_method3' => $_POST['wx'], 'pay_method4' => $_POST['ysf'], 'amount' => $amount, 'price' => $price, 'state' => 1]);
 			if ($flag['code'] == 1) {
-				$count = $model2->where('userid', session('uid'))->where('state', 1)->where('amount', 'gt', 0)->count();
-				$model->updateOne(['id' => session('uid'), 'ad_on_buy' => $count ? $count : 0]);
+				$count = $model2->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
+				$model->updateOne(['id' => $this->uid, 'ad_on_buy' => $count ? $count : 0]);
 				$this->success($flag['msg'], '/merchant/newadbuy/');
 			} else {
 				$this->error($flag['msg']);
@@ -1862,7 +1861,7 @@ class Merchant extends Base {
 		}
 		$id              = input('get.id');
 		$where['id']     = $id;
-		$where['userid'] = session('uid');
+		$where['userid'] = $this->uid;
 		$model           = new AdbuyModel();
 		$ad              = $model->getOne($where);
 		(empty($ad)) && $this->error('挂单标识错误');
@@ -1871,10 +1870,10 @@ class Merchant extends Base {
 		$this->assign('usdt_price_max', $usdt_price_max);
 		$this->assign('usdt_price_way', $usdt_price_way);
 		$this->assign('pricelimit', $pricelimit);
-		$banks = $m->where('merchant_id', session('uid'))->order('id desc')->select();
-		$this->assign('zfb', $zfb->getBank(['merchant_id' => session('uid')], 'id desc'));
-		$this->assign('wx', $wx->getBank(['merchant_id' => session('uid')], 'id desc'));
-		$this->assign('ysf', $ysf->getBank(['merchant_id' => session('uid')], 'id desc'));
+		$banks = $m->where('merchant_id', $this->uid)->order('id desc')->select();
+		$this->assign('zfb', $zfb->getBank(['merchant_id' => $this->uid], 'id desc'));
+		$this->assign('wx', $wx->getBank(['merchant_id' => $this->uid], 'id desc'));
+		$this->assign('ysf', $ysf->getBank(['merchant_id' => $this->uid], 'id desc'));
 		$this->assign('banks', $banks);
 		return $this->fetch();
 	}
@@ -1884,12 +1883,12 @@ class Merchant extends Base {
 		$id   = input('post.id');
 		$type = input('post.type');
 		$act  = input('post.act');
-		(!session('uid')) && $this->error('请登录操作');
+		!$this->uid && $this->error('请登录操作');
 		($type != 0 && $type != 1) && $this->error("挂单类型错误！");
 		$model           = new AdModel();
 		$model2          = new MerchantModel();
 		$where['id']     = $id;
-		$where['userid'] = session('uid');
+		$where['userid'] = $this->uid;
 		$ad_info         = $model->getOne($where);
 		if (!$ad_info) {
 			$this->error("挂单不存在！");
@@ -1900,28 +1899,28 @@ class Merchant extends Base {
 		Cache::has($id) && $this->error('操作频繁,请稍后重试');
 		$lock = Cache::set($id, TRUE, 60);
 		!$lock && $this->error('锁定操作失败，请重试。');
-		$merchant = $model2->getUserByParam(session('uid'), 'id');
+		$merchant = $model2->getUserByParam($this->uid, 'id');
 		if ($act == 1) {
-			// $haveadsum = Db::name('ad_sell')->where('userid', session('uid'))->where('state', 1)->sum('amount');
+			// $haveadsum = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->sum('amount');
 			// $haveadsum = $haveadsum ? $haveadsum : 0;
 			$haveadsum = 0;
 			if (($ad_info['remain_amount'] + $haveadsum) * 1 > $merchant['usdt'] * 1) {
 				Cache::rm($id);
 				$this->error('开启失败：账户余额不足');
 			} else {
-				!balanceChange(TRUE, session('uid'), -$ad_info['remain_amount'], 0, $ad_info['remain_amount'], 0, BAL_ENTRUST, $id) && $this->error('开启失败：扣款失败');
-				// Db::name('merchant')->where('id', session('uid'))->setDec('usdt', $ad_info['remain_amount']);
-				// Db::name('merchant')->where('id', session('uid'))->setInc('usdtd', $ad_info['remain_amount']);
+				!balanceChange(TRUE, $this->uid, -$ad_info['remain_amount'], 0, $ad_info['remain_amount'], 0, BAL_ENTRUST, $id) && $this->error('开启失败：扣款失败');
+				// Db::name('merchant')->where('id', $this->uid)->setDec('usdt', $ad_info['remain_amount']);
+				// Db::name('merchant')->where('id', $this->uid)->setInc('usdtd', $ad_info['remain_amount']);
 			}
 		} elseif ($act == 2) {
-			!balanceChange(TRUE, session('uid'), $ad_info['remain_amount'], 0, -$ad_info['remain_amount'], 0, BAL_REDEEM, $id) && $this->error('下架失败：退款失败');
-			//Db::name('merchant')->where('id', session('uid'))->setInc('usdt', $ad_info['remain_amount']);
-			//Db::name('merchant')->where('id', session('uid'))->setDec('usdtd', $ad_info['remain_amount']);
+			!balanceChange(TRUE, $this->uid, $ad_info['remain_amount'], 0, -$ad_info['remain_amount'], 0, BAL_REDEEM, $id) && $this->error('下架失败：退款失败');
+			//Db::name('merchant')->where('id', $this->uid)->setInc('usdt', $ad_info['remain_amount']);
+			//Db::name('merchant')->where('id', $this->uid)->setDec('usdtd', $ad_info['remain_amount']);
 		}
 		$result = $model->updateOne(['id' => $id, 'state' => $act]);
 		if ($result['code'] == 1) {
-			$count = $model->where('userid', session('uid'))->where('state', 1)->where('amount', 'gt', 0)->count();
-			$model2->updateOne(['id' => session('uid'), 'ad_on_sell' => $count ? $count : 0]);
+			$count = $model->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
+			$model2->updateOne(['id' => $this->uid, 'ad_on_sell' => $count ? $count : 0]);
 			Cache::rm($id);
 			$this->success("操作成功");
 		} else {
@@ -1934,28 +1933,28 @@ class Merchant extends Base {
 		$id   = input('post.id');
 		$type = input('post.type');
 		$act  = input('post.act');
-		(!session('uid')) && $this->error('请登录操作');
+		!$this->uid && $this->error('请登录操作');
 		($type != 0 && $type != 1) && $this->error("挂单类型错误！");
 		$model           = new AdbuyModel();
 		$model2          = new MerchantModel();
 		$where['id']     = $id;
-		$where['userid'] = session('uid');
+		$where['userid'] = $this->uid;
 		$ad_info         = $model->getOne($where);
 		if (!$ad_info) {
 			$this->error("挂单不存在！");
 		} else {
 			($ad_info['state'] == 4) && $this->error("此挂单已冻结禁止上下架操作！");
 		}
-		$merchant = $model2->getUserByParam(session('uid'), 'id');
+		$merchant = $model2->getUserByParam($this->uid, 'id');
 		if ($act == 1) {
-			$haveadsum = Db::name('ad_buy')->where('userid', session('uid'))->where('state', 1)->count();
+			$haveadsum = Db::name('ad_buy')->where('userid', $this->uid)->where('state', 1)->count();
 			$haveadsum = $haveadsum ? $haveadsum : 0;
 			($haveadsum > 20) && $this->error('开启失败：挂买最多上架20个');
 		}
 		$result = $model->updateOne(['id' => $id, 'state' => $act]);
 		if ($result['code'] == 1) {
-			$count = $model->where('userid', session('uid'))->where('state', 1)->where('amount', 'gt', 0)->count();
-			$model2->updateOne(['id' => session('uid'), 'ad_on_buy' => $count ? $count : 0]);
+			$count = $model->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
+			$model2->updateOne(['id' => $this->uid, 'ad_on_buy' => $count ? $count : 0]);
 			$this->success("操作成功");
 		} else {
 			$this->error("操作失败");
@@ -1968,9 +1967,9 @@ class Merchant extends Base {
 			$order = 'a.id ' . $_GET['order'];
 		}
 		$model = new AdbuyModel();
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
 		$where['state']  = 1;
-		$where['userid'] = ['neq', session('uid')];
+		$where['userid'] = ['neq', $this->uid];
 		$list            = $model->getAdIndex($where, $order);//dump($list);
 		foreach ($list as $k => $v) {
 			$deal_num               = Db::name('order_sell')->where('buy_bid', $v['id'])->where('status', 'neq', 5)->sum('deal_num');
@@ -2003,12 +2002,12 @@ class Merchant extends Base {
 		$ad['RemainNum'] = $ad['amount'] - $deal_num;
 		$this->assign('ad', $ad);
 		$this->assign('AdOwner', $AdOwner);
-		$banks = $m->where('merchant_id', session('uid'))->order('id desc')->select();
-		$this->assign('zfb', $zfb->getBank(['merchant_id' => session('uid')], 'id desc'));
-		$this->assign('wx', $wx->getBank(['merchant_id' => session('uid')], 'id desc'));
-		$this->assign('ysf', $ysf->getBank(['merchant_id' => session('uid')], 'id desc'));
+		$banks = $m->where('merchant_id', $this->uid)->order('id desc')->select();
+		$this->assign('zfb', $zfb->getBank(['merchant_id' => $this->uid], 'id desc'));
+		$this->assign('wx', $wx->getBank(['merchant_id' => $this->uid], 'id desc'));
+		$this->assign('ysf', $ysf->getBank(['merchant_id' => $this->uid], 'id desc'));
 		$this->assign('banks', $banks);
-		$user = $userModel->getUserByParam(session('uid'), 'id');
+		$user = $userModel->getUserByParam($this->uid, 'id');
 		$ga   = explode('|', $user['ga']);
 		$this->assign('ga', ($ga['3'] ?? 0));
 		return $this->fetch();
@@ -2020,12 +2019,12 @@ class Merchant extends Base {
 		$num     = input('post.qty');//数量
 		$tid     = input('post.tid');
 		$tamount = input('post.amount');//金额
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
 		// $getpaymethod = input('post.getpaymethod/a', []);
 		// empty($getpaymethod)&&$this->error('请选择收款方式');
 		(empty($_POST['bank']) && empty($_POST['zfb']) && empty($_POST['wx'])) && $this->error('请选择收款方式');
 		$model = new MerchantModel();
-		$my    = $model->getUserByParam(session('uid'), 'id');
+		$my    = $model->getUserByParam($this->uid, 'id');
 		$ga    = explode('|', $my['ga']);
 		if (isset($ga[3]) && $ga[3]) {
 			$code = input('post.ga');
@@ -2038,19 +2037,19 @@ class Merchant extends Base {
 		$wx  = new WxModel();
 		$ysf = new YsfModel();
 		//查询用户的银行卡信息
-		$where1['merchant_id'] = session('uid');
+		$where1['merchant_id'] = $this->uid;
 		$where1['id']          = $_POST['bank'];
 		$isbank                = $m->getOne($where1);
 		//查询用户的支付宝信息
-		$where2['merchant_id'] = session('uid');
+		$where2['merchant_id'] = $this->uid;
 		$where2['id']          = $_POST['zfb'];
 		$iszfb                 = $zfb->getOne($where2);
 		//查询用户的微信信息
-		$where3['merchant_id'] = session('uid');
+		$where3['merchant_id'] = $this->uid;
 		$where3['id']          = $_POST['wx'];
 		$iswx                  = $wx->getOne($where3);
 		//查询用户的云闪付信息
-		$where4['merchant_id'] = session('uid');
+		$where4['merchant_id'] = $this->uid;
 		$where4['id']          = $_POST['ysf'];
 		$isysf                 = $ysf->getOne($where4);
 		($_POST['bank'] && !$isbank) && $this->error('请先设置您的银行卡账户信息');
@@ -2071,30 +2070,30 @@ class Merchant extends Base {
 			$msg = '';
 			// foreach($getpaymethod as $k=>$v){
 			if ($orderInfo['pay_method'] > 0) {
-				$banks = $m->getBank(['merchant_id' => session('uid')], 'id desc');
-				// $banks = $m->where('merchant_id', session('uid'))->find();
-				// dump(session('uid'));die;
+				$banks = $m->getBank(['merchant_id' => $this->uid], 'id desc');
+				// $banks = $m->where('merchant_id', $this->uid)->find();
+				// dump($this->uid);die;
 				if (empty($banks)) {
 					$k2++;
 					$msg .= '银行转账信息未设置 ';
 				}
 			}
 			if ($orderInfo['pay_method2'] > 0) {
-				$zfb = $zfb->getBank(['merchant_id' => session('uid')], 'id desc');
+				$zfb = $zfb->getBank(['merchant_id' => $this->uid], 'id desc');
 				if (empty($zfb)) {
 					$k2++;
 					$msg .= '支付宝信息未设置 ';
 				}
 			}
 			if ($orderInfo['pay_method3'] > 0) {
-				$wx = $wx->getBank(['merchant_id' => session('uid')], 'id desc');
+				$wx = $wx->getBank(['merchant_id' => $this->uid], 'id desc');
 				if (empty($wx)) {
 					$k2++;
 					$msg .= '微信支付信息未设置 ';
 				}
 			}
 			if ($orderInfo['pay_method4'] > 0) {
-				$ysf = $ysf->getBank(['merchant_id' => session('uid')], 'id desc');
+				$ysf = $ysf->getBank(['merchant_id' => $this->uid], 'id desc');
 				if (empty($ysf)) {
 					$k2++;
 					$msg .= '云闪付支付信息未设置 ';
@@ -2121,13 +2120,13 @@ class Merchant extends Base {
 			$arr                = [];
 			$arr['buy_id']      = $orderInfo['userid'];
 			$arr['buy_bid']     = $orderInfo['id'];
-			$arr['sell_id']     = session('uid');
+			$arr['sell_id']     = $this->uid;
 			$arr['deal_amount'] = $tamount;
 			$arr['deal_num']    = $num;
 			$arr['deal_price']  = $orderInfo['price'];
 			$arr['ctime']       = time();
 			$arr['ltime']       = config('order_expire');
-			$arr['order_no']    = createOrderNo(4, session('uid'));
+			$arr['order_no']    = createOrderNo(4, $this->uid);
 			$arr['fee']         = $fee;
 			$arr['pay']         = $_POST['bank'];
 			$arr['pay2']        = $_POST['zfb'];
@@ -2138,12 +2137,12 @@ class Merchant extends Base {
 				Db::startTrans();
 				$rs1 = $id = Db::name('order_sell')->insertGetId($arr);
 				//卖家的btc需要冻结起来
-				$rs2 = balanceChange(FALSE, session('uid'), -$num, $fee, $num, $fee, BAL_SOLD, $arr['order_no'], "商户出售");
-				//$rs2 = Db::name('merchant')->where('id', session('uid'))->setDec($coin_name, $num + $fee);
-				//$rs3 = Db::name('merchant')->where('id', session('uid'))->setInc($coin_name . 'd', $num + $fee);
+				$rs2 = balanceChange(FALSE, $this->uid, -$num, $fee, $num, $fee, BAL_SOLD, $arr['order_no'], "商户出售");
+				//$rs2 = Db::name('merchant')->where('id', $this->uid)->setDec($coin_name, $num + $fee);
+				//$rs3 = Db::name('merchant')->where('id', $this->uid)->setInc($coin_name . 'd', $num + $fee);
 				if ($rs1 && $rs2) {
 					Db::commit();
-					financelog(session('uid'), ($num + $fee), '卖出USDT_冻结1', 1, session('user.name'));//添加日志
+					financelog($this->uid, ($num + $fee), '卖出USDT_冻结1', 1, session('user.name'));//添加日志
 					//todo:发送短信给买家
 					$mobile = Db::name('merchant')->where('id', $orderInfo['userid'])->value('mobile');
 					if (!empty($mobile)) {
@@ -2186,8 +2185,8 @@ class Merchant extends Base {
 	}
 
 	public function ordersell() {
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
-		$where['sell_id'] = session('uid');
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
+		$where['sell_id'] = $this->uid;
 		$get              = input('get.');
 		$order            = 'id desc';
 		if (isset($_GET['order'])) {
@@ -2220,8 +2219,8 @@ class Merchant extends Base {
          ['ctime','创建时间'],
          ['status','交易状态'],
          ] */
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
-		$where['sell_id'] = session('uid');
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
+		$where['sell_id'] = $this->uid;
 		$status           = input('get.status');
 		if (isset($status) && $status > 0) {
 			$where['status'] = $status;
@@ -2556,11 +2555,11 @@ class Merchant extends Base {
 	 * 承兑商标记付款
 	 */
 	public function uptradeinner() {
-		(!session('uid')) && $this->error('请登录操作');
+		!$this->uid && $this->error('请登录操作');
 		$id    = input('post.id');
 		$order = Db::name('order_sell')->where('id', $id)->find();
 		(empty($order)) && $this->error('订单参数错误1');
-		($order['buy_id'] != session('uid')) && $this->error('不是您的买单');
+		($order['buy_id'] != $this->uid) && $this->error('不是您的买单');
 		($order['status'] == 5) && $this->error('此订单已取消');
 		($order['status'] >= 1) && $this->error('你已经标记了已付款完成，请勿重复操作');
 		$rs = Db::name('order_sell')->where('id', $id)->update(['status' => 1, 'dktime' => time()]);
@@ -2578,9 +2577,9 @@ class Merchant extends Base {
 	}
 
 	public function pkorder() {
-		(!session('uid')) && $this->error('请登录操作', url('home/login/login'));
+		!$this->uid && $this->error('请登录操作', url('home/login/login'));
 		$model2          = new OrderModel();
-		$where['buy_id'] = session('uid');
+		$where['buy_id'] = $this->uid;
 		$get             = input('get.');
 		$order           = 'id desc';
 		if (isset($_GET['order'])) {
@@ -2610,7 +2609,7 @@ class Merchant extends Base {
 			if ($agentIds) {
 				$agFeeRate = $mcModel->where('id', 'in', array_values($agentIds))->column('trader_parent_get', 'id');
 			}
-			$user      = Db::name('merchant')->where('id', session('uid'))->find();
+			$user      = Db::name('merchant')->where('id', $this->uid)->find();
 			$currPrice = getUsdtPrice();
 			$dealerFee = $currPrice * (config('usdt_price_add') / 100);
 			foreach ($list as $k => $v) {
@@ -2647,8 +2646,8 @@ class Merchant extends Base {
 		['ctime','创建时间'],
 		['status','交易状态'],
 		] */
-		!session('uid') && $this->error('请登陆操作');
-		$where['buy_id'] = session('uid');
+		!$this->uid && $this->error('请登陆操作');
+		$where['buy_id'] = $this->uid;
 		$get             = input('get.');
 		$order           = 'id desc';
 		$model           = new OrderBuyModel();
@@ -2700,7 +2699,7 @@ class Merchant extends Base {
 	}
 
 	public function orderlist() {
-		(!session('uid')) && $this->error('请登录操作', url('home/login/login'));
+		!$this->uid && $this->error('请登录操作', url('home/login/login'));
 		$get   = input('get.');
 		$order = 'id desc';
 		if (isset($_GET['order'])) {
@@ -2720,15 +2719,15 @@ class Merchant extends Base {
 			$where['ctime'] = ['between', [$start, $end]];
 		}
 		$model2           = new OrderModel();
-		$where['sell_id'] = session('uid');
+		$where['sell_id'] = $this->uid;
 		$list             = $model2->getOrder($where, 'id desc');
 		$this->assign('list', $list);
 		return $this->fetch();
 	}
 
 	public function orderlistbuy() {
-		(!session('uid')) && $this->error('请登录操作', url('home/login/login'));
-		$where['buy_id'] = session('uid');
+		!$this->uid && $this->error('请登录操作', url('home/login/login'));
+		$where['buy_id'] = $this->uid;
 		$get             = input('get.');
 		$order           = 'id desc';
 		if (isset($_GET['order'])) {
@@ -2760,7 +2759,7 @@ class Merchant extends Base {
 	// 	$this->returnUrl      = 'http://47.104.23.74/test.php';
 	// }
 	public function gm() {
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
 		return $this->fetch();
 	}
 
@@ -2768,7 +2767,7 @@ class Merchant extends Base {
 		$price = input('post.amount');
 		!$price && $this->error("请输入金额");
 		$model           = new MerchantModel();
-		$user            = $model->getUserByParam(session('uid'), 'id');
+		$user            = $model->getUserByParam($this->uid, 'id');
 		$url             = 'http://zpays.com/api/merchant/requestTraderRechargeRmb';
 		$dataArr         = [
 			'amount'     => $price,
@@ -2819,12 +2818,12 @@ class Merchant extends Base {
 	 */
 	public function sfbtc_ajax() {//放行usdt
 		if (request()->isPost()) {
-			!session('uid') && $this->error('请登录操作');
+			!$this->uid && $this->error('请登录操作');
 			$id               = input('post.id');
 			$orderModel       = new OrderModel();
 			$mchModel         = new MerchantModel();
 			$where['id']      = $id;
-			$where['sell_id'] = session('uid');
+			$where['sell_id'] = $this->uid;
 			$orderInfo        = $orderModel->getOne($where);
 			empty($orderInfo) && $this->error('订单不存在');
 			($orderInfo['status'] == 5) && $this->error('订单已经被取消');
@@ -2833,7 +2832,7 @@ class Merchant extends Base {
 			$nopay = ($orderInfo['status'] == 0) ? 1 : 0;//20190830修改
 			// $this->error('此订单对方已经拍下还未付款');
 			($orderInfo['status'] >= 3) && $this->error('此订单已经释放无需再次释放');
-			$seller = $mchModel->getUserByParam(session('uid'), 'id');
+			$seller = $mchModel->getUserByParam($this->uid, 'id');
 			$buyer  = $mchModel->getUserByParam($orderInfo['buy_id'], 'id');
 			($seller['usdtd'] < $orderInfo['deal_num']) && $this->error('您的冻结不足，释放失败');
 			// 锁定操作 代码执行完成前不可继续操作 60秒后可再次点击操作
@@ -2851,47 +2850,47 @@ class Merchant extends Base {
 			$platformGet   = $platformGet ? $platformGet : 0;
 			$platformMoney = $platformGet * $orderInfo['deal_num'] / 100;
 			//承兑商卖单奖励
-			$traderGet         = $seller['trader_trader_get'];
-			$traderGet         = $traderGet ? $traderGet : 0;
-			$traderMoney       = $traderGet * $orderInfo['deal_num'] / 100;
-			$traderParentMoney = $traderMParentMoney = $tpexist = $mpexist = 0;
+			$sellerGet         = $seller['trader_trader_get'];
+			$sellerGet         = $sellerGet ? $sellerGet : 0;
+			$sellerMoney       = $sellerGet * $orderInfo['deal_num'] / 100;
+			$sellerParentMoney = $buyerParentMoney = $tpexist = $mpexist = 0;
 			if ($seller['pid']) {
 				$traderP = $mchModel->getUserByParam($seller['pid'], 'id');
 				if ($traderP['agent_check'] == 1 && $traderP['trader_parent_get']) {
 					//承兑商代理利润
 					$tpexist           = 1;
-					$traderParentGet   = $traderP['trader_parent_get'];
-					$traderParentGet   = $traderParentGet ? $traderParentGet : 0;
-					$traderParentMoney = $traderParentGet * $orderInfo['deal_num'] / 100;
+					$sellerParentGet   = $traderP['trader_parent_get'];
+					$sellerParentGet   = $sellerParentGet ? $sellerParentGet : 0;
+					$sellerParentMoney = $sellerParentGet * $orderInfo['deal_num'] / 100;
 				}
 			}
 			if ($buyer['pid']) {
-				$buyerP = $mchModel->getUserByParam($buyer['pid'], 'id');
-				$buyerP['enable_new_get'] == 0 ? $traderMParentGet = $buyerP['trader_merchant_parent_get'] : $traderMParentGet = $buyer['trader_merchant_parent_get_new'];
-				if ($buyerP['agent_check'] == 1 && $traderMParentGet) {
+				$buyerParent = $mchModel->getUserByParam($buyer['pid'], 'id');
+				$buyerParentGet = $buyerParent['enable_new_get'] == 0 ?  $buyerParent['trader_merchant_parent_get'] : $buyer['trader_merchant_parent_get_new'];
+				if ($buyerParent['agent_check'] == 1 && $buyerParentGet) {
 					//商户代理利润
 					$mpexist = 1;
-					//$traderMParentGet   = $buyerP['trader_merchant_parent_get'];
-					$traderMParentGet   = $traderMParentGet ? $traderMParentGet : 0;
-					$traderMParentMoney = $traderMParentGet * $orderInfo['deal_num'] / 100;
+					//$buyerParentGet   = $buyerParent['trader_merchant_parent_get'];
+					$buyerParentGet   = $buyerParentGet ? $buyerParentGet : 0;
+					$buyerParentMoney = $buyerParentGet * $orderInfo['deal_num'] / 100;
 				}
 				/*
 				if ($buyerP['agent_check'] == 1 && $buyerP['trader_merchant_parent_get']) {
 					//商户代理利润
 					$mpexist            = 1;
-					$traderMParentGet   = $buyerP['trader_merchant_parent_get'];
-					$traderMParentGet   = $traderMParentGet ? $traderMParentGet : 0;
-					$traderMParentMoney = $traderMParentGet * $orderInfo['deal_num'] / 100;
+					$sellerParentGet   = $buyerP['trader_merchant_parent_get'];
+					$sellerParentGet   = $traderMParentGet ? $traderMParentGet : 0;
+					$sellerParentGetMoney = $traderMParentGet * $orderInfo['deal_num'] / 100;
 				}
 				*/
 			}
 			//平台，承兑商代理，商户代理，承兑商，商户只能得到这么多，多的给平台
-			$moneyArr           = getMoneyByLevel($pkdec, $platformMoney, $traderParentMoney, $traderMParentMoney, $traderMoney);
+			$moneyArr           = getMoneyByLevel($pkdec, $platformMoney, $sellerParentMoney, $buyerParentMoney, $sellerMoney);
 			$mum                = $mum - $pkdec;
 			$platformMoney      = $moneyArr[0];
-			$traderParentMoney  = $moneyArr[1];
-			$traderMParentMoney = $moneyArr[2];
-			$traderMoney        = $moneyArr[3];
+			$sellerParentMoney  = $moneyArr[1];
+			$buyerParentMoney = $moneyArr[2];
+			$sellerMoney        = $moneyArr[3];
 			Db::startTrans();
 			try {
 				$rs1 = balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$orderInfo['deal_num'], 0, BAL_SOLD, $orderInfo['id']);
@@ -2912,34 +2911,34 @@ class Merchant extends Base {
 				$rs5      = Db::name('merchant')->where('id', $orderInfo['sell_id'])->update(['averge' => intval($tt / $transact)]);
 				//承兑商卖单奖励
 				$rs6 = $rs7 = $rs8 = $rs9 = $rs10 = $rs11 = $res3 = TRUE;
-				if ($traderMoney > 0) {
-					$rs6 = balanceChange(FALSE, $orderInfo['sell_id'], $traderMoney, 0, 0, 0, BAL_COMMISSION, $orderInfo['id']);
-					//$rs6 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $traderMoney);
-					$rs7 = Db::name('trader_reward')->insert(['uid' => $orderInfo['sell_id'], 'orderid' => $orderInfo['id'], 'amount' => $traderMoney, 'type' => 0, 'create_time' => time()]);
+				if ($sellerMoney > 0) {
+					$rs6 = balanceChange(FALSE, $orderInfo['sell_id'], $sellerMoney, 0, 0, 0, BAL_COMMISSION, $orderInfo['id']);
+					//$rs6 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $sellerMoney);
+					$rs7 = Db::name('trader_reward')->insert(['uid' => $orderInfo['sell_id'], 'orderid' => $orderInfo['id'], 'amount' => $sellerMoney, 'type' => 0, 'create_time' => time()]);
 				}
 				//承兑商代理利润
-				if ($traderParentMoney > 0 && $tpexist) {
-					$rsarr = agentReward($seller['pid'], $orderInfo['sell_id'], $traderParentMoney, 3);//3
-					$rs8   = $rsarr[0];
-					$rs9   = $rsarr[1];
+				if ($sellerParentMoney > 0 && $tpexist) {
+					$rsArr = agentReward($seller['pid'], $orderInfo['sell_id'], $sellerParentMoney, 3);//3
+					$rs8   = $rsArr[0];
+					$rs9   = $rsArr[1];
 				}
 				//商户代理利润
-				if ($traderMParentMoney > 0 && $mpexist) {
-					$rsarr = agentReward($buyer['pid'], $orderInfo['buy_id'], $traderMParentMoney, 4);//4
-					$rs10  = $rsarr[0];
-					$rs11  = $rsarr[1];
+				if ($buyerParentMoney > 0 && $mpexist) {
+					$rsArr = agentReward($buyer['pid'], $orderInfo['buy_id'], $buyerParentMoney, 4);//4
+					$rs10  = $rsArr[0];
+					$rs11  = $rsArr[1];
 				}
 				// 平台利润
 				if ($platformMoney > 0) {
-					$rsarr = agentReward(-1, 0, $platformMoney, 5);//5
-					$res3  = $rsarr[1];
+					$rsArr = agentReward(-1, 0, $platformMoney, 5);//5
+					$res3  = $rsArr[1];
 				}
 				if ($rs1 && $rs2 && $rs3 && $rs4 && $rs6 && $rs7 && $rs8 && $rs9 && $rs10 && $rs11 && $res3) {
 					// 提交事务
 					Db::commit();
 					financelog($orderInfo['buy_id'], $mum, '买入USDT_f1', 0, session('user.name'));//添加日志
-					if ($traderMoney > 0) {
-						financelog($orderInfo['sell_id'], $traderMoney, '承兑商卖单奖励_f1', 0, session('user.name'));//添加日志
+					if ($sellerMoney > 0) {
+						financelog($orderInfo['sell_id'], $sellerMoney, '承兑商卖单奖励_f1', 0, session('user.name'));//添加日志
 					}
 					getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $orderInfo['deal_num']);
 					//请求回调接口
@@ -2971,19 +2970,19 @@ class Merchant extends Base {
 	 */
 	public function sfbtc_ajax_merchant() {
 		if (request()->isPost()) {
-			(!session('uid')) && $this->error('请登录操作');
+			!$this->uid && $this->error('请登录操作');
 			$id = input('post.id');
 			// dump($id);
 			$mchModel         = new MerchantModel();
 			$where['id']      = $id;
-			$where['sell_id'] = session('uid');
+			$where['sell_id'] = $this->uid;
 			$orderInfo        = Db::name('order_sell')->where($where)->find();
 			(empty($orderInfo)) && $this->error('订单不存在');
 			($orderInfo['status'] == 5) && $this->error('订单已经被取消');
 			($orderInfo['status'] == 6) && $this->error('订单申诉中，无法释放');
 			($orderInfo['status'] == 0) && $this->error('此订单对方已经拍下还未付款');
 			($orderInfo['status'] >= 3) && $this->error('此订单已经释放无需再次释放');
-			$seller = $mchModel->getUserByParam(session('uid'), 'id');
+			$seller = $mchModel->getUserByParam($this->uid, 'id');
 			$buyer  = $mchModel->getUserByParam($orderInfo['buy_id'], 'id');
 			($seller['usdtd'] < $orderInfo['deal_num'] + $orderInfo['fee']) && $this->error('您的冻结不足，释放失败');
 			$fee  = config('usdt_buy_trader_fee');
@@ -3025,10 +3024,10 @@ class Merchant extends Base {
 		if (request()->isPost()) {
 			$content = input('post.content');
 			$id      = input('post.id');
-			(!session('uid')) && $this->error('请登录操作');
+			!$this->uid && $this->error('请登录操作');
 			$model            = new OrderModel();
 			$where['id']      = $id;
-			$where['sell_id'] = session('uid');
+			$where['sell_id'] = $this->uid;
 			$orderInfo        = $model->getOne($where);
 			(!$orderInfo) && $this->error('订单不存在');
 			($orderInfo['status'] == 5) && $this->error('该订单已经被取消');
@@ -3052,8 +3051,8 @@ class Merchant extends Base {
 			$order = 'a.id ' . $_GET['order'];
 		}
 		$model = new MerchantModel();
-		!session('uid') && $this->error('请登陆操作', url('home/login/login'));
-		$where['uid'] = session('uid');
+		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
+		$where['uid'] = $this->uid;
 		$this->assign('list', $model->getTraderReward($where, $order));
 		return $this->fetch();
 	}
@@ -3065,9 +3064,9 @@ class Merchant extends Base {
 		if (request()->isPost()) {
 			$content = input('post.content');
 			$id      = input('post.id');
-			(!session('uid')) && $this->error('请登录操作');
+			!$this->uid && $this->error('请登录操作');
 			$where['id']     = $id;
-			$where['buy_id'] = session('uid');
+			$where['buy_id'] = $this->uid;
 			$orderInfo       = Db::name('order_sell')->where($where)->find();
 			(!$orderInfo) && $this->error('订单不存在');
 			($orderInfo['status'] == 5) && $this->error('该订单已经被取消');
@@ -3090,9 +3089,9 @@ class Merchant extends Base {
 		if (request()->isPost()) {
 			$content = input('post.content');
 			$id      = input('post.id');
-			(!session('uid')) && $this->error('请登录操作');
+			!$this->uid && $this->error('请登录操作');
 			$where['id']      = $id;
-			$where['sell_id'] = session('uid');
+			$where['sell_id'] = $this->uid;
 			$orderInfo        = Db::name('order_sell')->where($where)->find();
 			(!$orderInfo) && $this->error('订单不存在');
 			($orderInfo['status'] == 5) && $this->error('该订单已经被取消');
@@ -3110,7 +3109,7 @@ class Merchant extends Base {
 
 	public function log() {
 		$model             = new MerchantModel();
-		$where['admin_id'] = session('uid');
+		$where['admin_id'] = $this->uid;
 		$log               = $model->getLoginLog($where, 'log_id desc');
 		$this->assign('log', $log);
 		return $this->fetch();

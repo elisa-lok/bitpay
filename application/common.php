@@ -395,9 +395,10 @@ function tradenoa() {
 	return substr(str_shuffle('ABCDEFGHIJKLMNPQRSTUVWXYZ'), 0, 6);
 }
 
-function agentReward($uid, $duid, $amount, $type) {
+function agentReward($uid, $duid, $amount, $type, $relateOrderId = '') {
 	$rs    = [];
-	$rs[0] = Db::name('merchant')->where('id', $uid)->setInc('usdt', $amount);
+	// $rs[0] = Db::name('merchant')->where('id', $uid)->setInc('usdt', $amount);
+	$rs[0] = balanceChange(false, $uid,$amount , 0 ,0 ,0 ,BAL_COMMISSION ,$relateOrderId);
 	$rs[1] = Db::name('agent_reward')->insert(['uid' => $uid, 'duid' => $duid, 'amount' => $amount, 'type' => $type, 'create_time' => time()]);
 	return $rs;
 }
@@ -523,27 +524,25 @@ function financelog($uid, $amount, $note, $status, $op) {
 	return $rs ? $rs : '记录失败';
 }
 
-function getMoneyByLevel($total, $pm, $tpm, $mpm, $tm) {
-	if ($pm >= $total) {
-		return [$total, 0, 0, 0];
+function getMoneyByLevel($totalFee, $platform, $sellerAgent, $buyerAgent, $sellerMoney) {
+	if ($platform >= $totalFee) {
+		return [$totalFee, 0, 0, 0];
 	}
-	if ($pm + $tpm >= $total) {
-		return [$pm, $total - $pm, 0, 0];
+	if ($platform + $sellerAgent >= $totalFee) {
+		return [$platform, $totalFee - $platform, 0, 0];
 	}
-	if ($pm + $tpm + $mpm >= $total) {
-		return [$pm, $tpm, $total - $pm - $tpm, 0];
+	if ($platform + $sellerAgent + $buyerAgent >= $totalFee) {
+		return [$platform, $sellerAgent, $totalFee - $platform - $sellerAgent, 0];
 	}
-	if ($pm + $tpm + $mpm + $tm >= $total) {
-		return [$pm, $tpm, $mpm, $total - $pm - $tpm - $mpm];
+	if ($platform + $sellerAgent + $buyerAgent + $sellerMoney >= $totalFee) {
+		return [$platform, $sellerAgent, $buyerAgent, $totalFee - $platform - $sellerAgent - $buyerAgent];
 	}
-	return [$total - $tpm - $mpm - $tm, $tpm, $mpm, $tm];
+	return [$totalFee - $sellerAgent - $buyerAgent - $sellerMoney, $sellerAgent, $buyerAgent, $sellerMoney];
 }
 
 function getStatisticsOfOrder($buyerid, $sellerid, $buyamount, $sellamount) {
-	Db::name('merchant')->where('id', $sellerid)->setInc('order_sell_success_num', 1);
-	Db::name('merchant')->where('id', $buyerid)->setInc('order_buy_success_num', 1);
-	Db::name('merchant')->where('id', $sellerid)->setInc('order_sell_usdt_amount', $sellamount);
-	Db::name('merchant')->where('id', $buyerid)->setInc('order_buy_usdt_amount', $buyamount);
+	Db::name('merchant')->where('id', $sellerid)->update(['order_sell_success_num'=>Db::raw('order_sell_success_num + 1'), 'order_sell_usdt_amount'=> Db::raw('order_sell_usdt_amount + '.$sellamount)]);
+	Db::name('merchant')->where('id', $buyerid)->update(['order_buy_success_num'=> Db::raw('order_buy_success_num + 1'), 'order_buy_usdt_amount'=> Db::raw('order_buy_usdt_amount + '.$buyamount)]);
 }
 
 function showMsg($msg = '', $code = 1, $data = [], $url = '#') {

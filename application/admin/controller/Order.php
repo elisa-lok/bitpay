@@ -51,7 +51,7 @@ class Order extends Base {
 
 				$merchant    = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
 				$buymerchant = Db::name('merchant')->where('id', $orderInfo['buy_id'])->find();
-				if ($merchant['usdtd'] < $orderInfo['deal_num']) showMsg('您的冻结不足，释放失败', 0);
+				if ($merchant['usdtd'] < $orderInfo['deal_num']) showMsg('您的冻结不足，交易失败', 0);
 
 				$nopay = ($orderInfo['status'] == 0) ? 1 : 0;
 				$sfee  = 0;
@@ -170,12 +170,12 @@ class Order extends Base {
 					} else {
 						// 回滚事务
 						Db::rollback();
-						showMsg('释放失败,请稍后再试!', 0);
+						showMsg('交易失败,请稍后再试!', 0);
 					}
 				} catch (\think\Exception\DbException $e) {
 					// 回滚事务
 					Db::rollback();
-					showMsg('释放失败，参考信息：' . $e->getMessage(), 0);
+					showMsg('交易失败，参考信息：' . $e->getMessage(), 0);
 				}
 			}
 			// 判断取消
@@ -262,7 +262,7 @@ class Order extends Base {
 			if (($args['status'] == 4) && ($src_status == 0 || $src_status == 1)) {
 				$merchant = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
 				if ($merchant['usdtd'] < $orderInfo['deal_num'] + $orderInfo['fee']) {
-					$this->error('您的冻结不足，释放失败');
+					$this->error('您的冻结不足，交易失败');
 				}
 				$fee  = config('usdt_buy_trader_fee');
 				$fee  = $fee ? $fee : 0;
