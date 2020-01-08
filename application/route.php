@@ -1,5 +1,6 @@
 <?php
 use think\Route;
+
 Route::rule('login','home/login/login', 'GET|POST');
 Route::rule('register','home/login/register', 'GET|POST');
 Route::rule('findpwd','home/login/findpwd', 'GET|POST');
@@ -23,9 +24,9 @@ Route::rule('merchant/payset','home/merchant/payset', 'GET|POST');
 Route::rule('merchant/newad','home/merchant/newad', 'GET|POST');
 Route::rule('merchant/newadbuy','home/merchant/newadbuy', 'GET|POST');
 Route::rule('merchant/orderlist','home/merchant/orderlist', 'GET|POST');
-Route::rule('merchant/editad','home/merchant/editad', 'GET|POST');
+// Route::rule('merchant/editad','home/merchant/editad', 'GET|POST'); //编辑广告
 Route::rule('merchant/pay','home/merchant/pay', 'GET|POST');
-Route::rule('merchant/editadbuy','home/merchant/editadbuy', 'GET|POST');
+// Route::rule('merchant/editadbuy','home/merchant/editadbuy', 'GET|POST');
 Route::rule('merchant/adindex','home/merchant/adindex', 'GET');
 Route::rule('merchant/addetail','home/merchant/addetail', 'GET');
 Route::rule('merchant/ordersell','home/merchant/ordersell', 'GET');

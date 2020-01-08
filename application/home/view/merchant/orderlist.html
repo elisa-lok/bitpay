@@ -146,7 +146,7 @@
 					$.post("{:url('home/merchant/checkpaypass')}", {paypassword: val}, function (respone) {
 						if (respone.code == 1) {
 							layer.close(val);
-							$.post("{:url('home/merchant/sfbtc_ajax')}", {id: id, type: type}, function (data) {
+							$.post("{:url('home/merchant/deal')}", {id: id, type: type}, function (data) {
 								// console.log(id)
 								shelf = data.url;
 								setTimeout("closetanchu()", 4000);
@@ -180,7 +180,7 @@
 						$.post("{:url('home/merchant/checkpaypass')}", {paypassword: val}, function (respone) {
 							if (respone.code == 1) {
 								layer.close(val);
-								$.post("{:url('home/merchant/sfbtc_ajax')}", {id: id, type: type}, function (data) {
+								$.post("{:url('home/merchant/deal')}", {id: id, type: type}, function (data) {
 									setTimeout("closetanchu()", 4000);
 									layer.close(index);
 									if (data.code == 1) {
