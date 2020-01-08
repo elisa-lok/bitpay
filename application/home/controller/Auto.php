@@ -2,6 +2,7 @@
 
 namespace app\home\controller;
 
+use think\Cache;
 use think\db;
 
 class Auto extends Base {
@@ -446,7 +447,6 @@ class Auto extends Base {
 		}
 		foreach ($list as $key => $vv) {
 			// 锁定操作 代码执行完成前不可继续操作
-
 			if (Cache::has($vv['id'])) continue;
 			Cache::set($vv['id'], TRUE, 60);
 

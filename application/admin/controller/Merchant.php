@@ -8,6 +8,7 @@ use app\admin\model\WithdrawModel;
 use app\common\model\Usdt;
 use app\home\controller\Auto;
 use com\IpLocation;
+use think\Cache;
 use think\db;
 use think\Exception\DbException;
 
@@ -1044,8 +1045,8 @@ class Merchant extends Base {
 		$buyerUsername = Db::name('merchant')->where('id', 'in', $buyerIds)->select();
 		$buyerUsername = array_column($buyerUsername, 'name', 'id');
 		foreach ($lists as $k => $v) {
-			$user    = Db::name('merchant')->where(['id' => $v['sell_id']])->find();
-			$accuser = Db::name('merchant')->where(['id' => $user['pid']])->find();
+			$user                 = Db::name('merchant')->where(['id' => $v['sell_id']])->find();
+			$accuser              = Db::name('merchant')->where(['id' => $user['pid']])->find();
 			$lists[$k]['accuser'] = $accuser['name'] . '/' . $accuser['mobile'];
 			$lists[$k]['name']    = $buyerUsername[$lists[$k]['buy_id']];
 			$lists[$k]['ctime']   = date("Y/m/d H:i:s", $v['ctime']);
@@ -1264,7 +1265,7 @@ class Merchant extends Base {
 			// $rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num'] + $orderInfo['fee']);
 			$rs2 = Db::name('order_sell')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'buyer_fee' => $sfee]);
 			// $rs3      = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('usdt', $mum);
-			$rs3 = balanceChange(FALSE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], "申述成功->buy");
+			$rs3      = balanceChange(FALSE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], "申述成功->buy");
 			$rs4      = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('transact_buy', 1);
 			$total    = Db::name('order_sell')->field('sum(dktime-ctime) as total')->where('buy_id', $orderInfo['buy_id'])->where('status', 4)->select();
 			$tt       = $total[0]['total'];
@@ -1306,9 +1307,6 @@ class Merchant extends Base {
 		if ($amount * 100 != $orderInfo['deal_amount'] * 100) {
 			$orderInfo['deal_num'] = round($amount / $orderInfo['deal_price'], 8);
 		}
-		//$fee = config('trader_merchant_fee');
-		//$fee = $fee ? $fee : 0;
-		//$sfee = $orderInfo['deal_num']*$fee/100;
 		$sfee        = 0;
 		$mum         = $orderInfo['deal_num'] - $sfee;
 		$buymerchant = Db::name('merchant')->where('id', $orderInfo['buy_id'])->find();
@@ -1382,7 +1380,7 @@ class Merchant extends Base {
 				$samount = $oldNum - $orderInfo['deal_num'];
 			}
 			//$rs3      = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('usdt', $mum);
-			$rs3 = balanceChange(FALSE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], "申述失败操作");
+			$rs3      = balanceChange(FALSE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], "申述失败操作");
 			$rs4      = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('transact', 1);
 			$total    = Db::name('order_buy')->field('sum(finished_time-dktime) as total')->where('sell_id', $orderInfo['sell_id'])->where('status', 4)->select();
 			$tt       = $total[0]['total'];
@@ -1534,8 +1532,8 @@ class Merchant extends Base {
 
 		(input('get.page'))  && showJson($lists);
 		*/
-		$this->assign('Nowpage', 1); //当前页
-		$this->assign('allpage', 1); //总页数
+		$this->assign('Nowpage', 1);                              //当前页
+		$this->assign('allpage', 1);                              //总页数
 		$this->assign('total_balance', $total_balance);           //总USDT
 		$this->assign('withdraw_num', $withdraw_num);             //总提币数量
 		$this->assign('withdraw_fee', $withdraw_fee);             //总提币手续费
@@ -1579,17 +1577,17 @@ class Merchant extends Base {
 			$buy_number      = $list->orderSell()->count('id');                                                                   // 购买数量
 			$success_rate    = ($success_number == 0 || $buy_number == 0) ? 0 : round(($success_number / $buy_number) * 100, 2);  // 成功率
 			// 获取当天笔数
-			$where['ctime'] = ['egt', $today];
+			$where['ctime']       = ['egt', $today];
 			$today_number         = $list->orderSell()->where($where)->count('id');                                                                                             // 当天笔数
 			$today_amount         = $list->orderSell()->where($where)->sum('deal_amount');                                                                                      // 当天数量
 			$today_success_number = $list->orderSell()->where($where)->where('status', 4)->count('id');                                                                         // 当天成功笔数
 			$today_success_amount = $list->orderSell()->where($where)->where('status', 4)->sum('deal_amount');                                                                  // 当天成功数量
 			if ($today_success_number == 0 || $today_number == 0) $today_success_rate = 0; else $today_success_rate = round(($today_success_number / $today_number) * 100, 2);  // 成功率
-			$lists[$key]['recharge_number'] = $recharge_number;
-			$lists[$key]['recharge_amount'] = $recharge_amount;
-			$lists[$key]['success_number']  = $success_number;
-			$lists[$key]['success_amount']  = $success_amount;
-			$lists[$key]['success_rate']    = $success_rate;
+			$lists[$key]['recharge_number']      = $recharge_number;
+			$lists[$key]['recharge_amount']      = $recharge_amount;
+			$lists[$key]['success_number']       = $success_number;
+			$lists[$key]['success_amount']       = $success_amount;
+			$lists[$key]['success_rate']         = $success_rate;
 			$lists[$key]['today_number']         = $today_number;
 			$lists[$key]['today_amount']         = $today_amount;
 			$lists[$key]['today_success_number'] = $today_success_number;
