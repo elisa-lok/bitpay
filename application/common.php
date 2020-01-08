@@ -3,7 +3,11 @@ use Aliyun\Api\Sms\Request\V20170525\SendSmsRequest;
 use Aliyun\Core\Config;
 use Aliyun\Core\DefaultAcsClient;
 use Aliyun\Core\Profile\DefaultProfile;
+use think\Cache;
 use think\Db;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\exception\DbException;
 
 /**
  * 字符串截取，支持中文和其他编码
@@ -39,7 +43,6 @@ function load_config() {
 	foreach ($list as $k => $v) {
 		$config[trim($v['name'])] = $v['value'];
 	}
-
 	return $config;
 }
 
@@ -65,14 +68,12 @@ function isMobile($mobile) {
 function sendMsg($mobile, $tplCode, $tplParam) {
 	if (empty($mobile) || empty($tplCode)) return ['Message' => '缺少参数', 'Code' => 'Error'];
 	if (!isMobile($mobile)) return ['Message' => '无效的手机号', 'Code' => 'Error'];
-
 	require_once '../extend/aliyunsms/vendor/autoload.php';
 	Config::load();             //加载区域结点配置
 	$accessKeyId     = config('alisms_appkey');
 	$accessKeySecret = config('alisms_appsecret');
 	if (empty($accessKeyId) || empty($accessKeySecret)) return ['Message' => '请先在后台配置appkey和appsecret', 'Code' => 'Error'];
 	$templateParam = $tplParam; //模板变量替换
-
 	//$signName = (empty(config('alisms_signname'))?'阿里大于测试专用':config('alisms_signname'));
 	$signName = config('alisms_signname');
 	//短信模板ID
@@ -105,7 +106,6 @@ function sendMsg($mobile, $tplCode, $tplParam) {
 	$acsResponse = $acsClient->getAcsResponse($request);
 	//返回请求结果
 	$result = json_decode(json_encode($acsResponse), TRUE);
-
 	return $result;
 }
 
@@ -120,7 +120,6 @@ function Qrcode($token, $url, $size = 8) {
 	$file     = 'qrcode/' . $dir . $md5 . '.png';
 	$fileName = $file;
 	if (!file_exists($fileName)) {
-
 		$level = 'L';
 		$data  = $url;
 		QRcode::png($data, $fileName, $level, $size, 2, TRUE);
@@ -152,7 +151,6 @@ function delete_dir_file($dir_name) {
 			}
 		}
 	}
-
 	return $result;
 }
 
@@ -218,15 +216,13 @@ function getRandomString($len, $chars = NULL) {
 
 function random_str($length) {
 	//生成一个包含 大写英文字母, 小写英文字母, 数字 的数组
-	$arr = array_merge(range(0, 9), range('a', 'z'), range('A', 'Z'));
-
+	$arr     = array_merge(range(0, 9), range('a', 'z'), range('A', 'Z'));
 	$str     = '';
 	$arr_len = count($arr);
 	for ($i = 0; $i < $length; $i++) {
 		$rand = mt_rand(0, $arr_len - 1);
 		$str  .= $arr[$rand];
 	}
-
 	return $str;
 }
 
@@ -247,7 +243,6 @@ function sql_check() {
 	$getfilter    = "'|(and|or)\\b.+?(>|<|=|in|like)|\\/\\*.+?\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT|UPDATE.+?SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE).+?FROM|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)";
 	$postfilter   = "\\b(and|or)\\b.{1,6}?(=|>|<|\\bin\\b|\\blike\\b)|\\/\\*.+?\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT|UPDATE.+?SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE).+?FROM|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)";
 	$cookiefilter = "\\b(and|or)\\b.{1,6}?(=|>|<|\\bin\\b|\\blike\\b)|\\/\\*.+?\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT|UPDATE.+?SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE).+?FROM|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)";
-
 	foreach ($_GET as $key => $value) {
 		if (!stopattack($key, $value, $getfilter)) return FALSE;
 	}
@@ -365,15 +360,12 @@ function curl_post($url, $post_data = []) {
 	curl_setopt($ch, CURLOPT_URL, $url);
 	$resp = curl_exec($ch); //执行发送
 	curl_close($ch);
-
 	return $resp;
 }
 
 function curl_get($url) {
-	$testurl = $url;
-	$ch      = curl_init();
+	$ch = curl_init($url);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-	curl_setopt($ch, CURLOPT_URL, $testurl);
 	//参数为1表示传输数据，为0表示直接输出显示。
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	//参数为0表示不带头文件，为1表示带头文件
@@ -381,9 +373,9 @@ function curl_get($url) {
 	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
 	curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 5);
 	//curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded'));
-	$output = curl_exec($ch);
+	$res = curl_exec($ch);
 	curl_close($ch);
-	return $output;
+	return $res;
 }
 
 function getTotalInfo($where, $table, $field) {
@@ -396,9 +388,9 @@ function tradenoa() {
 }
 
 function agentReward($uid, $duid, $amount, $type, $relateOrderId = '') {
-	$rs    = [];
+	$rs = [];
 	// $rs[0] = Db::name('merchant')->where('id', $uid)->setInc('usdt', $amount);
-	$rs[0] = balanceChange(false, $uid,$amount , 0 ,0 ,0 ,BAL_COMMISSION ,$relateOrderId);
+	$rs[0] = balanceChange(FALSE, $uid, $amount, 0, 0, 0, BAL_COMMISSION, $relateOrderId);
 	$rs[1] = Db::name('agent_reward')->insert(['uid' => $uid, 'duid' => $duid, 'amount' => $amount, 'type' => $type, 'create_time' => time()]);
 	return $rs;
 }
@@ -407,28 +399,17 @@ function apilog($uid, $duid, $api_name, $request_param, $return_param) {
 	Db::name('merchant_apilog')->insert(['uid' => $uid, 'duid' => $duid, 'api_name' => $api_name, 'request_param' => $request_param, 'return_param' => $return_param, 'create_time' => time()]);
 }
 
-function getUsdtPrice() {
-	$data     = curl_get('https://otc-api.huobi.pro/v1/data/market/detail');//获取火币价格
-	$price    = 0;
-	$data_arr = json_decode($data, TRUE);
-	if ($data_arr['success'] == TRUE) {
-		$buyprice  = $data_arr['data']['detail'][2]['buy'];
-		$sellprice = $data_arr['data']['detail'][2]['sell'];
-		// $map['buy']=$data_arr['data']['detail'][2]['buy'];
-		// $map['sell']=$data_arr['data']['detail'][2]['sell'];
-		// $map['addtime']=time();
-		// Db::name('hbprice')->where('id',1)->update($map);
-	} else {
-		$buyprice  = 7.00;
-		$sellprice = 7.00;
+function getUsdtPrice($ignore = FALSE) {
+	$price = Cache::get('usdt_price');
+	if (!$price) {
+		$url  = $ignore ? 'https://otc-api.hbg.com/v1/data/market/detail' : 'https://otc-api.huobi.pro/v1/data/market/detail';
+		$data = curl_get($url);//获取火币价格
+		$res  = json_decode($data, TRUE);
+		//$sellPrice = $data_arr['data']['detail'][2]['sell'];
+		$price = $res['success'] == TRUE ? $res['data']['detail'][2]['buy'] : ($ignore ? 7.00 : getUsdtPrice(TRUE));
+		($price != 7.00) && Cache::set('usdt_price', $price, 180);
 	}
-	// dump($sellprice);
-
-	// if($data_arr[0]['price_cny']>0){
-	//    $price=round($data_arr[0]['price_cny'],2);
-	// }
-	// return $price;
-	return $buyprice;
+	return $price;
 }
 
 function getUsdtPrice_old() {
@@ -471,14 +452,13 @@ function sendSms($mobile, $content) {
 	curl_setopt($curlHandle, CURLOPT_POSTFIELDS, $params);
 	$resp = curl_exec($curlHandle);
 	curl_close($curlHandle);
-
 	return $resp;
 }
 
-function sendNotice($userId, $title, $msg){
+function sendNotice($userId, $title, $msg) {
 	$user = Db::name('merchant')->where($userId)->find();
-	if($user && isset($user['device'])){
-		Db::name('msg')->insert(['device_id'=> $user['device'], 'title' =>$title, 'msg' =>  $msg]);
+	if ($user && isset($user['device'])) {
+		Db::name('msg')->insert(['device_id' => $user['device'], 'title' => $title, 'msg' => $msg]);
 	}
 }
 
@@ -492,7 +472,7 @@ function askNotify($data, $url, $key) {
 	$sign         = strtoupper(sha1($reserverStr));
 	$data['sign'] = $sign;
 	$return       = curl_post($url, $data);
-	file_put_contents(RUNTIME_PATH . 'data/notify_'.date('ymd').'.log', '【'.date('Y-m-d H:i:s', time()).'】【URL】'.$url.'【返回】' . $return .',【请求】' . json_encode($data,320) . PHP_EOL, FILE_APPEND);
+	file_put_contents(RUNTIME_PATH . 'data/notify_' . date('ymd') . '.log', '【' . date('Y-m-d H:i:s', time()) . '】【URL】' . $url . '【返回】' . $return . ',【请求】' . json_encode($data, 320) . PHP_EOL, FILE_APPEND);
 }
 
 function go_mobile() {
@@ -513,12 +493,10 @@ function checkName($name) {
 	if ($strLen < 2 || $strLen > 8) {//字符长度2到8之间
 		return FALSE;
 	}
-
 	return $ret;
 }
 
 function financelog($uid, $amount, $note, $status, $op) {
-
 	$user = Db::name('merchant')->where('id', $uid)->find();
 	$rs   = Db::name('financelog')->insert(['uid' => $uid, 'user' => $user['name'], 'note' => $note, 'amount' => $amount, 'status' => $status, 'add_time' => time(), 'op' => $op]);
 	return $rs ? $rs : '记录失败';
@@ -541,8 +519,8 @@ function getMoneyByLevel($totalFee, $platform, $sellerAgent, $buyerAgent, $selle
 }
 
 function getStatisticsOfOrder($buyerid, $sellerid, $buyamount, $sellamount) {
-	Db::name('merchant')->where('id', $sellerid)->update(['order_sell_success_num'=>Db::raw('order_sell_success_num + 1'), 'order_sell_usdt_amount'=> Db::raw('order_sell_usdt_amount + '.$sellamount)]);
-	Db::name('merchant')->where('id', $buyerid)->update(['order_buy_success_num'=> Db::raw('order_buy_success_num + 1'), 'order_buy_usdt_amount'=> Db::raw('order_buy_usdt_amount + '.$buyamount)]);
+	Db::name('merchant')->where('id', $sellerid)->update(['order_sell_success_num' => Db::raw('order_sell_success_num + 1'), 'order_sell_usdt_amount' => Db::raw('order_sell_usdt_amount + ' . $sellamount)]);
+	Db::name('merchant')->where('id', $buyerid)->update(['order_buy_success_num' => Db::raw('order_buy_success_num + 1'), 'order_buy_usdt_amount' => Db::raw('order_buy_usdt_amount + ' . $buyamount)]);
 }
 
 function showMsg($msg = '', $code = 1, $data = [], $url = '#') {
@@ -569,9 +547,9 @@ function showJson($data = [], $code = 200, $header = [], $options = []) {
  * @param string $memo
  * @return bool|string
  * @throws \think\Exception
- * @throws \think\db\exception\DataNotFoundException
- * @throws \think\db\exception\ModelNotFoundException
- * @throws \think\exception\DbException
+ * @throws DataNotFoundException
+ * @throws ModelNotFoundException
+ * @throws DbException
  * @throws \think\exception\PDOException
  */
 function balanceChange($enableTrans = TRUE, $uid = 0, float $modAmt = 0, float $fee = 0, float $frozenModAmt = 0, float $frozenFee = 0, $actType = 0, $relateId = '', $memo = '') {
@@ -626,7 +604,6 @@ function balanceChange($enableTrans = TRUE, $uid = 0, float $modAmt = 0, float $
 	return FALSE;
 }
 
-
 /**
  * * 修改金额, 直接填入输入后的金额
  * @param bool   $enableTrans    是否启动事务
@@ -640,9 +617,9 @@ function balanceChange($enableTrans = TRUE, $uid = 0, float $modAmt = 0, float $
  * @param string $memo           备注
  * @return bool|string
  * @throws \think\Exception
- * @throws \think\db\exception\DataNotFoundException
- * @throws \think\db\exception\ModelNotFoundException
- * @throws \think\exception\DbException
+ * @throws DataNotFoundException
+ * @throws ModelNotFoundException
+ * @throws DbException
  * @throws \think\exception\PDOException
  */
 function balanceMod($enableTrans = TRUE, $uid = 0, float $afterAmt = 0, float $fee = 0, float $afterFrozenAmt = 0, float $frozenFee = 0, $actType = 0, $relateId = '', $memo = '') {

@@ -255,7 +255,7 @@
                 $.post("{:url('home/merchant/checkpaypass')}", { paypassword: val }, function(respone) {
                     if (respone.code == 1) {
                         layer.close(val);
-                        $.post("{:url('home/merchant/sfbtc_ajax_merchant')}", {id:id, type:type}, function(data) {
+                        $.post("{:url('home/merchant/deal_merchant')}", {id:id, type:type}, function(data) {
                             shelf = data.url;
                             setTimeout("closetanchu()", 4000);
                             if (data.code == 1) {
