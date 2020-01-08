@@ -2,8 +2,8 @@
 return [
 	'type'            => 'mysql',       // 数据库类型
 	'hostname'        => '127.0.0.1',   // 服务器地址
-	'database'        => 'pay',            // 数据库名
-	'username'        => 'pay',        // 用户名
+	'database'        => 'pay_test',            // 数据库名
+	'username'        => 'pay_test',        // 用户名
 	'password'        => '123qweASD',   // 密码
 	'hostport'        => '3306',             // 端口
 	'dsn'             => '',                 // 连接dsn

@@ -402,12 +402,12 @@ function apilog($uid, $duid, $api_name, $request_param, $return_param) {
 function getUsdtPrice($ignore = FALSE) {
 	$price = Cache::get('usdt_price');
 	if (!$price) {
-		$url  = $ignore ? 'https://otc-api.hbg.com/v1/data/market/detail' : 'https://otc-api.huobi.pro/v1/data/market/detail';
+		$url  = $ignore ? 'https://otc-api.huobi.pro/v1/data/market/detail' : 'https://otc-api.hbg.com/v1/data/market/detail';
 		$data = curl_get($url);//获取火币价格
 		$res  = json_decode($data, TRUE);
 		//$sellPrice = $data_arr['data']['detail'][2]['sell'];
 		$price = $res['success'] == TRUE ? $res['data']['detail'][2]['buy'] : ($ignore ? 7.00 : getUsdtPrice(TRUE));
-		($price != 7.00) && Cache::set('usdt_price', $price, 180);
+		($price != 7.00) && Cache::set('usdt_price', $price, 600);
 	}
 	return $price;
 }
