@@ -518,6 +518,31 @@ function getMoneyByLevel($totalFee, $platform, $sellerAgent, $buyerAgent, $selle
 	return [$totalFee - $sellerAgent - $buyerAgent - $sellerMoney, $sellerAgent, $buyerAgent, $sellerMoney];
 }
 
+// 获取最上层所赋予的卖单利润
+function getTopAgentFeeRate($parentUid, $timeout = 900) {
+	$pidRate = Cache::get('pid_rate_' . $parentUid);
+	if (!$pidRate) {
+		$userModel   = Db::name('merchant');
+		$firstParent = $userModel->where('id', $parentUid)->find();
+		// 上级不存在
+		if (!$firstParent || $firstParent['pid'] < 1) {
+			$pidRate = 0;
+		} else {
+			// 上上级别
+			$secondParent = $userModel->where('id', $firstParent['pid'])->find();
+			if (!$secondParent || $secondParent['pid'] < 1) {
+				$pidRate = $firstParent['trader_parent_get'];
+			} else {
+				// 上上上级别
+				$thirdParent = $userModel->where('id', $secondParent['pid'])->find();
+				$pidRate     = $thirdParent ? $thirdParent['trader_parent_get'] : $secondParent['trader_parent_get'];
+			}
+		}
+		Cache::set('pid_' . $parentUid, $pidRate, $timeout);
+	}
+	return $pidRate;
+}
+
 function getStatisticsOfOrder($buyerid, $sellerid, $buyamount, $sellamount) {
 	Db::name('merchant')->where('id', $sellerid)->update(['order_sell_success_num' => Db::raw('order_sell_success_num + 1'), 'order_sell_usdt_amount' => Db::raw('order_sell_usdt_amount + ' . $sellamount)]);
 	Db::name('merchant')->where('id', $buyerid)->update(['order_buy_success_num' => Db::raw('order_buy_success_num + 1'), 'order_buy_usdt_amount' => Db::raw('order_buy_usdt_amount + ' . $buyamount)]);
