@@ -15,8 +15,8 @@ class Auto extends Base {
 		PHP_SAPI != 'cli' && die('error');
 		// $accounts = Db::name('address')->where(array('status'=>1,'type'=>'eth'))->field('uid,address')->select();
 		$time     = time();
-		$confirms = Db::name('config')->where('name', 'usdt_confirms')->value('value');//确认次数
-		$feemy    = Db::name('config')->where('name', 'agent_recharge_fee')->value('value');//充值手续费
+		$confirms = config('usdt_confirms');//确认次数
+		$feemy    = config('agent_recharge_fee');//充值手续费
 		empty($confirms) && die('请设置确认数');
 		$wei      = 1e6;
 		$addr     = config('usdtaddr');//usdt合约地址
@@ -172,8 +172,8 @@ class Auto extends Base {
 		}
 		$time = time();
 		// dump($time);
-		$confirms = Db::name('config')->where('name', 'usdt_confirms')->value('value');//充值手续费
-		$feemy    = Db::name('config')->where('name', 'agent_recharge_fee')->value('value');//充值手续费
+		$confirms = config('usdt_confirms');//充值手续费
+		$feemy    = config('agent_recharge_fee');//充值手续费
 		if (empty($confirms)) {
 			exit('请设置确认数');
 		}
@@ -322,8 +322,8 @@ class Auto extends Base {
 		 }
 		 */
 		$time = time();
-		//$fee = Db::name('config')->where('name', 'user_recharge_fee')->value('value');//充值手续费
-		$confirms = Db::name('config')->where('name', 'usdt_confirms')->value('value');//充值手续费
+		//$fee = config('user_recharge_fee')->value('value');//充值手续费
+		$confirms = config('usdt_confirms');//充值手续费
 		if (empty($confirms)) {
 			exit('请设置确认数');
 		}
@@ -588,7 +588,7 @@ class Auto extends Base {
 		if (PHP_SAPI != 'cli') {//只允许cli模式访问
 			die('error');
 		}
-		$remain = Db::name('config')->where('name', 'ad_down_remain_amount')->value('value');//充值手续费
+		$remain = config('ad_down_remain_amount');//充值手续费
 		// dump($remain);
 		//挂卖下架
 		// $sellids = Db::name('ad_sell')->field('id, amount, userid')->where('state', 1)->where('amount', 'gt', 0)->select();
@@ -640,7 +640,7 @@ class Auto extends Base {
 	// 更新市价单价格
 	public function updateAdSellPrice() {
 		(PHP_SAPI != 'cli') && die('error');
-		$usdtPriceWay = Db::name('config')->where('name', 'usdt_price_way')->value('value');
+		$usdtPriceWay = config('usdt_price_way');
 		($usdtPriceWay == 0) && die('price way error');
 		// $addFee = $usdtPriceWay == 2 ? config('usdt_price_add') : 0;
 
@@ -658,7 +658,7 @@ class Auto extends Base {
 	// 更新市价单价格
 	public function updateAdBuyPrice() {
 		(PHP_SAPI != 'cli') && die('error');
-		$usdtPriceWay = Db::name('config')->where('name', 'usdt_price_way_buy')->value('value');
+		$usdtPriceWay = config('usdt_price_way_buy');
 		($usdtPriceWay == 0) && die('price way error');
 		$addFee = $usdtPriceWay == 2 ? config('usdt_price_add_buy') : 0;
 		// 只有支持加价模式的变动

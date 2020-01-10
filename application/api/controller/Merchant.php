@@ -334,7 +334,7 @@ class Merchant extends Base {
 		foreach ($ads as $k => $v) {
 			//开始判断挂单剩余
 			//$total     = Db::name('order_buy')->where('sell_sid', $v['id'])->whereNotIn('status', '5,9')->sum('deal_num');
-			$actualAmt = number_format($data['amount'] / $v['price'], 8, '.', ''); //todo 修改成动态价格
+			$actualAmt = number_format($data['amount'] / $v['price'], 8, '.', ''); //todo 修改成动态价格查询匹配的价格
 			if ($v['remain_amount'] < $actualAmt) {
 				continue;
 			}

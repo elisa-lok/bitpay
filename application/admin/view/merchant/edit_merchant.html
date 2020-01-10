@@ -169,9 +169,15 @@
 						{eq name="merchant['reg_type']" value="3"} {eq name="merchant['agent_check']" value="1"}
 						<div class="hr-line-dashed"></div>
 						<div class="form-group">
-							<label class="col-sm-3 control-label">下级承兑商卖单利润比例：</label>
+							<label class="col-sm-3 control-label">下级承兑卖单佣金比例：</label>
 							<div class="input-group">
-								<input id="trader_parent_get" type="text" class="form-control" name="trader_parent_get" value="{$merchant.trader_parent_get}" placeholder="下级承兑商卖单利润">%
+								<input id="trader_parent_get" type="text" class="form-control" name="trader_parent_get" value="{$merchant.trader_parent_get}" placeholder="下级承兑卖单佣金比例">%
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label">下级承兑卖单利润比例：</label>
+							<div class="input-group">
+								<input id="tariff" type="text" class="form-control" name="tariff" value="{$merchant.tariff}" placeholder="下级承兑商卖单利润">%
 							</div>
 						</div>
 						<div class="hr-line-dashed"></div>
