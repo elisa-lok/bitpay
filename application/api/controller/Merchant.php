@@ -415,9 +415,9 @@ class Merchant extends Base {
 				}
 				$http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
 				if ($data['type'] != 'all') {
-					$url = $http_type . $_SERVER['HTTP_HOST'] . '/home/merchant/pay_a?id=' . $rs2 . '&appid=' . $data['appid'] . '&type=' . $data['type'];
+					$url = $http_type . $_SERVER['HTTP_HOST'] . '/home/merchant/pay_a?id=' . $orderAddRes . '&appid=' . $data['appid'] . '&type=' . $data['type'];
 				} else {
-					$url = $http_type . $_SERVER['HTTP_HOST'] . '/merchant/pay?id=' . $rs2 . '&appid=' . $data['appid'] . '&type=' . $data['type'];
+					$url = $http_type . $_SERVER['HTTP_HOST'] . '/merchant/pay?id=' . $orderAddRes . '&appid=' . $data['appid'] . '&type=' . $data['type'];
 				}
 				Cache::rm('sell_order_lock_' . $onlineAd['id']);
 				$this->suc($url);

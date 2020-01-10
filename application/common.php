@@ -363,15 +363,15 @@ function curl_post($url, $post_data = []) {
 	return $resp;
 }
 
-function curl_get($url) {
+function curl_get($url, $ttl = 5) {
 	$ch = curl_init($url);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 	//参数为1表示传输数据，为0表示直接输出显示。
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	//参数为0表示不带头文件，为1表示带头文件
 	curl_setopt($ch, CURLOPT_HEADER, 0);
-	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-	curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 5);
+	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $ttl);
+	curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, $ttl);
 	//curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded'));
 	$res = curl_exec($ch);
 	curl_close($ch);
@@ -399,11 +399,11 @@ function apilog($uid, $duid, $api_name, $request_param, $return_param) {
 	Db::name('merchant_apilog')->insert(['uid' => $uid, 'duid' => $duid, 'api_name' => $api_name, 'request_param' => $request_param, 'return_param' => $return_param, 'create_time' => time()]);
 }
 
-function getUsdtPrice($ignore = FALSE) {
+function getUsdtPrice($ignore = FALSE, $ttl = 5) {
 	$price = Cache::get('usdt_price');
 	if (!$price) {
 		$url  = $ignore ? 'https://otc-api.huobi.pro/v1/data/market/detail' : 'https://otc-api.hbg.com/v1/data/market/detail';
-		$data = curl_get($url);//获取火币价格
+		$data = curl_get($url, $ttl);//获取火币价格
 		$res  = json_decode($data, TRUE);
 		//$sellPrice = $data_arr['data']['detail'][2]['sell'];
 		$price = $res['success'] == TRUE ? $res['data']['detail'][2]['buy'] : ($ignore ? 7.00 : getUsdtPrice(TRUE));
@@ -516,31 +516,6 @@ function getMoneyByLevel($totalFee, $platform, $sellerAgent, $buyerAgent, $selle
 		return [$platform, $sellerAgent, $buyerAgent, $totalFee - $platform - $sellerAgent - $buyerAgent];
 	}
 	return [$totalFee - $sellerAgent - $buyerAgent - $sellerMoney, $sellerAgent, $buyerAgent, $sellerMoney];
-}
-
-// 获取最上层所赋予的卖单利润
-function getTopAgentFeeRate($parentUid, $timeout = 900) {
-	$pidRate = Cache::get('pid_rate_' . $parentUid);
-	if (!$pidRate) {
-		$userModel   = Db::name('merchant');
-		$firstParent = $userModel->where('id', $parentUid)->find();
-		// 上级不存在
-		if (!$firstParent || $firstParent['pid'] < 1) {
-			$pidRate = 0;
-		} else {
-			// 上上级别
-			$secondParent = $userModel->where('id', $firstParent['pid'])->find();
-			if (!$secondParent || $secondParent['pid'] < 1) {
-				$pidRate = $firstParent['trader_parent_get'];
-			} else {
-				// 上上上级别
-				$thirdParent = $userModel->where('id', $secondParent['pid'])->find();
-				$pidRate     = $thirdParent ? $thirdParent['trader_parent_get'] : $secondParent['trader_parent_get'];
-			}
-		}
-		Cache::set('pid_' . $parentUid, $pidRate, $timeout);
-	}
-	return $pidRate;
 }
 
 function getStatisticsOfOrder($buyerid, $sellerid, $buyamount, $sellamount) {
@@ -713,4 +688,38 @@ function getIp() {
 	}
 	$res = preg_match('/[\d\.]{7,15}/', $ip, $matches) ? $matches [0] : '';
 	return $res;
+}
+
+// 获取最上层所赋予的卖单利润
+function getTopAgentFeeRate($uid, $timeout = 900) {
+	$pidRate = Cache::get('pid_rate_' . $uid);
+	if (!$pidRate) {
+		$userModel = Db::name('merchant');
+		$user      = $userModel->where('id', $uid)->find();
+		// 非承兑商不算利
+		if (!$user || $user['pid'] < 1 || $user['reg_type'] != 2) {
+			$pidRate = Db::name('config')->where('name', 'usdt_price_add_buy')->value('value');
+		} else {
+			$firstParent = $userModel->where('id', $user['pid'])->find();
+			// 上级不存在
+			if (!$firstParent) {
+				$pidRate = Db::name('config')->where('name', 'usdt_price_add_buy')->value('value');
+			} elseif ($firstParent['pid'] < 1) {
+				$pidRate = $firstParent['tariff'];
+			} else {
+				// 上上级别
+				$secondParent = $userModel->where('id', $firstParent['pid'])->find();
+				if (!$secondParent || $secondParent['pid'] < 1) {
+					$pidRate = $firstParent['tariff'];
+				} else {
+					// 上上上级别
+					$thirdParent = $userModel->where('id', $secondParent['pid'])->find();
+					$pidRate     = $thirdParent ? $thirdParent['tariff'] : $secondParent['tariff'];
+				}
+			}
+		}
+		$pidRate = $pidRate / 100;
+		Cache::set('pid_' . $uid, $pidRate, $timeout);
+	}
+	return $pidRate;
 }

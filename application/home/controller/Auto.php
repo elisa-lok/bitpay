@@ -1,9 +1,9 @@
 <?php
-
 namespace app\home\controller;
-
 use think\Cache;
 use think\db;
+
+(PHP_SAPI != 'cli') && die('error');
 
 class Auto extends Base {
 	/**
@@ -11,11 +11,9 @@ class Auto extends Base {
 	 * 定时获取充值记录，并给对应商户增加usdt
 	 */
 	public function autoErc($block = '') {//ERC代币检测到账,1分钟检测一次
-		//只允许cli模式访问
-		PHP_SAPI != 'cli' && die('error');
 		// $accounts = Db::name('address')->where(array('status'=>1,'type'=>'eth'))->field('uid,address')->select();
 		$time     = time();
-		$confirms = config('usdt_confirms');//确认次数
+		$confirms = config('usdt_confirms');     //确认次数
 		$feemy    = config('agent_recharge_fee');//充值手续费
 		empty($confirms) && die('请设置确认数');
 		$wei      = 1e6;
@@ -24,7 +22,6 @@ class Auto extends Base {
 		$blockn   = file_get_contents($getblock);
 		$blockn   = json_decode($blockn, TRUE);
 		$blockn   = explode('0x', $blockn['result'])[1];
-
 		if ($block) {
 			$lastblock = $block;
 			$fromblock = $block;
@@ -32,11 +29,9 @@ class Auto extends Base {
 			$lastblock = hexdec($blockn);
 			$fromblock = $lastblock - 10;
 		}
-
 		$url    = 'http://api.etherscan.io/api?module=account&action=txlist&address=' . $addr . '&startblock=' . $fromblock . '&endblock=' . $lastblock . '&sort=asc&apikey=ERXIYCNF6PP3ZNQAWICHJ6N5W7P212AHZI';
 		$fanhui = file_get_contents($url);
 		$fanhui = json_decode($fanhui, TRUE);
-		// dump($fanhui);die;
 		if ($fanhui['message'] == 'OK') {
 			foreach ($fanhui['result'] as $v2) {
 				if (strlen($v2['input']) == 138) {
@@ -48,9 +43,7 @@ class Auto extends Base {
 					$num      = hexdec($amount) / $wei;
 					// dump($num);
 					if ($num >= 1) { //1usdt以上才入账
-
 						$useradd = Db::name('address')->where(['status' => 1, 'type' => 'eth', 'address' => $account])->field('uid,address')->find();
-
 						if ($v2['txreceipt_status'] == '1' && $useradd) {
 							$fee = Db::name('merchant')->where('id', $useradd['uid'])->value('user_recharge_fee');
 							$pid = Db::name('merchant')->where('id', $useradd['uid'])->value('pid');
@@ -60,7 +53,6 @@ class Auto extends Base {
 									$sfee = $num * $fee / 100;
 								}
 								if ($v2['confirmations'] < $confirms) {
-
 									//待确认
 									if ($res = Db::name('merchant_recharge')->where(['txid' => $v2['hash']])->find()) {
 										Db::name('merchant_recharge')->update(['id' => $res['id'], 'confirmations' => $v2['confirmations'], 'addtime' => $time]);
@@ -94,7 +86,6 @@ class Auto extends Base {
 										//增加充值数量统计，不算手续费
 										Db::name('merchant')->where(['id' => $useradd['uid']])->setInc('recharge_amount', $num);
 										financelog($useradd['uid'], ($num - $sfee), 'USDT充值到账_1', 0, '系统自动');//添加日志
-
 										if ($pid && $sfee && $feemy) {
 											$feemy = round($feemy * $sfee / 100, 8);
 											$rsArr = agentReward($pid, $useradd['uid'], $feemy, 2);
@@ -143,9 +134,7 @@ class Auto extends Base {
 											'confirmations' => $v2['confirmations']
 										]);
 									}
-
 								}
-
 								if ($rs1 && $rs2) {
 									Db::commit();
 								} else {
@@ -163,16 +152,12 @@ class Auto extends Base {
 		} else {
 			echo $fanhui['message'];
 		}
-
 	}
 
-	public function autoEth() {//盘口提币
-		if (PHP_SAPI != 'cli') {//只允许cli模式访问
-			die('error');
-		}
+	public function autoEth() {                  //盘口提币
 		$time = time();
 		// dump($time);
-		$confirms = config('usdt_confirms');//充值手续费
+		$confirms = config('usdt_confirms');     //充值手续费
 		$feemy    = config('agent_recharge_fee');//充值手续费
 		if (empty($confirms)) {
 			exit('请设置确认数');
@@ -234,7 +219,6 @@ class Auto extends Base {
 							//增加充值数量统计，不算手续费
 							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
 							financelog($v['merchant_id'], ($v2['amount'] - $sfee), '盘口提币到账_1', 0, '系统自动');//添加日志
-
 							if ($pid && $sfee && $feemy) {
 								$feemy = round($feemy * $sfee / 100, 8);
 								$rsArr = agentReward($pid, $v['merchant_id'], $feemy, 2);
@@ -283,9 +267,7 @@ class Auto extends Base {
 								'confirmations' => $v2['confirmations']
 							]);
 						}
-
 					}
-
 					if ($rs1 && $rs2) {
 						Db::commit();
 					} else {
@@ -300,10 +282,7 @@ class Auto extends Base {
 		}
 	}
 
-	public function autoEthTrader() {//omni入账检测
-		if (PHP_SAPI != 'cli') {//只允许cli模式访问
-			die('error');
-		}
+	public function autoEthTrader() {       //omni入账检测
 		/*
 		 {
 		 "txid" : "hash",                 // (string) the hex-encoded hash of the transaction
@@ -420,9 +399,7 @@ class Auto extends Base {
 								'confirmations' => $v2['confirmations']
 							]);
 						}
-
 					}
-
 					if ($rs1 && $rs2) {
 						Db::commit();
 					} else {
@@ -438,9 +415,6 @@ class Auto extends Base {
 	}
 
 	public function selldaojishi() {
-		if (PHP_SAPI != 'cli') {//只允许cli模式访问
-			die('error');
-		}
 		$list = Db::name('order_buy')->where("" . time() . "-ctime>ltime*60 and status=0 ")->select();
 		if (!$list) {
 			return;
@@ -449,7 +423,6 @@ class Auto extends Base {
 			// 锁定操作 代码执行完成前不可继续操作
 			if (Cache::has($vv['id'])) continue;
 			Cache::set($vv['id'], TRUE, 60);
-
 			Db::startTrans();
 			$orderInfo = [];
 			$orderInfo = Db::name('order_buy')->where(['id' => $vv['id']])->find();
@@ -460,21 +433,19 @@ class Auto extends Base {
 			$rs1         = Db::name('order_buy')->update(['status' => 5, 'id' => $vv['id']]);
 			$real_number = $orderInfo['deal_num'] + $orderInfo['fee'];
 			// 回滚挂单
-			$rs2 = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->setInc('remain_amount', $real_number);  // 增加剩余量
+			$rs2 = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->setInc('remain_amount', $real_number);   // 增加剩余量
 			$rs3 = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->setDec('trading_volume', $real_number);  // 减少交易量
 			// 获取挂单
 			$sellInfo = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->find();
-
-			$rs4 = $rs5 = 1;
+			$rs4      = $rs5 = 1;
 			if ($sellInfo['state'] == 2) {
 				// 如果挂单已下架 回滚余额
-				$rs4 = balanceChange(false, $orderInfo['sell_id'], $real_number, 0, -$real_number, 0, BAL_REDEEM, $orderInfo['id'], "支付超时->自动下架");
+				$rs4 = balanceChange(FALSE, $orderInfo['sell_id'], $real_number, 0, -$real_number, 0, BAL_REDEEM, $orderInfo['id'], "支付超时->自动下架");
 				//$rs4 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $real_number);
 				//$rs5 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $real_number);
 			}
 			if ($rs1 && $rs2 && $rs3 && $rs4 && $rs5) {
 				Db::commit();
-
 				//请求回调接口,失败
 				$data['amount']  = $orderInfo['deal_num'];
 				$data['orderid'] = $orderInfo['orderid'];
@@ -490,9 +461,6 @@ class Auto extends Base {
 	}
 
 	public function buydaojishi() {
-		if (PHP_SAPI != 'cli') {//只允许cli模式访问
-			die('error');
-		}
 		$list = Db::name('order_sell')->where("" . time() . "-ctime>ltime*60 and status=0 ")->select();
 		// dump($list);die;
 		if (!$list) {
@@ -505,23 +473,20 @@ class Auto extends Base {
 			$coin_name   = 'usdt';
 			$rs1         = Db::name('order_sell')->update(['status' => 5, 'id' => $vv['id']]);
 			$real_number = $orderInfo['deal_num'] + $orderInfo['fee'];
-			$rs2 = balanceChange(false, $orderInfo['sell_id'], $real_number, 0, -$real_number, 0, BAL_REDEEM, $orderInfo['id'], "支付超时->自动下架->buy");
+			$rs2         = balanceChange(FALSE, $orderInfo['sell_id'], $real_number, 0, -$real_number, 0, BAL_REDEEM, $orderInfo['id'], "支付超时->自动下架->buy");
 			//$rs2         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec($coin_name . 'd', $real_number);
 			//$rs3         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc($coin_name, $real_number);
 			if ($rs1 && $rs2) {
 				Db::commit();
 			} else {
 				Db::rollback();
-				$msg = '【' . date('Y-m-d H:i:s') . '】 订单' . $vv['id'] . '回滚失败, 买家ID: ' . $vv['buy_id'] . ' , 卖家ID: ' . $vv['sell_id'] . ", 失败步骤: $rs1,$rs2,$rs3";
+				$msg = '【' . date('Y-m-d H:i:s') . '】 订单' . $vv['id'] . '回滚失败, 买家ID: ' . $vv['buy_id'] . ' , 卖家ID: ' . $vv['sell_id'] . ", 失败步骤: $rs1,$rs2";
 				file_put_contents(RUNTIME_PATH . 'data/cli_buyCountDown_' . date('ymd') . '.log', $msg, FILE_APPEND);
 			}
 		}
 	}
 
 	public function statistics() {
-		//   if(PHP_SAPI != 'cli'){//只允许cli模式访问
-		//    die('error');
-		// }
 		//平台利润，所有平台的手续费,用户充值手续费+用户提币手续费+商户提币手续费+场外交易商户手续(不计算为0)+场外交易平台利润+承兑商求购商户手续费+承兑商求购承兑商手续费
 		$feeMap['status']  = 1;
 		$fee1              = getTotalInfo($feeMap, 'merchant_user_recharge', 'fee');
@@ -585,9 +550,6 @@ class Auto extends Base {
 	}
 
 	public function downad() {
-		if (PHP_SAPI != 'cli') {//只允许cli模式访问
-			die('error');
-		}
 		$remain = config('ad_down_remain_amount');//充值手续费
 		// dump($remain);
 		//挂卖下架
@@ -615,9 +577,6 @@ class Auto extends Base {
 	}
 
 	public function coverusdt() {//OMNI汇总USDT
-		if (PHP_SAPI != 'cli') {//只允许cli模式访问
-			die('error');
-		}
 		$list = Db::name('merchant')->where(['usdtb' => ['neq', NULL]])->select();
 		if ($list) {
 			$model = new \app\common\model\Usdt();
@@ -634,32 +593,26 @@ class Auto extends Base {
 				}
 			}
 		}
-
 	}
 
-	// 更新市价单价格
 	public function updateAdSellPrice() {
-		(PHP_SAPI != 'cli') && die('error');
 		$usdtPriceWay = config('usdt_price_way');
 		($usdtPriceWay == 0) && die('price way error');
-		// $addFee = $usdtPriceWay == 2 ? config('usdt_price_add') : 0;
-
-		// 只有支持加价模式的变动
-		Db::startTrans();
-		$usdtPrice = getUsdtPrice();
-		$addFee    = $usdtPrice * (config('usdt_price_add') / 100);
-
-		$res = Db::name('ad_sell')->where('state=1')->update(['price' => $usdtPrice + $addFee]);
-		$res ? Db::commit() : Db::rollback();
-		$msg = '【' . date('Y-m-d H:i:s') . '】 卖单加价价格更新' . ($res ? '成功' : '失败') . "更新模式:$usdtPriceWay, USDT价格:$usdtPrice \r\n";
+		$sellOrderModel = Db::name('ad_sell');
+		$sellOrders     = $sellOrderModel->where('state=1')->select();
+		$usdtPrice      = getUsdtPrice();
+		foreach ($sellOrders as $v) {
+			$price =  $usdtPrice * (1 + getTopAgentFeeRate($v['userid']));
+			$sellOrderModel->where('id', $v['id'])->update(['price' =>$price ]); // 计算溢价
+		}
+		$msg = '【' . date('Y-m-d H:i:s') . "】 卖单加价, 更新模式: $usdtPriceWay, USDT价格:$usdtPrice \r\n";
 		file_put_contents(RUNTIME_PATH . 'data/cli_updateAdSellPrice_' . date('ymd') . '.log', $msg, FILE_APPEND);
 	}
 
 	// 更新市价单价格
 	public function updateAdBuyPrice() {
-		(PHP_SAPI != 'cli') && die('error');
 		$usdtPriceWay = config('usdt_price_way_buy');
-		($usdtPriceWay == 0) && die('price way error');
+		($usdtPriceWay == 0) && die('price way buy error');
 		$addFee = $usdtPriceWay == 2 ? config('usdt_price_add_buy') : 0;
 		// 只有支持加价模式的变动
 		Db::startTrans();
