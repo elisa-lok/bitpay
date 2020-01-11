@@ -1,31 +1,16 @@
 <?php
-
 namespace app\home\controller;
-
 use app\home\model\LogModel;
 use app\home\model\MerchantModel;
 use think\db;
 
 class Login extends Base {
-	public function test22222222() {
-		$a = checkName('代理商');
-		dump($a);
-		die;
-		$model = new \app\common\model\Usdt();
-		$a     = $model->index('validateaddress', $addr = '1223456', $mum = NULL, $index = NULL, $count = NULL, $skip = NULL);
-		dump($a);
-		die;
-		echo generate_password();
-	}
-
 	public function register() {
 		if (request()->isPost()) {
 			$reg_type = input('post.reg_type');
-			if (!$reg_type) {
-				$this->error('请选择注册类型');
-			}
+			!$reg_type && $this->error('请选择注册类型');
 			$name          = input('post.username');
-			$idcard        = input('post.idcard');
+			$idCard        = input('post.idcard');
 			$mobile        = input('post.mobile');
 			$password      = input('post.password');
 			$paypassword   = input('post.paypassword');
@@ -43,19 +28,19 @@ class Login extends Base {
 				$this->error('请填写短信验证码');
 			}*/
 			$model  = new MerchantModel();
-			$idfind = $model->getOneByParam($idcard, 'idcard');
+			$idfind = $model->getOneByParam($idCard, 'idcard');
 			if (!$idfind) {
 				$this->error('注册失败：身份证号码已注册');
 			}
-			$namefind = $model->getOneByParam($name, 'name');//dump($name);dump($namefind);die;
-			if (!$namefind) {
+			$nameind = $model->getOneByParam($name, 'name');
+			if (!$nameind) {
 				$this->error('注册失败：姓名已注册');
 			}
-			$mobilefind = $model->getOneByParam($mobile, 'mobile');
-			if (!$mobilefind) {
+			$mobileFind = $model->getOneByParam($mobile, 'mobile');
+			if (!$mobileFind) {
 				$this->error('注册失败：手机号已注册');
 			}
-			if (empty($idcard)) {
+			if (empty($idCard)) {
 				$this->error('请填写身份证号');
 			}
 			if (empty($mobile)) {
@@ -103,24 +88,22 @@ class Login extends Base {
 				$this->error('请同时上传身份证正面和反面照片');
 			}
 
-			$idcard_zheng = $imgarr[0];
-			$idcard_fan = $imgarr[1];
+			$idCard_zheng = $imgarr[0];
+			$idCard_fan = $imgarr[1];
 
 
-			if(empty($idcard_zheng) || empty($idcard_fan)){
+			if(empty($idCard_zheng) || empty($idCard_fan)){
 				$this->error('请上传照片');
 			}*/
-			while (true) {
+			while (TRUE) {
 				$appid = generate_password();
 				if ($model->getOneByParam($appid, 'appid')) {
 					break;
 				}
 			}
-
 			// if ($smscode != session($mobile.'_code')) {
 			//     $this->error('短信验证码错误!');
 			// }
-
 			$key                  = md5(time() . $mobile);
 			$param['name']        = $name;
 			$param['nickname']    = $nickname;
@@ -128,7 +111,7 @@ class Login extends Base {
 			$param['password']    = md5($password);
 			$param['paypassword'] = md5($paypassword);
 			$param['pid']         = $pid;
-			$param['idcard']      = $idcard;
+			$param['idcard']      = $idCard;
 			//$param['idcard_zheng'] = $imgarr[0];
 			//$param['idcard_fan'] = $imgarr[1];
 			$param['appid']    = $appid;
@@ -208,8 +191,7 @@ class Login extends Base {
 				$flag  = $model->insertOne(['merchant_id' => $return['data']['id'], 'login_time' => time(), 'update_time' => time(), 'online' => 1]);
 				if ($device) {
 					session('device', $device);
-					Db::name('merchant')->where(['id'=>$return['data']['id']])->update(['device' => $device]);
-
+					Db::name('merchant')->where(['id' => $return['data']['id']])->update(['device' => $device]);
 				}
 				if ($flag['code'] > 0) {
 					session('logid', $flag['code']);
@@ -311,9 +293,8 @@ class Login extends Base {
 		if (request()->isPost()) {
 			$mobile     = input('post.mobile');
 			$model      = new MerchantModel();
-			$mobilefind = $model->getOneByParam($mobile, 'mobile');
-
-			if (!$mobilefind) {
+			$mobileFind = $model->getOneByParam($mobile, 'mobile');
+			if (!$mobileFind) {
 				$this->error('注册失败：手机号已注册');
 			}
 			if (session($mobile . '_code')) {
@@ -329,8 +310,6 @@ class Login extends Base {
 				if ($result > 0) {
 					session($mobile . '_code', $code); //验证码超时
 					session($mobile . '_time', time());
-					// dump(session($mobile.'_code'));
-					// dump($_SESSION);
 					$this->success('手机验证码已发送,请注意查收.');
 				} else {
 					$this->error('短信验证码发送失败,请稍后再试!');
@@ -345,9 +324,8 @@ class Login extends Base {
 		if (request()->isPost()) {
 			$mobile     = input('post.mobile');
 			$model      = new MerchantModel();
-			$mobilefind = $model->getOneByParam($mobile, 'mobile');
-			// dump($mobile);
-			if ($mobilefind) {
+			$mobileFind = $model->getOneByParam($mobile, 'mobile');
+			if ($mobileFind) {
 				$this->error('账户不存在!');
 			}
 			if (session($mobile . '_mcode')) {
@@ -363,8 +341,6 @@ class Login extends Base {
 				if ($result > 0) {
 					session($mobile . '_mcode', $code); //验证码超时
 					session($mobile . '_time', time());
-					// dump(session($mobile.'_code'));
-					// dump($_SESSION);
 					$this->success('手机验证码已发送,请注意查收.');
 				} else {
 					$this->error('短信验证码发送失败,请稍后再试!');

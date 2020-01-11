@@ -41,7 +41,6 @@ class Auto extends Base {
 					$account  = strtolower($account);
 					$amount   = substr($datalist, -26);
 					$num      = hexdec($amount) / $wei;
-					// dump($num);
 					if ($num >= 1) { //1usdt以上才入账
 						$useradd = Db::name('address')->where(['status' => 1, 'type' => 'eth', 'address' => $account])->field('uid,address')->find();
 						if ($v2['txreceipt_status'] == '1' && $useradd) {
@@ -73,7 +72,6 @@ class Auto extends Base {
 									}
 									continue;
 								}
-								// dump($v2);
 								Db::startTrans();
 								$rsArr    = [];
 								$rsArr[0] = 1;
@@ -156,7 +154,6 @@ class Auto extends Base {
 
 	public function autoEth() {                  //盘口提币
 		$time = time();
-		// dump($time);
 		$confirms = config('usdt_confirms');     //充值手续费
 		$feemy    = config('agent_recharge_fee');//充值手续费
 		if (empty($confirms)) {
@@ -174,7 +171,7 @@ class Auto extends Base {
 			if (empty($record['data']) || $record['data'] == 'false') {
 				continue;
 			}
-			$record_data = json_decode($record['data'], TRUE);//dump($record_data);
+			$record_data = json_decode($record['data'], TRUE);
 			$fee         = Db::name('merchant')->where('id', $v['merchant_id'])->value('user_recharge_fee');
 			$pid         = Db::name('merchant')->where('id', $v['merchant_id'])->value('pid');
 			foreach ($record_data as $k2 => $v2) {
@@ -318,7 +315,7 @@ class Auto extends Base {
 			if (empty($record['data']) || $record['data'] == 'false') {
 				continue;
 			}
-			$record_data = json_decode($record['data'], TRUE);//dump($record_data);
+			$record_data = json_decode($record['data'], TRUE);
 			$fee         = $v['trader_recharge_fee'];
 			foreach ($record_data as $k2 => $v2) {
 				if ($v2['referenceaddress'] != $v['address']) {
@@ -462,7 +459,6 @@ class Auto extends Base {
 
 	public function buydaojishi() {
 		$list = Db::name('order_sell')->where("" . time() . "-ctime>ltime*60 and status=0 ")->select();
-		// dump($list);die;
 		if (!$list) {
 			return;
 		}
@@ -551,7 +547,6 @@ class Auto extends Base {
 
 	public function downad() {
 		$remain = config('ad_down_remain_amount');//充值手续费
-		// dump($remain);
 		//挂卖下架
 		// $sellids = Db::name('ad_sell')->field('id, amount, userid')->where('state', 1)->where('amount', 'gt', 0)->select();
 		// foreach ($sellids as $k => $v) {
@@ -602,8 +597,8 @@ class Auto extends Base {
 		$sellOrders     = $sellOrderModel->where('state=1')->select();
 		$usdtPrice      = getUsdtPrice();
 		foreach ($sellOrders as $v) {
-			$price =  $usdtPrice * (1 + getTopAgentFeeRate($v['userid']));
-			$sellOrderModel->where('id', $v['id'])->update(['price' =>$price ]); // 计算溢价
+			$price = $usdtPrice * (1 + getTopAgentFeeRate($v['userid']));
+			$sellOrderModel->where('id', $v['id'])->update(['price' => $price]); // 计算溢价
 		}
 		$msg = '【' . date('Y-m-d H:i:s') . "】 卖单加价, 更新模式: $usdtPriceWay, USDT价格:$usdtPrice \r\n";
 		file_put_contents(RUNTIME_PATH . 'data/cli_updateAdSellPrice_' . date('ymd') . '.log', $msg, FILE_APPEND);

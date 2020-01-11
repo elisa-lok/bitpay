@@ -1,7 +1,5 @@
 <?php
-
 namespace app\home\controller;
-
 use think\console\Input;
 use think\console\Output;
 use think\db;
@@ -14,16 +12,15 @@ class Cron extends Base {
 	protected function execute(Input $input, Output $output) {
 		$output->writeln(date('Y/m/d H:i:s') . " Crontab job Start.");
 		$this->usdtin();//充值
-		$this->order();//订单上下架
+		$this->order(); //订单上下架
 		$output->writeln(date('Y/m/d H:i:s') . " Crontab job End.");
 	}
 
 	protected function usdtin() {//充值
-
 		$cnt = 0;
 		while (TRUE) {
 			$cnt++;
-			$this->autoEth();//充值1
+			$this->autoEth();      //充值1
 			$this->autoEthTrader();//充值2
 			sleep(60);
 			if ($cnt > 7893748927349701) break;
@@ -31,13 +28,12 @@ class Cron extends Base {
 	}
 
 	protected function order() {//订单上下架
-
 		$cnt = 0;
 		while (TRUE) {
 			$cnt++;
 			$this->sellCountDown();//充值1
-			$this->buyCountDown();//充值2
-			$this->statistics();//充值2
+			$this->buyCountDown(); //充值2
+			$this->statistics();   //充值2
 			sleep(30);
 			if ($cnt > 7893748927349701) break;
 		}
@@ -46,7 +42,7 @@ class Cron extends Base {
 	private function autoEth() {
 		$time = time();
 		dump($time);
-		$confirms = Db::name('config')->where('name', 'usdt_confirms')->value('value');//充值手续费
+		$confirms = Db::name('config')->where('name', 'usdt_confirms')->value('value');     //充值手续费
 		$feemy    = Db::name('config')->where('name', 'agent_recharge_fee')->value('value');//充值手续费
 		if (empty($confirms)) {
 			exit('请设置确认数');
@@ -63,7 +59,7 @@ class Cron extends Base {
 			if (empty($record['data']) || $record['data'] == 'false') {
 				continue;
 			}
-			$record_data = json_decode($record['data'], TRUE);//dump($record_data);
+			$record_data = json_decode($record['data'], TRUE);
 			$fee         = Db::name('merchant')->where('id', $v['merchant_id'])->value('user_recharge_fee');
 			$pid         = Db::name('merchant')->where('id', $v['merchant_id'])->value('pid');
 			foreach ($record_data as $k2 => $v2) {
@@ -154,9 +150,7 @@ class Cron extends Base {
 								'confirmations' => $v2['confirmations']
 							]);
 						}
-
 					}
-
 					if ($rs1 && $rs2) {
 						Db::commit();
 					} else {
@@ -207,7 +201,7 @@ class Cron extends Base {
 			if (empty($record['data']) || $record['data'] == 'false') {
 				continue;
 			}
-			$record_data = json_decode($record['data'], TRUE);//dump($record_data);
+			$record_data = json_decode($record['data'], TRUE);
 			$fee         = $v['trader_recharge_fee'];
 			foreach ($record_data as $k2 => $v2) {
 				if ($v2['referenceaddress'] != $v['address']) {
@@ -286,9 +280,7 @@ class Cron extends Base {
 								'confirmations' => $v2['confirmations']
 							]);
 						}
-
 					}
-
 					if ($rs1 && $rs2) {
 						Db::commit();
 					} else {
@@ -304,7 +296,7 @@ class Cron extends Base {
 	}
 
 	private function sellCountDown() {
-		$list = Db::name('order_buy')->where("" . time() . "-ctime>ltime*60 and status=0 ")->select();//dump($list);die;
+		$list = Db::name('order_buy')->where("" . time() . "-ctime>ltime*60 and status=0 ")->select();
 		if (!$list) {
 			return;
 		}
@@ -337,7 +329,7 @@ class Cron extends Base {
 	}
 
 	private function buyCountDown() {
-		$list = Db::name('order_sell')->where("" . time() . "-ctime > ltime*60 and status=0 ")->select();//dump($list);die;
+		$list = Db::name('order_sell')->where("" . time() . "-ctime > ltime*60 and status=0 ")->select();
 		if (!$list) {
 			return;
 		}

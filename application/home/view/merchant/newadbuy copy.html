@@ -33,21 +33,21 @@
         <div class="box-body">
 <div class="fields-group">
                 <div class="form-group">
-                    <label for="currency" class="col-sm-3 control-label"><em class="text-danger">*</em> 购买数量：</label>
+                    <label class="col-sm-3 control-label"><em class="text-danger">*</em> 购买数量：</label>
                     <div class="col-sm-6">
                         <input type="text" class="form-control" name="amount" id="amount" onblur="jisuan()"/>
 					</div>
                 </div>
                 {eq name="usdt_price_way" value="1"}
 				<div class="form-group">
-                    <label for="currency" class="col-sm-3 control-label"><em class="text-danger">*</em> 购买价格：</label>
+                    <label class="col-sm-3 control-label"><em class="text-danger">*</em> 购买价格：</label>
                     <div class="col-sm-6">
                         <input type="text" class="form-control" name="price" id="price" value="{:getUsdtPrice()}" readOnly/>
 					</div>
                 </div>
                 {else/}
                 <div class="form-group">
-                    <label for="currency" class="col-sm-3 control-label"><em class="text-danger">*</em> 购买价格：</label>
+                    <label class="col-sm-3 control-label"><em class="text-danger">*</em> 购买价格：</label>
                     <div class="col-sm-6">
                         <input type="text" onblur="jisuan()" style="display:inline-block;width:72%;" class="form-control" name="price" id="price" value="" placeholder="价格区间{$usdt_price_min}~{$usdt_price_max}"/>
 						<span style="font-weight:bold">参考价格：{:getUsdtPrice()}</span>
@@ -55,19 +55,19 @@
                 </div>
                 {/eq}
                 <div class="form-group">
-                    <label for="currency" class="col-sm-3 control-label"><em class="text-danger">*</em> 最小限额：</label>
+                    <label class="col-sm-3 control-label"><em class="text-danger">*</em> 最小限额：</label>
                     <div class="col-sm-6">
                         <input type="text" class="form-control" name="min_limit" id="min_limit"/>
 					</div>
                 </div>
                 <div class="form-group">
-                    <label for="currency" class="col-sm-3 control-label"><em class="text-danger">*</em> 最大限额：</label>
+                    <label class="col-sm-3 control-label"><em class="text-danger">*</em> 最大限额：</label>
                     <div class="col-sm-6">
                         <input type="text" class="form-control" name="max_limit" id="max_limit" onblur="getMax()"/>
 					</div>
                 </div>
                 <div class="form-group">
-                    <label for="currency" class="col-sm-3 control-label"><em class="text-danger">*</em> 收款方式：</label>
+                    <label class="col-sm-3 control-label"><em class="text-danger">*</em> 收款方式：</label>
                     <div class="col-sm-6">
                         {volist name="banks" id="vo"}
                     	<label class="radio-inline">

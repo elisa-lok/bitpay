@@ -239,7 +239,6 @@ function stopattack($StrFiltKey, $StrFiltValue, $ArrFiltReq) {
 }
 
 function sql_check() {
-	//dump($_POST);
 	$getfilter    = "'|(and|or)\\b.+?(>|<|=|in|like)|\\/\\*.+?\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT|UPDATE.+?SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE).+?FROM|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)";
 	$postfilter   = "\\b(and|or)\\b.{1,6}?(=|>|<|\\bin\\b|\\blike\\b)|\\/\\*.+?\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT|UPDATE.+?SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE).+?FROM|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)";
 	$cookiefilter = "\\b(and|or)\\b.{1,6}?(=|>|<|\\bin\\b|\\blike\\b)|\\/\\*.+?\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT|UPDATE.+?SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE).+?FROM|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)";
@@ -420,7 +419,7 @@ function getUsdtPrice_old() {
 	return $biarr[0]['price_cny'];*/
 	$data     = curl_get('https://otc-api.huobi.co/v1/data/market/detail');
 	$price    = 0;
-	$data_arr = json_decode($data, TRUE);//dump($data_arr);
+	$data_arr = json_decode($data, TRUE);
 	if ($data_arr['code'] == 200) {
 		$coin_arr = $data_arr['data']['detail'];
 		foreach ($coin_arr as $k => $v) {

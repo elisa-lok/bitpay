@@ -3,8 +3,8 @@
 namespace app\home\model;
 
 use app\admin\model\ChongBiModel;
-use think\Model;
 use think\Db;
+use think\Model;
 use think\request;
 
 class MerchantModel extends Model {
@@ -24,7 +24,7 @@ class MerchantModel extends Model {
 	}
 
 	public function insertOne($param) {
-		//dump($param);
+
 		try {
 			$result = $this->allowField(TRUE)->save($param);
 			if (FALSE === $result) {

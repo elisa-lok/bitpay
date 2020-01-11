@@ -17,7 +17,7 @@ class Merchant extends Base {
 		$key = input('key');
 		$map = [];
 		if ($key && $key !== "") {
-			$uid             = Db::name('merchant')->where('mobile|name', $key)->value('id');//dump($uid);
+			$uid             = Db::name('merchant')->where('mobile|name', $key)->value('id');
 			$map['admin_id'] = $uid;
 		}
 		$Nowpage = input('get.page') ? input('get.page') : 1;
@@ -377,7 +377,6 @@ class Merchant extends Base {
 			$return['code'] = 1;
 			$return['data'] = '';
 		}
-		//dump($return);die;
 		if ($return['code'] == 1) {
 			/* $dbreturn = $model->editWithdraw(['id'=>$id, 'status'=>1, 'endtime'=>time(), 'txid'=>$return['data']]);
             if($dbreturn['code'] == 0){
@@ -468,13 +467,11 @@ class Merchant extends Base {
 		if ($type == -1) {
 			$map['status'] = ['neq', 3];
 		}
-		// dump($map);
 		$count   = Db::name('address')->where($map)->count();
 		$allpage = intval(ceil($count / $limits));
 		$lists   = Db::name('address')->where($map)->page($Nowpage, $limits)->order('id desc')->select();
 		foreach ($lists as $k => &$v) {
 			$user = Db::name('merchant')->where(['id' => $v['uid']])->find();
-			// dump($user);
 			$v['addtime']  = getTime($v['addtime']);
 			$v['mobile']   = ($user['mobile'] == NULL ? '未分配' : $user['mobile']);
 			$v['username'] = ($user['name'] == NULL ? '未分配' : $user['name']);
@@ -1019,7 +1016,6 @@ class Merchant extends Base {
 	public function orderlist() {
 		$key = input('key');
 		$oid = input('oid');
-		// dump($oid);
 		$status                    = input('status');
 		$map['think_order_buy.id'] = ['gt', 0];
 		if ($key && $key !== "") {
@@ -1033,14 +1029,12 @@ class Merchant extends Base {
 		if (!empty($status)) {
 			$map['think_order_buy.status'] = $status - 1;
 		}
-		// dump($map);
 		$member  = new MerchantModel();
 		$Nowpage = input('get.page') ? input('get.page') : 1;
 		$limits  = config('list_rows');            // 获取总条数
 		$count   = $member->getAllCountOrder($map);//计算总页面
 		$allpage = intval(ceil($count / $limits));
 		$lists   = $member->getOrderByWhere($map, $Nowpage, $limits);
-		// dump($lists);
 		$buyerIds      = array_column($lists, 'buy_id');
 		$buyerUsername = Db::name('merchant')->where('id', 'in', $buyerIds)->select();
 		$buyerUsername = array_column($buyerUsername, 'name', 'id');
@@ -1077,10 +1071,8 @@ class Merchant extends Base {
 				$wx                   = Db::name('merchant_ysf')->where(['id' => $sorder['pay_method4']])->find();
 				$lists[$k]['ysfinfo'] = '/uploads/face/' . $wx['c_bank_detail'];
 			}
-			// dump($str);
 			// $lists[$k]['payway'] = $str;
 		}
-		// dump($lists);
 		$this->assign('Nowpage', $Nowpage);        //当前页
 		$this->assign('allpage', $allpage);        //总页数
 		$this->assign('val', $key);
@@ -1140,7 +1132,6 @@ class Merchant extends Base {
 				$lists[$k]['wxinfo'] = '/uploads/face/' . $wx['c_bank_detail'];
 			}
 		}
-		// dump($lists);
 		$this->assign('Nowpage', $Nowpage);           //当前页
 		$this->assign('allpage', $allpage);           //总页数
 		$this->assign('val', $key);
@@ -1605,7 +1596,6 @@ class Merchant extends Base {
 	public function order() {
 		$key = input('key');
 		$oid = input('oid');
-		// dump($oid);
 		$status                    = input('status');
 		$map['think_order_buy.id'] = ['gt', 0];
 		if ($key && $key !== "") {
@@ -1619,7 +1609,6 @@ class Merchant extends Base {
 		if (!empty($status)) {
 			$map['think_order_buy.status'] = $status - 1;
 		}
-		// dump($map);
 		$member  = new MerchantModel();
 		$Nowpage = input('get.page') ? input('get.page') : 1;
 		$limits  = config('list_rows');            // 获取总条数
@@ -1640,8 +1629,6 @@ class Merchant extends Base {
 				}
 			}
 		}
-		//dump($lists);die;
-		// dump($lists);
 		$this->assign('Nowpage', $Nowpage);        //当前页
 		$this->assign('allpage', $allpage);        //总页数
 		$this->assign('val', $key);
