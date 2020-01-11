@@ -11,12 +11,7 @@ class Base extends Controller {
 	public function _initialize() {
 		header("Content-type: text/html; charset=utf-8");
 		!sql_check() && $this->error('您提交的参数非法,系统已记录您的本次操作！');
-		$config = cache('db_config_data');
-		if (!$config) {
-			$config = api('Config/lists');
-			cache('db_config_data', $config);
-		}
-		$a     = config($config);
+
 		$model = new BaseModel();
 		$cate  = $model->getAllCate();
 		//强制设置谷歌验证码
@@ -32,21 +27,21 @@ class Base extends Controller {
 		isset($_GET['invite']) && session('invite', $_GET['invite']);
 		$controller = $request->controller();
 		if ($controller != 'Login' && session('uid') && $action != 'pay') {
-			$logid = session('logid');
-			if (!$logid) {
+			$logId = session('logid');
+			if (!$logId) {
 				header('Location: /home/login/loginout');
 				die;
 			}
 			$m           = new LogModel();
-			$where['id'] = $logid;
+			$where['id'] = $logId;
 			$log         = $m->getLog($where);
 			if (!empty($log)) {
 				if ((time() - $log['update_time']) >= 1800) {
-					$m->updateOne(['id' => $logid, 'update_time' => time(), 'online' => 0]);
+					$m->updateOne(['id' => $logId, 'update_time' => time(), 'online' => 0]);
 					header('Location: /home/login/loginout');
 					die;
 				} else {
-					$m->updateOne(['id' => $logid, 'update_time' => time()]);
+					$m->updateOne(['id' => $logId, 'update_time' => time()]);
 				}
 			} else {
 				header('Location: /home/login/loginout');
@@ -57,5 +52,14 @@ class Base extends Controller {
 		$c = request()->controller();
 		$a = request()->action();
 		$this->assign('url', '/' . $c . '/' . $a);
+	}
+
+	private function setConfig(){
+		$config = cache('db_config_data');
+		if (!$config) {
+			$config = api('Config/lists');
+			cache('db_config_data', $config);
+		}
+		config($config);
 	}
 }

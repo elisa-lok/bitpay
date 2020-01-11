@@ -27,17 +27,15 @@ use think\request;
 class Merchant extends Base {
 	//商户首页
 	public function index() {
-		// echo session('user.name');die;
 		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
 		$model = new MerchantModel();
 		$this->assign('merchant', $model->getUserByParam($this->uid, 'id'));
-		$myinfo = $model->getUserByParam($this->uid, 'id');
-		$this->assign('myacc', $model->getUserByParam($myinfo['pid'], 'id'));
+		$myInfo = $model->getUserByParam($this->uid, 'id');
+		$this->assign('myacc', $model->getUserByParam($myInfo['pid'], 'id'));
 		$ids  = Db::name('article_cate')->field('id, name')->order('orderby asc')->select();
 		$list = Db::name('article_cate')->field('a.name, b.id, b.title, b.cate_id, b.create_time')->alias('a')->join('article b', 'a.id=b.cate_id')->where('a.status', 1)->select();
-		//$haveadsum = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->sum('amount');
-		$haveadsum = Db::name('ad_sell')->where('userid', $this->uid)->sum('remain_amount');
-		$haveadsum = Db::name('ad_sell')->where('userid', $this->uid)->sum('remain_amount');
+		//$haveAdSum = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->sum('amount');
+		$haveAdSum = Db::name('ad_sell')->where('userid', $this->uid)->sum('remain_amount');
 		foreach ($ids as $k => $v) {
 			foreach ($list as $kk => $vv) {
 				if ($v['id'] == $vv['cate_id']) {
@@ -46,7 +44,7 @@ class Merchant extends Base {
 			}
 		}
 		$this->assign('article', $ids);
-		$this->assign('froze', $haveadsum);
+		$this->assign('froze', $haveAdSum);
 		$this->assign('price', getUsdtPrice());
 		return $this->fetch();
 	}
@@ -87,10 +85,7 @@ class Merchant extends Base {
 	public function payinfo_bak() {
 		$id    = input('post.id');
 		$order = Db::name('order_sell')->where('id', $id)->where('buy_id', $this->uid)->find();
-		if (empty($order)) {
-			echo '订单信息错误';
-			die;
-		}
+		empty($order) && die('订单信息错误');
 		$ad                       = Db::name('ad_buy')->where('id', $order['buy_bid'])->find();
 		$merchant                 = Db::name('merchant')->where('id', $order['sell_id'])->find();
 		$merchant['c_wechat_img'] = str_replace("\\", "/", $merchant['c_wechat_img']);
@@ -109,10 +104,7 @@ class Merchant extends Base {
 	public function payinfo() {
 		$id    = input('post.id');
 		$order = Db::name('order_sell')->where('id', $id)->find();
-		if (empty($order)) {
-			echo '订单信息错误';
-			die;
-		}
+		empty($order) && die('订单信息错误');
 		$ad   = Db::name('ad_buy')->where('id', $order['buy_bid'])->find();
 		$bank = new BankModel();
 		$zfb  = new ZfbModel();
@@ -154,10 +146,7 @@ class Merchant extends Base {
 	public function payinfo2() {
 		$id    = input('post.id');
 		$order = Db::name('order_sell')->where('id', $id)->where('buy_id', $this->uid)->find();
-		if (empty($order)) {
-			echo '订单信息错误';
-			die;
-		}
+		empty($order) && die('订单信息错误');
 		$ad       = Db::name('ad_buy')->where('id', $order['buy_bid'])->find();
 		$merchant = Db::name('merchant')->where('id', $order['sell_id'])->find();//查找卖家信息
 		$bank     = new BankModel();
@@ -1044,7 +1033,7 @@ class Merchant extends Base {
  }
  */ // $this->assign('qianbao', $qianbao);
 		// $this->assign('qianbao2', $qianbao2);
-		$confirms = Db::name('config')->where('name', 'usdt_confirms')->value('value');
+		$confirms = config('usdt_confirms');
 		$this->assign('confirms', $confirms);
 		$list = Db::name('merchant_recharge')->where(['merchant_id' => $this->uid])->order('id desc')->paginate(20);
 		$this->assign('list', $list);
@@ -1377,9 +1366,9 @@ class Merchant extends Base {
 
 	public function newad() {
 		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
-		$usdtPriceWay    = Db::name('config')->where('name', 'usdt_price_way')->value('value');
-		$usdtPriceMin    = Db::name('config')->where('name', 'usdt_price_min')->value('value');
-		$usdtPriceMax    = Db::name('config')->where('name', 'usdt_price_max')->value('value');
+		$usdtPriceWay    = config('usdt_price_way');
+		$usdtPriceMin    = config('usdt_price_min');
+		$usdtPriceMax    = config('usdt_price_max');
 		$defaultCfgPrice = (float)config('usdt_price_add') / 100;
 		$currentPrice    = $usdtPriceWay > 0 ? getUsdtPrice() : 0;
 		if ($usdtPriceWay == 2) {
@@ -1396,11 +1385,11 @@ class Merchant extends Base {
 		if (request()->isPost()) {
 			$amount = input('post.amount');
 			($amount <= 0) && $this->error('请输入正确的出售数量');
-			$min_limit = input('post.min_limit');
-			($min_limit <= 0) && $this->error('请输入正确的最小限额');
-			$max_limit = input('post.max_limit');
-			($max_limit <= 0) && $this->error('请输入正确的最大限额');
-			($min_limit > $max_limit) && $this->error('最小限额不能大于最大限额！');
+			$minLimit = input('post.min_limit');
+			($minLimit <= 0) && $this->error('请输入正确的最小限额');
+			$maxLimit = input('post.max_limit');
+			($maxLimit <= 0) && $this->error('请输入正确的最大限额');
+			($minLimit > $maxLimit) && $this->error('最小限额不能大于最大限额！');
 			if ($usdtPriceWay == 0) {
 				$price = input('post.price');
 				($price > $usdtPriceMax || $price < $usdtPriceMin) && $this->error('价格区间：' . $usdtPriceMin . '~' . $usdtPriceMax);
@@ -1419,9 +1408,9 @@ class Merchant extends Base {
 			$model = new MerchantModel();
 			$user  = $model->getUserByParam($this->uid, 'id');
 			($user['trader_check'] != 1) && $this->error('您的承兑商资格未通过');
-			//$haveadsum = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->sum('amount');
-			$haveadsum = 0;
-			($user['usdt'] < $amount + $haveadsum) && $this->error('账户余额不足');
+			//$haveAdSum = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->sum('amount');
+			$haveAdSum = 0;
+			($user['usdt'] < $amount + $haveAdSum) && $this->error('账户余额不足');
 			(empty($_POST['bank']) && empty($_POST['zfb']) && empty($_POST['wx']) && empty($_POST['ysf'])) && $this->error('请选择收款方式');
 			$codes = ['zfb' => (int)$_POST['zfb'], 'bank' => (int)$_POST['bank'], 'wx' => (int)$_POST['wx'], 'ysf' => (int)$_POST['ysf']];
 			//查询用户的银行卡信息
@@ -1446,8 +1435,8 @@ class Merchant extends Base {
 			($codes['ysf'] && !$isUnionPay) && $this->error('请先设置您的云闪付账户信息');
 			Db::startTrans();
 			// 减少余额 增加冻结余额
-			$ad_no = $this->getAdvNo();
-			$res1  = balanceChange(FALSE, $this->uid, -$amount, 0, $amount, 0, BAL_ENTRUST, $ad_no);
+			$adNo = $this->getAdvNo();
+			$res1  = balanceChange(FALSE, $this->uid, -$amount, 0, $amount, 0, BAL_ENTRUST, $adNo);
 			// $res1 = Db::name('merchant')->where('id', $this->uid)->setDec('usdt', $amount);
 			// $res2 = Db::name('merchant')->where('id', $this->uid)->setInc('usdtd', $amount);
 			if ($res1) {
@@ -1457,13 +1446,13 @@ class Merchant extends Base {
 					'userid'        => $this->uid,
 					'add_time'      => time(),
 					'coin'          => '0',
-					'min_limit'     => $min_limit,
-					'max_limit'     => $max_limit,
+					'min_limit'     => $minLimit,
+					'max_limit'     => $maxLimit,
 					'pay_method'    => $codes['bank'],
 					'pay_method2'   => $codes['zfb'],
 					'pay_method3'   => $codes['wx'],
 					'pay_method4'   => $codes['ysf'],
-					'ad_no'         => $ad_no,
+					'ad_no'         => $adNo,
 					'amount'        => $amount,
 					'remain_amount' => $amount,
 					'price'         => $price,
@@ -1486,14 +1475,14 @@ class Merchant extends Base {
 			$where['userid'] = $this->uid;
 			$list            = $model2->getAd($where, 'id desc');
 			foreach ($list as $k => $v) {
-				//$deal_num = Db::name('order_buy')->where(['sell_sid' => $v['id'], 'status' => ['neq', 5], 'status' => ['neq', 9]])->sum('deal_num');
-				$deal_num           = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 7)->sum('deal_num');
-				$deal_num           = $deal_num ? $deal_num : 0;
-				$list[$k]['deal']   = $deal_num;
+				//$dealNum = Db::name('order_buy')->where(['sell_sid' => $v['id'], 'status' => ['neq', 5], 'status' => ['neq', 9]])->sum('deal_num');
+				$dealNum           = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 7)->sum('deal_num');
+				$dealNum           = $dealNum ? $dealNum : 0;
+				$list[$k]['deal']   = $dealNum;
 				$list[$k]['remain'] = $v['amount'] - $list[$k]['deal'];
 			}
 			$this->assign('list', $list);
-			$this->assign('pricelimit', $priceLimit);
+			$this->assign('priceLimit', $priceLimit);
 			$banks = $m->where('merchant_id', $this->uid)->order('id desc')->select();
 			$this->assign('zfb', $zfb->getBank(['merchant_id' => $this->uid], 'id desc'));
 			$this->assign('wx', $wx->getBank(['merchant_id' => $this->uid], 'id desc'));
@@ -1505,9 +1494,9 @@ class Merchant extends Base {
 
 	public function newadbuy() {
 		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
-		$usdtPriceWay = Db::name('config')->where('name', 'usdt_price_way_buy')->value('value');
-		$usdtPriceMin = Db::name('config')->where('name', 'usdt_price_min_buy')->value('value');
-		$usdtPriceMax = Db::name('config')->where('name', 'usdt_price_max_buy')->value('value');
+		$usdtPriceWay = config('usdt_price_way_buy');
+		$usdtPriceMin = config('usdt_price_min_buy');
+		$usdtPriceMax = config('usdt_price_max_buy');
 		if ($usdtPriceWay == 2) {
 			$priceLimit = getUsdtPrice() + config('usdt_price_add_buy');
 		} else {
@@ -1520,11 +1509,11 @@ class Merchant extends Base {
 		if (request()->isPost()) {
 			$amount = input('post.amount');
 			($amount <= 0) && $this->error('请输入正确的购买数量');
-			$min_limit = input('post.min_limit');
-			($min_limit <= 0) && $this->error('请输入正确的最小限额');
-			$max_limit = input('post.max_limit');
-			($max_limit <= 0) && $this->error('请输入正确的最大限额');
-			($min_limit > $max_limit) && $this->error('最小限额不能大于最大限额！');
+			$minLimit = input('post.min_limit');
+			($minLimit <= 0) && $this->error('请输入正确的最小限额');
+			$maxLimit = input('post.max_limit');
+			($maxLimit <= 0) && $this->error('请输入正确的最大限额');
+			($minLimit > $maxLimit) && $this->error('最小限额不能大于最大限额！');
 			// if($usdtPriceWay == 0){
 			// $price = input('post.price');
 			// if($price > $usdtPriceMax || $price < $usdtPriceMin){
@@ -1555,9 +1544,9 @@ class Merchant extends Base {
 			$model = new MerchantModel();
 			$user  = $model->getUserByParam($this->uid, 'id');
 			($user['trader_check'] != 1) && $this->error('您的承兑商资格未通过');
-			$haveadsum = Db::name('ad_buy')->where('userid', $this->uid)->where('state', 1)->count();
-			$haveadsum = $haveadsum ? $haveadsum : 0;
-			($haveadsum > 20) && $this->error('挂买最多发布20个');
+			$haveAdSum = Db::name('ad_buy')->where('userid', $this->uid)->where('state', 1)->count();
+			$haveAdSum = $haveAdSum ? $haveAdSum : 0;
+			($haveAdSum > 20) && $this->error('挂买最多发布20个');
 			(empty($_POST['bank']) && empty($_POST['zfb']) && empty($_POST['wx']) && empty($_POST['ysf'])) && $this->error('请选择收款方式');
 			$codes = ['zfb' => (int)$_POST['zfb'], 'bank' => (int)$_POST['bank'], 'wx' => (int)$_POST['wx'], 'ysf' => (int)$_POST['ysf']];
 			//查询用户的银行卡信息
@@ -1580,19 +1569,19 @@ class Merchant extends Base {
 			($codes['zfb'] && !$isAlipay) && $this->error('请先设置您的支付宝账户信息');
 			($codes['wx'] && !$isWxpay) && $this->error('请先设置您的微信账户信息');
 			($codes['ysf'] && !$isUnionPay) && $this->error('请先设置您的云闪付账户信息');
-			$ad_no  = $this->getAdvNo();
+			$adNo  = $this->getAdvNo();
 			$model2 = new AdbuyModel();
 			$flag   = $model2->insertOne([
 				'userid'      => $this->uid,
 				'add_time'    => time(),
 				'coin'        => 'usdt',
-				'min_limit'   => $min_limit,
-				'max_limit'   => $max_limit,
+				'min_limit'   => $minLimit,
+				'max_limit'   => $maxLimit,
 				'pay_method'  => $codes['bank'],
 				'pay_method2' => $codes['zfb'],
 				'pay_method3' => $codes['wx'],
 				'pay_method4' => $codes['ysf'],
-				'ad_no'       => $ad_no,
+				'ad_no'       => $adNo,
 				'amount'      => $amount,
 				'price'       => $price,
 				'state'       => 1
@@ -1613,13 +1602,13 @@ class Merchant extends Base {
 			$where['userid'] = $this->uid;
 			$list            = $model2->getAd($where, 'id desc');
 			foreach ($list as $k => $v) {
-				$deal_num           = Db::name('order_sell')->where(['buy_bid' => $v['id'], 'status' => ['neq', 5]])->sum('deal_num');
-				$deal_num           = $deal_num ? $deal_num : 0;
-				$list[$k]['deal']   = $deal_num;
+				$dealNum           = Db::name('order_sell')->where(['buy_bid' => $v['id'], 'status' => ['neq', 5]])->sum('deal_num');
+				$dealNum           = $dealNum ? $dealNum : 0;
+				$list[$k]['deal']   = $dealNum;
 				$list[$k]['remain'] = $v['amount'] - $list[$k]['deal'];
 			}
 			$this->assign('list', $list);
-			$this->assign('pricelimit', $priceLimit);
+			$this->assign('priceLimit', $priceLimit);
 			// $m = new \app\home\model\BankModel();
 			$banks = $m->where('merchant_id', $this->uid)->order('id desc')->select();
 			$this->assign('zfb', $zfb->getBank(['merchant_id' => $this->uid], 'id desc'));
@@ -1632,9 +1621,9 @@ class Merchant extends Base {
 
 	public function editad() {
 		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
-		$usdtPriceWay = Db::name('config')->where('name', 'usdt_price_way')->value('value');
-		$usdtPriceMin = Db::name('config')->where('name', 'usdt_price_min')->value('value');
-		$usdtPriceMax = Db::name('config')->where('name', 'usdt_price_max')->value('value');
+		$usdtPriceWay = config('usdt_price_way');
+		$usdtPriceMin = config('usdt_price_min');
+		$usdtPriceMax = config('usdt_price_max');
 		if ($usdtPriceWay == 2) {
 			$priceLimit = getUsdtPrice() + config('usdt_price_add');
 		} else {
@@ -1656,11 +1645,11 @@ class Merchant extends Base {
 			(!empty($order)) && $this->error('该挂单有订单，不能编辑');
 			$amount = input('post.amount');
 			($amount <= 0) && $this->error('请输入正确的出售数量');
-			$min_limit = input('post.min_limit');
-			($min_limit <= 0) && $this->error('请输入正确的最小限额');
-			$max_limit = input('post.max_limit');
-			($max_limit <= 0) && $this->error('请输入正确的最大限额');
-			($min_limit > $max_limit) && $this->error('最小限额不能大于最大限额！');
+			$minLimit = input('post.min_limit');
+			($minLimit <= 0) && $this->error('请输入正确的最小限额');
+			$maxLimit = input('post.max_limit');
+			($maxLimit <= 0) && $this->error('请输入正确的最大限额');
+			($minLimit > $maxLimit) && $this->error('最小限额不能大于最大限额！');
 			// if($usdtPriceWay == 0){
 			// $price = input('post.price');
 			// if($price > $usdtPriceMax || $price < $usdtPriceMin){
@@ -1690,9 +1679,9 @@ class Merchant extends Base {
 			// $pay_method = $_POST['pay_method'];
 			$user = $model->getUserByParam($this->uid, 'id');
 			($user['trader_check'] != 1) && $this->error('您的承兑商资格未通过');
-			$haveadsum = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->sum('amount');
-			$haveadsum = $haveadsum ? $haveadsum : 0;
-			($user['usdt'] < $amount + $haveadsum) && $this->error('账户余额不足');
+			$haveAdSum = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->sum('amount');
+			$haveAdSum = $haveAdSum ? $haveAdSum : 0;
+			($user['usdt'] < $amount + $haveAdSum) && $this->error('账户余额不足');
 			(empty($_POST['bank']) && empty($_POST['zfb']) && empty($_POST['wx']) && empty($_POST['ysf'])) && $this->error('请选择收款方式');
 			//查询用户的银行卡信息
 			$where1['merchant_id'] = $this->uid;
@@ -1714,11 +1703,11 @@ class Merchant extends Base {
 			($_POST['zfb'] && !$isAlipay) && $this->error('请先设置您的支付宝账户信息');
 			($_POST['wx'] && !$isWxpay) && $this->error('请先设置您的微信账户信息');
 			($_POST['ysf'] && !$isUnionPay) && $this->error('请先设置您的云闪付账户信息');
-			$ad_no = $this->getAdvNo();
+			$adNo = $this->getAdvNo();
 			$flag  = $model2->updateOne([
 				'id'          => $id,
-				'min_limit'   => $min_limit,
-				'max_limit'   => $max_limit,
+				'min_limit'   => $minLimit,
+				'max_limit'   => $maxLimit,
 				'state'       => 1,
 				'pay_method'  => $_POST['bank'],
 				'pay_method2' => $_POST['zfb'],
@@ -1743,7 +1732,7 @@ class Merchant extends Base {
 		$ad              = $model->getOne($where);
 		(empty($ad)) && $this->error('挂单标识错误');
 		$this->assign('ad', $ad);
-		$this->assign('pricelimit', $priceLimit);
+		$this->assign('priceLimit', $priceLimit);
 		$this->assign('usdt_price_min', $usdtPriceMin);
 		$this->assign('usdt_price_max', $usdtPriceMax);
 		$this->assign('usdt_price_way', $usdtPriceWay);
@@ -1758,9 +1747,9 @@ class Merchant extends Base {
 
 	public function editadbuy() {
 		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
-		$usdtPriceWay = Db::name('config')->where('name', 'usdt_price_way_buy')->value('value');
-		$usdtPriceMin = Db::name('config')->where('name', 'usdt_price_min_buy')->value('value');
-		$usdtPriceMax = Db::name('config')->where('name', 'usdt_price_max_buy')->value('value');
+		$usdtPriceWay = config('usdt_price_way_buy');
+		$usdtPriceMin = config('usdt_price_min_buy');
+		$usdtPriceMax = config('usdt_price_max_buy');
 		if ($usdtPriceWay == 2) {
 			$priceLimit = getUsdtPrice() + config('usdt_price_add_buy');
 		} else {
@@ -1782,11 +1771,11 @@ class Merchant extends Base {
 			(!empty($order)) && $this->error('该挂单有订单，不能编辑');
 			$amount = input('post.amount');
 			($amount <= 0) && $this->error('请输入正确的出售数量');
-			$min_limit = input('post.min_limit');
-			($min_limit <= 0) && $this->error('请输入正确的最小限额');
-			$max_limit = input('post.max_limit');
-			($max_limit <= 0) && $this->error('请输入正确的最大限额');
-			($min_limit > $max_limit) && $this->error('最小限额不能大于最大限额！');
+			$minLimit = input('post.min_limit');
+			($minLimit <= 0) && $this->error('请输入正确的最小限额');
+			$maxLimit = input('post.max_limit');
+			($maxLimit <= 0) && $this->error('请输入正确的最大限额');
+			($minLimit > $maxLimit) && $this->error('最小限额不能大于最大限额！');
 			// if($usdtPriceWay == 0){
 			// $price = input('post.price');
 			// if($price > $usdtPriceMax || $price < $usdtPriceMin){
@@ -1809,9 +1798,9 @@ class Merchant extends Base {
 			// $pay_method = $_POST['pay_method'];
 			$user = $model->getUserByParam($this->uid, 'id');
 			($user['trader_check'] != 1) && $this->error('您的承兑商资格未通过');
-			$haveadsum = Db::name('ad_buy')->where('userid', $this->uid)->where('state', 1)->count();
-			$haveadsum = $haveadsum ? $haveadsum : 0;
-			($haveadsum > 20) && $this->error('购买挂单最多发布20个');
+			$haveAdSum = Db::name('ad_buy')->where('userid', $this->uid)->where('state', 1)->count();
+			$haveAdSum = $haveAdSum ? $haveAdSum : 0;
+			($haveAdSum > 20) && $this->error('购买挂单最多发布20个');
 			(empty($_POST['bank']) && empty($_POST['zfb']) && empty($_POST['wx'])) && $this->error('请选择收款方式');
 			//查询用户的银行卡信息
 			$where1['merchant_id'] = $this->uid;
@@ -1833,8 +1822,8 @@ class Merchant extends Base {
 			($_POST['zfb'] && !$isAlipay) && $this->error('请先设置您的支付宝账户信息');
 			($_POST['wx'] && !$isWxpay) && $this->error('请先设置您的微信账户信息');
 			($_POST['ysf'] && !$isUnionPay) && $this->error('请先设置您的云闪付账户信息');
-			$ad_no = $this->getAdvNo();
-			$flag  = $model2->updateOne(['id' => $id, 'min_limit' => $min_limit, 'max_limit' => $max_limit, 'pay_method' => $_POST['bank'], 'pay_method2' => $_POST['zfb'], 'pay_method3' => $_POST['wx'], 'pay_method4' => $_POST['ysf'], 'amount' => $amount, 'price' => $price, 'state' => 1]);
+			$adNo = $this->getAdvNo();
+			$flag  = $model2->updateOne(['id' => $id, 'min_limit' => $minLimit, 'max_limit' => $maxLimit, 'pay_method' => $_POST['bank'], 'pay_method2' => $_POST['zfb'], 'pay_method3' => $_POST['wx'], 'pay_method4' => $_POST['ysf'], 'amount' => $amount, 'price' => $price, 'state' => 1]);
 			if ($flag['code'] == 1) {
 				$count = $model2->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
 				$model->updateOne(['id' => $this->uid, 'ad_on_buy' => $count ? $count : 0]);
@@ -1853,7 +1842,7 @@ class Merchant extends Base {
 		$this->assign('usdt_price_min', $usdtPriceMin);
 		$this->assign('usdt_price_max', $usdtPriceMax);
 		$this->assign('usdt_price_way', $usdtPriceWay);
-		$this->assign('pricelimit', $priceLimit);
+		$this->assign('priceLimit', $priceLimit);
 		$banks = $m->where('merchant_id', $this->uid)->order('id desc')->select();
 		$this->assign('zfb', $zfb->getBank(['merchant_id' => $this->uid], 'id desc'));
 		$this->assign('wx', $wx->getBank(['merchant_id' => $this->uid], 'id desc'));
@@ -1885,10 +1874,10 @@ class Merchant extends Base {
 		!$lock && $this->error('锁定操作失败，请重试。');
 		$merchant = $model2->getUserByParam($this->uid, 'id');
 		if ($act == 1) {
-			// $haveadsum = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->sum('amount');
-			// $haveadsum = $haveadsum ? $haveadsum : 0;
-			$haveadsum = 0;
-			if (($ad_info['remain_amount'] + $haveadsum) * 1 > $merchant['usdt'] * 1) {
+			// $haveAdSum = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->sum('amount');
+			// $haveAdSum = $haveAdSum ? $haveAdSum : 0;
+			$haveAdSum = 0;
+			if (($ad_info['remain_amount'] + $haveAdSum) * 1 > $merchant['usdt'] * 1) {
 				Cache::rm($id);
 				$this->error('开启失败：账户余额不足');
 			} else {
@@ -1931,9 +1920,9 @@ class Merchant extends Base {
 		}
 		$merchant = $model2->getUserByParam($this->uid, 'id');
 		if ($act == 1) {
-			$haveadsum = Db::name('ad_buy')->where('userid', $this->uid)->where('state', 1)->count();
-			$haveadsum = $haveadsum ? $haveadsum : 0;
-			($haveadsum > 20) && $this->error('开启失败：挂买最多上架20个');
+			$haveAdSum = Db::name('ad_buy')->where('userid', $this->uid)->where('state', 1)->count();
+			$haveAdSum = $haveAdSum ? $haveAdSum : 0;
+			($haveAdSum > 20) && $this->error('开启失败：挂买最多上架20个');
 		}
 		$result = $model->updateOne(['id' => $id, 'state' => $act]);
 		if ($result['code'] == 1) {
@@ -1956,8 +1945,8 @@ class Merchant extends Base {
 		$where['userid'] = ['neq', $this->uid];
 		$list            = $model->getAdIndex($where, $order);
 		foreach ($list as $k => $v) {
-			$deal_num               = Db::name('order_sell')->where('buy_bid', $v['id'])->where('status', 'neq', 5)->sum('deal_num');
-			$list[$k]['remain_num'] = $v['amount'] - $deal_num;
+			$dealNum               = Db::name('order_sell')->where('buy_bid', $v['id'])->where('status', 'neq', 5)->sum('deal_num');
+			$list[$k]['remain_num'] = $v['amount'] - $dealNum;
 		}
 		$this->assign('list', $list);
 		return $this->fetch();
@@ -1975,15 +1964,15 @@ class Merchant extends Base {
 		$wx           = new WxModel();
 		$ysf          = new YsfModel();
 		$AdOwner      = $userModel->getUserByParam($ad['userid'], 'id');
-		$deal_num     = Db::name('order_sell')->where('buy_bid', $id)->where('status', 'neq', 5)->sum('deal_num');
-		$remainNum    = $ad['amount'] - $deal_num;
+		$dealNum     = Db::name('order_sell')->where('buy_bid', $id)->where('status', 'neq', 5)->sum('deal_num');
+		$remainNum    = $ad['amount'] - $dealNum;
 		$usdtPriceWay = config('usdt_price_way_buy');
 		$addFee       = $usdtPriceWay == 2 ? config('usdt_price_add_buy') : 0;
-		$max_limit    = (getUsdtPrice() + $addFee) * $remainNum;
-		$rs1          = Db::name('ad_buy')->where('id', $ad['id'])->update(['max_limit' => $max_limit]);
+		$maxLimit    = (getUsdtPrice() + $addFee) * $remainNum;
+		$rs1          = Db::name('ad_buy')->where('id', $ad['id'])->update(['max_limit' => $maxLimit]);
 		//!$rs1 && $this->error('交易限额更新失败');
 		$ad              = $adModel->getOne(['id' => $id]);
-		$ad['RemainNum'] = $ad['amount'] - $deal_num;
+		$ad['RemainNum'] = $ad['amount'] - $dealNum;
 		$this->assign('ad', $ad);
 		$this->assign('AdOwner', $AdOwner);
 		$banks = $m->where('merchant_id', $this->uid)->order('id desc')->select();
@@ -2087,7 +2076,7 @@ class Merchant extends Base {
 			//判断交易范围
 			($tamount < $orderInfo['min_limit']) && $this->error('交易金额超出范围');
 			($tamount > $orderInfo['max_limit']) && $this->error('交易金额超出范围');
-			$merchant_fee = Db::name('config')->where('name', 'usdt_buy_merchant_fee')->value('value');
+			$merchant_fee = config('usdt_buy_merchant_fee');
 			$fee          = 0;
 			if ($merchant_fee) {
 				$fee = $num * $merchant_fee / 100;
@@ -2248,7 +2237,7 @@ class Merchant extends Base {
 		(empty($merchant)) && $this->error('订单参数错误2');
 		($merchant['appid'] != $appid) && $this->error('请求路径appid错误');
 		$this->assign('remaintime', $order['ltime'] * 60 + $order['ctime'] - time());
-		$pay = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method');
+		$pay    = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method');
 		$payarr = explode(',', $pay);
 		$this->assign('payarr', $payarr);
 		$this->assign('id', $id);
@@ -2517,7 +2506,7 @@ class Merchant extends Base {
 		if ($rs) {
 			/*$mobile = Db::name('merchant')->where('id', $order['sell_id'])->value('mobile');
 			if (!empty($mobile)) {
-				$send_content = Db::name('config')->where('name', 'send_message_content')->value('value');
+				$send_content = config('send_message_content');
 				$content = str_replace('{usdt}', round($order['deal_num'], 2), $send_content);
 				$content = str_replace('{cny}', round($order['deal_amount'], 2), $content);
 				$content = str_replace('{tx_id}', $order['orderid'], $content);
@@ -2641,7 +2630,7 @@ class Merchant extends Base {
 		}
 		$list = $model->getAllByWhere($where, $order);
 		if ($list) {
-			$usdtPriceWay = Db::name('config')->where('name', 'usdt_price_way')->value('value');
+			$usdtPriceWay = config('usdt_price_way');
 			$dealerFee    = 0; //承兑商费用
 			$newList      = collection($list)->toArray();
 			$sellerIds    = array_unique(array_column($newList, 'sell_id'));
@@ -2907,7 +2896,7 @@ class Merchant extends Base {
 	public function deal_merchant() {
 		if (request()->isPost()) {
 			!$this->uid && $this->error('请登录操作');
-			$id = input('post.id');
+			$id               = input('post.id');
 			$mchModel         = new MerchantModel();
 			$where['id']      = $id;
 			$where['sell_id'] = $this->uid;

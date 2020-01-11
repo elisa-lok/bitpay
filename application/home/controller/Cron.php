@@ -391,9 +391,9 @@ class Cron extends Base {
 		$adSellSum       = Db::name('ad_sell')->where($adMap)->count();
 		$adtotal         = Db::name('ad_sell')->where($adMap)->sum('amount');
 		$adids           = Db::name('ad_sell')->where($adMap)->column('id');
-		$deal_nums       = Db::name('order_buy')->where('sell_sid', 'in', $adids)->where('status', 'neq', 5)->where('status', 'neq', 9)->sum('deal_num');
+		$dealNums       = Db::name('order_buy')->where('sell_sid', 'in', $adids)->where('status', 'neq', 5)->where('status', 'neq', 9)->sum('deal_num');
 		//现存挂单出售总USDT，计算所有挂卖的剩余数量
-		$orderSellSum = $adtotal - $deal_nums;
+		$orderSellSum = $adtotal - $dealNums;
 		//求购笔数，承兑商挂买数量
 		$adBuySum     = Db::name('ad_buy')->where($adMap)->count();
 		$adbuytotal   = Db::name('ad_buy')->where($adMap)->sum('amount');

@@ -29,12 +29,7 @@ class Base extends Controller {
 			'rolename' => session('rolename'),
 			'menu'     => $node->getMenu(session('rule'))
 		]);
-		$config = cache('db_config_data');
-		if (!$config) {
-			$config = load_config();
-			cache('db_config_data', $config);
-		}
-		config($config);
+		$this->setConfig();
 		if (config('web_site_close') == 0 && session('adminuid') != 1) {
 			$this->error('站点已经关闭，请稍后访问~');
 		}
@@ -43,5 +38,13 @@ class Base extends Controller {
 				$this->error('403:禁止访问');
 			}
 		}
+	}
+	private function setConfig(){
+		$config = cache('db_config_data');
+		if (!$config) {
+			$config = api('Config/lists');
+			cache('db_config_data', $config);
+		}
+		config($config);
 	}
 }

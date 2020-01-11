@@ -774,9 +774,9 @@ class Merchant extends Base {
 				$str .= '|云闪付';
 			}
 			//新-结束
-			$deal_num          = Db::name('order_buy')->where(['sell_sid' => $v['id'], 'status' => ['neq', 5], 'status' => ['neq', 9]])->sum('deal_num');
-			$deal_num          = $deal_num ? $deal_num : 0;
-			$lists[$k]['deal'] = $deal_num;
+			$dealNum          = Db::name('order_buy')->where(['sell_sid' => $v['id'], 'status' => ['neq', 5], 'status' => ['neq', 9]])->sum('deal_num');
+			$dealNum          = $dealNum ? $dealNum : 0;
+			$lists[$k]['deal'] = $dealNum;
 			//$total = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 7)->sum('deal_num');
 			//$lists[$k]['remain'] = $v['amount'] - $lists[$k]['deal'];
 			$lists[$k]['remain']         = $v['remain_amount'];
@@ -844,9 +844,9 @@ class Merchant extends Base {
 				$str .= '|云闪付';
 			}
 			//新-结束
-			$deal_num            = Db::name('order_sell')->where(['buy_bid' => $v['id'], 'status' => ['neq', 5]])->sum('deal_num');
-			$deal_num            = $deal_num ? $deal_num : 0;
-			$lists[$k]['deal']   = $deal_num;
+			$dealNum            = Db::name('order_sell')->where(['buy_bid' => $v['id'], 'status' => ['neq', 5]])->sum('deal_num');
+			$dealNum            = $dealNum ? $dealNum : 0;
+			$lists[$k]['deal']   = $dealNum;
 			$lists[$k]['remain'] = $v['amount'] - $lists[$k]['deal'];
 			$lists[$k]['payway'] = $str;
 		}

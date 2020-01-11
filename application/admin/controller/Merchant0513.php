@@ -674,9 +674,9 @@
 // 			if (in_array(4, $temp)) {
 // 				$str .= '|微信支付';
 // 			}
-// 			$deal_num            = Db::name('order_buy')->where(['sell_sid' => $v['id'], 'status' => ['neq', 5], 'status' => ['neq', 9]])->sum('deal_num');
-// 			$deal_num            = $deal_num ? $deal_num : 0;
-// 			$lists[$k]['deal']   = $deal_num;
+// 			$dealNum            = Db::name('order_buy')->where(['sell_sid' => $v['id'], 'status' => ['neq', 5], 'status' => ['neq', 9]])->sum('deal_num');
+// 			$dealNum            = $dealNum ? $dealNum : 0;
+// 			$lists[$k]['deal']   = $dealNum;
 // 			$lists[$k]['remain'] = $v['amount'] - $lists[$k]['deal'];
 // 			$lists[$k]['payway'] = $str;
 // 		}
@@ -722,9 +722,9 @@
 // 			if (in_array(4, $temp)) {
 // 				$str .= '|微信支付';
 // 			}
-// 			$deal_num            = Db::name('order_sell')->where(['buy_bid' => $v['id'], 'status' => ['neq', 5]])->sum('deal_num');
-// 			$deal_num            = $deal_num ? $deal_num : 0;
-// 			$lists[$k]['deal']   = $deal_num;
+// 			$dealNum            = Db::name('order_sell')->where(['buy_bid' => $v['id'], 'status' => ['neq', 5]])->sum('deal_num');
+// 			$dealNum            = $dealNum ? $dealNum : 0;
+// 			$lists[$k]['deal']   = $dealNum;
 // 			$lists[$k]['remain'] = $v['amount'] - $lists[$k]['deal'];
 // 			$lists[$k]['payway'] = $str;
 // 		}
