@@ -2835,12 +2835,12 @@ class Merchant extends Base {
 				// 二级
 				if ($firstParent && $firstParent['pid'] > 0) {
 					$secondParent      = $mchModel->where('id', $firstParent['pid'])->find();
-					$sellerSecondMoney = ($secondParent && $secondParent['agent_check'] == 1) ? ($orderInfo['deal_num'] * $secondParent['trader_parent_get'] / 100) : $sellerSecondMoney;
+					$sellerSecondMoney = ($secondParent && $secondParent['agent_check'] == 1) ? ($orderInfo['deal_num'] * ($secondParent['trader_parent_get'] - $firstParent['trader_parent_get']) / 100) : $sellerSecondMoney;
 				}
 				// 三级
 				if ($secondParent && $secondParent['pid']) {
 					$thirdParent      = $mchModel->where('id', $secondParent['pid'])->find();
-					$sellerThirdMoney = ($thirdParent && $thirdParent['agent_check'] == 1) ? ($orderInfo['deal_num'] * $thirdParent['trader_parent_get'] / 100) : $sellerThirdMoney;
+					$sellerThirdMoney = ($thirdParent && $thirdParent['agent_check'] == 1) ? ($orderInfo['deal_num'] * ($thirdParent['trader_parent_get'] -$secondParent['trader_parent_get'] ) / 100) : $sellerThirdMoney;
 				}
 				$sellerParentMoney = $sellerFirstMoney + $sellerSecondMoney + $sellerThirdMoney;
 			}
@@ -2926,7 +2926,7 @@ class Merchant extends Base {
 		}
 	}
 
-	public function rollbackAndMsg($msg, $cacheKey) {
+	private function rollbackAndMsg($msg, $cacheKey) {
 		$cacheKey && Cache::rm($cacheKey);
 		Db::rollback();
 		$this->error($msg);
