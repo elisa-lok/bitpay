@@ -1168,12 +1168,12 @@ class Merchant extends Base {
 					// $this->error('请上传支付宝收款码：' . $file->getError());
 				}
 			} else {
-				$last_img = input('post.last_alipay_img');
-				if (empty($last_img)) {
+				$lastImg = input('post.last_alipay_img');
+				if (empty($lastImg)) {
 					$param['c_alipay_img'] = '';
 					//$this->error('请上传支付宝收款码');
 				} else {
-					$param['c_alipay_img'] = $last_img;
+					$param['c_alipay_img'] = $lastImg;
 				}
 			}
 			$param['id']               = $this->uid;
@@ -1212,18 +1212,18 @@ class Merchant extends Base {
 					// $this->error('请上传微信收款码：' . $file->getError());
 				}
 			} else {
-				$last_img = input('post.last_wechat_img');
-				if (empty($last_img)) {
+				$lastImg = input('post.last_wechat_img');
+				if (empty($lastImg)) {
 					$param['c_wechat_img'] = '';
 					// $this->error('请上传微信收款码');
 				} else {
-					$param['c_wechat_img'] = $last_img;
+					$param['c_wechat_img'] = $lastImg;
 				}
 			}
-			$wechat_account = input('post.wechat_account');
-			(!$wechat_account) && $this->error('请输入微信账户');
+			$wxAccount = input('post.wechat_account');
+			(!$wxAccount) && $this->error('请输入微信账户');
 			$param['id']               = $this->uid;
-			$param['c_wechat_account'] = $wechat_account;
+			$param['c_wechat_account'] = $wxAccount;
 			$param['name']             = $name;
 			$model                     = new MerchantModel();
 			$return                    = $model->updateOne($param);
@@ -1246,11 +1246,11 @@ class Merchant extends Base {
 				$google = new GoogleAuthenticator();
 				!$google->verifyCode($ga['0'], $code, 1) && $this->error('谷歌验证码错误！');
 			}
-			$truename       = input('post.zfbtruename');
+			$trueName       = input('post.zfbtruename');
 			$name           = input('post.zfbname');
 			$alipay_account = input('post.alipay_account');
 			$alipay_id      = input('post.alipay_id');
-			empty($truename) && $this->error('请填写真实姓名');
+			empty($trueName) && $this->error('请填写真实姓名');
 			empty($name) && $this->error('请填写标识名称');
 			empty($alipay_id) && $this->error('请输入支付宝ID');
 			// if(!$alipay_account){
@@ -1266,17 +1266,17 @@ class Merchant extends Base {
 					// $this->error('请上传支付宝收款码：' . $file->getError());
 				}
 			} else {
-				$last_img = input('post.last_alipay_img');
-				if (empty($last_img)) {
+				$lastImg = input('post.last_alipay_img');
+				if (empty($lastImg)) {
 					$param['c_bank_detail'] = '';
 					// $this->error('请上传支付宝收款码');
 				} else {
-					$param['c_bank_detail'] = $last_img;
+					$param['c_bank_detail'] = $lastImg;
 				}
 			}
 			$param['merchant_id'] = $this->uid;
 			$param['c_bank']      = $alipay_account;
-			$param['truename']    = $truename;
+			$param['truename']    = $trueName;
 			$param['name']        = $name;
 			$param['alipay_id']   = trim($alipay_id);
 			$model                = new ZfbModel();
@@ -1292,33 +1292,24 @@ class Merchant extends Base {
 	public function dowechatnew() {
 		if (request()->isPost()) {
 			!$this->uid && $this->error('请登陆操作', url('home/login/login'));
-			$truename       = input('post.wxtruename');
-			$name           = input('post.wxname');
-			$wechat_account = input('post.wechat_account');
-			(empty($truename)) && $this->error('请填写真实姓名');
+			$trueName  = input('post.wxtruename');
+			$name      = input('post.wxname');
+			$wxAccount = input('post.wechat_account');
+			(empty($trueName)) && $this->error('请填写真实姓名');
 			(empty($name)) && $this->error('请填写标识名称');
-			(!$wechat_account) && $this->error('请输入微信账户');
+			(!$wxAccount) && $this->error('请输入微信账户');
 			$file = request()->file('avatar2');
 			if ($file) {
-				$info = $file->validate(['size' => 3145728, 'ext' => 'jpg,png'])->move(ROOT_PATH . 'public' . DS . 'uploads/face');
-				if ($info) {
-					$param['c_bank_detail'] = $info->getSaveName();
-				} else {
-					$param['c_bank_detail'] = '';
-					//$this->error('请上传微信收款码：' . $file->getError());
-				}
+				$info                   = $file->validate(['size' => 3145728, 'ext' => 'jpg,png'])->move(ROOT_PATH . 'public' . DS . 'uploads/face');
+				$param['c_bank_detail'] = $info ? $info->getSaveName() : '';
 			} else {
-				$last_img = input('post.last_wechat_img');
-				if (empty($last_img)) {
-					$param['c_bank_detail'] = '';
-					// $this->error('请上传微信收款码');
-				} else {
-					$param['c_bank_detail'] = $last_img;
-				}
+				$lastImg = input('post.last_wechat_img');
+				// $this->error('请上传微信收款码');
+				$param['c_bank_detail'] = empty($lastImg) ? '' : $lastImg;
 			}
 			$param['merchant_id'] = $this->uid;
-			$param['c_bank']      = $wechat_account;
-			$param['truename']    = $truename;
+			$param['c_bank']      = $wxAccount;
+			$param['truename']    = $trueName;
 			$param['name']        = $name;
 			$model                = new WxModel();
 			$return               = $model->insertOne($param);
@@ -1333,9 +1324,9 @@ class Merchant extends Base {
 	public function doysfnew() {
 		if (request()->isPost()) {
 			!$this->uid && $this->error('请登陆操作', url('home/login/login'));
-			$truename = input('post.ysftruename');
+			$trueName = input('post.ysftruename');
 			$name     = input('post.ysfname');
-			(empty($truename)) && $this->error('请填写真实姓名');
+			(empty($trueName)) && $this->error('请填写真实姓名');
 			(empty($name)) && $this->error('请填写标识名称');
 			$file = request()->file('avatar2');
 			if ($file) {
@@ -1346,13 +1337,13 @@ class Merchant extends Base {
 					$this->error('请上传已释放收款码：' . $file->getError());
 				}
 			} else {
-				$last_img = input('post.ysfimg');
-				(empty($last_img)) && $this->error('请上传微信收款码');
-				$param['c_bank_detail'] = $last_img;
+				$lastImg = input('post.ysfimg');
+				(empty($lastImg)) && $this->error('请上传微信收款码');
+				$param['c_bank_detail'] = $lastImg;
 			}
 			$param['merchant_id'] = $this->uid;
-			// $param['c_bank'] = $wechat_account;
-			$param['truename'] = $truename;
+			// $param['c_bank'] = $wxAccount;
+			$param['truename'] = $trueName;
 			$param['name']     = $name;
 			$model             = new YsfModel();
 			$return            = $model->insertOne($param);
@@ -1366,22 +1357,16 @@ class Merchant extends Base {
 
 	public function newad() {
 		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
-		$usdtPriceWay    = config('usdt_price_way');
-		$usdtPriceMin    = config('usdt_price_min');
-		$usdtPriceMax    = config('usdt_price_max');
-		$defaultCfgPrice = (float)config('usdt_price_add') / 100;
-		$currentPrice    = $usdtPriceWay > 0 ? getUsdtPrice() : 0;
-		if ($usdtPriceWay == 2) {
-			$currPrice  = getUsdtPrice();
-			$addPrice   = number_format($currentPrice * $addPriceUsdt, 6, '.', ',');
-			$priceLimit = $currPrice + $addPrice;
-		} else {
-			$priceLimit = 0;
-		}
-		$m   = new BankModel();
-		$zfb = new ZfbModel();
-		$wx  = new WxModel();
-		$ysf = new YsfModel();
+		$usdtPriceWay        = config('usdt_price_way');
+		$usdtPriceMin        = config('usdt_price_min');
+		$usdtPriceMax        = config('usdt_price_max');
+		$defaultAddPriceRate = 1 + getTopAgentFeeRate($this->uid);
+		$usdtCurrentPrice    = getUsdtPrice();
+		$priceLimit          = $usdtPriceWay == 2 ? number_format($usdtCurrentPrice * $defaultAddPriceRate, 6, '.', ',') : $usdtCurrentPrice;
+		$m                   = new BankModel();
+		$zfb                 = new ZfbModel();
+		$wx                  = new WxModel();
+		$ysf                 = new YsfModel();
 		if (request()->isPost()) {
 			$amount = input('post.amount');
 			($amount <= 0) && $this->error('请输入正确的出售数量');
@@ -1390,21 +1375,8 @@ class Merchant extends Base {
 			$maxLimit = input('post.max_limit');
 			($maxLimit <= 0) && $this->error('请输入正确的最大限额');
 			($minLimit > $maxLimit) && $this->error('最小限额不能大于最大限额！');
-			if ($usdtPriceWay == 0) {
-				$price = input('post.price');
-				($price > $usdtPriceMax || $price < $usdtPriceMin) && $this->error('价格区间：' . $usdtPriceMin . '~' . $usdtPriceMax);
-			}
-			if ($usdtPriceWay == 1) {
-				$price = getUsdtPrice();
-			}
-			if ($usdtPriceWay == 2) {
-				$currPrice = getUsdtPrice();
-				$addPrice  = number_format($currPrice * $addPriceUsdt, 6, '.', ',');
-				// $priceLimit = getUsdtPrice() + config('usdt_price_add');
-				$priceLimit = $currPrice + $addPrice;
-				$price      = $priceLimit;
-			}
-			// $pay_method = $_POST['pay_method'];
+			$price = $usdtPriceWay == 0 ? input('post.price') : $priceLimit;
+			($price > $usdtPriceMax || $price < $usdtPriceMin) && $this->error('价格区间：' . $usdtPriceMin . '~' . $usdtPriceMax);
 			$model = new MerchantModel();
 			$user  = $model->getUserByParam($this->uid, 'id');
 			($user['trader_check'] != 1) && $this->error('您的承兑商资格未通过');
@@ -1436,9 +1408,7 @@ class Merchant extends Base {
 			Db::startTrans();
 			// 减少余额 增加冻结余额
 			$adNo = $this->getAdvNo();
-			$res1  = balanceChange(FALSE, $this->uid, -$amount, 0, $amount, 0, BAL_ENTRUST, $adNo);
-			// $res1 = Db::name('merchant')->where('id', $this->uid)->setDec('usdt', $amount);
-			// $res2 = Db::name('merchant')->where('id', $this->uid)->setInc('usdtd', $amount);
+			$res1 = balanceChange(FALSE, $this->uid, -$amount, 0, $amount, 0, BAL_ENTRUST, $adNo);
 			if ($res1) {
 				Db::commit();
 				$model2 = new AdModel();
@@ -1476,8 +1446,8 @@ class Merchant extends Base {
 			$list            = $model2->getAd($where, 'id desc');
 			foreach ($list as $k => $v) {
 				//$dealNum = Db::name('order_buy')->where(['sell_sid' => $v['id'], 'status' => ['neq', 5], 'status' => ['neq', 9]])->sum('deal_num');
-				$dealNum           = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 7)->sum('deal_num');
-				$dealNum           = $dealNum ? $dealNum : 0;
+				$dealNum            = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 7)->sum('deal_num');
+				$dealNum            = $dealNum ? $dealNum : 0;
 				$list[$k]['deal']   = $dealNum;
 				$list[$k]['remain'] = $v['amount'] - $list[$k]['deal'];
 			}
@@ -1514,14 +1484,6 @@ class Merchant extends Base {
 			$maxLimit = input('post.max_limit');
 			($maxLimit <= 0) && $this->error('请输入正确的最大限额');
 			($minLimit > $maxLimit) && $this->error('最小限额不能大于最大限额！');
-			// if($usdtPriceWay == 0){
-			// $price = input('post.price');
-			// if($price > $usdtPriceMax || $price < $usdtPriceMin){
-			// $this->error('价格区间：'.$usdtPriceMin.'~'.$usdtPriceMax);
-			// }
-			// }else{
-			// $price = getUsdtPrice();
-			// }
 			if ($usdtPriceWay == 0) {
 				$price = input('post.price');
 				($price > $usdtPriceMax || $price < $usdtPriceMin) && $this->error('价格区间：' . $usdtPriceMin . '~' . $usdtPriceMax);
@@ -1529,13 +1491,6 @@ class Merchant extends Base {
 			if ($usdtPriceWay == 1) {
 				$price = getUsdtPrice();
 			}
-			// if($usdtPriceWay == 2){
-			// $price = input('post.price');
-			// $priceLimit = getUsdtPrice()+config('usdt_price_add');
-			// if($price !=$priceLimit){
-			// $this->error('价格错误!');
-			// }
-			// }
 			if ($usdtPriceWay == 2) {
 				// $priceLimit = floatval(getUsdtPrice()+config('usdt_price_add_buy'));
 				$price = floatval(getUsdtPrice() + config('usdt_price_add_buy'));
@@ -1569,7 +1524,7 @@ class Merchant extends Base {
 			($codes['zfb'] && !$isAlipay) && $this->error('请先设置您的支付宝账户信息');
 			($codes['wx'] && !$isWxpay) && $this->error('请先设置您的微信账户信息');
 			($codes['ysf'] && !$isUnionPay) && $this->error('请先设置您的云闪付账户信息');
-			$adNo  = $this->getAdvNo();
+			$adNo   = $this->getAdvNo();
 			$model2 = new AdbuyModel();
 			$flag   = $model2->insertOne([
 				'userid'      => $this->uid,
@@ -1602,8 +1557,8 @@ class Merchant extends Base {
 			$where['userid'] = $this->uid;
 			$list            = $model2->getAd($where, 'id desc');
 			foreach ($list as $k => $v) {
-				$dealNum           = Db::name('order_sell')->where(['buy_bid' => $v['id'], 'status' => ['neq', 5]])->sum('deal_num');
-				$dealNum           = $dealNum ? $dealNum : 0;
+				$dealNum            = Db::name('order_sell')->where(['buy_bid' => $v['id'], 'status' => ['neq', 5]])->sum('deal_num');
+				$dealNum            = $dealNum ? $dealNum : 0;
 				$list[$k]['deal']   = $dealNum;
 				$list[$k]['remain'] = $v['amount'] - $list[$k]['deal'];
 			}
@@ -1704,7 +1659,7 @@ class Merchant extends Base {
 			($_POST['wx'] && !$isWxpay) && $this->error('请先设置您的微信账户信息');
 			($_POST['ysf'] && !$isUnionPay) && $this->error('请先设置您的云闪付账户信息');
 			$adNo = $this->getAdvNo();
-			$flag  = $model2->updateOne([
+			$flag = $model2->updateOne([
 				'id'          => $id,
 				'min_limit'   => $minLimit,
 				'max_limit'   => $maxLimit,
@@ -1823,7 +1778,7 @@ class Merchant extends Base {
 			($_POST['wx'] && !$isWxpay) && $this->error('请先设置您的微信账户信息');
 			($_POST['ysf'] && !$isUnionPay) && $this->error('请先设置您的云闪付账户信息');
 			$adNo = $this->getAdvNo();
-			$flag  = $model2->updateOne(['id' => $id, 'min_limit' => $minLimit, 'max_limit' => $maxLimit, 'pay_method' => $_POST['bank'], 'pay_method2' => $_POST['zfb'], 'pay_method3' => $_POST['wx'], 'pay_method4' => $_POST['ysf'], 'amount' => $amount, 'price' => $price, 'state' => 1]);
+			$flag = $model2->updateOne(['id' => $id, 'min_limit' => $minLimit, 'max_limit' => $maxLimit, 'pay_method' => $_POST['bank'], 'pay_method2' => $_POST['zfb'], 'pay_method3' => $_POST['wx'], 'pay_method4' => $_POST['ysf'], 'amount' => $amount, 'price' => $price, 'state' => 1]);
 			if ($flag['code'] == 1) {
 				$count = $model2->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
 				$model->updateOne(['id' => $this->uid, 'ad_on_buy' => $count ? $count : 0]);
@@ -1945,7 +1900,7 @@ class Merchant extends Base {
 		$where['userid'] = ['neq', $this->uid];
 		$list            = $model->getAdIndex($where, $order);
 		foreach ($list as $k => $v) {
-			$dealNum               = Db::name('order_sell')->where('buy_bid', $v['id'])->where('status', 'neq', 5)->sum('deal_num');
+			$dealNum                = Db::name('order_sell')->where('buy_bid', $v['id'])->where('status', 'neq', 5)->sum('deal_num');
 			$list[$k]['remain_num'] = $v['amount'] - $dealNum;
 		}
 		$this->assign('list', $list);
@@ -1964,11 +1919,11 @@ class Merchant extends Base {
 		$wx           = new WxModel();
 		$ysf          = new YsfModel();
 		$AdOwner      = $userModel->getUserByParam($ad['userid'], 'id');
-		$dealNum     = Db::name('order_sell')->where('buy_bid', $id)->where('status', 'neq', 5)->sum('deal_num');
+		$dealNum      = Db::name('order_sell')->where('buy_bid', $id)->where('status', 'neq', 5)->sum('deal_num');
 		$remainNum    = $ad['amount'] - $dealNum;
 		$usdtPriceWay = config('usdt_price_way_buy');
 		$addFee       = $usdtPriceWay == 2 ? config('usdt_price_add_buy') : 0;
-		$maxLimit    = (getUsdtPrice() + $addFee) * $remainNum;
+		$maxLimit     = (getUsdtPrice() + $addFee) * $remainNum;
 		$rs1          = Db::name('ad_buy')->where('id', $ad['id'])->update(['max_limit' => $maxLimit]);
 		//!$rs1 && $this->error('交易限额更新失败');
 		$ad              = $adModel->getOne(['id' => $id]);
