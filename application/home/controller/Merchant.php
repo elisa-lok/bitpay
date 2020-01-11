@@ -2806,41 +2806,30 @@ class Merchant extends Base {
 			$pkFeeRate = $buyer['merchant_pk_fee'];
 			$pkFeeRate = $pkFeeRate ? $pkFeeRate : 0;
 			$totalFee  = $orderInfo['deal_num'] * $pkFeeRate / 100;
-			//平台利润
-			$platformGet   = config('trader_platform_get');
-			$platformGet   = $platformGet ? $platformGet : 0;
-			$platformMoney = $platformGet * $orderInfo['deal_num'] / 100;
 			//承兑商卖单奖励
 			$sellerGet         = $seller['trader_trader_get'];
 			$sellerGet         = $sellerGet ? $sellerGet : 0;
 			$sellerAwardMoney  = $sellerGet * $orderInfo['deal_num'] / 100;
 			$sellerParentMoney = $buyerParentMoney = $buyerAgentExist = 0;
-			/*if ($seller['pid']) {
-				$traderP = $mchModel->getUserByParam($seller['pid'], 'id');
-				if ($traderP['agent_check'] == 1 && $traderP['trader_parent_get']) {
-					//承兑商代理利润
-					$tpexist = 1;
-					$sellerParentGet = $traderP['trader_parent_get'];
-					$sellerParentGet = $sellerParentGet ? $sellerParentGet : 0;
-					$sellerParentMoney = $sellerParentGet * $orderInfo['deal_num'] / 100;
-				}
-			}*/
 			// 承兑商代理
 			$firstParent      = $secondParent = $thirdParent = NULL;
 			$sellerFirstMoney = $sellerSecondMoney = $sellerThirdMoney = 0;
-			if ($seller['pid'] > 0 && $seller['reg_type'] == 2) {
+			if ($seller['pid'] > 0) {
 				// 一级
 				$firstParent      = $mchModel->where('id', $seller['pid'])->find();
-				$sellerFirstMoney = ($firstParent && $firstParent['agent_check'] == 1) ? $orderInfo['deal_num'] * $firstParent['trader_parent_get'] / 100 : $sellerFirstMoney;
+				$sellerFirstMoney = ($firstParent && $firstParent['agent_check'] == 1) ? $orderInfo['deal_num'] * (float)$firstParent['trader_parent_get'] / 100 : $sellerFirstMoney;
+				$sellerFirstMoney < 0 && $this->error('配置异常, 请联系管理员,错误码:231');
 				// 二级
 				if ($firstParent && $firstParent['pid'] > 0) {
 					$secondParent      = $mchModel->where('id', $firstParent['pid'])->find();
 					$sellerSecondMoney = ($secondParent && $secondParent['agent_check'] == 1) ? ($orderInfo['deal_num'] * ($secondParent['trader_parent_get'] - $firstParent['trader_parent_get']) / 100) : $sellerSecondMoney;
+					$sellerSecondMoney < 0 && $this->error('配置异常, 请联系管理员,错误码:232');
 				}
 				// 三级
 				if ($secondParent && $secondParent['pid']) {
 					$thirdParent      = $mchModel->where('id', $secondParent['pid'])->find();
 					$sellerThirdMoney = ($thirdParent && $thirdParent['agent_check'] == 1) ? ($orderInfo['deal_num'] * ($thirdParent['trader_parent_get'] -$secondParent['trader_parent_get'] ) / 100) : $sellerThirdMoney;
+					$sellerThirdMoney < 0 && $this->error('配置异常, 请联系管理员,错误码:233');
 				}
 				$sellerParentMoney = $sellerFirstMoney + $sellerSecondMoney + $sellerThirdMoney;
 			}
@@ -2889,7 +2878,7 @@ class Merchant extends Base {
 					}
 					// 三级
 					if ($sellerThirdMoney > 0) {
-						$rsArr = agentReward($firstParent['id'], $orderInfo['sell_id'], $sellerThirdMoney, 3, $id);
+						$rsArr = agentReward($thirdParent['id'], $orderInfo['sell_id'], $sellerThirdMoney, 3, $id);
 						!$rsArr[0] && $this->rollbackAndMsg('订单操作失败,错误码:10009', $id);
 						!$rsArr[1] && $this->rollbackAndMsg('订单操作失败,错误码:10010', $id);
 					}
