@@ -3,6 +3,7 @@ namespace app\api\controller;
 use app\home\model\OrderModel;
 use think\Cache;
 use think\Db;
+use think\Exception\DbException;
 
 class Merchant extends Base {
 	private $model;
@@ -108,23 +109,23 @@ class Merchant extends Base {
 		empty($data['username']) && $this->err('用户名不能为空');
 		$usdt = $this->merchant['usdt'];
 		($usdt * 100000000 < $data['num'] * 100000000) && $this->err('商户余额不足');
-		$ordersn = createOrderNo(2, $this->merchant['id']);
+		$orderSn = createOrderNo(2, $this->merchant['id']);
 		$rs      = Db::name('merchant_user_withdraw')->insert([
 			'merchant_id' => $this->merchant['id'],
 			'address'     => $data['address'],
 			'username'    => $data['username'],
 			'num'         => $data['num'],
 			'addtime'     => time(),
-			'ordersn'     => $ordersn
+			'ordersn'     => $orderSn
 		]);
 		if (!$rs) {
 			$this->err('提交失败，请稍后再试');
 		} else {
 			if ($this->merchant['pid'] > 0) {
 				$request_param = "address=>" . $data['address'] . 'num=>' . $data['num'] . 'username=>' . $data['username'];
-				apilog($this->merchant['pid'], $this->merchant['id'], '获取usdt账户余额', $request_param, $ordersn);
+				apilog($this->merchant['pid'], $this->merchant['id'], '获取usdt账户余额', $request_param, $orderSn);
 			}
-			$this->suc($ordersn);
+			$this->suc($orderSn);
 		}
 	}
 
@@ -272,7 +273,7 @@ class Merchant extends Base {
 				Db::rollback();
 				$this->err('提交失败');
 			}
-		} catch (\think\Exception\DbException $e) {
+		} catch (DbException $e) {
 			// 回滚事务
 			Db::rollback();
 			$this->err('提交失败，参考信息：' . $e->getMessage());
@@ -427,7 +428,7 @@ class Merchant extends Base {
 				Cache::rm('sell_order_lock_' . $onlineAd['id']);
 				$this->err('提交失败');
 			}
-		} catch (\think\Exception\DbException $e) {
+		} catch (DbException $e) {
 			// 回滚事务
 			Db::rollback();
 			$this->err('提交失败，参考信息：' . $e->getMessage());

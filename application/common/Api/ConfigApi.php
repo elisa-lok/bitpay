@@ -9,13 +9,15 @@
 // | Author: 田建龙 <864491238@qq.com>
 // +----------------------------------------------------------------------
 namespace app\common\Api;
+use think\Db;
+
 class ConfigApi {
 	/**
 	 * 获取数据库中的配置列表
 	 * @return array 配置数组
 	 */
 	public static function lists() {
-		$data   = \think\Db::name('Config')->field('name,value')->select();
+		$data   = Db::name('Config')->field('name,value')->select();
 		$config = [];
 		if ($data) {
 			foreach ($data as $value) {
@@ -31,7 +33,7 @@ class ConfigApi {
 	 */
 	public static function getValue($name) {
 		$map  = ['status' => 1, 'name' => $name];
-		$data = \think\Db::name('Config')->where($map)->field('type,name,value')->find();
+		$data = Db::name('Config')->where($map)->field('type,name,value')->find();
 		return self::parse($data['type'], $data['value']);
 	}
 

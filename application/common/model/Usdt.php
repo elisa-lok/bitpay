@@ -1,5 +1,7 @@
 <?php
 namespace app\common\model;
+use com\Bitcoin;
+use com\JSON;
 use think\Db;
 
 // require './extend/com/easybitcoin.php';
@@ -41,7 +43,6 @@ class Usdt {
 			case 'getnewaddress':
 				$result = $this->getNewAddress();
 				return ['code' => 1, 'msg' => '', 'data' => $result];
-
 			case 'validateaddress':
 				if (!isset($addr) || empty($addr)) {
 					return ['code' => 0, 'msg' => API_ERROR_MESSAGE_PARAMETERERROR];
@@ -50,7 +51,6 @@ class Usdt {
 				}
 				$result = $this->vailedAddress($addr);
 				return ['code' => 1, 'msg' => '', 'data' => $result];
-
 			case 'getbalance':
 				if (!isset($addr) || empty($addr)) {
 					return ['code' => 0, 'msg' => API_ERROR_MESSAGE_PARAMETERERROR];
@@ -96,15 +96,12 @@ class Usdt {
 			case 'getbtcbalance':
 				$result = $this->getBtcBalace();
 				return ['code' => 1, 'msg' => '', 'data' => $result];
-
 			case 'getAllAddress':
 				$result = $this->getAllAddress();
 				return ['code' => 1, 'msg' => '', 'data' => $result];
-
 			case 'getblockcount':
 				$result = $this->getBlockCount();
 				return ['code' => 1, 'msg' => '', 'data' => $result];
-
 			case 'transactionslist':
 				$addr       = !empty($addr) ? $addr : '*';
 				$count      = !empty($count) && is_numeric($count) ? intval($count) : 10;
@@ -113,7 +110,6 @@ class Usdt {
 				$endblock   = 999999; //$_REQUEST['txid'];
 				$result     = $this->transactionsList($addr, $count, $skip, $startblock, $endblock);
 				return ['code' => 1, 'msg' => '', 'data' => $result];
-
 			case 'blocktransactionslist':
 				if (!isset($index) || empty($index) || !is_numeric($index)) {
 					return ['code' => 0, 'msg' => API_ERROR_MESSAGE_PARAMETERERROR];
@@ -122,7 +118,6 @@ class Usdt {
 				}
 				$result = $this->blockTransactionsList($index);
 				return ['code' => 1, 'msg' => '', 'data' => $result];
-
 			case 'getinfo':
 				return ['code' => 1, 'msg' => '', 'data' => $this->getinfo()];
 				//echo $this->getinfo();
@@ -130,7 +125,6 @@ class Usdt {
 			case 'getallbalances':
 				$result = $this->getAllBalance();
 				return ['code' => 1, 'msg' => '', 'data' => $result];
-
 			default:
 				return ['code' => 0, 'msg' => API_ERROR_MESSAGE_NOMETHOD, 'data' => ''];
 				//echo API_ERROR_MESSAGE_NOMETHOD; //方法名不能为空
@@ -158,9 +152,9 @@ class Usdt {
 	 * 若获取失败，result为空，error信息为错误信息的编码
 	 **/
 	private function getInfo() {
-		$bitcoin = new \com\Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
+		$bitcoin = new Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
 		$info    = $bitcoin->omni_getinfo();
-		$json    = new \com\JSON;
+		$json    = new JSON;
 		$res     = $json->encode($info);
 		return $res;
 	}
@@ -171,7 +165,7 @@ class Usdt {
 	 * @return [type]       [description]
 	 */
 	private function getNewAddress() {
-		$bitcoin = new \com\Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
+		$bitcoin = new Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
 		$address = $bitcoin->getnewaddress();
 		error_log($address . PHP_EOL, 3, './addressdebug.log');
 		return $address;
@@ -184,7 +178,7 @@ class Usdt {
 	 */
 	private function getBalance($addr) {
 		if ($this->vailedAddress($addr)) {
-			$bitcoin = new \com\Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
+			$bitcoin = new Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
 			$money   = $bitcoin->omni_getbalance($addr, PROPERTY_ID);
 			$num     = empty($money['balance']) ? 0 : $money['balance'];
 			return ['code' => 1, 'msg' => '', 'data' => $num];
@@ -196,7 +190,7 @@ class Usdt {
 
 	private function getBtcBalance($addr) {
 		if ($this->vailedAddress($addr)) {
-			$bitcoin = new \com\Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
+			$bitcoin = new Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
 			$money   = $bitcoin->omni_getbalance($addr, 0);
 			$num     = empty($money['balance']) ? 0 : $money['balance'];
 			return ['code' => 1, 'msg' => '', 'data' => $num];
@@ -210,7 +204,7 @@ class Usdt {
 	 * 查询钱包BTC余额
 	 */
 	private function getBtcBalace() {
-		$bitcoin = new \com\Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
+		$bitcoin = new Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
 		$balance = $bitcoin->getbalance();
 		return $balance;
 	}
@@ -230,7 +224,7 @@ class Usdt {
 		if ($this->vailedAddress($taddr)) {
 			$redeemaddress   = '';
 			$referenceamount = '0';
-			$bitcoin         = new \com\Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
+			$bitcoin         = new Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
 			//$fee = 0.0008;
 			//$pwd = '19910408a';//钱包密码
 			if (!empty($pwd) && !empty($fee)) {
@@ -267,7 +261,7 @@ class Usdt {
 		if ($this->vailedAddress($taddr)) {
 			$redeemaddress   = '';
 			$referenceamount = '0';
-			$bitcoin         = new \com\Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
+			$bitcoin         = new Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
 			//$fee = 0.0008;
 			//$pwd = '19910408a';//钱包密码
 			if (!empty($pwd) && !empty($fee)) {
@@ -295,7 +289,7 @@ class Usdt {
 	 * @return 是有效地址返回1 无效返回0
 	 */
 	private function vailedAddress($addr) {
-		$bitcoin = new \com\Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
+		$bitcoin = new Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
 		$address = $bitcoin->validateaddress($addr);
 		if ($address['isvalid']) {
 			return 1;
@@ -309,41 +303,41 @@ class Usdt {
 	 * @return
 	 */
 	private function getBlockCount() {
-		$bitcoin    = new \com\Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
+		$bitcoin    = new Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
 		$blockcount = $bitcoin->getblockcount();
 		return $blockcount;
 		//echo $blockcount;
 	}
 
 	private function transactionsList($addr, $count, $skip, $startblock, $endblock) {
-		$bitcoin = new \com\Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
+		$bitcoin = new Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
 		$info    = $bitcoin->omni_listtransactions($addr, $count, $skip, $startblock, $endblock);
-		$json    = new \com\JSON;
+		$json    = new JSON;
 		$res     = $json->encode($info);
 		return $res;
 	}
 
 	private function getAllBalance() {
-		$bitcoin = new \com\Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
+		$bitcoin = new Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
 		$info    = $bitcoin->omni_getallbalancesforid(PROPERTY_ID);
-		$json    = new \com\JSON;
+		$json    = new JSON;
 		$res     = $json->encode($info);
 		return $res;
 	}
 
 	private function blockTransactionsList($index) {
-		$bitcoin = new \com\Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
+		$bitcoin = new Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
 		$info    = $bitcoin->omni_listblocktransactions($index);
 		if (empty($info)) {
 			return "";
 		}
-		$json = new \com\JSON;
+		$json = new JSON;
 		$res  = $json->encode($info);
 		return $res;
 	}
 
 	private function getAllAddress() {
-		$bitcoin = new \com\Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
+		$bitcoin = new Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
 		$info    = $bitcoin->getaddressesbyaccount('');
 		return $info;
 	}

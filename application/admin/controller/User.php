@@ -1,7 +1,5 @@
 <?php
-
 namespace app\admin\controller;
-
 use app\admin\model\UserModel;
 use app\admin\model\UserType;
 use think\Db;
@@ -19,7 +17,7 @@ class User extends Base {
 			$map['username'] = ['like', "%" . $key . "%"];
 		}
 		$page          = input('get.page') ? input('get.page') : 1;
-		$rows          = input('get.rows');// 获取总条数
+		$rows          = input('get.rows');                      // 获取总条数
 		$count         = Db::name('admin')->where($map)->count();//计算总页面
 		$user          = new UserModel();
 		$lists         = $user->getUsersByWhere($map, $page, $rows);
@@ -73,7 +71,6 @@ class User extends Base {
 			$group_access = Db::name('auth_group_access')->where('uid', $user['id'])->update(['group_id' => $param['groupid']]);
 			return json(['code' => $flag['code'], 'data' => $flag['data'], 'msg' => $flag['msg']]);
 		}
-
 		$id   = input('param.id');
 		$role = new UserType();
 		$this->assign([
@@ -116,7 +113,7 @@ class User extends Base {
 	 * 支付方式查看
 	 */
 	public function payment($id) {
-		$data = [];
+		$data             = [];
 		$data['bankcard'] = Db::name('merchant_bankcard')->where('merchant_id=' . $id)->select();
 		$data['alipay']   = Db::name('merchant_zfb')->where('merchant_id=' . $id)->select();
 		$data['wxpay']    = Db::name('merchant_wx')->where('merchant_id=' . $id)->select();
@@ -128,12 +125,12 @@ class User extends Base {
 	// 删除支付方式
 	public function delPayment($type, $id) {
 		if ($type == 0) {
-			Db::name('merchant_bankcard')->where('id='.$id)->delete();
-		} elseif($type>0 && $type <4){
-			$arr = ['1'=> 'merchant_zfb', '2'=>'merchant_wx','3'=>'merchant_ysf' ];
-			$res = Db::name($arr[$type])->where('id='.$id)->find();
-			unlink(UPLOAD_PATH.'/uploads/face/'.$res['c_bank_detail']);
-			Db::name($arr[$type])->where('id='.$id)->delete();
+			Db::name('merchant_bankcard')->where('id=' . $id)->delete();
+		} elseif ($type > 0 && $type < 4) {
+			$arr = ['1' => 'merchant_zfb', '2' => 'merchant_wx', '3' => 'merchant_ysf'];
+			$res = Db::name($arr[$type])->where('id=' . $id)->find();
+			unlink(UPLOAD_PATH . '/uploads/face/' . $res['c_bank_detail']);
+			Db::name($arr[$type])->where('id=' . $id)->delete();
 		}
 		return $this->error('删除成功');
 	}

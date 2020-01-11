@@ -1,7 +1,9 @@
 <?php
 namespace app\home\controller;
+use app\common\model\Usdt;
 use think\Cache;
 use think\db;
+use think\Exception;
 
 (PHP_SAPI != 'cli') && die('error');
 
@@ -137,9 +139,9 @@ class Auto extends Base {
 									Db::commit();
 								} else {
 									Db::rollback();
-									throw new \think\Exception('write databses fail');
+									throw new Exception('write databses fail');
 								}
-							} catch (\think\Exception $e) {
+							} catch (Exception $e) {
 								file_put_contents(RUNTIME_PATH . "data/traderzrdebug.txt", " - " . $v2['hash'] . "|" . date("Y-m-d H:i:s", $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
 								Db::rollback();
 							}
@@ -153,13 +155,13 @@ class Auto extends Base {
 	}
 
 	public function autoEth() {                  //盘口提币
-		$time = time();
+		$time     = time();
 		$confirms = config('usdt_confirms');     //充值手续费
 		$feemy    = config('agent_recharge_fee');//充值手续费
 		if (empty($confirms)) {
 			exit('请设置确认数');
 		}
-		$model   = new \app\common\model\Usdt();
+		$model   = new Usdt();
 		$address = Db::name('merchant_user_address')->field('merchant_id, username, addtime, address')->select();
 		$count   = 1000;
 		$skip    = 0;
@@ -269,9 +271,9 @@ class Auto extends Base {
 						Db::commit();
 					} else {
 						Db::rollback();
-						throw new \think\Exception('write databses fail');
+						throw new Exception('write databses fail');
 					}
-				} catch (\think\Exception $e) {
+				} catch (Exception $e) {
 					file_put_contents(RUNTIME_PATH . "data/zrdebug.txt", " - " . $v2['txid'] . "|" . date("Y-m-d H:i:s", $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
 					Db::rollback();
 				}
@@ -303,7 +305,7 @@ class Auto extends Base {
 		if (empty($confirms)) {
 			exit('请设置确认数');
 		}
-		$model   = new \app\common\model\Usdt();
+		$model   = new Usdt();
 		$address = Db::name('merchant')->field('id as merchant_id, usdtb as address, trader_recharge_fee')->where('usdtb', 'not null')->where('trader_check', 1)->select();
 		$count   = 1000;
 		$skip    = 0;
@@ -401,9 +403,9 @@ class Auto extends Base {
 						Db::commit();
 					} else {
 						Db::rollback();
-						throw new \think\Exception('write databses fail');
+						throw new Exception('write databses fail');
 					}
-				} catch (\think\Exception $e) {
+				} catch (Exception $e) {
 					file_put_contents(RUNTIME_PATH . "data/traderzrdebug.txt", " - " . $v2['txid'] . "|" . date("Y-m-d H:i:s", $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
 					Db::rollback();
 				}
@@ -515,7 +517,7 @@ class Auto extends Base {
 		$adSellSum       = Db::name('ad_sell')->where($adMap)->count();
 		$adtotal         = Db::name('ad_sell')->where($adMap)->sum('amount');
 		$adids           = Db::name('ad_sell')->where($adMap)->column('id');
-		$dealNums       = Db::name('order_buy')->where('sell_sid', 'in', $adids)->where('status', 'neq', 5)->where('status', 'neq', 9)->sum('deal_num');
+		$dealNums        = Db::name('order_buy')->where('sell_sid', 'in', $adids)->where('status', 'neq', 5)->where('status', 'neq', 9)->sum('deal_num');
 		//现存挂单出售总USDT，计算所有挂卖的剩余数量
 		$orderSellSum = $adtotal - $dealNums;
 		//求购笔数，承兑商挂买数量
@@ -574,7 +576,7 @@ class Auto extends Base {
 	public function coverusdt() {//OMNI汇总USDT
 		$list = Db::name('merchant')->where(['usdtb' => ['neq', NULL]])->select();
 		if ($list) {
-			$model = new \app\common\model\Usdt();
+			$model = new Usdt();
 			foreach ($list as $k => $v) {
 				$usdt = $model->index('getbalance', $v['usdtb'], $money = NULL, $index = NULL, $count = NULL, $skip = NULL);
 				if ($usdt['code'] == 1 && $usdt['data'] >= 50) {//只有大于50才做汇总

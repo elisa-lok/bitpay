@@ -1,5 +1,4 @@
 <?php
-use think\route;
 //Route::bind('home');
 //Route::rule('login','home/login/login');
 /* return [

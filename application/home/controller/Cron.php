@@ -1,8 +1,10 @@
 <?php
 namespace app\home\controller;
+use app\common\model\Usdt;
 use think\console\Input;
 use think\console\Output;
 use think\db;
+use think\Exception;
 
 class Cron extends Base {
 	protected function configure() {
@@ -47,7 +49,7 @@ class Cron extends Base {
 		if (empty($confirms)) {
 			exit('请设置确认数');
 		}
-		$model   = new \app\common\model\Usdt();
+		$model   = new Usdt();
 		$address = Db::name('merchant_user_address')->field('merchant_id, username, addtime, address')->select();
 		$count   = 1000;
 		$skip    = 0;
@@ -155,9 +157,9 @@ class Cron extends Base {
 						Db::commit();
 					} else {
 						Db::rollback();
-						throw new \think\Exception('write databses fail');
+						throw new Exception('write databses fail');
 					}
-				} catch (\think\Exception $e) {
+				} catch (Exception $e) {
 					file_put_contents(RUNTIME_PATH . "data/zrdebug.txt", " - " . $v2['txid'] . "|" . date("Y-m-d H:i:s", $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
 					Db::rollback();
 				}
@@ -189,7 +191,7 @@ class Cron extends Base {
 		if (empty($confirms)) {
 			exit('请设置确认数');
 		}
-		$model   = new \app\common\model\Usdt();
+		$model   = new Usdt();
 		$address = Db::name('merchant')->field('id as merchant_id, usdtb as address, trader_recharge_fee')->where('usdtb', 'not null')->where('trader_check', 1)->select();
 		$count   = 1000;
 		$skip    = 0;
@@ -285,9 +287,9 @@ class Cron extends Base {
 						Db::commit();
 					} else {
 						Db::rollback();
-						throw new \think\Exception('write databses fail');
+						throw new Exception('write databses fail');
 					}
-				} catch (\think\Exception $e) {
+				} catch (Exception $e) {
 					file_put_contents(RUNTIME_PATH . "data/traderzrdebug.txt", " - " . $v2['txid'] . "|" . date("Y-m-d H:i:s", $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
 					Db::rollback();
 				}
@@ -391,7 +393,7 @@ class Cron extends Base {
 		$adSellSum       = Db::name('ad_sell')->where($adMap)->count();
 		$adtotal         = Db::name('ad_sell')->where($adMap)->sum('amount');
 		$adids           = Db::name('ad_sell')->where($adMap)->column('id');
-		$dealNums       = Db::name('order_buy')->where('sell_sid', 'in', $adids)->where('status', 'neq', 5)->where('status', 'neq', 9)->sum('deal_num');
+		$dealNums        = Db::name('order_buy')->where('sell_sid', 'in', $adids)->where('status', 'neq', 5)->where('status', 'neq', 9)->sum('deal_num');
 		//现存挂单出售总USDT，计算所有挂卖的剩余数量
 		$orderSellSum = $adtotal - $dealNums;
 		//求购笔数，承兑商挂买数量

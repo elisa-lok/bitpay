@@ -2,6 +2,8 @@
 namespace app\home\controller;
 use app\home\model\LogModel;
 use app\home\model\MerchantModel;
+use com\GoogleAuthenticator;
+use think\captcha\Captcha;
 use think\db;
 
 class Login extends Base {
@@ -9,14 +11,14 @@ class Login extends Base {
 		if (request()->isPost()) {
 			$reg_type = input('post.reg_type');
 			!$reg_type && $this->error('请选择注册类型');
-			$name          = input('post.username');
-			$idCard        = input('post.idcard');
-			$mobile        = input('post.mobile');
-			$password      = input('post.password');
-			$paypassword   = input('post.paypassword');
-			$repassword    = input('post.password_confirmation');
-			$repaypassword = input('post.paypassword_confirmation');
-			$nickname      = input('post.nickname');
+			$name       = input('post.username');
+			$idCard     = input('post.idcard');
+			$mobile     = input('post.mobile');
+			$password   = input('post.password');
+			$payPsw     = input('post.paypassword');
+			$repassword = input('post.password_confirmation');
+			$repayPsw   = input('post.paypassword_confirmation');
+			$nickname   = input('post.nickname');
 			//$smscode = input('post.smscode');
 			if (empty($nickname) || strlen($nickname) > 20) {
 				$this->error('请填写正确的昵称');
@@ -52,7 +54,7 @@ class Login extends Base {
 			if ($password != $repassword) {
 				$this->error('登录确认密码错误');
 			}
-			if ($paypassword != $repaypassword) {
+			if ($payPsw != $repayPsw) {
 				$this->error('交易确认密码错误');
 			}
 			$invite_code = input('post.invite_code');
@@ -96,8 +98,8 @@ class Login extends Base {
 				$this->error('请上传照片');
 			}*/
 			while (TRUE) {
-				$appid = generate_password();
-				if ($model->getOneByParam($appid, 'appid')) {
+				$appId = generate_password();
+				if ($model->getOneByParam($appId, 'appid')) {
 					break;
 				}
 			}
@@ -109,21 +111,17 @@ class Login extends Base {
 			$param['nickname']    = $nickname;
 			$param['mobile']      = $mobile;
 			$param['password']    = md5($password);
-			$param['paypassword'] = md5($paypassword);
+			$param['paypassword'] = md5($payPsw);
 			$param['pid']         = $pid;
 			$param['idcard']      = $idCard;
 			//$param['idcard_zheng'] = $imgarr[0];
 			//$param['idcard_fan'] = $imgarr[1];
-			$param['appid']    = $appid;
+			$param['appid']    = $appId;
 			$param['key']      = $key;
 			$param['addtime']  = time();
 			$param['reg_type'] = $reg_type;
 			$return            = $model->insertOne($param);
-			if ($return['code'] == 1) {
-				$this->success($return['msg'], '/login.html');
-			} else {
-				$this->error($return['msg']);
-			}
+			($return['code'] == 1) ? $this->success($return['msg'], '/login.html') : $this->error($return['msg']);
 		}
 		if (!session('uid')) {
 			return $this->fetch();
@@ -169,7 +167,7 @@ class Login extends Base {
 			} else {
 				$user = $return['data'];
 				if ($user['ga']) {
-					$ga_n = new \com\GoogleAuthenticator();
+					$ga_n = new GoogleAuthenticator();
 					$arr  = explode('|', $user['ga']);
 					// 存储的信息为谷歌密钥
 					$secret = $arr[0];
@@ -245,7 +243,7 @@ class Login extends Base {
 			if (empty($merchant['ga'])) {
 				$this->error('你未设置谷歌验证');
 			}
-			$ga_n = new \com\GoogleAuthenticator();
+			$ga_n = new GoogleAuthenticator();
 			$arr  = explode('|', $merchant['ga']);
 			// 存储的信息为谷歌密钥
 			$secret = $arr[0];
@@ -253,11 +251,7 @@ class Login extends Base {
 			if (!$aa) {
 				$this->error('谷歌验证码错误！');
 			}
-			if (Db::name('merchant')->where('id', $merchant['id'])->update(['password' => md5($password)])) {
-				$this->success('修改成功', url('home/login/login'));
-			} else {
-				$this->error('修改失败，请稍后再试');
-			}
+			(Db::name('merchant')->where('id', $merchant['id'])->update(['password' => md5($password)])) ? $this->success('修改成功', url('home/login/login')) : $this->error('修改失败，请稍后再试');
 		}
 		if (!session('uid')) {
 			return $this->fetch();
@@ -277,7 +271,7 @@ class Login extends Base {
 			'useNoise' => FALSE,
 			// 'bg' =>  array(100,100,100),
 		];
-		$captcha          = new \think\captcha\Captcha($config);
+		$captcha          = new Captcha($config);
 		$captcha->codeSet = '2345689';
 		return $captcha->entry();
 	}

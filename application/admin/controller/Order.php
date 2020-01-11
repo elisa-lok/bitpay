@@ -1,9 +1,8 @@
 <?php
-
 namespace app\admin\controller;
-
 use app\admin\model\MerchantModel;
 use think\Db;
+use think\Exception\DbException;
 
 class Order extends Base {
 	public function buy($edit) {
@@ -12,9 +11,7 @@ class Order extends Base {
 		!$orderInfo && $this->error('订单不存在');
 		if (request()->isPost()) {
 			$args = input('post.');
-
 			$src_status = $orderInfo['status'];
-
 			($orderInfo['status'] == $args['status']) && ($orderInfo['deal_amount'] == $args['deal_amount']) && showMsg('操作成功'); //状态未改变
 			$updateArr = ['status' => $args['status']];
 			if ($args['deal_amount'] != $orderInfo['deal_amount']) {
@@ -26,11 +23,8 @@ class Order extends Base {
 				$updateArr['ltime']         = ((time() - $orderInfo['ctime']) / 60) + 61;//延长60分钟, 预留多一分钟
 				$updateArr['finished_time'] = 0;
 			}
-
-
 			Cache::has($orderInfo['id']) && showMsg('操作频繁', 0);
 			Cache::set($orderInfo['id'], TRUE, 30);
-
 			Db::startTrans();
 			$res1 = Db::name('order_buy')->where('id=' . $edit)->update($updateArr); // 更新订单
 			// 判断剩余额度
@@ -40,7 +34,7 @@ class Order extends Base {
 				!in_array($orderInfo['status'], ['5', '9']) && showMsg('该状态不能重建订单', 0);
 				//在余额里面进行扣钱
 				$realAmt = $orderInfo['deal_num'] + $orderInfo['fee'];
-				$res2    = balanceChange(false, $orderInfo['sell_id'], -$orderInfo['deal_num'], $orderInfo['fee'], $orderInfo['deal_num'], $orderInfo['fee'], BAL_SYS, $orderInfo['id'], "重建订单");
+				$res2    = balanceChange(FALSE, $orderInfo['sell_id'], -$orderInfo['deal_num'], $orderInfo['fee'], $orderInfo['deal_num'], $orderInfo['fee'], BAL_SYS, $orderInfo['id'], "重建订单");
 				//$res2    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec('usdt', $realAmt);
 				//$res3    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdtd', $realAmt);
 			}
@@ -48,11 +42,9 @@ class Order extends Base {
 			if (($args['status'] == 4) && ($src_status == 0 || $src_status == 1)) {
 				// 放行扣承兑商冻结和增加商户余额
 				$model2 = new MerchantModel();
-
 				$merchant    = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
 				$buymerchant = Db::name('merchant')->where('id', $orderInfo['buy_id'])->find();
 				if ($merchant['usdtd'] < $orderInfo['deal_num']) showMsg('您的冻结不足，交易失败', 0);
-
 				$nopay = ($orderInfo['status'] == 0) ? 1 : 0;
 				$sfee  = 0;
 				$mum   = $orderInfo['deal_num'] - $sfee;
@@ -81,9 +73,7 @@ class Order extends Base {
 				}
 				if ($buymerchant['pid']) {
 					$buymerchantP = $model2->getUserByParam($buymerchant['pid'], 'id');
-					$buymerchantP['enable_new_get'] == 0 ?
-						$traderMParentGet = $buymerchantP['trader_merchant_parent_get'] :
-						$traderMParentGet = $buymerchant['trader_merchant_parent_get_new'];
+					$buymerchantP['enable_new_get'] == 0 ? $traderMParentGet = $buymerchantP['trader_merchant_parent_get'] : $traderMParentGet = $buymerchant['trader_merchant_parent_get_new'];
 					if ($buymerchantP['agent_check'] == 1 && $traderMParentGet) {
 						//商户代理利润
 						$mpexist = 1;
@@ -120,7 +110,7 @@ class Order extends Base {
 					}
 					// $rs2 = Db::name('order_buy')->update(['id'=>$orderInfo['id'], 'status'=>4, 'finished_time'=>time(), 'platform_fee'=>$moneyArr[0]]);
 					//$rs3      = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('usdt', $mum);
-					$rs3      = balanceChange(false, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], "编辑修改状态->完成订单");
+					$rs3      = balanceChange(FALSE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], "编辑修改状态->完成订单");
 					$rs4      = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('transact', 1);
 					$total    = Db::name('order_buy')->field('sum(finished_time-dktime) as total')->where('sell_id', $orderInfo['sell_id'])->where('status', 4)->select();
 					$tt       = $total[0]['total'];
@@ -129,7 +119,7 @@ class Order extends Base {
 					//承兑商卖单奖励
 					$rs6 = $rs7 = $rs8 = $rs9 = $rs10 = $rs11 = $res3 = TRUE;
 					if ($traderMoney > 0) {
-						$rs6 = balanceChange(false, $orderInfo['sell_id'], $traderMoney, 0, 0, 0, BAL_COMMISSION, $orderInfo['id'], "编辑修改状态->完成订单");
+						$rs6 = balanceChange(FALSE, $orderInfo['sell_id'], $traderMoney, 0, 0, 0, BAL_COMMISSION, $orderInfo['id'], "编辑修改状态->完成订单");
 						//$rs6 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $traderMoney);
 						$rs7 = Db::name('trader_reward')->insert(['uid' => $orderInfo['sell_id'], 'orderid' => $orderInfo['id'], 'amount' => $traderMoney, 'type' => 0, 'create_time' => time()]);
 					}
@@ -157,7 +147,6 @@ class Order extends Base {
 						if ($traderMoney > 0) {
 							financelog($orderInfo['sell_id'], $traderMoney, '承兑商卖单奖励_f1', 0, session('username'));//添加日志
 						}
-
 						getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $orderInfo['deal_num']);
 						//请求回调接口
 						$data['amount']  = $orderInfo['deal_num'];
@@ -172,7 +161,7 @@ class Order extends Base {
 						Db::rollback();
 						showMsg('交易失败,请稍后再试!', 0);
 					}
-				} catch (\think\Exception\DbException $e) {
+				} catch (DbException $e) {
 					// 回滚事务
 					Db::rollback();
 					showMsg('交易失败，参考信息：' . $e->getMessage(), 0);
@@ -189,7 +178,6 @@ class Order extends Base {
 				if ($sell['state'] == 2) {
 					// 如果挂单已下架 回滚余额
 					$res6 = balanceChange(TRUE, $orderInfo['sell_id'], $orderInfo['deal_num'], $orderInfo['fee'], -$orderInfo['deal_num'], $orderInfo['fee'], BAL_CANCEL, $orderInfo['id'], "编辑修改状态->取消订单");
-
 					//$res6 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $real_number);
 					//$res7 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $real_number);
 				}
@@ -237,15 +225,11 @@ class Order extends Base {
 	public function sell($edit) {
 		$orderInfo = Db::name('order_sell')->where('id=' . $edit)->find();
 		!$orderInfo && $this->error('订单不存在');
-
 		if (request()->isPost()) {
 			$args = input('post.');
-
 			$src_status = $orderInfo['status'];
-
 			($orderInfo['status'] == $args['status']) && ($orderInfo['deal_amount'] == $args['deal_amount']) && showMsg('操作成功'); //状态未改变
 			$updateArr = ['status' => $args['status']];
-
 			if ($args['deal_amount'] != $orderInfo['deal_amount']) {
 				$updateArr['deal_amount'] = $args['deal_amount'];
 				$updateArr['deal_num']    = number_format($args['deal_amount'] / $orderInfo['deal_price'], 8, '.', '');
@@ -286,7 +270,7 @@ class Order extends Base {
 					if ($res1 && $rs1 && $rs2 && $rs3 && $rs4 && $rs5) {
 						// 提交事务
 						Db::commit();
-						financelog($orderInfo['buy_id'], $mum, '买入USDT_f2', 0, session('username'));//添加日志
+						financelog($orderInfo['buy_id'], $mum, '买入USDT_f2', 0, session('username'));         //添加日志
 						financelog($orderInfo['sell_id'], $real_number, '卖出USDT_f2', 1, session('username'));//添加日志
 						getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $real_number, session('username'));
 						showMsg('操作成功', 1);
@@ -295,8 +279,7 @@ class Order extends Base {
 						Db::rollback();
 						showMsg('操作失败', 0);
 					}
-
-				} catch (\think\Exception\DbException $e) {
+				} catch (DbException $e) {
 					// 回滚事务
 					Db::rollback();
 					showMsg('操作失败,参考信息:' . $e->getMessage(), 0);

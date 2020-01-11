@@ -55,11 +55,7 @@ class Merchant extends Base {
 			(empty($password)) && $this->error('请输入交易密码');
 			$model = new MerchantModel();
 			$user  = $model->getUserByParam($this->uid, 'id');
-			if ($user['paypassword'] != md5($password)) {
-				$this->error('交易密码错误');
-			} else {
-				$this->success('ok');
-			}
+			($user['paypassword'] != md5($password)) ? $this->error('交易密码错误') : $this->success('ok');
 		}
 	}
 
@@ -191,16 +187,16 @@ class Merchant extends Base {
 				}
 			}
 			//$smscode = input('post.code');
-			$name          = input('post.name');
-			$password      = input('post.password');
-			$paypassword   = input('post.paypassword');
-			$repassword    = input('post.password_confirmation');
-			$repaypassword = input('post.paypassword_confirmation');
+			$name       = input('post.name');
+			$password   = input('post.password');
+			$payPsw     = input('post.paypassword');
+			$repassword = input('post.password_confirmation');
+			$repayPsw   = input('post.paypassword_confirmation');
 			($password != $repassword && !empty($password)) && $this->error('登录密码错误！');
-			($paypassword != $repaypassword && !empty($paypassword)) && $this->error('交易密码错误！');
+			($payPsw != $repayPsw && !empty($payPsw)) && $this->error('交易密码错误！');
 			(!$name) && $this->error('请输入用户名');
-			if (!empty($paypassword) && !empty($password)) {
-				($paypassword == $password) && $this->error('交易密码不能与登录密码相同！');
+			if (!empty($payPsw) && !empty($password)) {
+				($payPsw == $password) && $this->error('交易密码不能与登录密码相同！');
 			}
 			/*if (empty($smscode)) {
 				$this->error('请填写短信验证码');
@@ -212,8 +208,8 @@ class Merchant extends Base {
 			if (!empty($password)) {
 				$param['password'] = md5($password);
 			}
-			if (!empty($paypassword)) {
-				$param['paypassword'] = md5($paypassword);
+			if (!empty($payPsw)) {
+				$param['paypassword'] = md5($payPsw);
 			}
 			$param['name'] = $name;
 			$model         = new MerchantModel();
@@ -397,12 +393,12 @@ class Merchant extends Base {
 		}
 		$username = input('get.username');
 		$status   = input('get.status');
-		$ordersn  = input('get.ordersn');
+		$orderSn  = input('get.ordersn');
 		if (!empty($username)) {
 			$where['username'] = $username;
 		}
-		if (!empty($ordersn)) {
-			$where['ordersn'] = $ordersn;
+		if (!empty($orderSn)) {
+			$where['ordersn'] = $orderSn;
 		}
 		if (isset($status) && $status > 0) {
 			$where['status'] = $status - 1;
@@ -474,10 +470,10 @@ class Merchant extends Base {
 		if (isset($_GET['order'])) {
 			$order = 'id ' . $_GET['order'];
 		}
-		$ordersn = input('get.ordersn');
+		$orderSn = input('get.ordersn');
 		$status  = input('get.status');
-		if (!empty($ordersn)) {
-			$where['ordersn'] = ['like', '%' . $ordersn . '%'];
+		if (!empty($orderSn)) {
+			$where['ordersn'] = ['like', '%' . $orderSn . '%'];
 		}
 		if (isset($status) && $status > 0) {
 			$where['status'] = $status - 1;
@@ -593,8 +589,8 @@ class Merchant extends Base {
 			}
 			Db::startTrans();
 			try {
-				$ordersn = createOrderNo(1, $this->uid);
-				$rs1     = balanceChange(FALSE, $this->uid, -$num, 0, $num, 0, BAL_WITHDRAW, $ordersn);
+				$orderSn = createOrderNo(1, $this->uid);
+				$rs1     = balanceChange(FALSE, $this->uid, -$num, 0, $num, 0, BAL_WITHDRAW, $orderSn);
 				//$rs1 = Db::name('merchant')->where('id', $this->uid)->setDec('usdt', $num);
 				//$rs3 = Db::name('merchant')->where('id', $this->uid)->setInc('usdtd', $num);
 				$rs2 = Db::name('merchant_withdraw')->insert([
@@ -605,7 +601,7 @@ class Merchant extends Base {
 					'mum'         => $mum,
 					'note'        => $remark,
 					'addtime'     => time(),
-					'ordersn'     => $ordersn
+					'ordersn'     => $orderSn
 				]);
 				if ($rs1 && $rs2) {
 					// 提交事务
@@ -717,11 +713,7 @@ class Merchant extends Base {
 		$merchant = $model->getUserByParam($this->uid, 'id');
 		($merchant['agent_check'] != 0) && $this->error('请勿重复申请');
 		$flag = $model->updateOne(['id' => $this->uid, 'agent_check' => 3]);
-		if ($flag['code'] == 1) {
-			$this->success('申请成功，请等待审核');
-		} else {
-			$this->error($flag['msg']);
-		}
+		($flag['code'] == 1) ? $this->success('申请成功，请等待审核') : $this->error($flag['msg']);
 	}
 
 	public function applyTrader() {
@@ -730,11 +722,7 @@ class Merchant extends Base {
 		$merchant = $model->getUserByParam($this->uid, 'id');
 		($merchant['trader_check'] != 0) && $this->error('请勿重复申请');
 		$flag = $model->updateOne(['id' => $this->uid, 'trader_check' => 3]);
-		if ($flag['code'] == 1) {
-			$this->success('申请成功，请等待审核');
-		} else {
-			$this->error($flag['msg']);
-		}
+		($flag['code'] == 1) ? $this->success('申请成功，请等待审核') : $this->error($flag['msg']);
 	}
 
 	public function downmerchant() {
@@ -751,13 +739,13 @@ class Merchant extends Base {
 			$order = 'id ' . $_GET['order'];
 		}
 		$orderid = input('get.orderid');
-		$ordersn = input('get.ordersn');
+		$orderSn = input('get.ordersn');
 		$status  = input('get.status');
 		if (!empty($orderid)) {
 			$where['id'] = ['like', '%' . $orderid . '%'];
 		}
-		if (!empty($ordersn)) {
-			$where['name'] = ['like', '%' . $ordersn . '%'];
+		if (!empty($orderSn)) {
+			$where['name'] = ['like', '%' . $orderSn . '%'];
 		}
 		if (!empty($get['created_at']['start']) && !empty($get['created_at']['end'])) {
 			$where['addtime'] = ['between', [strtotime($get['created_at']['start']), strtotime($get['created_at']['end'])]];
@@ -781,13 +769,13 @@ class Merchant extends Base {
 			$order = 'id ' . $_GET['order'];
 		}
 		$orderid = input('get.orderid');
-		$ordersn = input('get.ordersn');
+		$orderSn = input('get.ordersn');
 		$status  = input('get.status');
 		if (!empty($orderid)) {
 			$where['id'] = ['like', '%' . $orderid . '%'];
 		}
-		if (!empty($ordersn)) {
-			$where['name'] = ['like', '%' . $ordersn . '%'];
+		if (!empty($orderSn)) {
+			$where['name'] = ['like', '%' . $orderSn . '%'];
 		}
 		if (!empty($get['created_at']['start']) && !empty($get['created_at']['end'])) {
 			$where['addtime'] = ['between', [strtotime($get['created_at']['start']), strtotime($get['created_at']['end'])]];
@@ -832,11 +820,7 @@ class Merchant extends Base {
 			$user_withdraw_fee = input('post.user_withdraw_fee');
 			$user_recharge_fee = input('post.user_recharge_fee');
 			$flag              = $model->updateOne(['id' => $id, 'merchant_tibi_fee' => $merchant_tibi_fee, 'user_withdraw_fee' => $user_withdraw_fee, 'user_recharge_fee' => $user_recharge_fee]);
-			if ($flag['code'] == 1) {
-				$this->success('编辑成功');
-			} else {
-				$this->error($flag['msg']);
-			}
+			($flag['code'] == 1) ? $this->success('编辑成功') : $this->error($flag['msg']);
 		} else {
 			$id = $_GET['id'];
 			(!$id) && $this->error('参数错误');
@@ -872,11 +856,7 @@ class Merchant extends Base {
 		} else {
 			$this->error('下级商户注册类型错误');
 		}
-		if (Db::name('merchant')->where('id', $id)->update($update)) {
-			$this->success('审核成功');
-		} else {
-			$this->error('审核失败');
-		}
+		(Db::name('merchant')->where('id', $id)->update($update)) ? $this->success('审核成功') : $this->error('审核失败');
 	}
 
 	public function agentreward() {
@@ -1135,11 +1115,7 @@ class Merchant extends Base {
 			$param['name']          = $name;
 			$model                  = new MerchantModel();
 			$return                 = $model->updateOne($param);
-			if ($return['code'] == 1) {
-				$this->success($return['msg']);
-			} else {
-				$this->error($return['msg']);
-			}
+			($return['code'] == 1) ? $this->success($return['msg']) : $this->error($return['msg']);
 		}
 	}
 
@@ -1181,11 +1157,7 @@ class Merchant extends Base {
 			$param['name']             = $name;
 			$model                     = new MerchantModel();
 			$return                    = $model->updateOne($param);
-			if ($return['code'] == 1) {
-				$this->success($return['msg']);
-			} else {
-				$this->error($return['msg']);
-			}
+			($return['code'] == 1) ? $this->success($return['msg']) : $this->error($return['msg']);
 		}
 	}
 
@@ -1227,11 +1199,7 @@ class Merchant extends Base {
 			$param['name']             = $name;
 			$model                     = new MerchantModel();
 			$return                    = $model->updateOne($param);
-			if ($return['code'] == 1) {
-				$this->success($return['msg']);
-			} else {
-				$this->error($return['msg']);
-			}
+			($return['code'] == 1) ? $this->success($return['msg']) : $this->error($return['msg']);
 		}
 	}
 
@@ -1281,11 +1249,7 @@ class Merchant extends Base {
 			$param['alipay_id']   = trim($alipay_id);
 			$model                = new ZfbModel();
 			$return               = $model->insertOne($param);
-			if ($return['code'] == 1) {
-				$this->success($return['msg']);
-			} else {
-				$this->error($return['msg']);
-			}
+			($return['code'] == 1) ? $this->success($return['msg']) : $this->error($return['msg']);
 		}
 	}
 
@@ -1313,11 +1277,7 @@ class Merchant extends Base {
 			$param['name']        = $name;
 			$model                = new WxModel();
 			$return               = $model->insertOne($param);
-			if ($return['code'] == 1) {
-				$this->success($return['msg']);
-			} else {
-				$this->error($return['msg']);
-			}
+			($return['code'] == 1) ? $this->success($return['msg']) : $this->error($return['msg']);
 		}
 	}
 
@@ -1347,11 +1307,7 @@ class Merchant extends Base {
 			$param['name']     = $name;
 			$model             = new YsfModel();
 			$return            = $model->insertOne($param);
-			if ($return['code'] == 1) {
-				$this->success($return['msg']);
-			} else {
-				$this->error($return['msg']);
-			}
+			($return['code'] == 1) ? $this->success($return['msg']) : $this->error($return['msg']);
 		}
 	}
 
@@ -1544,11 +1500,7 @@ class Merchant extends Base {
 			//增加挂买数
 			$count = $model2->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
 			$model->updateOne(['id' => $this->uid, 'ad_on_buy' => $count]);
-			if ($flag['code'] == 1) {
-				$this->success($flag['msg']);
-			} else {
-				$this->error($flag['msg']);
-			}
+			($flag['code'] == 1) ? $this->success($flag['msg']) : $this->error($flag['msg']);
 		} else {
 			$this->assign('usdt_price_min', $usdtPriceMin);
 			$this->assign('usdt_price_max', $usdtPriceMax);
@@ -2118,10 +2070,10 @@ class Merchant extends Base {
 		if (isset($_GET['order'])) {
 			$order = 'id ' . $_GET['order'];
 		}
-		$ordersn = input('get.ordersn');
+		$orderSn = input('get.ordersn');
 		$status  = input('get.status');
-		if (!empty($ordersn)) {
-			$where['order_no'] = ['like', '%' . $ordersn . '%'];
+		if (!empty($orderSn)) {
+			$where['order_no'] = ['like', '%' . $orderSn . '%'];
 		}
 		if (isset($status) && $status > 0) {
 			$where['status'] = $status;
@@ -2185,18 +2137,18 @@ class Merchant extends Base {
 
 	public function pay_bak() {
 		$id    = input('get.id');
-		$appid = input('get.appid');
+		$appId = input('get.appid');
 		$order = Db::name('order_buy')->where('id', $id)->find();
 		(empty($order)) && $this->error('订单参数错误1');
 		$merchant = Db::name('merchant')->where('id', $order['buy_id'])->find();
 		(empty($merchant)) && $this->error('订单参数错误2');
-		($merchant['appid'] != $appid) && $this->error('请求路径appid错误');
+		($merchant['appid'] != $appId) && $this->error('请求路径appid错误');
 		$this->assign('remaintime', $order['ltime'] * 60 + $order['ctime'] - time());
 		$pay    = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method');
 		$payarr = explode(',', $pay);
 		$this->assign('payarr', $payarr);
 		$this->assign('id', $id);
-		$this->assign('appid', $appid);
+		$this->assign('appid', $appId);
 		$this->assign('money', round($order['deal_amount'], 2));
 		$this->assign('amount', $order['deal_num']);
 		$this->assign('no', $order['order_no']);
@@ -2229,13 +2181,13 @@ class Merchant extends Base {
 
 	public function pay_a() {
 		$id    = input('get.id');
-		$appid = input('get.appid');
+		$appId = input('get.appid');
 		$type  = input('get.type');
 		$order = Db::name('order_buy')->where('id', $id)->find();
 		(empty($order)) && $this->error('订单参数错误1');
 		$merchant = Db::name('merchant')->where('id', $order['buy_id'])->find();
 		(empty($merchant)) && $this->error('订单参数错误2');
-		($merchant['appid'] != $appid) && $this->error('请求路径appid错误');
+		($merchant['appid'] != $appId) && $this->error('请求路径appid错误');
 		$this->assign('remaintime', $order['ltime'] * 60 + $order['ctime'] - time());
 		$bankid = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method');
 		$zfbid  = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method2');//5
@@ -2244,7 +2196,7 @@ class Merchant extends Base {
 		$arr    = [];
 		$this->assign('id', $id);
 		$this->assign('order', $order);
-		$this->assign('appid', $appid);
+		$this->assign('appid', $appId);
 		$this->assign('money', round($order['deal_amount'], 2));
 		$this->assign('amount', $order['deal_num']);
 		$this->assign('no', $order['order_no']);
@@ -2330,13 +2282,13 @@ class Merchant extends Base {
 			Cache::set($ip, $limit, 7200);
 		}
 		//$id = input('get.id');
-		$appid = input('get.appid');
+		$appId = input('get.appid');
 		$type  = input('get.type');
 		$order = Db::name('order_buy')->where('id', $id)->find();
 		(empty($order)) && $this->error('订单参数错误1');
 		$merchant = Db::name('merchant')->where('id', $order['buy_id'])->find();
 		(empty($merchant)) && $this->error('订单参数错误2');
-		($merchant['appid'] != $appid) && $this->error('请求路径appid错误');
+		($merchant['appid'] != $appId) && $this->error('请求路径appid错误');
 		$this->assign('remaintime', $order['ltime'] * 60 + $order['ctime'] - time());
 		$bankid = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method');
 		$zfbid  = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method2');
@@ -2344,7 +2296,7 @@ class Merchant extends Base {
 		$ysfid  = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method4');
 		$this->assign('id', $id);
 		$this->assign('order', $order);
-		$this->assign('appid', $appid);
+		$this->assign('appid', $appId);
 		$this->assign('money', round($order['deal_amount'], 2));
 		$this->assign('amount', round($order['deal_num'], 4));
 		$this->assign('no', $order['order_no']);
@@ -2439,22 +2391,18 @@ class Merchant extends Base {
 			exit;
 		}
 		(empty($order)) && $this->error('no order');
-		$remaintime = $order['ltime'] * 60 + $order['ctime'] - time();
-		if ($remaintime < 0) {
-			$this->success('ok');
-		} else {
-			$this->error('no');
-		}
+		$remainTime = $order['ltime'] * 60 + $order['ctime'] - time();
+		($remainTime < 0) ? $this->success('ok') : $this->error('no');
 	}
 
 	public function uptrade() {
 		$id    = input('post.id');
-		$appid = input('post.appid');
+		$appId = input('post.appid');
 		$order = Db::name('order_buy')->where('id', $id)->find();
 		(empty($order)) && $this->error('订单参数错误1');
 		$merchant = Db::name('merchant')->where('id', $order['buy_id'])->find();
 		(empty($merchant)) && $this->error('订单参数错误2');
-		($merchant['appid'] != $appid) && $this->error('appid错误');
+		($merchant['appid'] != $appId) && $this->error('appid错误');
 		($order['status'] == 5) && $this->error('此订单已取消');
 		($order['status'] >= 1) && $this->error('你已经标记了已付款完成，请勿重复操作');
 		$rs = Db::name('order_buy')->where('id', $id)->update(['status' => 1, 'dktime' => time()]);
@@ -2508,10 +2456,10 @@ class Merchant extends Base {
 		if (isset($_GET['order'])) {
 			$order = 'id ' . $_GET['order'];
 		}
-		$ordersn = input('get.ordersn');
+		$orderSn = input('get.ordersn');
 		$status  = input('get.status');
-		if (!empty($ordersn)) {
-			$where['order_no'] = ['like', '%' . $ordersn . '%'];
+		if (!empty($orderSn)) {
+			$where['order_no'] = ['like', '%' . $orderSn . '%'];
 		}
 		if (isset($status) && $status > 0) {
 			$where['status'] = $status;
@@ -2628,10 +2576,10 @@ class Merchant extends Base {
 		if (isset($_GET['order'])) {
 			$order = 'id ' . $_GET['order'];
 		}
-		$ordersn = input('get.ordersn');
+		$orderSn = input('get.ordersn');
 		$status  = input('get.status');
-		if (!empty($ordersn)) {
-			$where['order_no'] = ['like', '%' . $ordersn . '%'];
+		if (!empty($orderSn)) {
+			$where['order_no'] = ['like', '%' . $orderSn . '%'];
 		}
 		if (isset($status) && $status > 0) {
 			$where['status'] = $status;
@@ -2656,10 +2604,10 @@ class Merchant extends Base {
 		if (isset($_GET['order'])) {
 			$order = 'id ' . $_GET['order'];
 		}
-		$ordersn = input('get.ordersn');
+		$orderSn = input('get.ordersn');
 		$status  = input('get.status');
-		if (!empty($ordersn)) {
-			$where['order_no'] = ['like', '%' . $ordersn . '%'];
+		if (!empty($orderSn)) {
+			$where['order_no'] = ['like', '%' . $orderSn . '%'];
 		}
 		if (isset($status) && $status > 0) {
 			$where['status'] = $status;
@@ -2916,11 +2864,7 @@ class Merchant extends Base {
 			($orderInfo['status'] == 6) && $this->error('该订单已经处于申诉状态，请耐心等待');
 			($orderInfo['status'] == 4 || $orderInfo['status'] == 3) && $this->error('该订单已经完成，无法申诉');
 			$rs = $model->updateOne(['id' => $id, 'status' => 6, 'su_reason' => $content]);
-			if ($rs['code'] == 1) {
-				$this->success('申诉成功');
-			} else {
-				$this->error($rs['msg']);
-			}
+			($rs['code'] == 1) ? $this->success('申诉成功') : $this->error($rs['msg']);
 		}
 	}
 
@@ -2953,11 +2897,7 @@ class Merchant extends Base {
 			($orderInfo['status'] == 6) && $this->error('该订单已经处于申诉状态，请耐心等待');
 			($orderInfo['status'] == 4 || $orderInfo['status'] == 3) && $this->error('该订单已经完成，无法申诉');
 			$rs = Db::name('order_sell')->where('id', $id)->update(['status' => 6, 'su_reason' => $content]);
-			if ($rs['code'] == 1) {
-				$this->success('申诉成功');
-			} else {
-				$this->error('申诉失败，请稍后再试');
-			}
+			($rs['code'] == 1) ? $this->success('申诉成功') : $this->error('申诉失败，请稍后再试');
 		}
 	}
 
@@ -2978,11 +2918,7 @@ class Merchant extends Base {
 			($orderInfo['status'] == 6) && $this->error('该订单已经处于申诉状态，请耐心等待');
 			($orderInfo['status'] == 4 || $orderInfo['status'] == 3) && $this->error('该订单已经完成，无法申诉');
 			$rs = Db::name('order_sell')->where('id', $id)->update(['status' => 6, 'su_reason' => $content]);
-			if ($rs['code'] == 1) {
-				$this->success('申诉成功');
-			} else {
-				$this->error('申诉失败，请稍后再试');
-			}
+			($rs['code'] == 1) ? $this->success('申诉成功') : $this->error('申诉失败，请稍后再试');
 		}
 	}
 

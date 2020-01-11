@@ -1,10 +1,8 @@
 <?php
-
 namespace app\admin\controller;
-
 use app\admin\model\LogModel;
-use think\Db;
 use com\IpLocation;
+use think\Db;
 
 class Log extends Base {
 	/**
@@ -13,7 +11,6 @@ class Log extends Base {
 	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function operate_log() {
-
 		$key = input('key');
 		$map = [];
 		if ($key && $key !== "") {
@@ -21,7 +18,7 @@ class Log extends Base {
 		}
 		$arr     = Db::name("admin")->column("id,username"); //获取用户列表
 		$Nowpage = input('get.page') ? input('get.page') : 1;
-		$limits  = config('list_rows');// 获取总条数
+		$limits  = config('list_rows');                  // 获取总条数
 		$count   = Db::name('log')->where($map)->count();//计算总页面
 		$allpage = intval(ceil($count / $limits));
 		$lists   = Db::name('log')->where($map)->page($Nowpage, $limits)->order('add_time desc')->select();
@@ -54,7 +51,6 @@ class Log extends Base {
 	}
 
 	public function financelog() {//资金日志
-
 		$key = input('key');
 		$map = [];
 		if ($key && $key !== "") {
@@ -62,14 +58,13 @@ class Log extends Base {
 		}
 		$arr     = Db::name("merchant")->column("id,name"); //获取用户列表
 		$Nowpage = input('get.page') ? input('get.page') : 1;
-		$limits  = config('list_rows');// 获取总条数
+		$limits  = config('list_rows');                         // 获取总条数
 		$count   = Db::name('financelog')->where($map)->count();//计算总页面
 		$allpage = intval(ceil($count / $limits));
 		$lists   = Db::name('financelog')->where($map)->page($Nowpage, $limits)->order('add_time desc')->select();
 		foreach ($lists as $k => $v) {
 			$lists[$k]['add_time'] = date('Y-m-d H:i:s', $v['add_time']);
 		}
-
 		$this->assign('Nowpage', $Nowpage); //当前页
 		$this->assign('allpage', $allpage); //总页数
 		$this->assign('count', $count);

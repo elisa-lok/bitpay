@@ -1,6 +1,4 @@
 <?php
-
-return
-[
+return [
 	"app\home\controller\Cron",
 ];

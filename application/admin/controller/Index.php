@@ -1,5 +1,6 @@
 <?php
 namespace app\admin\controller;
+use app\common\model\Usdt;
 use think\Db;
 
 class Index extends Base {
@@ -10,7 +11,7 @@ class Index extends Base {
 	public function addaddress() {
 		// $wallettype=config('wallettype');
 		// if($wallettype=='omni'){
-		$model2 = new \app\common\model\Usdt();
+		$model2 = new Usdt();
 		for ($i = 0; $i < 10; $i++) {
 			$return = $model2->index('getnewaddress', $addr = NULL, $mum = NULL, $index = NULL, $count = NULL, $skip = NULL);
 			if ($return['code'] == 1 && !empty($return['data'])) {
@@ -216,7 +217,7 @@ class Index extends Base {
 
 	public function getUsdt() {
 		if (request()->isPost()) {
-			$model        = new \app\common\model\Usdt();
+			$model        = new Usdt();
 			$addressarray = $model->index('getAllAddress', $address = NULL, $money = NULL, $index = NULL, $count = NULL, $skip = NULL);
 			$usdt         = 0;
 			foreach ($addressarray['data'] as $k => $v) {
@@ -239,7 +240,7 @@ class Index extends Base {
 
 	public function getBtc() {
 		if (request()->isPost()) {
-			$model = new \app\common\model\Usdt();
+			$model = new Usdt();
 			$temp2 = $model->index('getbtcbalance', $address = NULL, $money = NULL, $index = NULL, $count = NULL, $skip = NULL);
 			Db::name('coin_log')->insert(['admin_id' => session('adminuid'), 'balance' => $temp2['data'], 'create_time' => time(), 'coin_type' => 1]);
 			$this->success($temp2['data']);
@@ -250,7 +251,7 @@ class Index extends Base {
 		if (request()->isPost()) {
 			$address = input('post.address');
 			dump($address);
-			$model = new \app\common\model\Usdt();
+			$model = new Usdt();
 			$usdt  = $model->index('getbalance', $address, $money = NULL, $index = NULL, $count = NULL, $skip = NULL);
 			$btc   = $model->index('getbtcbalance', $address, $money = NULL, $index = NULL, $count = NULL, $skip = NULL);
 			$msg   = 'BTC:' . $btc['data'] . ' / USDT:' . $usdt['data'];

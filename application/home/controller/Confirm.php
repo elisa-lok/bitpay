@@ -1,18 +1,21 @@
 <?php
-
 namespace app\home\controller;
-
 use app\home\model\MerchantModel;
 use app\home\model\OrderModel;
 use think\Db;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\ModelNotFoundException;
+use think\Exception;
+use think\exception\DbException;
+use think\exception\PDOException;
 
 class Confirm extends Base {
 	/**
 	 * 短信处理页面
 	 * @return mixed
-	 * @throws \think\db\exception\DataNotFoundException
-	 * @throws \think\db\exception\ModelNotFoundException
-	 * @throws \think\exception\DbException
+	 * @throws DataNotFoundException
+	 * @throws ModelNotFoundException
+	 * @throws DbException
 	 */
 	public function Confirm() {
 		$data = input('get.');
@@ -28,10 +31,10 @@ class Confirm extends Base {
 
 	/**
 	 * 订单确认
-	 * @throws \think\Exception
-	 * @throws \think\db\exception\DataNotFoundException
-	 * @throws \think\db\exception\ModelNotFoundException
-	 * @throws \think\exception\DbException
+	 * @throws Exception
+	 * @throws DataNotFoundException
+	 * @throws ModelNotFoundException
+	 * @throws DbException
 	 */
 	public function OrderConfirmation() {
 		if (request()->isPost()) {
@@ -65,7 +68,6 @@ class Confirm extends Base {
 				$merchant    = $model2->getUserByParam($order['sell_id'], 'id');
 				$buymerchant = $model2->getUserByParam($orderInfo['buy_id'], 'id');
 				($merchant['usdtd'] < $orderInfo['deal_num']) && $this->error('您的冻结不足，确认失败');
-
 				$sfee = 0;
 				$mum  = $orderInfo['deal_num'] - $sfee;
 				//盘口费率
@@ -148,7 +150,6 @@ class Confirm extends Base {
 						if ($traderMoney > 0) {
 							financelog($orderInfo['sell_id'], $traderMoney, '承兑商卖单奖励_f1', 0, $order['buy_username']);//添加日志
 						}
-
 						getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $orderInfo['deal_num']);
 						//请求回调接口
 						$data['amount']  = $orderInfo['deal_num'];
@@ -163,23 +164,22 @@ class Confirm extends Base {
 						Db::rollback();
 						$this->error('确认失败,请稍后再试!');
 					}
-				} catch (\think\Exception\DbException $e) {
+				} catch (DbException $e) {
 					// 回滚事务
 					Db::rollback();
 					$this->error('确认失败，参考信息：' . $e->getMessage());
 				}
 			}
 		}
-
 	}
 
 	/**
 	 * 订单申诉
-	 * @throws \think\Exception
-	 * @throws \think\db\exception\DataNotFoundException
-	 * @throws \think\db\exception\ModelNotFoundException
-	 * @throws \think\exception\DbException
-	 * @throws \think\exception\PDOException
+	 * @throws Exception
+	 * @throws DataNotFoundException
+	 * @throws ModelNotFoundException
+	 * @throws DbException
+	 * @throws PDOException
 	 */
 	public function disputed() {
 		$param             = input('post.');

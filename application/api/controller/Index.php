@@ -1,12 +1,11 @@
 <?php
 namespace app\api\controller;
-
 class Index {
 	public function __construct() {
-		$this->appid          = 'cIPBDs97dP2iMklV';                        //商户号
-		$this->key            = 'c46c36e3f2dcccd54806a89c373ae856';                //秘钥
+		$this->appid          = 'cIPBDs97dP2iMklV';                                     //商户号
+		$this->key            = 'c46c36e3f2dcccd54806a89c373ae856';                     //秘钥
 		$this->rechargeUrl    = 'http://www.***.com/api/merchant/requestTraderRecharge';//用户充值接口按数量
-		$this->rechargeRmbUrl = 'http://zpay.cc/api/merchant/requestTraderRechargeRmb';//用户充值接口按人民币
+		$this->rechargeRmbUrl = 'http://zpay.cc/api/merchant/requestTraderRechargeRmb'; //用户充值接口按人民币
 		$this->notifyUrl      = 'http://47.104.23.74/test.php';
 		$this->returnUrl      = 'http://47.104.23.74/test.php';
 	}
@@ -28,35 +27,28 @@ class Index {
 			'return_url' => $this->returnUrl,
 			'notify_url' => $this->notifyUrl
 		];
-
 		$sign = $this->sign($dataArr);
-
 		$dataArr['sign'] = $sign;
-
 		$res  = $this->curl($this->rechargeRmbUrl, $dataArr);
 		$data = json_decode($res, TRUE);
 		return $data;
 	}
+
 	/**
 	 * [sign 签名验签]
 	 * @author max
 	 */
-	private function sign($dataArr)
-	{
+	private function sign($dataArr) {
 		ksort($dataArr);
 		$str = '';
 		foreach ($dataArr as $key => $value) {
-			$str.=$key.$value;
+			$str .= $key . $value;
 		}
-
-		$str = $str.$this->key;
-
+		$str = $str . $this->key;
 		return strtoupper(sha1($str));
 	}
 
-
-	private function curl($url,$data = array())
-	{
+	private function curl($url, $data = []) {
 		//使用crul模拟
 		$ch = curl_init();
 		//禁用https
@@ -70,7 +62,6 @@ class Index {
 		curl_setopt($ch, CURLOPT_URL, $url);
 		$result = curl_exec($ch); //执行发送
 		curl_close($ch);
-
 		return $result;
 	}
 }

@@ -11,7 +11,6 @@ class Base extends Controller {
 	public function _initialize() {
 		header("Content-type: text/html; charset=utf-8");
 		!sql_check() && $this->error('您提交的参数非法,系统已记录您的本次操作！');
-
 		$model = new BaseModel();
 		$cate  = $model->getAllCate();
 		//强制设置谷歌验证码
@@ -54,7 +53,7 @@ class Base extends Controller {
 		$this->assign('url', '/' . $c . '/' . $a);
 	}
 
-	private function setConfig(){
+	private function setConfig() {
 		$config = cache('db_config_data');
 		if (!$config) {
 			$config = api('Config/lists');

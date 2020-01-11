@@ -1,6 +1,7 @@
 <?php
 namespace app\admin\controller;
 use app\admin\model\Node;
+use com\Auth;
 use think\Controller;
 
 class Base extends Controller {
@@ -8,7 +9,7 @@ class Base extends Controller {
 		if (!session('adminuid') || !session('username')) {
 			$this->redirect('login/index');
 		}
-		$auth       = new \com\Auth();
+		$auth       = new Auth();
 		$module     = strtolower(request()->module());
 		$controller = strtolower(request()->controller());
 		$action     = strtolower(request()->action());
@@ -39,7 +40,8 @@ class Base extends Controller {
 			}
 		}
 	}
-	private function setConfig(){
+
+	private function setConfig() {
 		$config = cache('db_config_data');
 		if (!$config) {
 			$config = api('Config/lists');

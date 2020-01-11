@@ -1,8 +1,7 @@
 <?php
-
 namespace app\home\model;
-
 use app\admin\model\ChongBiModel;
+use PDOException;
 use think\Db;
 use think\Model;
 use think\request;
@@ -24,7 +23,6 @@ class MerchantModel extends Model {
 	}
 
 	public function insertOne($param) {
-
 		try {
 			$result = $this->allowField(TRUE)->save($param);
 			if (FALSE === $result) {
@@ -32,7 +30,7 @@ class MerchantModel extends Model {
 			} else {
 				return ['code' => 1, 'data' => '', 'msg' => '恭喜你，注册成功'];
 			}
-		} catch (\PDOException $e) {
+		} catch (PDOException $e) {
 			return ['code' => -2, 'data' => '', 'msg' => $e->getMessage()];
 		}
 	}
@@ -101,7 +99,7 @@ class MerchantModel extends Model {
 	}
 
 	public function getMerchantStatistics($map, $order = ['id' => 'desc']) {
-		return $this->field('id, reg_type, name, mobile, usdt+usdtd as usdtt, order_sell_usdt_amount')->where($map)->order($order)->paginate(20, FALSE, ['query' => Request::instance()->param()]);;
+		return $this->field('id, reg_type, name, mobile, usdt+usdtd as usdtt, order_sell_usdt_amount')->where($map)->order($order)->paginate(20, FALSE, ['query' => Request::instance()->param()]);
 	}
 
 	public function recharge() {

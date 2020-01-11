@@ -33,11 +33,7 @@ class Message extends Base {
 			}
 			$model  = new MessageModel();
 			$return = $model->insertQuestion(['type' => $type, 'content' => $content, 'merchant_id' => session('uid'), 'addtime' => time()]);
-			if ($return['code'] == 1) {
-				$this->success($return['msg'], url('home/message/index'));
-			} else {
-				$this->error($return['msg']);
-			}
+			($return['code'] == 1) ? $this->success($return['msg'], url('home/message/index')) : $this->error($return['msg']);
 		} else {
 			return $this->fetch();
 		}

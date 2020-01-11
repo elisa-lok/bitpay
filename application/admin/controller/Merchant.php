@@ -471,7 +471,7 @@ class Merchant extends Base {
 		$allpage = intval(ceil($count / $limits));
 		$lists   = Db::name('address')->where($map)->page($Nowpage, $limits)->order('id desc')->select();
 		foreach ($lists as $k => &$v) {
-			$user = Db::name('merchant')->where(['id' => $v['uid']])->find();
+			$user          = Db::name('merchant')->where(['id' => $v['uid']])->find();
 			$v['addtime']  = getTime($v['addtime']);
 			$v['mobile']   = ($user['mobile'] == NULL ? '未分配' : $user['mobile']);
 			$v['username'] = ($user['name'] == NULL ? '未分配' : $user['name']);
@@ -774,8 +774,8 @@ class Merchant extends Base {
 				$str .= '|云闪付';
 			}
 			//新-结束
-			$dealNum          = Db::name('order_buy')->where(['sell_sid' => $v['id'], 'status' => ['neq', 5], 'status' => ['neq', 9]])->sum('deal_num');
-			$dealNum          = $dealNum ? $dealNum : 0;
+			$dealNum           = Db::name('order_buy')->where(['sell_sid' => $v['id'], 'status' => ['neq', 5], 'status' => ['neq', 9]])->sum('deal_num');
+			$dealNum           = $dealNum ? $dealNum : 0;
 			$lists[$k]['deal'] = $dealNum;
 			//$total = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 7)->sum('deal_num');
 			//$lists[$k]['remain'] = $v['amount'] - $lists[$k]['deal'];
@@ -844,8 +844,8 @@ class Merchant extends Base {
 				$str .= '|云闪付';
 			}
 			//新-结束
-			$dealNum            = Db::name('order_sell')->where(['buy_bid' => $v['id'], 'status' => ['neq', 5]])->sum('deal_num');
-			$dealNum            = $dealNum ? $dealNum : 0;
+			$dealNum             = Db::name('order_sell')->where(['buy_bid' => $v['id'], 'status' => ['neq', 5]])->sum('deal_num');
+			$dealNum             = $dealNum ? $dealNum : 0;
 			$lists[$k]['deal']   = $dealNum;
 			$lists[$k]['remain'] = $v['amount'] - $lists[$k]['deal'];
 			$lists[$k]['payway'] = $str;
@@ -1014,8 +1014,8 @@ class Merchant extends Base {
 	}
 
 	public function orderlist() {
-		$key = input('key');
-		$oid = input('oid');
+		$key                       = input('key');
+		$oid                       = input('oid');
 		$status                    = input('status');
 		$map['think_order_buy.id'] = ['gt', 0];
 		if ($key && $key !== "") {
@@ -1029,12 +1029,12 @@ class Merchant extends Base {
 		if (!empty($status)) {
 			$map['think_order_buy.status'] = $status - 1;
 		}
-		$member  = new MerchantModel();
-		$Nowpage = input('get.page') ? input('get.page') : 1;
-		$limits  = config('list_rows');            // 获取总条数
-		$count   = $member->getAllCountOrder($map);//计算总页面
-		$allpage = intval(ceil($count / $limits));
-		$lists   = $member->getOrderByWhere($map, $Nowpage, $limits);
+		$member        = new MerchantModel();
+		$Nowpage       = input('get.page') ? input('get.page') : 1;
+		$limits        = config('list_rows');            // 获取总条数
+		$count         = $member->getAllCountOrder($map);//计算总页面
+		$allpage       = intval(ceil($count / $limits));
+		$lists         = $member->getOrderByWhere($map, $Nowpage, $limits);
 		$buyerIds      = array_column($lists, 'buy_id');
 		$buyerUsername = Db::name('merchant')->where('id', 'in', $buyerIds)->select();
 		$buyerUsername = array_column($buyerUsername, 'name', 'id');
@@ -1594,8 +1594,8 @@ class Merchant extends Base {
 	 * @return mixed
 	 */
 	public function order() {
-		$key = input('key');
-		$oid = input('oid');
+		$key                       = input('key');
+		$oid                       = input('oid');
 		$status                    = input('status');
 		$map['think_order_buy.id'] = ['gt', 0];
 		if ($key && $key !== "") {
