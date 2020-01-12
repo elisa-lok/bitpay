@@ -42,10 +42,9 @@ class Cron extends Base {
 	}
 
 	private function autoEth() {
-		$time = time();
-		dump($time);
+		$time     = time();
 		$confirms = Db::name('config')->where('name', 'usdt_confirms')->value('value');     //充值手续费
-		$feemy    = Db::name('config')->where('name', 'agent_recharge_fee')->value('value');//充值手续费
+		$feeMy    = Db::name('config')->where('name', 'agent_recharge_fee')->value('value');//充值手续费
 		if (empty($confirms)) {
 			exit('请设置确认数');
 		}
@@ -101,13 +100,13 @@ class Cron extends Base {
 					$valid    = $v2['valid'];
 					if ($res = Db::name('merchant_user_recharge')->where(['txid' => $v2['txid']])->find()) {
 						if ($res['status'] != 1 && $valid) {
-							$rs1 = Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('usdt', $v2['amount'] - $sfee);
+							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
 							$rs2 = Db::name('merchant_user_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 1, 'confirmations' => $v2['confirmations']]);
 							//增加充值数量统计，不算手续费
 							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
-							if ($pid && $sfee && $feemy) {
-								$feemy = round($feemy * $sfee / 100, 8);
-								$rsArr = agentReward($pid, $v['merchant_id'], $feemy, 2);
+							if ($pid && $sfee && $feeMy) {
+								$feeMy = round($feeMy * $sfee / 100, 8);
+								$rsArr = agentReward($pid, $v['merchant_id'], $feeMy, 2);
 							}
 						}
 						if (!$valid && $res['status'] != 5) {
@@ -116,7 +115,7 @@ class Cron extends Base {
 						}
 					} else {
 						if ($valid) {
-							$rs1 = Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('usdt', $v2['amount'] - $sfee);
+							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
 							$rs2 = Db::name('merchant_user_recharge')->insert([
 								'merchant_id'   => $v['merchant_id'],
 								'from_address'  => $v2['sendingaddress'],
@@ -132,9 +131,9 @@ class Cron extends Base {
 							]);
 							//增加充值数量统计，不算手续费
 							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
-							if ($pid && $sfee && $feemy) {
-								$feemy = round($feemy * $sfee / 100, 8);
-								$rsArr = agentReward($pid, $v['merchant_id'], $feemy, 2);
+							if ($pid && $sfee && $feeMy) {
+								$feeMy = round($feeMy * $sfee / 100, 8);
+								$rsArr = agentReward($pid, $v['merchant_id'], $feeMy, 2);
 							}
 						} else {
 							$rs1 = TRUE;
@@ -239,7 +238,7 @@ class Cron extends Base {
 					$valid = $v2['valid'];
 					if ($res = Db::name('merchant_recharge')->where(['txid' => $v2['txid']])->find()) {
 						if ($res['status'] != 1 && $valid) {
-							$rs1 = Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('usdt', $v2['amount'] - $sfee);
+							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
 							$rs2 = Db::name('merchant_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 1, 'confirmations' => $v2['confirmations']]);
 							//增加充值数量统计，不算手续费
 							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
@@ -250,7 +249,7 @@ class Cron extends Base {
 						}
 					} else {
 						if ($valid) {
-							$rs1 = Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('usdt', $v2['amount'] - $sfee);
+							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
 							$rs2 = Db::name('merchant_recharge')->insert([
 								'merchant_id'   => $v['merchant_id'],
 								'from_address'  => $v2['sendingaddress'],
@@ -310,10 +309,10 @@ class Cron extends Base {
 			//$seller = Db::name('merchant')->where(array('id'=>$vv['sell_id']))->find();
 			$buymerchant = Db::name('merchant')->where(['id' => $vv['buy_id']])->find();
 			//$table = "movesay_".$coin_name."_log";
-			$rs1         = Db::name('order_buy')->update(['status' => 5, 'id' => $vv['id']]);
-			$real_number = $orderInfo['deal_num'] + $orderInfo['fee'];
-			$rs2         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec($coin_name . 'd', $real_number);
-			$rs3         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc($coin_name, $real_number);
+			$rs1     = Db::name('order_buy')->update(['status' => 5, 'id' => $vv['id']]);
+			$realAmt = $orderInfo['deal_num'] + $orderInfo['fee'];
+			$rs2     = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec($coin_name . 'd', $realAmt);
+			$rs3     = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc($coin_name, $realAmt);
 			if ($rs1 && $rs2 && $rs3) {
 				Db::commit();
 				//请求回调接口,失败
@@ -342,9 +341,9 @@ class Cron extends Base {
 			$buymerchant = Db::name('merchant')->where(['id' => $vv['buy_id']])->find();
 			$coin_name   = 'usdt';
 			$rs1         = Db::name('order_sell')->update(['status' => 5, 'id' => $vv['id']]);
-			$real_number = $orderInfo['deal_num'] + $orderInfo['fee'];
-			$rs2         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec($coin_name . 'd', $real_number);
-			$rs3         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc($coin_name, $real_number);
+			$realAmt     = $orderInfo['deal_num'] + $orderInfo['fee'];
+			$rs2         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec($coin_name . 'd', $realAmt);
+			$rs3         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc($coin_name, $realAmt);
 			if ($rs1 && $rs2 && $rs3) {
 				Db::commit();
 				$data['amount']  = $orderInfo['deal_num'];

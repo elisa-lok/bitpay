@@ -226,8 +226,7 @@ class Merchant extends Base {
 		Db::startTrans();
 		try {
 			$checkCode = $this->check_code();
-			$rs1       = Db::name('merchant')->where('id', $onlineAd['traderid'])->setDec('usdt', $data['amount']);
-			$rs3       = Db::name('merchant')->where('id', $onlineAd['traderid'])->setInc('usdtd', $data['amount']);
+			$rs1       = balanceChange(FALSE, $onlineAd['traderid'], -$data['amount'], 0, $data['amount'], 0, BAL_BOUGHT, $data['orderid'], '商家买币');
 			$rs4       = Db::name('merchant')->where('id', $onlineAd['traderid'])->setInc('pp_amount', 1);
 			//$rs6       = Db::name('ad_sell')->where('id', $onlineAd['id'])-> setDec('remain_amount', $data['amount']);
 			//$rs7       = Db::name('ad_sell')->where('id', $onlineAd['id'])-> setInc('trading_volume', $data['amount']);
@@ -249,7 +248,7 @@ class Merchant extends Base {
 				'check_code'   => $checkCode,
 				'status'       => 1
 			]);
-			if ($rs1 && $rs2 && $rs3 && $rs4) {
+			if ($rs1 && $rs2 && $rs4) {
 				// 提交事务
 				Db::commit();
 				//todo 发送短信给承兑商
@@ -325,7 +324,7 @@ class Merchant extends Base {
 		$join = [['__MERCHANT__ c', 'a.userid=c.id', 'LEFT']];
 		// 匹配所有订单
 		//$ads  = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile, c.usdt')->alias('a')->join($join)->group('a.id')->where($where)->order('online DESC,price ASC,averge ASC,pp_amount ASC,id ASC')->select();
-		$ads = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile, c.usdt')->alias('a')->join($join)->group('a.id')->where($where)->order('match_time ASC, pp_amount ASC,online DESC,averge ASC,price ASC,id ASC')->select();
+		$ads = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile, c.usdt, c.usdtd')->alias('a')->join($join)->group('a.id')->where($where)->order('match_time ASC, pp_amount ASC,online DESC,averge ASC,price ASC,id ASC')->select();
 		// $ads  = Db::name('ad_sell')->field('a.*, c.id as traderid, c.mobile, c.usdt')->alias('a')->join($join)->group('a.id')->where($where)->orderRaw(' rand() ')->select();
 		$onlineAd         = [];
 		$actualAmt        = 0;
@@ -339,12 +338,15 @@ class Merchant extends Base {
 			if ($v['remain_amount'] < $actualAmt) {
 				continue;
 			}
-			//判断承兑商是否被其它盘口设置过
+			//判断可匹配用户
 			if ($matchTraderEmpty) {
 				$find = Db::name('merchant')->where('pptrader', 'like', '%' . $v['traderid'] . '%')->find();
 				if (!empty($find)) {
 					continue;
 				}
+			}
+			if ($v['usdtd'] < $actualAmt) {
+				continue;
 			}
 			//判断未完成的单子
 			$traderCounter = Db::name('order_buy')->where('sell_id', $v['traderid'])->where('status', 'in', [0, 1])->count();

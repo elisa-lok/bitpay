@@ -10,7 +10,7 @@ class Order extends Base {
 		$orderInfo      = $orderInfoModel->find();
 		!$orderInfo && $this->error('订单不存在');
 		if (request()->isPost()) {
-			$args = input('post.');
+			$args       = input('post.');
 			$src_status = $orderInfo['status'];
 			($orderInfo['status'] == $args['status']) && ($orderInfo['deal_amount'] == $args['deal_amount']) && showMsg('操作成功'); //状态未改变
 			$updateArr = ['status' => $args['status']];
@@ -41,7 +41,7 @@ class Order extends Base {
 			// 判断完成
 			if (($args['status'] == 4) && ($src_status == 0 || $src_status == 1)) {
 				// 放行扣承兑商冻结和增加商户余额
-				$model2 = new MerchantModel();
+				$model2      = new MerchantModel();
 				$merchant    = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
 				$buymerchant = Db::name('merchant')->where('id', $orderInfo['buy_id'])->find();
 				if ($merchant['usdtd'] < $orderInfo['deal_num']) showMsg('您的冻结不足，交易失败', 0);
@@ -170,16 +170,16 @@ class Order extends Base {
 			// 判断取消
 			if ($args['status'] == 5 && ($src_status == 0 || $src_status == 1)) {
 				// 减少挂卖单交易量和增加挂卖单剩余量
-				$real_number = $orderInfo['deal_num'] + $orderInfo['fee'];
-				$res4        = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid']])->setDec('trading_volume', $real_number);
-				$res5        = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid']])->setInc('remain_amount', $real_number);
+				$realAmt = $orderInfo['deal_num'] + $orderInfo['fee'];
+				$res4    = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid']])->setDec('trading_volume', $realAmt);
+				$res5    = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid']])->setInc('remain_amount', $realAmt);
 				// 获取挂单
 				$sell = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->find();
 				if ($sell['state'] == 2) {
 					// 如果挂单已下架 回滚余额
 					$res6 = balanceChange(TRUE, $orderInfo['sell_id'], $orderInfo['deal_num'], $orderInfo['fee'], -$orderInfo['deal_num'], $orderInfo['fee'], BAL_CANCEL, $orderInfo['id'], "编辑修改状态->取消订单");
-					//$res6 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $real_number);
-					//$res7 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $real_number);
+					//$res6 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $realAmt);
+					//$res7 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $realAmt);
 				}
 				// 减少用户冻结余额和增加用户余额
 				//$res2    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdt', $orderInfo['deal_num']);
@@ -188,24 +188,24 @@ class Order extends Base {
 			// 判断付款&放行
 			if ($src_status == 5 && ($args['status'] == 0 || $args['status'] == 1)) {
 				// 关闭状态下改待付款或待放行
-				$real_number = $orderInfo['deal_num'] + $orderInfo['fee'];
+				$realAmt = $orderInfo['deal_num'] + $orderInfo['fee'];
 				// 如果挂单已下架则不允许修改
 				$sellInfo = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->find();
 				($sellInfo['state'] == 2) && showMsg('原挂单已下架，不允许修改订单状态。', 0);
 				// 剩余数量不足
-				$sellInfo['remain_amount'] < $real_number && showMsg('挂单剩余数量不足，无法修改。', 0);
+				$sellInfo['remain_amount'] < $realAmt && showMsg('挂单剩余数量不足，无法修改。', 0);
 				/*
-				if ($sellinfo['remain_amount'] < $real_number) {
+				if ($sellinfo['remain_amount'] < $realAmt) {
 					// 如果账户余额不足则不操作
 					$sellUser = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
-					$sellUser['usdt'] < $real_number && showMsg('账户可用余额不足，无法修改。', 0);
+					$sellUser['usdt'] < $realAmt && showMsg('账户可用余额不足，无法修改。', 0);
 					// 如果余额足够 则直接扣余额
-					!balanceChange(TRUE, $orderInfo['sell_id'], -$real_number, 0, $real_number, 0, BAL_SYS, $orderInfo['id'], "挂单剩余数量不足") && showMsg('扣除余额失败', 0);
+					!balanceChange(TRUE, $orderInfo['sell_id'], -$realAmt, 0, $realAmt, 0, BAL_SYS, $orderInfo['id'], "挂单剩余数量不足") && showMsg('扣除余额失败', 0);
 				}
 				*/
 				// 需重新扣除剩余数量
-				$res5 = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid']])->setDec('remain_amount', $real_number);
-				$res4 = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid']])->setInc('trading_volume', $real_number);
+				$res5 = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid']])->setDec('remain_amount', $realAmt);
+				$res4 = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid']])->setInc('trading_volume', $realAmt);
 			}
 			if ($res1 && $res2 && $res3 && $res4 && $res5 && $res6 && $res7) {
 				Db::commit();
@@ -226,7 +226,7 @@ class Order extends Base {
 		$orderInfo = Db::name('order_sell')->where('id=' . $edit)->find();
 		!$orderInfo && $this->error('订单不存在');
 		if (request()->isPost()) {
-			$args = input('post.');
+			$args       = input('post.');
 			$src_status = $orderInfo['status'];
 			($orderInfo['status'] == $args['status']) && ($orderInfo['deal_amount'] == $args['deal_amount']) && showMsg('操作成功'); //状态未改变
 			$updateArr = ['status' => $args['status']];
@@ -241,7 +241,7 @@ class Order extends Base {
 			}
 			Db::startTrans();
 			$res1 = Db::name('order_sell')->where('id=' . $edit)->update($updateArr); // 更新订单
-			$res2 = $res3 = TRUE;
+			$res2 = TRUE;
 			// 判断完成
 			if (($args['status'] == 4) && ($src_status == 0 || $src_status == 1)) {
 				$merchant = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
@@ -253,13 +253,13 @@ class Order extends Base {
 				$sfee = $orderInfo['deal_num'] * $fee / 100;
 				$mum  = $orderInfo['deal_num'] - $sfee;
 				try {
-					$real_number = number_format($orderInfo['deal_num'] + $orderInfo['fee'], 8, '.', '');
+					$realAmt = number_format($orderInfo['deal_num'] + $orderInfo['fee'], 8, '.', '');
 					// 减少商户冻结
-					$rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $real_number);
+					$rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $realAmt);
 					// 更新完成时间
 					$rs2 = Db::name('order_sell')->update(['id' => $orderInfo['id'], 'finished_time' => time(), 'buyer_fee' => $sfee]);
 					// 增加买家余额
-					$rs3 = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('usdt', $mum);
+					$rs3 = balanceChange(FALSE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $edit, '买入');
 					// 增加买家求购成功次数
 					$rs4 = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('transact_buy', 1);
 					// 查询平均打款时间
@@ -271,8 +271,8 @@ class Order extends Base {
 						// 提交事务
 						Db::commit();
 						financelog($orderInfo['buy_id'], $mum, '买入USDT_f2', 0, session('username'));         //添加日志
-						financelog($orderInfo['sell_id'], $real_number, '卖出USDT_f2', 1, session('username'));//添加日志
-						getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $real_number, session('username'));
+						financelog($orderInfo['sell_id'], $realAmt, '卖出USDT_f2', 1, session('username'));    //添加日志
+						getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $realAmt, session('username'));
 						showMsg('操作成功', 1);
 					} else {
 						// 回滚事务
@@ -287,11 +287,10 @@ class Order extends Base {
 			} else {
 				// 判断取消
 				if (($args['status'] == 5) && ($src_status == 0 || $src_status == 1)) {
-					$real_number = number_format($orderInfo['deal_num'] + $orderInfo['fee'], 8, '.', '');
-					$res2        = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $real_number);
-					$res3        = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $real_number);
+					$realAmt = number_format($orderInfo['deal_num'] + $orderInfo['fee'], 8, '.', '');
+					$res2    = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_SOLD, $edit, '卖出');
 				}
-				if ($res1 && $res2 && $res3) {
+				if ($res1 && $res2) {
 					Db::commit();
 					showMsg('操作成功', 1);
 				} else {

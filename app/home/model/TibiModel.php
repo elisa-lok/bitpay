@@ -23,10 +23,9 @@ class TibiModel extends Model {
 		}
 		Db::startTrans();
 		try {
-			$rs1 = Db::name('merchant')->where('id', $find['merchant_id'])->setInc('usdt', $find['num']); //0
-			$rs3 = Db::name('merchant')->where('id', $find['merchant_id'])->setDec('usdtd', $find['num']);//0
+			$rs1 = balanceChange(FALSE, $find['merchant_id'], $find['num'], 0, -$find['num'], 0, BAL_CANCEL, $id, '订单取消');
 			$rs2 = $this->where('id', $id)->update(['status' => 3]);
-			if ($rs1 && $rs2 && $rs3) {
+			if ($rs1 && $rs2) {
 				// 提交事务
 				Db::commit();
 				return ['code' => 1, 'data' => '', 'msg' => '撤销成功'];

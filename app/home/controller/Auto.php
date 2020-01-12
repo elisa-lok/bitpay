@@ -16,26 +16,26 @@ class Auto extends Base {
 		// $accounts = Db::name('address')->where(array('status'=>1,'type'=>'eth'))->field('uid,address')->select();
 		$time     = time();
 		$confirms = config('usdt_confirms');     //确认次数
-		$feemy    = config('agent_recharge_fee');//充值手续费
+		$feeMy    = config('agent_recharge_fee');//充值手续费
 		empty($confirms) && die('请设置确认数');
 		$wei      = 1e6;
 		$addr     = config('usdtaddr');//usdt合约地址
-		$getblock = 'http://api.etherscan.io/api?module=proxy&action=eth_blockNumber&apikey=YourApiKeyToken';
-		$blockn   = file_get_contents($getblock);
-		$blockn   = json_decode($blockn, TRUE);
-		$blockn   = explode('0x', $blockn['result'])[1];
+		$getBlock = 'http://api.etherscan.io/api?module=proxy&action=eth_blockNumber&apikey=YourApiKeyToken';
+		$blockNum = file_get_contents($getBlock);
+		$blockNum = json_decode($blockNum, TRUE);
+		$blockNum = explode('0x', $blockNum['result'])[1];
 		if ($block) {
-			$lastblock = $block;
-			$fromblock = $block;
+			$lastBlock = $block;
+			$fromBlock = $block;
 		} else {
-			$lastblock = hexdec($blockn);
-			$fromblock = $lastblock - 10;
+			$lastBlock = hexdec($blockNum);
+			$fromBlock = $lastBlock - 10;
 		}
-		$url    = 'http://api.etherscan.io/api?module=account&action=txlist&address=' . $addr . '&startblock=' . $fromblock . '&endblock=' . $lastblock . '&sort=asc&apikey=ERXIYCNF6PP3ZNQAWICHJ6N5W7P212AHZI';
-		$fanhui = file_get_contents($url);
-		$fanhui = json_decode($fanhui, TRUE);
-		if ($fanhui['message'] == 'OK') {
-			foreach ($fanhui['result'] as $v2) {
+		$url    = 'http://api.etherscan.io/api?module=account&action=txlist&address=' . $addr . '&startblock=' . $fromBlock . '&endblock=' . $lastBlock . '&sort=asc&apikey=ERXIYCNF6PP3ZNQAWICHJ6N5W7P212AHZI';
+		$return = file_get_contents($url);
+		$return = json_decode($return, TRUE);
+		if ($return['message'] == 'OK') {
+			foreach ($return['result'] as $v2) {
 				if (strlen($v2['input']) == 138) {
 					$datalist = explode('0x', $v2['input'])[1];
 					$account  = substr($datalist, 32, 40);
@@ -81,14 +81,14 @@ class Auto extends Base {
 								$valid    = $v2['confirmations'];
 								if ($res = Db::name('merchant_recharge')->where(['txid' => $v2['hash']])->find()) {
 									if ($res['status'] != 1 && $valid) {
-										$rs1 = Db::name('merchant')->where(['id' => $useradd['uid']])->setInc('usdt', $num - $sfee);
+										$rs1 = balanceChange(FALSE, $useradd['uid'], $num - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
 										$rs2 = Db::name('merchant_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 1, 'confirmations' => $v2['confirmations']]);
 										//增加充值数量统计，不算手续费
 										Db::name('merchant')->where(['id' => $useradd['uid']])->setInc('recharge_amount', $num);
 										financelog($useradd['uid'], ($num - $sfee), 'USDT充值到账_1', 0, '系统自动');//添加日志
-										if ($pid && $sfee && $feemy) {
-											$feemy = round($feemy * $sfee / 100, 8);
-											$rsArr = agentReward($pid, $useradd['uid'], $feemy, 2);
+										if ($pid && $sfee && $feeMy) {
+											$feeMy = round($feeMy * $sfee / 100, 8);
+											$rsArr = agentReward($pid, $useradd['uid'], $feeMy, 2);
 										}
 									}
 									if (!$valid && $res['status'] != 5) {
@@ -97,7 +97,7 @@ class Auto extends Base {
 									}
 								} else {
 									if ($valid) {
-										$rs1 = Db::name('merchant')->where(['id' => $useradd['uid']])->setInc('usdt', $num - $sfee);
+										$rs1 = balanceChange(FALSE, $useradd['uid'], $num - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充币');
 										$rs2 = Db::name('merchant_recharge')->insert([
 											'merchant_id'   => $useradd['uid'],
 											'from_address'  => $v2['from'],
@@ -114,9 +114,9 @@ class Auto extends Base {
 										//增加充值数量统计，不算手续费
 										Db::name('merchant')->where(['id' => $useradd['uid']])->setInc('recharge_amount', $num);
 										// financelog($useradd['uid'],($num - $sfee),'USDT充值_1',0);//添加日志
-										if ($pid && $sfee && $feemy) {
-											$feemy = round($feemy * $sfee / 100, 8);
-											$rsArr = agentReward($pid, $useradd['uid'], $feemy, 2);
+										if ($pid && $sfee && $feeMy) {
+											$feeMy = round($feeMy * $sfee / 100, 8);
+											$rsArr = agentReward($pid, $useradd['uid'], $feeMy, 2);
 										}
 									} else {
 										$rs1 = TRUE;
@@ -150,14 +150,14 @@ class Auto extends Base {
 				}
 			}
 		} else {
-			echo $fanhui['message'];
+			echo $return['message'];
 		}
 	}
 
 	public function autoEth() {                  //盘口提币
 		$time     = time();
 		$confirms = config('usdt_confirms');     //充值手续费
-		$feemy    = config('agent_recharge_fee');//充值手续费
+		$feeMy    = config('agent_recharge_fee');//充值手续费
 		if (empty($confirms)) {
 			exit('请设置确认数');
 		}
@@ -213,14 +213,14 @@ class Auto extends Base {
 					$valid    = $v2['valid'];
 					if ($res = Db::name('merchant_user_recharge')->where(['txid' => $v2['txid']])->find()) {
 						if ($res['status'] != 1 && $valid) {
-							$rs1 = Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('usdt', $v2['amount'] - $sfee);
+							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
 							$rs2 = Db::name('merchant_user_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 1, 'confirmations' => $v2['confirmations']]);
 							//增加充值数量统计，不算手续费
 							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
 							financelog($v['merchant_id'], ($v2['amount'] - $sfee), '盘口提币到账_1', 0, '系统自动');//添加日志
-							if ($pid && $sfee && $feemy) {
-								$feemy = round($feemy * $sfee / 100, 8);
-								$rsArr = agentReward($pid, $v['merchant_id'], $feemy, 2);
+							if ($pid && $sfee && $feeMy) {
+								$feeMy = round($feeMy * $sfee / 100, 8);
+								$rsArr = agentReward($pid, $v['merchant_id'], $feeMy, 2);
 							}
 						}
 						if (!$valid && $res['status'] != 5) {
@@ -229,7 +229,7 @@ class Auto extends Base {
 						}
 					} else {
 						if ($valid) {
-							$rs1 = Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('usdt', $v2['amount'] - $sfee);
+							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
 							$rs2 = Db::name('merchant_user_recharge')->insert([
 								'merchant_id'   => $v['merchant_id'],
 								'from_address'  => $v2['sendingaddress'],
@@ -246,9 +246,9 @@ class Auto extends Base {
 							//增加充值数量统计，不算手续费
 							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
 							financelog($v['merchant_id'], ($v2['amount'] - $sfee), 'USDT充值_1', 0, '系统自动');//添加日志
-							if ($pid && $sfee && $feemy) {
-								$feemy = round($feemy * $sfee / 100, 8);
-								$rsArr = agentReward($pid, $v['merchant_id'], $feemy, 2);
+							if ($pid && $sfee && $feeMy) {
+								$feeMy = round($feeMy * $sfee / 100, 8);
+								$rsArr = agentReward($pid, $v['merchant_id'], $feeMy, 2);
 							}
 						} else {
 							$rs1 = TRUE;
@@ -353,7 +353,7 @@ class Auto extends Base {
 					$valid = $v2['valid'];
 					if ($res = Db::name('merchant_recharge')->where(['txid' => $v2['txid']])->find()) {
 						if ($res['status'] != 1 && $valid) {
-							$rs1 = Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('usdt', $v2['amount'] - $sfee);
+							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
 							$rs2 = Db::name('merchant_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 1, 'confirmations' => $v2['confirmations']]);
 							//增加充值数量统计，不算手续费
 							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
@@ -365,7 +365,7 @@ class Auto extends Base {
 						}
 					} else {
 						if ($valid) {
-							$rs1 = Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('usdt', $v2['amount'] - $sfee);
+							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
 							$rs2 = Db::name('merchant_recharge')->insert([
 								'merchant_id'   => $v['merchant_id'],
 								'from_address'  => $v2['sendingaddress'],
@@ -429,19 +429,17 @@ class Auto extends Base {
 			//$seller = Db::name('merchant')->where(array('id'=>$vv['sell_id']))->find();
 			$buymerchant = Db::name('merchant')->where(['id' => $vv['buy_id']])->find();
 			//$table = "movesay_".$coin_name."_log";
-			$rs1         = Db::name('order_buy')->update(['status' => 5, 'id' => $vv['id']]);
-			$real_number = $orderInfo['deal_num'] + $orderInfo['fee'];
+			$rs1     = Db::name('order_buy')->update(['status' => 5, 'id' => $vv['id']]);
+			$realAmt = $orderInfo['deal_num'] + $orderInfo['fee'];
 			// 回滚挂单
-			$rs2 = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->setInc('remain_amount', $real_number);   // 增加剩余量
-			$rs3 = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->setDec('trading_volume', $real_number);  // 减少交易量
+			$rs2 = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->setInc('remain_amount', $realAmt);   // 增加剩余量
+			$rs3 = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->setDec('trading_volume', $realAmt);  // 减少交易量
 			// 获取挂单
 			$sellInfo = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->find();
 			$rs4      = $rs5 = 1;
 			if ($sellInfo['state'] == 2) {
 				// 如果挂单已下架 回滚余额
-				$rs4 = balanceChange(FALSE, $orderInfo['sell_id'], $real_number, 0, -$real_number, 0, BAL_REDEEM, $orderInfo['id'], "支付超时->自动下架");
-				//$rs4 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $real_number);
-				//$rs5 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $real_number);
+				$rs4 = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $orderInfo['id'], "支付超时->自动下架");
 			}
 			if ($rs1 && $rs2 && $rs3 && $rs4 && $rs5) {
 				Db::commit();
@@ -466,14 +464,14 @@ class Auto extends Base {
 		}
 		foreach ($list as $key => $vv) {
 			Db::startTrans();
-			$orderInfo   = [];
-			$orderInfo   = Db::name('order_sell')->where(['id' => $vv['id']])->find();
-			$coin_name   = 'usdt';
-			$rs1         = Db::name('order_sell')->update(['status' => 5, 'id' => $vv['id']]);
-			$real_number = $orderInfo['deal_num'] + $orderInfo['fee'];
-			$rs2         = balanceChange(FALSE, $orderInfo['sell_id'], $real_number, 0, -$real_number, 0, BAL_REDEEM, $orderInfo['id'], "支付超时->自动下架->buy");
-			//$rs2         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec($coin_name . 'd', $real_number);
-			//$rs3         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc($coin_name, $real_number);
+			$orderInfo = [];
+			$orderInfo = Db::name('order_sell')->where(['id' => $vv['id']])->find();
+			$coin_name = 'usdt';
+			$rs1       = Db::name('order_sell')->update(['status' => 5, 'id' => $vv['id']]);
+			$realAmt   = $orderInfo['deal_num'] + $orderInfo['fee'];
+			$rs2       = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $orderInfo['id'], "支付超时->自动下架->buy");
+			//$rs2         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec($coin_name . 'd', $realAmt);
+			//$rs3         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc($coin_name, $realAmt);
 			if ($rs1 && $rs2) {
 				Db::commit();
 			} else {

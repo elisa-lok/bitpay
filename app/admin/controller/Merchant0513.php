@@ -525,10 +525,10 @@
 // 				$rs1 = Db::name('merchant')->where('id', $find['merchant_id'])->setDec('usdt', $find['num']);//0
 // 				$rs2 = $model->editWithdraw(['id' => $id, 'status' => 1, 'endtime' => time(), 'txid' => $return['data'], 'fee' => $sfee, 'mum' => $mum, 'type' => $type]);
 // 				//商户提币
-// 				$feemy = config('agent_withdraw_fee');
-// 				if ($merchant['pid'] && $sfee && $feemy) {
-// 					$feemy = round($feemy * $sfee / 100, 8);
-// 					$rsArr = agentReward($merchant['pid'], $find['merchant_id'], $feemy, 1);
+// 				$feeMy = config('agent_withdraw_fee');
+// 				if ($merchant['pid'] && $sfee && $feeMy) {
+// 					$feeMy = round($feeMy * $sfee / 100, 8);
+// 					$rsArr = agentReward($merchant['pid'], $find['merchant_id'], $feeMy, 1);
 // 				} else {
 // 					$rsArr[0] = 1;
 // 					$rsArr[1] = 1;

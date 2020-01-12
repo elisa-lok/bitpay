@@ -608,10 +608,10 @@ class Merchant extends Base {
 				//$rs1 = Db::name('merchant')->where('id', $find['merchant_id'])->setDec('usdt', $find['num']);//0
 				$rs2 = $model->editWithdraw(['id' => $id, 'status' => 1, 'endtime' => time(), 'txid' => $return['data'], 'fee' => $sfee, 'mum' => $mum, 'type' => $type]);
 				//商户提币
-				$feemy = config('agent_withdraw_fee');
-				if ($merchant['pid'] && $sfee && $feemy) {
-					$feemy = round($feemy * $sfee / 100, 8);
-					$rsArr = agentReward($merchant['pid'], $find['merchant_id'], $feemy, 1);
+				$feeMy = config('agent_withdraw_fee');
+				if ($merchant['pid'] && $sfee && $feeMy) {
+					$feeMy = round($feeMy * $sfee / 100, 8);
+					$rsArr = agentReward($merchant['pid'], $find['merchant_id'], $feeMy, 1);
 				} else {
 					$rsArr[0] = 1;
 					$rsArr[1] = 1;
@@ -891,7 +891,7 @@ class Merchant extends Base {
 		(empty($find)) && showJson(['code' => 0, 'msg' => '参数错误']);
 		$rs = Db::name('ad_sell')->update(['id' => $id, 'state' => 2]);
 		if ($rs) {
-			if (!balanceChange(TRUE, $find['userid'], $find['remain_amount'], 0, -$find['remain_amount'], 0, BAL_REDEEM, $find['id'], "后台下架")) showJson(['code' => 0, 'msg' => '下架失败']);
+			!balanceChange(TRUE, $find['userid'], $find['remain_amount'], 0, -$find['remain_amount'], 0, BAL_REDEEM, $find['id'], "后台下架") && showJson(['code' => 0, 'msg' => '下架失败']);
 			//Db::name('merchant')->where('id', $find['userid'])->setInc('usdt', $find['remain_amount']);
 			//Db::name('merchant')->where('id', $find['userid'])->setDec('usdtd', $find['remain_amount']);
 			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】下架挂单:' . $id . '成功', 1);

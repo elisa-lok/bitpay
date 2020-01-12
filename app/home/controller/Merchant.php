@@ -591,9 +591,7 @@ class Merchant extends Base {
 			try {
 				$orderSn = createOrderNo(1, $this->uid);
 				$rs1     = balanceChange(FALSE, $this->uid, -$num, 0, $num, 0, BAL_WITHDRAW, $orderSn);
-				//$rs1 = Db::name('merchant')->where('id', $this->uid)->setDec('usdt', $num);
-				//$rs3 = Db::name('merchant')->where('id', $this->uid)->setInc('usdtd', $num);
-				$rs2 = Db::name('merchant_withdraw')->insert([
+				$rs2     = Db::name('merchant_withdraw')->insert([
 					'merchant_id' => $this->uid,
 					'address'     => $address,
 					'num'         => $num,
@@ -1770,11 +1768,11 @@ class Merchant extends Base {
 		$model2          = new MerchantModel();
 		$where['id']     = $id;
 		$where['userid'] = $this->uid;
-		$ad_info         = $model->getOne($where);
-		if (!$ad_info) {
+		$adInfo          = $model->getOne($where);
+		if (!$adInfo) {
 			$this->error("挂单不存在！");
 		} else {
-			($ad_info['state'] == 4) && $this->error("此挂单已冻结禁止上下架操作！");
+			($adInfo['state'] == 4) && $this->error("此挂单已冻结禁止上下架操作！");
 		}
 		// 锁定操作 代码执行完成前不可继续操作 60秒后可再次点击操作
 		Cache::has($id) && $this->error('操作频繁,请稍后重试');
@@ -1785,18 +1783,14 @@ class Merchant extends Base {
 			// $haveAdSum = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->sum('amount');
 			// $haveAdSum = $haveAdSum ? $haveAdSum : 0;
 			$haveAdSum = 0;
-			if (($ad_info['remain_amount'] + $haveAdSum) * 1 > $merchant['usdt'] * 1) {
+			if (($adInfo['remain_amount'] + $haveAdSum) * 1 > $merchant['usdt'] * 1) {
 				Cache::rm($id);
 				$this->error('开启失败：账户余额不足');
 			} else {
-				!balanceChange(TRUE, $this->uid, -$ad_info['remain_amount'], 0, $ad_info['remain_amount'], 0, BAL_ENTRUST, $id) && $this->error('开启失败：扣款失败');
-				// Db::name('merchant')->where('id', $this->uid)->setDec('usdt', $ad_info['remain_amount']);
-				// Db::name('merchant')->where('id', $this->uid)->setInc('usdtd', $ad_info['remain_amount']);
+				!balanceChange(TRUE, $this->uid, -$adInfo['remain_amount'], 0, $adInfo['remain_amount'], 0, BAL_ENTRUST, $id) && $this->error('开启失败：扣款失败');
 			}
 		} elseif ($act == 2) {
-			!balanceChange(TRUE, $this->uid, $ad_info['remain_amount'], 0, -$ad_info['remain_amount'], 0, BAL_REDEEM, $id) && $this->error('下架失败：退款失败');
-			//Db::name('merchant')->where('id', $this->uid)->setInc('usdt', $ad_info['remain_amount']);
-			//Db::name('merchant')->where('id', $this->uid)->setDec('usdtd', $ad_info['remain_amount']);
+			!balanceChange(TRUE, $this->uid, $adInfo['remain_amount'], 0, -$adInfo['remain_amount'], 0, BAL_REDEEM, $id) && $this->error('下架失败：退款失败');
 		}
 		$result = $model->updateOne(['id' => $id, 'state' => $act]);
 		if ($result['code'] == 1) {
@@ -1820,11 +1814,11 @@ class Merchant extends Base {
 		$model2          = new MerchantModel();
 		$where['id']     = $id;
 		$where['userid'] = $this->uid;
-		$ad_info         = $model->getOne($where);
-		if (!$ad_info) {
+		$adInfo          = $model->getOne($where);
+		if (!$adInfo) {
 			$this->error("挂单不存在！");
 		} else {
-			($ad_info['state'] == 4) && $this->error("此挂单已冻结禁止上下架操作！");
+			($adInfo['state'] == 4) && $this->error("此挂单已冻结禁止上下架操作！");
 		}
 		$merchant = $model2->getUserByParam($this->uid, 'id');
 		if ($act == 1) {
