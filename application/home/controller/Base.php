@@ -47,6 +47,7 @@ class Base extends Controller {
 				die;
 			}
 		}
+		$this->setConfig();
 		$this->assign('cate', $cate);
 		$c = request()->controller();
 		$a = request()->action();

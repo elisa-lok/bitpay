@@ -1394,6 +1394,7 @@ class Merchant extends Base {
 				$this->error("挂单失败,无法冻结余额。");
 			}
 		} else {
+			$this->assign('usdt_price', $usdtCurrentPrice);
 			$this->assign('usdt_price_min', $usdtPriceMin);
 			$this->assign('usdt_price_max', $usdtPriceMax);
 			$this->assign('usdt_price_way', $usdtPriceWay);
