@@ -12,8 +12,8 @@ class UserType extends Model {
 	 * [getRoleByWhere 根据条件获取角色列表信息]
 	 * @author [Max] [864491238@qq.com]
 	 */
-	public function getRoleByWhere($map, $Nowpage, $limits) {
-		return $this->where($map)->page($Nowpage, $limits)->order('id desc')->select();
+	public function getRoleByWhere($map, $nowPage, $limits) {
+		return $this->where($map)->page($nowPage, $limits)->order('id desc')->select();
 	}
 
 	/**

@@ -17,17 +17,17 @@ class Role extends Base {
 			$map['title'] = ['like', "%" . $key . "%"];
 		}
 		$user    = new UserType();
-		$Nowpage = input('get.page') ? input('get.page') : 1;
+		$nowPage = input('get.page') ? input('get.page') : 1;
 		$limits  = config('list_rows');      // 获取总条数
 		$count   = $user->getAllRole($map);  //总数据
-		$allpage = intval(ceil($count / $limits));
-		$lists   = $user->getRoleByWhere($map, $Nowpage, $limits);
+		$allPage = intval(ceil($count / $limits));
+		$lists   = $user->getRoleByWhere($map, $nowPage, $limits);
 		foreach ($lists as $k => $v) {
 			$lists[$k]['create_time'] = date('Y/m/d H:i:s', $v['create_time']);
 			$lists[$k]['update_time'] = date('Y/m/d H:i:s', $v['update_time']);
 		}
-		$this->assign('Nowpage', $Nowpage); //当前页
-		$this->assign('allpage', $allpage); //总页数
+		$this->assign('Nowpage', $nowPage); //当前页
+		$this->assign('allpage', $allPage); //总页数
 		$this->assign('val', $key);
 		if (input('get.page')) {
 			return json($lists);

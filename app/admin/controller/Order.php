@@ -1,6 +1,7 @@
 <?php
 namespace app\admin\controller;
 use app\admin\model\MerchantModel;
+use think\Cache;
 use think\Db;
 use think\Exception\DbException;
 
@@ -143,9 +144,9 @@ class Order extends Base {
 					if ($rs1 && $rs2 && $rs3 && $rs4 && $rs6 && $rs7 && $rs8 && $rs9 && $rs10 && $rs11 && $res3) {
 						// 提交事务
 						Db::commit();
-						financelog($orderInfo['buy_id'], $mum, '买入USDT_f1', 0, session('username'));//添加日志
+						financeLog($orderInfo['buy_id'], $mum, '买入USDT_f1', 0, session('username'));//添加日志
 						if ($traderMoney > 0) {
-							financelog($orderInfo['sell_id'], $traderMoney, '承兑商卖单奖励_f1', 0, session('username'));//添加日志
+							financeLog($orderInfo['sell_id'], $traderMoney, '承兑商卖单奖励_f1', 0, session('username'));//添加日志
 						}
 						getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $orderInfo['deal_num']);
 						//请求回调接口
@@ -270,8 +271,8 @@ class Order extends Base {
 					if ($res1 && $rs1 && $rs2 && $rs3 && $rs4 && $rs5) {
 						// 提交事务
 						Db::commit();
-						financelog($orderInfo['buy_id'], $mum, '买入USDT_f2', 0, session('username'));         //添加日志
-						financelog($orderInfo['sell_id'], $realAmt, '卖出USDT_f2', 1, session('username'));    //添加日志
+						financeLog($orderInfo['buy_id'], $mum, '买入USDT_f2', 0, session('username'));         //添加日志
+						financeLog($orderInfo['sell_id'], $realAmt, '卖出USDT_f2', 1, session('username'));    //添加日志
 						getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $realAmt, session('username'));
 						showMsg('操作成功', 1);
 					} else {

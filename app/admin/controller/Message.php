@@ -13,16 +13,16 @@ class Message extends Base {
 			$map['merchant_id']   = $id;
 		}
 		$member  = new MessageModel();
-		$Nowpage = input('get.page') ? input('get.page') : 1;
+		$nowPage = input('get.page') ? input('get.page') : 1;
 		$limits  = config('list_rows');       // 获取总条数
 		$count   = $member->getAllCount($map);//计算总页面
-		$allpage = intval(ceil($count / $limits));
-		$lists   = $member->getMessageByWhere($map, $Nowpage, $limits);
+		$allPage = intval(ceil($count / $limits));
+		$lists   = $member->getMessageByWhere($map, $nowPage, $limits);
 		foreach ($lists as $k => $v) {
 			$lists[$k]['addtime'] = date("Y/m/d H:i:s", $v['addtime']);
 		}
-		$this->assign('Nowpage', $Nowpage); //当前页
-		$this->assign('allpage', $allpage); //总页数
+		$this->assign('Nowpage', $nowPage); //当前页
+		$this->assign('allpage', $allPage); //总页数
 		$this->assign('val', $key);
 		if (input('get.page')) {
 			return json($lists);

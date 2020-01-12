@@ -8,11 +8,11 @@ class AdModel extends Model {
 	/**
 	 * 根据条件获取列表信息
 	 * @param $where
-	 * @param $Nowpage
+	 * @param $nowPage
 	 * @param $limits
 	 */
-	public function getAdAll($map, $Nowpage, $limits) {
-		return $this->field('think_ad.*,name')->join('think_ad_position', 'think_ad.ad_position_id = think_ad_position.id')->where($map)->page($Nowpage, $limits)->order('orderby desc')->select();
+	public function getAdAll($map, $nowPage, $limits) {
+		return $this->field('think_ad.*,name')->join('think_ad_position', 'think_ad.ad_position_id = think_ad_position.id')->where($map)->page($nowPage, $limits)->order('orderby desc')->select();
 	}
 
 	/**

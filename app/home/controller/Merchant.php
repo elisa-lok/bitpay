@@ -2015,7 +2015,7 @@ class Merchant extends Base {
 				//$rs3 = Db::name('merchant')->where('id', $this->uid)->setInc($coin_name . 'd', $num + $fee);
 				if ($rs1 && $rs2) {
 					Db::commit();
-					financelog($this->uid, ($num + $fee), '卖出USDT_冻结1', 1, session('user.name'));//添加日志
+					financeLog($this->uid, ($num + $fee), '卖出USDT_冻结1', 1, session('user.name'));//添加日志
 					//todo:发送短信给买家
 					$mobile = Db::name('merchant')->where('id', $orderInfo['userid'])->value('mobile');
 					if (!empty($mobile)) {
@@ -2765,9 +2765,9 @@ class Merchant extends Base {
 				}
 				// 提交事务
 				Db::commit();
-				financelog($orderInfo['buy_id'], $sum, '买入USDT_f1', 0, session('user.name'));//添加日志
+				financeLog($orderInfo['buy_id'], $sum, '买入USDT_f1', 0, session('user.name'));//添加日志
 				if ($sellerAwardMoney > 0) {
-					financelog($orderInfo['sell_id'], $sellerAwardMoney, '承兑商卖单奖励_f1', 0, session('user.name'));//添加日志
+					financeLog($orderInfo['sell_id'], $sellerAwardMoney, '承兑商卖单奖励_f1', 0, session('user.name'));//添加日志
 				}
 				getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $sum, $orderInfo['deal_num']);
 				//请求回调接口
@@ -2814,9 +2814,7 @@ class Merchant extends Base {
 			Db::startTrans();
 			try {
 				$rs1 = balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$orderInfo['deal_num'], $orderInfo['fee'], BAL_SOLD, $orderInfo['id']);
-				//$rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num'] + $orderInfo['fee']);
 				$rs2 = Db::name('order_sell')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'buyer_fee' => $sfee]);
-				//$rs3 = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('usdt', $mum);
 				$rs3      = balanceChange(FALSE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id']);
 				$rs4      = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('transact_buy', 1);
 				$total    = Db::name('order_sell')->field('sum(dktime-ctime) as total')->where('buy_id', $orderInfo['buy_id'])->where('status', 4)->select();
@@ -2826,7 +2824,7 @@ class Merchant extends Base {
 				if ($rs1 && $rs2 && $rs3 && $rs4) {
 					// 提交事务
 					Db::commit();
-					financelog($orderInfo['buy_id'], $mum, '买入USDT_f2', 0, session('user.name'));//添加日志
+					financeLog($orderInfo['buy_id'], $mum, '买入USDT_f2', 0, session('user.name'));//添加日志
 					getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $orderInfo['deal_num'] + $orderInfo['fee'], session('user.name'));
 					$this->success('交易成功');
 				} else {

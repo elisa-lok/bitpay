@@ -9,8 +9,8 @@ class MemberGroupModel extends Model {
 	/**
 	 * 根据条件获取全部数据
 	 */
-	public function getAll($map, $Nowpage, $limits) {
-		return $this->where($map)->page($Nowpage, $limits)->order('id asc')->select();
+	public function getAll($map, $nowPage, $limits) {
+		return $this->where($map)->page($nowPage, $limits)->order('id asc')->select();
 	}
 
 	/**

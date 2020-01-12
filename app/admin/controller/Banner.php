@@ -18,14 +18,14 @@ class Banner extends Base {
 		if ($key && $key !== "") {
 			$map['title'] = ['like', "%" . $key . "%"];
 		}
-		$Nowpage = input('get.page') ? input('get.page') : 1;
+		$nowPage = input('get.page') ? input('get.page') : 1;
 		$limits  = config('list_rows');                     // 获取总条数
 		$count   = Db::name('banner')->where($map)->count();//计算总页面
-		$allpage = intval(ceil($count / $limits));
+		$allPage = intval(ceil($count / $limits));
 		$ad      = new BannerModel();
-		$lists   = $ad->getAdAll($map, $Nowpage, $limits);
-		$this->assign('Nowpage', $Nowpage); //当前页
-		$this->assign('allpage', $allpage); //总页数
+		$lists   = $ad->getAdAll($map, $nowPage, $limits);
+		$this->assign('Nowpage', $nowPage); //当前页
+		$this->assign('allpage', $allPage); //总页数
 		$this->assign('val', $key);
 		if (input('get.page')) {
 			return json($lists);
@@ -108,13 +108,13 @@ class Banner extends Base {
 	 */
 	public function index_position() {
 		$ad      = new BannerPositionModel();
-		$nowpage = input('get.page') ? input('get.page') : 1;
+		$nowPage = input('get.page') ? input('get.page') : 1;
 		$limits  = 10;                                  // 获取总条数
 		$count   = Db::name('banner_position')->count();//计算总页面
-		$allpage = intval(ceil($count / $limits));
-		$list    = $ad->getAll($nowpage, $limits);
-		$this->assign('nowpage', $nowpage); //当前页
-		$this->assign('allpage', $allpage); //总页数
+		$allPage = intval(ceil($count / $limits));
+		$list    = $ad->getAll($nowPage, $limits);
+		$this->assign('nowpage', $nowPage); //当前页
+		$this->assign('allpage', $allPage); //总页数
 		$this->assign('list', $list);
 		return $this->fetch();
 	}

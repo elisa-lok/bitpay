@@ -14,26 +14,26 @@
 // class Merchant extends Base {
 // 	public function index() {
 // 		$key       = input('key');
-// 		$reg_type  = input('reg_type');
+// 		$regType  = input('reg_type');
 // 		$map['id'] = ['gt', 0];
 // 		if ($key && $key !== "") {
 // 			$map['name|mobile'] = $key;
 // 		}
-// 		$map['reg_type'] = $reg_type;
+// 		$map['reg_type'] = $regType;
 // 		$member          = new MerchantModel();
-// 		$Nowpage         = input('get.page') ? input('get.page') : 1;
+// 		$nowPage         = input('get.page') ? input('get.page') : 1;
 // 		$limits          = config('list_rows');       // 获取总条数
 // 		$count           = $member->getAllCount($map);//计算总页面
-// 		$allpage         = intval(ceil($count / $limits));
-// 		$lists           = $member->getMerchantByWhere($map, $Nowpage, $limits);
+// 		$allPage         = intval(ceil($count / $limits));
+// 		$lists           = $member->getMerchantByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => &$v) {
 // 			$v['addtime'] = getTime($v['addtime']);
 // 			$v['parent']  = $member->where('id', $v['pid'])->value('name');
 // 		}
-// 		$this->assign('Nowpage', $Nowpage); //当前页
-// 		$this->assign('allpage', $allpage); //总页数
+// 		$this->assign('Nowpage', $nowPage); //当前页
+// 		$this->assign('allpage', $allPage); //总页数
 // 		$this->assign('val', $key);
-// 		$this->assign('reg_type', $reg_type);
+// 		$this->assign('reg_type', $regType);
 // 		if (input('get.page')) {
 // 			return json($lists);
 // 		}
@@ -48,16 +48,16 @@
 // 			$map['uid'] = $uid;
 // 		}
 // 		$member  = new MerchantModel();
-// 		$Nowpage = input('get.page') ? input('get.page') : 1;
+// 		$nowPage = input('get.page') ? input('get.page') : 1;
 // 		$limits  = config('list_rows');            // 获取总条数
 // 		$count   = $member->getAllCountAgent($map);//计算总页面
-// 		$allpage = intval(ceil($count / $limits));
-// 		$lists   = $member->getRewardByWhere($map, $Nowpage, $limits);
+// 		$allPage = intval(ceil($count / $limits));
+// 		$lists   = $member->getRewardByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => $v) {
 // 			$lists[$k]['create_time'] = date("Y-m-d H:i:s", $v['create_time']);
 // 		}
-// 		$this->assign('Nowpage', $Nowpage); //当前页
-// 		$this->assign('allpage', $allpage); //总页数
+// 		$this->assign('Nowpage', $nowPage); //当前页
+// 		$this->assign('allpage', $allPage); //总页数
 // 		$this->assign('val', $key);
 // 		if (input('get.page')) {
 // 			return json($lists);
@@ -73,16 +73,16 @@
 // 			$map['uid'] = $uid;
 // 		}
 // 		$member  = new MerchantModel();
-// 		$Nowpage = input('get.page') ? input('get.page') : 1;
+// 		$nowPage = input('get.page') ? input('get.page') : 1;
 // 		$limits  = config('list_rows');            // 获取总条数
 // 		$count   = $member->getAllCountAgent($map);//计算总页面
-// 		$allpage = intval(ceil($count / $limits));
-// 		$lists   = $member->getTraderRewardByWhere($map, $Nowpage, $limits);
+// 		$allPage = intval(ceil($count / $limits));
+// 		$lists   = $member->getTraderRewardByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => $v) {
 // 			$lists[$k]['create_time'] = date("Y-m-d H:i:s", $v['create_time']);
 // 		}
-// 		$this->assign('Nowpage', $Nowpage); //当前页
-// 		$this->assign('allpage', $allpage); //总页数
+// 		$this->assign('Nowpage', $nowPage); //当前页
+// 		$this->assign('allpage', $allPage); //总页数
 // 		$this->assign('val', $key);
 // 		if (input('get.page')) {
 // 			return json($lists);
@@ -97,16 +97,16 @@
 // 			$map['name|mobile'] = $id;
 // 		}
 // 		$member  = new MerchantModel();
-// 		$Nowpage = input('get.page') ? input('get.page') : 1;
+// 		$nowPage = input('get.page') ? input('get.page') : 1;
 // 		$limits  = config('list_rows');           // 获取总条数
 // 		$count   = $member->getAllCountUsdt($map);//计算总页面
-// 		$allpage = intval(ceil($count / $limits));
-// 		$lists   = $member->getUsdtByWhere($map, $Nowpage, $limits);
+// 		$allPage = intval(ceil($count / $limits));
+// 		$lists   = $member->getUsdtByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => $v) {
 // 			$lists[$k]['create_time'] = date("Y-m-d H:i:s", $v['create_time']);
 // 		}
-// 		$this->assign('Nowpage', $Nowpage); //当前页
-// 		$this->assign('allpage', $allpage); //总页数
+// 		$this->assign('Nowpage', $nowPage); //当前页
+// 		$this->assign('allpage', $allPage); //总页数
 // 		$this->assign('val', $key);
 // 		if (input('get.page')) {
 // 			return json($lists);
@@ -121,16 +121,16 @@
 // 			$map['name|mobile'] = $id;
 // 		}
 // 		$member  = new MerchantModel();
-// 		$Nowpage = input('get.page') ? input('get.page') : 1;
+// 		$nowPage = input('get.page') ? input('get.page') : 1;
 // 		$limits  = config('list_rows');           // 获取总条数
 // 		$count   = $member->getAllCountUsdt($map);//计算总页面
-// 		$allpage = intval(ceil($count / $limits));
-// 		$lists   = $member->getUsdtByWhere($map, $Nowpage, $limits);
+// 		$allPage = intval(ceil($count / $limits));
+// 		$lists   = $member->getUsdtByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => $v) {
 // 			$lists[$k]['create_time'] = date("Y-m-d H:i:s", $v['create_time']);
 // 		}
-// 		$this->assign('Nowpage', $Nowpage); //当前页
-// 		$this->assign('allpage', $allpage); //总页数
+// 		$this->assign('Nowpage', $nowPage); //当前页
+// 		$this->assign('allpage', $allPage); //总页数
 // 		$this->assign('val', $key);
 // 		if (input('get.page')) {
 // 			return json($lists);
@@ -227,12 +227,12 @@
 // 			return json(['code' => $flag['code'], 'data' => $flag['data'], 'msg' => $flag['msg']]);
 // 		}
 // 		$id       = input('param.id');
-// 		$reg_type = input('param.reg_type');
+// 		$regType = input('param.reg_type');
 // 		$minfo    = $member->getOneByWhere($id, 'id');
-// 		$pptrader = explode(',', $minfo['pptrader']);
+// 		$matchTrader = explode(',', $minfo['pptrader']);
 // 		$traders  = $member->field('id, name')->where('trader_check', 1)->order('id asc')->select();
 // 		foreach ($traders as $k => &$v) {
-// 			if (in_array($v['id'], $pptrader)) {
+// 			if (in_array($v['id'], $matchTrader)) {
 // 				$v['ispp'] = 1;
 // 			} else {
 // 				$v['ispp'] = 0;
@@ -241,7 +241,7 @@
 // 		$this->assign([
 // 			'merchant' => $minfo,
 // 			'traders'  => $traders,
-// 			'reg_type' => $reg_type
+// 			'reg_type' => $regType
 // 		]);
 // 		return $this->fetch();
 // 	}
@@ -262,17 +262,17 @@
 // 			$map['merchant_id']   = $id;
 // 		}
 // 		$member  = new TibiModel();
-// 		$Nowpage = input('get.page') ? input('get.page') : 1;
+// 		$nowPage = input('get.page') ? input('get.page') : 1;
 // 		$limits  = config('list_rows');       // 获取总条数
 // 		$count   = $member->getAllCount($map);//计算总页面
-// 		$allpage = intval(ceil($count / $limits));
-// 		$lists   = $member->getTibiByWhere($map, $Nowpage, $limits);
+// 		$allPage = intval(ceil($count / $limits));
+// 		$lists   = $member->getTibiByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => &$v) {
 // 			$v['addtime'] = getTime($v['addtime']);
 // 			$v['endtime'] = getTime($v['endtime']);
 // 		}
-// 		$this->assign('Nowpage', $Nowpage); //当前页
-// 		$this->assign('allpage', $allpage); //总页数
+// 		$this->assign('Nowpage', $nowPage); //当前页
+// 		$this->assign('allpage', $allPage); //总页数
 // 		$this->assign('val', $key);
 // 		if (input('get.page')) {
 // 			return json($lists);
@@ -397,12 +397,12 @@
 // 			$id                   = Db::name('merchant')->where($where)->value('id');
 // 			$map['merchant_id']   = $id;
 // 		}
-// 		$Nowpage = input('get.page') ? input('get.page') : 1;
+// 		$nowPage = input('get.page') ? input('get.page') : 1;
 // 		$limits  = config('list_rows');// 获取总条数
 // 		if ($type == 2) {
 // 			$count   = Db::name('merchant')->where('usdtb', 'exp', 'is not Null')->count();
-// 			$allpage = intval(ceil($count / $limits));
-// 			$lists   = Db::name('merchant')->where('usdtb', 'exp', 'is not Null')->page($Nowpage, $limits)->order('id desc')->select();
+// 			$allPage = intval(ceil($count / $limits));
+// 			$lists   = Db::name('merchant')->where('usdtb', 'exp', 'is not Null')->page($nowPage, $limits)->order('id desc')->select();
 // 			foreach ($lists as $k => &$v) {
 // 				$v['addtime']  = getTime($v['addtime']);
 // 				$v['username'] = $v['name'];
@@ -411,14 +411,14 @@
 // 		} else {
 // 			$member  = new AddressModel();
 // 			$count   = $member->getAllCount($map);//计算总页面
-// 			$allpage = intval(ceil($count / $limits));
-// 			$lists   = $member->getAddressByWhere($map, $Nowpage, $limits);
+// 			$allPage = intval(ceil($count / $limits));
+// 			$lists   = $member->getAddressByWhere($map, $nowPage, $limits);
 // 			foreach ($lists as $k => &$v) {
 // 				$v['addtime'] = getTime($v['addtime']);
 // 			}
 // 		}
-// 		$this->assign('Nowpage', $Nowpage); //当前页
-// 		$this->assign('allpage', $allpage); //总页数
+// 		$this->assign('Nowpage', $nowPage); //当前页
+// 		$this->assign('allpage', $allPage); //总页数
 // 		$this->assign('val', $key);
 // 		$this->assign('type', $type);
 // 		if (input('get.page')) {
@@ -444,16 +444,16 @@
 // 			$map['think_merchant_user_withdraw.status'] = $status - 1;
 // 		}
 // 		$member  = new WithdrawModel();
-// 		$Nowpage = input('get.page') ? input('get.page') : 1;
+// 		$nowPage = input('get.page') ? input('get.page') : 1;
 // 		$limits  = config('list_rows');       // 获取总条数
 // 		$count   = $member->getAllCount($map);//计算总页面
-// 		$allpage = intval(ceil($count / $limits));
-// 		$lists   = $member->getWithdrawByWhere($map, $Nowpage, $limits);
+// 		$allPage = intval(ceil($count / $limits));
+// 		$lists   = $member->getWithdrawByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => &$v) {
 // 			$v['addtime'] = getTime($v['addtime']);
 // 		}
-// 		$this->assign('Nowpage', $Nowpage); //当前页
-// 		$this->assign('allpage', $allpage); //总页数
+// 		$this->assign('Nowpage', $nowPage); //当前页
+// 		$this->assign('allpage', $allPage); //总页数
 // 		$this->assign('val', $key);
 // 		$this->assign('valuser', $keyuser);
 // 		$this->assign('status', $status);
@@ -591,16 +591,16 @@
 // 			$map['think_merchant_user_recharge.status'] = $status;
 // 		}
 // 		$member  = new RechargeModel();
-// 		$Nowpage = input('get.page') ? input('get.page') : 1;
+// 		$nowPage = input('get.page') ? input('get.page') : 1;
 // 		$limits  = config('list_rows');       // 获取总条数
 // 		$count   = $member->getAllCount($map);//计算总页面
-// 		$allpage = intval(ceil($count / $limits));
-// 		$lists   = $member->getRechargeByWhere($map, $Nowpage, $limits);
+// 		$allPage = intval(ceil($count / $limits));
+// 		$lists   = $member->getRechargeByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => &$v) {
 // 			$v['addtime'] = getTime($v['addtime']);
 // 		}
-// 		$this->assign('Nowpage', $Nowpage); //当前页
-// 		$this->assign('allpage', $allpage); //总页数
+// 		$this->assign('Nowpage', $nowPage); //当前页
+// 		$this->assign('allpage', $allPage); //总页数
 // 		$this->assign('val', $key);
 // 		$this->assign('valuser', $keyuser);
 // 		$this->assign('status', $status);
@@ -624,16 +624,16 @@
 // 			$map['think_merchant_recharge.status'] = $status - 1;
 // 		}
 // 		$member  = new MerchantModel();
-// 		$Nowpage = input('get.page') ? input('get.page') : 1;
+// 		$nowPage = input('get.page') ? input('get.page') : 1;
 // 		$limits  = config('list_rows');         // 获取总条数
 // 		$count   = $member->getAllCountTr($map);//计算总页面
-// 		$allpage = intval(ceil($count / $limits));
-// 		$lists   = $member->getTraderRechargeByWhere($map, $Nowpage, $limits);
+// 		$allPage = intval(ceil($count / $limits));
+// 		$lists   = $member->getTraderRechargeByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => $v) {
 // 			$lists[$k]['addtime'] = date("Y-m-d H:i:s", $v['addtime']);
 // 		}
-// 		$this->assign('Nowpage', $Nowpage); //当前页
-// 		$this->assign('allpage', $allpage); //总页数
+// 		$this->assign('Nowpage', $nowPage); //当前页
+// 		$this->assign('allpage', $allPage); //总页数
 // 		$this->assign('val', $key);
 // 		$this->assign('status', $status);
 // 		if (input('get.page')) {
@@ -656,11 +656,11 @@
 // 			$map['think_ad_sell.state'] = $status;
 // 		}
 // 		$member  = new MerchantModel();
-// 		$Nowpage = input('get.page') ? input('get.page') : 1;
+// 		$nowPage = input('get.page') ? input('get.page') : 1;
 // 		$limits  = config('list_rows');         // 获取总条数
 // 		$count   = $member->getAllCountAd($map);//计算总页面
-// 		$allpage = intval(ceil($count / $limits));
-// 		$lists   = $member->getAdByWhere($map, $Nowpage, $limits);
+// 		$allPage = intval(ceil($count / $limits));
+// 		$lists   = $member->getAdByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => $v) {
 // 			$lists[$k]['add_time'] = date("Y-m-d H:i:s", $v['add_time']);
 // 			$temp                  = explode(',', $v['pay_method']);
@@ -680,8 +680,8 @@
 // 			$lists[$k]['remain'] = $v['amount'] - $lists[$k]['deal'];
 // 			$lists[$k]['payway'] = $str;
 // 		}
-// 		$this->assign('Nowpage', $Nowpage); //当前页
-// 		$this->assign('allpage', $allpage); //总页数
+// 		$this->assign('Nowpage', $nowPage); //当前页
+// 		$this->assign('allpage', $allPage); //总页数
 // 		$this->assign('val', $key);
 // 		$this->assign('status', $status);
 // 		if (input('get.page')) {
@@ -704,11 +704,11 @@
 // 			$map['think_ad_sell.state'] = $status;
 // 		}
 // 		$member  = new MerchantModel();
-// 		$Nowpage = input('get.page') ? input('get.page') : 1;
+// 		$nowPage = input('get.page') ? input('get.page') : 1;
 // 		$limits  = config('list_rows');            // 获取总条数
 // 		$count   = $member->getAllCountAdBuy($map);//计算总页面
-// 		$allpage = intval(ceil($count / $limits));
-// 		$lists   = $member->getAdBuyByWhere($map, $Nowpage, $limits);
+// 		$allPage = intval(ceil($count / $limits));
+// 		$lists   = $member->getAdBuyByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => $v) {
 // 			$lists[$k]['add_time'] = date("Y-m-d H:i:s", $v['add_time']);
 // 			$temp                  = explode(',', $v['pay_method']);
@@ -728,8 +728,8 @@
 // 			$lists[$k]['remain'] = $v['amount'] - $lists[$k]['deal'];
 // 			$lists[$k]['payway'] = $str;
 // 		}
-// 		$this->assign('Nowpage', $Nowpage); //当前页
-// 		$this->assign('allpage', $allpage); //总页数
+// 		$this->assign('Nowpage', $nowPage); //当前页
+// 		$this->assign('allpage', $allPage); //总页数
 // 		$this->assign('val', $key);
 // 		$this->assign('status', $status);
 // 		if (input('get.page')) {
@@ -891,17 +891,17 @@
 // 			$map['think_order_buy.status'] = $status - 1;
 // 		}
 // 		$member  = new MerchantModel();
-// 		$Nowpage = input('get.page') ? input('get.page') : 1;
+// 		$nowPage = input('get.page') ? input('get.page') : 1;
 // 		$limits  = config('list_rows');            // 获取总条数
 // 		$count   = $member->getAllCountOrder($map);//计算总页面
-// 		$allpage = intval(ceil($count / $limits));
-// 		$lists   = $member->getOrderByWhere($map, $Nowpage, $limits);
+// 		$allPage = intval(ceil($count / $limits));
+// 		$lists   = $member->getOrderByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => $v) {
 // 			$lists[$k]['ctime']         = date("Y-m-d H:i:s", $v['ctime']);
 // 			$lists[$k]['finished_time'] = date("Y-m-d H:i:s", $v['finished_time']);
 // 		}
-// 		$this->assign('Nowpage', $Nowpage); //当前页
-// 		$this->assign('allpage', $allpage); //总页数
+// 		$this->assign('Nowpage', $nowPage); //当前页
+// 		$this->assign('allpage', $allPage); //总页数
 // 		$this->assign('val', $key);
 // 		$this->assign('status', $status);
 // 		if (input('get.page')) {
@@ -914,9 +914,9 @@
 // 		$key                        = input('key');
 // 		$status                     = input('status');
 // 		$map['think_order_sell.id'] = ['gt', 0];
-// 		$reg_type                   = input('reg_type', 0);
-// 		if ($reg_type) {
-// 			$map['c.reg_type'] = $reg_type;
+// 		$regType                   = input('reg_type', 0);
+// 		if ($regType) {
+// 			$map['c.reg_type'] = $regType;
 // 		}
 // 		if ($key && $key !== "") {
 // 			$where['name|mobile'] = $key;
@@ -927,20 +927,20 @@
 // 			$map['think_order_sell.status'] = $status - 1;
 // 		}
 // 		$member  = new MerchantModel();
-// 		$Nowpage = input('get.page') ? input('get.page') : 1;
+// 		$nowPage = input('get.page') ? input('get.page') : 1;
 // 		$limits  = config('list_rows');               // 获取总条数
 // 		$count   = $member->getAllCountOrderBuy($map);//计算总页面
-// 		$allpage = intval(ceil($count / $limits));
-// 		$lists   = $member->getOrderBuyByWhere($map, $Nowpage, $limits);
+// 		$allPage = intval(ceil($count / $limits));
+// 		$lists   = $member->getOrderBuyByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => $v) {
 // 			$lists[$k]['ctime']         = date("Y-m-d H:i:s", $v['ctime']);
 // 			$lists[$k]['finished_time'] = date("Y-m-d H:i:s", $v['finished_time']);
 // 		}
-// 		$this->assign('Nowpage', $Nowpage); //当前页
-// 		$this->assign('allpage', $allpage); //总页数
+// 		$this->assign('Nowpage', $nowPage); //当前页
+// 		$this->assign('allpage', $allPage); //总页数
 // 		$this->assign('val', $key);
 // 		$this->assign('status', $status);
-// 		$this->assign('reg_type', $reg_type);
+// 		$this->assign('reg_type', $regType);
 // 		if (input('get.page')) {
 // 			return json($lists);
 // 		}
@@ -1222,16 +1222,16 @@
 // 			$auto->statistics();
 // 		}
 // 		$member  = new MerchantModel();
-// 		$Nowpage = input('get.page') ? input('get.page') : 1;
+// 		$nowPage = input('get.page') ? input('get.page') : 1;
 // 		$limits  = config('list_rows');             // 获取总条数
 // 		$count   = $member->getAllCountStatistics();//计算总页面
-// 		$allpage = intval(ceil($count / $limits));
-// 		$lists   = $member->getStatistics($map, $Nowpage, $limits);
+// 		$allPage = intval(ceil($count / $limits));
+// 		$lists   = $member->getStatistics($map, $nowPage, $limits);
 // 		foreach ($lists as $k => $v) {
 // 			$lists[$k]['create_time'] = date("Y-m-d H:i:s", $v['create_time']);
 // 		}
-// 		$this->assign('Nowpage', $Nowpage); //当前页
-// 		$this->assign('allpage', $allpage); //总页数
+// 		$this->assign('Nowpage', $nowPage); //当前页
+// 		$this->assign('allpage', $allPage); //总页数
 // 		if (input('get.page')) {
 // 			return json($lists);
 // 		}
@@ -1251,13 +1251,13 @@
 // 			$order['id'] = 'desc';
 // 		}
 // 		$member  = new MerchantModel();
-// 		$Nowpage = input('get.page') ? input('get.page') : 1;
+// 		$nowPage = input('get.page') ? input('get.page') : 1;
 // 		$limits  = config('list_rows');       // 获取总条数
 // 		$count   = $member->getAllCount($map);//计算总页面
-// 		$allpage = intval(ceil($count / $limits));
-// 		$lists   = $member->getMerchantStatistics($map, $Nowpage, $limits, $order);
-// 		$this->assign('Nowpage', $Nowpage); //当前页
-// 		$this->assign('allpage', $allpage); //总页数
+// 		$allPage = intval(ceil($count / $limits));
+// 		$lists   = $member->getMerchantStatistics($map, $nowPage, $limits, $order);
+// 		$this->assign('Nowpage', $nowPage); //当前页
+// 		$this->assign('allpage', $allPage); //总页数
 // 		$this->assign('val', $key);
 // 		$this->assign('order', $order2);
 // 		if (input('get.page')) {

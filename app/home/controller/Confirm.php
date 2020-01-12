@@ -146,9 +146,9 @@ class Confirm extends Base {
 					if ($rs1 && $rs2 && $rs3 && $rs4 && $rs6 && $rs7 && $rs8 && $rs9 && $rs10 && $rs11) {
 						// 提交事务
 						Db::commit();
-						financelog($orderInfo['buy_id'], $mum, '买入USDT_f1', 0, $order['buy_username']);//添加日志
+						financeLog($orderInfo['buy_id'], $mum, '买入USDT_f1', 0, $order['buy_username']);//添加日志
 						if ($traderMoney > 0) {
-							financelog($orderInfo['sell_id'], $traderMoney, '承兑商卖单奖励_f1', 0, $order['buy_username']);//添加日志
+							financeLog($orderInfo['sell_id'], $traderMoney, '承兑商卖单奖励_f1', 0, $order['buy_username']);//添加日志
 						}
 						getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $orderInfo['deal_num']);
 						//请求回调接口

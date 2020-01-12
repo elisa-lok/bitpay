@@ -10,8 +10,8 @@ class MemberModel extends Model {
 	/**
 	 * 根据搜索条件获取用户列表信息
 	 */
-	public function getMemberByWhere($map, $Nowpage, $limits) {
-		return $this->field('think_member.*,group_name')->join('think_member_group', 'think_member.group_id = think_member_group.id')->where($map)->page($Nowpage, $limits)->order('id desc')->select();
+	public function getMemberByWhere($map, $nowPage, $limits) {
+		return $this->field('think_member.*,group_name')->join('think_member_group', 'think_member.group_id = think_member_group.id')->where($map)->page($nowPage, $limits)->order('id desc')->select();
 	}
 
 	/**

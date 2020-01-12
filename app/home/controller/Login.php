@@ -9,8 +9,8 @@ use think\db;
 class Login extends Base {
 	public function register() {
 		if (request()->isPost()) {
-			$reg_type = input('post.reg_type');
-			!$reg_type && $this->error('请选择注册类型');
+			$regType = input('post.reg_type');
+			!$regType && $this->error('请选择注册类型');
 			$name       = input('post.username');
 			$idCard     = input('post.idcard');
 			$mobile     = input('post.mobile');
@@ -57,16 +57,16 @@ class Login extends Base {
 			if ($payPsw != $repayPsw) {
 				$this->error('交易确认密码错误');
 			}
-			$invite_code = input('post.invite_code');
+			$inviteCode = input('post.invite_code');
 			$pid         = 0;
-			if (!$invite_code) {
-				$invite_code = session('invite');
+			if (!$inviteCode) {
+				$inviteCode = session('invite');
 			}
-			if (empty($invite_code) && config('reg_invite_on') == 1) {
+			if (empty($inviteCode) && config('reg_invite_on') == 1) {
 				$this->error('注册失败：邀请码必填');
 			}
-			if ($invite_code) {
-				$puser = Db::name('merchant')->where('invite', $invite_code)->find();
+			if ($inviteCode) {
+				$puser = Db::name('merchant')->where('invite', $inviteCode)->find();
 				if ($puser) {
 					$pid = $puser['id'];
 				}
@@ -119,7 +119,7 @@ class Login extends Base {
 			$param['appid']    = $appId;
 			$param['key']      = $key;
 			$param['addtime']  = time();
-			$param['reg_type'] = $reg_type;
+			$param['reg_type'] = $regType;
 			$return            = $model->insertOne($param);
 			($return['code'] == 1) ? $this->success($return['msg'], '/login.html') : $this->error($return['msg']);
 		}

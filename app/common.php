@@ -494,7 +494,7 @@ function checkName($name) {
 	return $ret;
 }
 
-function financelog($uid, $amount, $note, $status, $op) {
+function financeLog($uid, $amount, $note, $status, $op) {
 	$user = Db::name('merchant')->where('id', $uid)->find();
 	$rs   = Db::name('financelog')->insert(['uid' => $uid, 'user' => $user['name'], 'note' => $note, 'amount' => $amount, 'status' => $status, 'add_time' => time(), 'op' => $op]);
 	return $rs ? $rs : '记录失败';

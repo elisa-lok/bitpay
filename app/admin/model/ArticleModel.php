@@ -11,8 +11,8 @@ class ArticleModel extends Model {
 	 * 根据搜索条件获取用户列表信息
 	 * @author [Max] [864491238@qq.com]
 	 */
-	public function getArticleByWhere($map, $Nowpage, $limits) {
-		return $this->field('think_article.*,name')->join('think_article_cate', 'think_article.cate_id = think_article_cate.id')->where($map)->page($Nowpage, $limits)->order('id desc')->select();
+	public function getArticleByWhere($map, $nowPage, $limits) {
+		return $this->field('think_article.*,name')->join('think_article_cate', 'think_article.cate_id = think_article_cate.id')->where($map)->page($nowPage, $limits)->order('id desc')->select();
 	}
 
 	/**

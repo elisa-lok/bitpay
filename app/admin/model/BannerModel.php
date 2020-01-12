@@ -8,11 +8,11 @@ class BannerModel extends Model {
 	/**
 	 * 根据条件获取列表信息
 	 * @param $where
-	 * @param $Nowpage
+	 * @param $nowPage
 	 * @param $limits
 	 */
-	public function getAdAll($map, $Nowpage, $limits) {
-		return $this->field('think_banner.*,name')->join('think_banner_position', 'think_banner.ad_position_id = think_banner_position.id')->where($map)->page($Nowpage, $limits)->order('orderby desc')->select();
+	public function getAdAll($map, $nowPage, $limits) {
+		return $this->field('think_banner.*,name')->join('think_banner_position', 'think_banner.ad_position_id = think_banner_position.id')->where($map)->page($nowPage, $limits)->order('orderby desc')->select();
 	}
 
 	/**

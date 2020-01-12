@@ -11,8 +11,8 @@ class BannerPositionModel extends Model {
 	 * [getAll 根据条件获取全部数据]
 	 * @author [Max] [864491238@qq.com]
 	 */
-	public function getAll($nowpage, $limits) {
-		return $this->page($nowpage, $limits)->order('id asc')->select();
+	public function getAll($nowPage, $limits) {
+		return $this->page($nowPage, $limits)->order('id asc')->select();
 	}
 
 	/**

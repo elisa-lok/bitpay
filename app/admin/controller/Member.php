@@ -17,13 +17,13 @@ class Member extends Base {
 			$map['group_name'] = ['like', "%" . $key . "%"];
 		}
 		$group   = new MemberGroupModel();
-		$Nowpage = input('get.page') ? input('get.page') : 1;
+		$nowPage = input('get.page') ? input('get.page') : 1;
 		$limits  = config('list_rows');
 		$count   = $group->getAllCount($map);         //获取总条数
-		$allpage = intval(ceil($count / $limits));    //计算总页面
-		$lists   = $group->getAll($map, $Nowpage, $limits);
-		$this->assign('Nowpage', $Nowpage); //当前页
-		$this->assign('allpage', $allpage); //总页数
+		$allPage = intval(ceil($count / $limits));    //计算总页面
+		$lists   = $group->getAll($map, $nowPage, $limits);
+		$this->assign('Nowpage', $nowPage); //当前页
+		$this->assign('allpage', $allPage); //总页数
 		$this->assign('val', $key);
 		if (input('get.page')) {
 			return json($lists);
@@ -102,13 +102,13 @@ class Member extends Base {
 			$map['account|nickname|mobile'] = ['like', "%" . $key . "%"];
 		}
 		$member  = new MemberModel();
-		$Nowpage = input('get.page') ? input('get.page') : 1;
+		$nowPage = input('get.page') ? input('get.page') : 1;
 		$limits  = config('list_rows');       // 获取总条数
 		$count   = $member->getAllCount($map);//计算总页面
-		$allpage = intval(ceil($count / $limits));
-		$lists   = $member->getMemberByWhere($map, $Nowpage, $limits);
-		$this->assign('Nowpage', $Nowpage); //当前页
-		$this->assign('allpage', $allpage); //总页数
+		$allPage = intval(ceil($count / $limits));
+		$lists   = $member->getMemberByWhere($map, $nowPage, $limits);
+		$this->assign('Nowpage', $nowPage); //当前页
+		$this->assign('allpage', $allPage); //总页数
 		$this->assign('val', $key);
 		if (input('get.page')) {
 			return json($lists);

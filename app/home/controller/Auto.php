@@ -85,7 +85,7 @@ class Auto extends Base {
 										$rs2 = Db::name('merchant_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 1, 'confirmations' => $v2['confirmations']]);
 										//增加充值数量统计，不算手续费
 										Db::name('merchant')->where(['id' => $useradd['uid']])->setInc('recharge_amount', $num);
-										financelog($useradd['uid'], ($num - $sfee), 'USDT充值到账_1', 0, '系统自动');//添加日志
+										financeLog($useradd['uid'], ($num - $sfee), 'USDT充值到账_1', 0, '系统自动');//添加日志
 										if ($pid && $sfee && $feeMy) {
 											$feeMy = round($feeMy * $sfee / 100, 8);
 											$rsArr = agentReward($pid, $useradd['uid'], $feeMy, 2);
@@ -113,7 +113,7 @@ class Auto extends Base {
 										]);
 										//增加充值数量统计，不算手续费
 										Db::name('merchant')->where(['id' => $useradd['uid']])->setInc('recharge_amount', $num);
-										// financelog($useradd['uid'],($num - $sfee),'USDT充值_1',0);//添加日志
+										// financeLog($useradd['uid'],($num - $sfee),'USDT充值_1',0);//添加日志
 										if ($pid && $sfee && $feeMy) {
 											$feeMy = round($feeMy * $sfee / 100, 8);
 											$rsArr = agentReward($pid, $useradd['uid'], $feeMy, 2);
@@ -217,7 +217,7 @@ class Auto extends Base {
 							$rs2 = Db::name('merchant_user_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 1, 'confirmations' => $v2['confirmations']]);
 							//增加充值数量统计，不算手续费
 							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
-							financelog($v['merchant_id'], ($v2['amount'] - $sfee), '盘口提币到账_1', 0, '系统自动');//添加日志
+							financeLog($v['merchant_id'], ($v2['amount'] - $sfee), '盘口提币到账_1', 0, '系统自动');//添加日志
 							if ($pid && $sfee && $feeMy) {
 								$feeMy = round($feeMy * $sfee / 100, 8);
 								$rsArr = agentReward($pid, $v['merchant_id'], $feeMy, 2);
@@ -245,7 +245,7 @@ class Auto extends Base {
 							]);
 							//增加充值数量统计，不算手续费
 							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
-							financelog($v['merchant_id'], ($v2['amount'] - $sfee), 'USDT充值_1', 0, '系统自动');//添加日志
+							financeLog($v['merchant_id'], ($v2['amount'] - $sfee), 'USDT充值_1', 0, '系统自动');//添加日志
 							if ($pid && $sfee && $feeMy) {
 								$feeMy = round($feeMy * $sfee / 100, 8);
 								$rsArr = agentReward($pid, $v['merchant_id'], $feeMy, 2);
@@ -357,7 +357,7 @@ class Auto extends Base {
 							$rs2 = Db::name('merchant_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 1, 'confirmations' => $v2['confirmations']]);
 							//增加充值数量统计，不算手续费
 							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
-							financelog($v['merchant_id'], ($v2['amount'] - $sfee), 'USDT充值_1', 0, '系统自动');//添加日志
+							financeLog($v['merchant_id'], ($v2['amount'] - $sfee), 'USDT充值_1', 0, '系统自动');//添加日志
 						}
 						if (!$valid && $res['status'] != 5) {
 							$rs1 = TRUE;
@@ -381,7 +381,7 @@ class Auto extends Base {
 							]);
 							//增加充值数量统计，不算手续费
 							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
-							financelog($v['merchant_id'], ($v2['amount'] - $sfee), 'USDT充值_1', 0, '系统自动');//添加日志
+							financeLog($v['merchant_id'], ($v2['amount'] - $sfee), 'USDT充值_1', 0, '系统自动');//添加日志
 						} else {
 							$rs1 = TRUE;
 							$rs2 = Db::name('merchant_recharge')->insert([
