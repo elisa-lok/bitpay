@@ -123,38 +123,6 @@
 
     <!-- sidebar: style can be found in sidebar.less -->
     <div class="slimScrollDiv" style="position: relative; overflow: hidden; width: auto; height: 656px;"><section class="sidebar" style="height: 656px; overflow: hidden; width: auto;">
-
-        <!-- Sidebar user panel (optional) -->
-        <div class="user-panel" style="height: 80px;">
-            <div class="pull-left image">
-                <img src="{empty name='Think.session.user.headpic'}__IMG__/user2-160x160.jpg{else/}/Uploads/face/{$Think.session.user.headpic}{/empty}" class="img-circle" alt="User Image">
-            </div>
-            <div class="pull-left info">
-                <p>{$Think.session.user['name']}</p>
-                <!-- Status -->
-              <i class="fa fa-circle text-success"></i>
-          {if condition="$Think.session.user.reg_type eq 1 and $Think.session.user.reg_check eq 1"}
-        商户
-        {elseif condition="$Think.session.user.reg_type eq 2 and $Think.session.user.trader_check eq 1"/}
-        承兑商
-        {elseif condition="$Think.session.user.reg_type eq 3 and $Think.session.user.agent_check eq 1"/}
-        代理商
-        {/if}
-            </div>
-        </div>
-
-        <!-- search form (Optional) -->
-        <!--<form action="#" method="get" class="sidebar-form">
-            <div class="input-group">
-                <input type="text" name="q" class="form-control" placeholder="Search...">
-              <span class="input-group-btn">
-                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-                </button>
-              </span>
-            </div>
-        </form>-->
-        <!-- /.search form -->
-
         <!-- Sidebar Menu -->
         {if condition="$Think.session.user.reg_type eq 1 and $Think.session.user.reg_check eq 1"}
         {include file="Public:menu_merchant"/}
