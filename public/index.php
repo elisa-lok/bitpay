@@ -1,6 +1,6 @@
 <?php
 // 定义应用目录
-const APP_PATH     = __DIR__ . '/../application/';
+const APP_PATH     = __DIR__ . '/../app/';
 const UPLOAD_PATH  = __DIR__ . '/../public';   // 定义上传目录
 const RUNTIME_PATH = __DIR__ . '/../runtime/'; // 定义应用缓存目录
 const APP_DEBUG    = FALSE;                    // 开启调试模式
@@ -12,4 +12,4 @@ if (APP_DEBUG) {
 	error_reporting(-1);
 }
 // 加载框架引导文件
-require __DIR__ . '/../thinkphp/start.php';
+require __DIR__ . '/../vendor/thinkphp/start.php';

@@ -1,0 +1,19 @@
+<div style="padding:10px;"><div style="text-align:center;"><label>支付金额</label>：<font color="red" style="font-weight:bold;">{$order.deal_amount}</font></div>
+{php}
+                    	$str = $order['getpaymethod'];
+                    	$arr = explode(',', $str);
+                    	$wimg = $merchant['c_wechat_img'];
+                    	$aimg = $merchant['c_alipay_img'];
+                    	if(in_array(4, $arr) && $merchant['c_wechat_img']){
+                    		echo '<div style="margin-top:10px;text-align:center;"><lable style="display:inline-block;width:20%;">微信支付：</lable><img src="/uploads/face/'.$merchant['c_wechat_img'].'" style="width:200px;height:200px;"/></div></div>';
+                    	}else{
+                    	}
+                    	if(in_array(2, $arr) && $merchant['c_bank_card']){
+                    		echo '<div style="margin-top:10px;text-align:center;"><lable style="display:inline-block;width:20%;">银行转账：</lable><div style="display:inline-block;"><p style="margin:0;text-align:left;"><label style="">姓名</label>：'.$merchant['name'].'</p><p style="margin:0;text-align:left;"><label style="margin:0;text-align:left;">开户银行</label>：'.$merchant['c_bank'].'</p><p style="margin:0;text-align:left;"><label style="">开户地址</label>：'.$merchant['c_bank_detail'].'</p><p style="margin:0;"><label style="margin:0;text-align:left;">银行卡号</label>：'.$merchant['c_bank_card'].'</p> </div></div>';
+                    	}else{
+                    	}
+                    	if(in_array(3, $arr) && $merchant['c_alipay_img']){
+                    		echo '<div style="margin-top:10px;text-align:center;"><lable style="display:inline-block;width:20%;">支付宝：</lable><img src="/uploads/face/'.$merchant['c_alipay_img'].'" style="width:200px;height:200px;"/></div></div>';
+                    	}else{
+                    	}
+                    	{/php}
