@@ -2657,7 +2657,7 @@ class Merchant extends Base {
 			//20190830修改,不打款,也可以确认
 			$unpay = ($orderInfo['status'] == 0) ? 1 : 0;
 			// $this->error('此订单对方已经拍下还未付款');
-			($orderInfo['status'] >= 3) && $this->error('此订单已经释放无需再次释放');
+			($orderInfo['status'] >= 3) && $this->error('此订单已处理,无需再次处理');
 			$seller = $mchModel->where('id', $this->uid)->find();
 			$buyer  = $mchModel->where('id', $orderInfo['buy_id'])->find();
 			($seller['usdtd'] < $orderInfo['deal_num']) && $this->error('您的冻结不足，交易失败');

@@ -1,13 +1,7 @@
 {include file="Public:header_new"}
-<style>
-	.cards-item { border: 1px dashed #cccccc; padding: 10px; margin-bottom: 5px; background: #fbfbfb; }
-	.cards-item .form-group { width: 80%; margin-bottom: 5px; }
-	.cards-item .btn-remove { float: right; border: 1px solid #cccccc; padding: 5px; border-radius: 2px;}
-</style>
+<style> .cards-item{ border:1px dashed #cccccc; padding:10px; margin-bottom:5px; background:#fbfbfb; }  .cards-item .form-group{ width:80%; margin-bottom:5px; }  .cards-item .btn-remove{ float:right; border:1px solid #cccccc; padding:5px; border-radius:2px;}</style>
 <div class="content-wrapper" id="pjax-container" style="min-height: 706px;">
-	<section class="content-header">
-		<h1>订单列表 </h1>
-	</section>
+	<section class="content-header"><h1>订单列表</h1></section>
 	<section class="content">
 		<div class="row">
 			<div class="col-md-12">
@@ -109,7 +103,7 @@
 										{eq name="vo.status" value="0"}待付款{/eq} {eq name="vo.status" value="1"}待放行{/eq} {eq name="vo.status" value="4"}已完成{/eq} {eq name="vo.status" value="5"}已关闭{/eq} {eq name="vo.status" value="6"}申诉中{/eq} {eq name="vo.status" value="9"}订单失败{/eq}
 									</td>
 									<td>
-										{eq name="vo.status" value="1"} <a id="{$vo.id}" class="btn btn-sm btn-danger shifang">放行</a> {/eq} {eq name="vo.status" value="0"} <a id="{$vo.id}" class="btn btn-sm btn-danger shifang2">放行</a> {/eq}
+										{eq name="vo.status" value="1"} <a id="{$vo.id}" class="btn btn-sm btn-danger release">放行</a> {/eq} {eq name="vo.status" value="0"} <a id="{$vo.id}" class="btn btn-sm btn-danger release2">放行</a> {/eq}
 										<a id="{$vo.id}" class="btn btn-sm btn-success shensu">申诉</a>
 									</td>
 								</tr>
@@ -129,12 +123,10 @@
 	<script src="/static/admin/js/layer/layer.js"></script>
 	<script data-exec-on-popstate="">
 		var type = 1;
-
-		function closetanchu() {
+		function closePopUp() {
 			layer.closeAll('loading');
 		}
-
-		$('.shifang').click(function () {
+		$('.release').click(function () {
 			var id = $(this).attr('id');
 			layer.load(0, {shade: [0.5, '#8f8f8f']});
 			layer.prompt({
@@ -142,33 +134,32 @@
 				formType: 1
 			}, function (val) {
 				if (val) {
-
 					$.post("{:url('home/merchant/checkpaypass')}", {paypassword: val}, function (respone) {
 						if (respone.code == 1) {
 							layer.close(val);
 							$.post("{:url('home/merchant/deal')}", {id: id, type: type}, function (data) {
-								// console.log(id)
 								shelf = data.url;
-								setTimeout("closetanchu()", 4000);
+								setTimeout("closePopUp()", 4000);
 								if (data.code == 1) {
 									layer.msg(data.msg, {icon: 1});
 									window.location.reload();
 								} else {
+									layer.close(loader);
 									layer.msg(data.msg, {icon: 2});
 								}
 							});
 						} else {
+							layer.close(loader);
 							layer.msg(respone.msg, {icon: 2});
 						}
 					});
-
 				} else {
+					layer.close(loader);
 					layer.msg('请输入交易密码!', {icon: 2});
 				}
 			});
-
 		});
-		$('.shifang2').click(function () {
+		$('.release2').click(function () {
 			var id = $(this).attr('id');
 			layer.load(0, {shade: [0.5, '#8f8f8f']});
 			layer.confirm('确认继续吗，卖家尚未标记付款', {icon: 3, title: '提示'}, function (index) {
@@ -181,28 +172,27 @@
 							if (respone.code == 1) {
 								layer.close(val);
 								$.post("{:url('home/merchant/deal')}", {id: id, type: type}, function (data) {
-									setTimeout("closetanchu()", 4000);
+									setTimeout("closePopUp()", 4000);
 									layer.close(index);
 									if (data.code == 1) {
 										layer.msg(data.msg, {icon: 1});
 										window.location.reload();
 									} else {
+										layer.close(loader);
 										layer.msg(data.msg, {icon: 2});
 									}
 								});
 							} else {
+								layer.close(loader);
 								layer.msg(respone.msg, {icon: 2});
 							}
 						});
-
 					} else {
 						layer.close(loader);
 						layer.msg('请输入交易密码!', {icon: 2});
 					}
 				});
-
 			});
-
 		});
 		$('.shensu').click(function () {
 			//alert($(this).attr('id'));
@@ -228,7 +218,7 @@
 			layer.load(0, {shade: [0.5, '#8f8f8f']});
 			$.post("{:url('home/merchant/setShelf')}", {id: $(this).attr('id'), type: type, act: 1}, function (data) {
 				shelf = data.url;
-				setTimeout("closetanchu()", 4000);
+				setTimeout("closePopUp()", 4000);
 				if (data.code == 1) {
 					layer.msg(data.msg, {icon: 1});
 					window.location.reload();
@@ -239,10 +229,9 @@
 		});
 		$('.dong').click(function () {
 			layer.load(0, {shade: [0.5, '#8f8f8f']});
-			setTimeout("closetanchu()", 3000);
+			setTimeout("closePopUp()", 3000);
 			layer.msg('请联系管理员解除冻结!', {icon: 2});
 		});
-
 		$(function () {
 			$('#created_at_start').datetimepicker({"format": "YYYY-MM-DD HH:mm:ss", "locale": "zh_CN"});
 			$('#created_at_end').datetimepicker({"format": "YYYY-MM-DD HH:mm:ss", "locale": "zh_CN", "useCurrent": false});
@@ -260,39 +249,31 @@
 			$("#end_at_end").on("dp.change", function (e) {
 				$('#end_at_start').data("DateTimePicker").maxDate(e.date);
 			});
-
 			$("#filter-modal .submit").click(function () {
 				$("#filter-modal").modal('toggle');
 				$('body').removeClass('modal-open');
 				$('.modal-backdrop').remove();
 			});
-
 			$(".status").select2({
 				placeholder: "选择"
 			});
-
 			$('.export-selected').click(function (e) {
 				e.preventDefault();
-
 				var rows = selectedRows().join(',');
 				if (!rows) {
 					return false;
 				}
-
 				var href = $(this).attr('href').replace('__rows__', rows);
 				location.href = href;
 			});
-
 			$('.grid-refresh').on('click', function () {
 				//$.pjax.reload('#pjax-container');
 				//toastr.success('刷新成功 !');
 				window.location.reload();
 			});
-
 			$('.grid-per-pager').on("change", function (e) {
 				//$.pjax({url: this.value, container: '#pjax-container'});
 			});
-
 		});
 	</script>
 </div>{include file="Public:footer_new"/}

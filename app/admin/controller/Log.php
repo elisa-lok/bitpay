@@ -92,6 +92,14 @@ class Log extends Base {
 		foreach ($list as $k => $v) {
 			$list[$k]['merchant_name'] = Db::name('merchant')->where('id', $v['merchant_id'])->value('name');
 			$list[$k]['action_type']   = BAL_REC[$v['action_type']];
+			$list[$k]['amt_before'] = round($v['amt_before'], 8);
+			$list[$k]['amt_after'] = round($v['amt_after'], 8);
+			$list[$k]['amt_change'] = round($v['amt_change'], 8);
+			$list[$k]['amt_fee'] = round($v['amt_fee'], 8);
+			$list[$k]['frozen_amt_before'] = round($v['frozen_amt_before'], 8);
+			$list[$k]['frozen_amt_after'] = round($v['frozen_amt_after'], 8);
+			$list[$k]['frozen_amt_change'] = round($v['frozen_amt_change'], 8);
+			$list[$k]['frozen_amt_fee'] = round($v['frozen_amt_fee'], 8);
 		}
 		$this->assign('Nowpage', $nowPage); //当前页
 		$this->assign('allpage', $allPage); //总页数

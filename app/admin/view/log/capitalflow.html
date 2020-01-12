@@ -33,12 +33,11 @@
 							<th width="5%">客户</th>
 							<th width="5%">变动前</th>
 							<th width="5%">变动后</th>
-							<th width="5%">变动金额</th>
+							<th width="5%">变动数量</th>
 							<th width="5%">手续费</th>
 							<th width="5%">冻结前</th>
 							<th width="5%">冻结后</th>
 							<th width="5%">冻结变动</th>
-							<th width="8%">币种</th>
 							<th width="5%">类型</th>
 							<th width="8%">单号</th>
 							<th width="5%">备注</th>
@@ -57,8 +56,6 @@
 								<td>{{d[i].frozen_amt_before}}</td>
 								<td>{{d[i].frozen_amt_after}}</td>
 								<td style="font-weight:bold;color: {{# if(d[i].frozen_amt_change>0){ }}red{{# }else{ }}green{{# } }}">{{d[i].frozen_amt_change}}</td>
-								<td>{{d[i].frozen_amt_fee}}</td>
-								<td>{{d[i].cur_code}}</td>
 								<td>{{d[i].action_type}}</td>
 								<td>{{d[i].relate_id}}</td>
 								<td>{{d[i].memo}}</td>
@@ -66,11 +63,6 @@
 							</tr>
 							{{# } }}
 						</script>
-						{{# if(d[i].status==1){ }}
-						<span style="color: blue">减少</span>
-						{{# }else{ }}
-						<span style="color: red">增加<span>
-                                        {{# } }}
 						<tbody id="list-content"></tbody>
 					</table>
 					<div id="AjaxPage" style="text-align:right;"></div>
