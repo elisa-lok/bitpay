@@ -15,7 +15,7 @@ class Ad {
 	public function list($position) {
 		$map['ad_position_id'] = $position;
 		$map['status']         = 1;
-		$info                  = Db::name('ad')->where($map)->order('id desc')->field('images')->select();
+		$info                  = Db::name('ad')->where($map)->order('id DESC')->field('images')->select();
 		if ($info) {
 			$data['code']  = 200;
 			$data['datas'] = $info;

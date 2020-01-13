@@ -12,7 +12,7 @@ class ArticleCateModel extends Model {
 	 * @author [] [864491238@qq.com]
 	 */
 	public function getAllCate() {
-		return $this->order('id asc')->select();
+		return $this->order('id ASC')->select();
 	}
 
 	/**
@@ -21,12 +21,7 @@ class ArticleCateModel extends Model {
 	 */
 	public function insertCate($param) {
 		try {
-			$result = $this->save($param);
-			if (FALSE === $result) {
-				return ['code' => -1, 'data' => '', 'msg' => $this->getError()];
-			} else {
-				return ['code' => 1, 'data' => '', 'msg' => '分类添加成功'];
-			}
+			return FALSE === $this->save($param) ? ['code' => -1, 'data' => '', 'msg' => $this->getError()] : ['code' => 1, 'data' => '', 'msg' => '分类添加成功'];
 		} catch (PDOException $e) {
 			return ['code' => -2, 'data' => '', 'msg' => $e->getMessage()];
 		}

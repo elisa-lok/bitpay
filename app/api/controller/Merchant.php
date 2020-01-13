@@ -442,7 +442,7 @@ class Merchant extends Base {
 		!$data && $this->err('填写订单号');
 		$model2            = new OrderModel();
 		$where['order_no'] = $data;
-		$list              = $model2->getOne($where, 'id desc');
+		$list              = $model2->getOne($where, 'id DESC');
 		!$list && $this->err('订单不存在');
 		$arr ['order_no']     = $list['order_no'];    //订单号
 		$arr ['deal_amount']  = $list['deal_amount']; //金额

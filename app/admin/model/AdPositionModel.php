@@ -12,7 +12,7 @@ class AdPositionModel extends Model {
 	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function getAll($nowPage, $limits) {
-		return $this->page($nowPage, $limits)->order('id asc')->select();
+		return $this->page($nowPage, $limits)->order('id ASC')->select();
 	}
 
 	/**
@@ -62,7 +62,7 @@ class AdPositionModel extends Model {
 	 * @author [] [864491238@qq.com]
 	 */
 	public function getAllPosition() {
-		return $this->order('id asc')->select();
+		return $this->order('id ASC')->select();
 	}
 
 	/**

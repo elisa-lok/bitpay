@@ -289,7 +289,7 @@ class Order extends Base {
 				// 判断取消
 				if (($args['status'] == 5) && ($src_status == 0 || $src_status == 1)) {
 					$realAmt = number_format($orderInfo['deal_num'] + $orderInfo['fee'], 8, '.', '');
-					$res2    = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_SOLD, $edit, '卖出');
+					$res2    = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_SYS, $edit, '系统编辑订单');
 				}
 				if ($res1 && $res2) {
 					Db::commit();

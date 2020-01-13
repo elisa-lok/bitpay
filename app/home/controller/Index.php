@@ -7,10 +7,10 @@ class Index extends Base {
 		$key     = input('key');
 		$cate_id = input('param.cate_id');
 		$map     = [];
-		if ($key && $key !== "") {
+		if ($key && $key !== '') {
 			$map['title'] = ['like', "%" . $key . "%"];
 		}
-		if ($cate_id && $cate_id !== "") {
+		if ($cate_id && $cate_id !== '') {
 			$map['think_article.cate_id'] = $cate_id;
 		}
 		$nowPage = input('get.page') ? input('get.page') : 1;

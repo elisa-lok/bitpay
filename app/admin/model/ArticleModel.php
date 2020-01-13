@@ -12,7 +12,7 @@ class ArticleModel extends Model {
 	 * @author [Max] [864491238@qq.com]
 	 */
 	public function getArticleByWhere($map, $nowPage, $limits) {
-		return $this->field('think_article.*,name')->join('think_article_cate', 'think_article.cate_id = think_article_cate.id')->where($map)->page($nowPage, $limits)->order('id desc')->select();
+		return $this->field('think_article.*,name')->join('think_article_cate', 'think_article.cate_id = think_article_cate.id')->where($map)->page($nowPage, $limits)->order('id DESC')->select();
 	}
 
 	/**

@@ -7,7 +7,7 @@ class Message extends Base {
 	public function index() {
 		$key                      = input('key');
 		$map['think_question.id'] = ['egt', 0];
-		if ($key && $key !== "") {
+		if ($key && $key !== '') {
 			$where['name|mobile'] = $key;
 			$id                   = Db::name('merchant')->where($where)->value('id');
 			$map['merchant_id']   = $id;

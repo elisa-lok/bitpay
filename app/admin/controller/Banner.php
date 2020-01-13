@@ -15,7 +15,7 @@ class Banner extends Base {
 		$key           = input('key');
 		$map           = [];
 		$map['closed'] = 0;
-		if ($key && $key !== "") {
+		if ($key && $key !== '') {
 			$map['title'] = ['like', "%" . $key . "%"];
 		}
 		$nowPage = input('get.page') ? input('get.page') : 1;

@@ -12,7 +12,7 @@ class MenuModel extends Model {
 	 * @author [Max] [864491238@qq.com]
 	 */
 	public function getAllMenu() {
-		return $this->order('id asc')->select();
+		return $this->order('id ASC')->select();
 	}
 
 	/**

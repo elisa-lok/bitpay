@@ -13,7 +13,7 @@ class UserType extends Model {
 	 * @author [Max] [864491238@qq.com]
 	 */
 	public function getRoleByWhere($map, $nowPage, $limits) {
-		return $this->where($map)->page($nowPage, $limits)->order('id desc')->select();
+		return $this->where($map)->page($nowPage, $limits)->order('id DESC')->select();
 	}
 
 	/**

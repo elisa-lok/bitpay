@@ -425,10 +425,9 @@ class Auto extends Base {
 			Db::startTrans();
 			$orderInfo = [];
 			$orderInfo = Db::name('order_buy')->where(['id' => $vv['id']])->find();
-			$coin_name = 'usdt';
 			//$seller = Db::name('merchant')->where(array('id'=>$vv['sell_id']))->find();
 			$buymerchant = Db::name('merchant')->where(['id' => $vv['buy_id']])->find();
-			//$table = "movesay_".$coin_name."_log";
+			//$table = "movesay_".'usdt'."_log";
 			$rs1     = Db::name('order_buy')->update(['status' => 5, 'id' => $vv['id']]);
 			$realAmt = $orderInfo['deal_num'] + $orderInfo['fee'];
 			// 回滚挂单
@@ -466,12 +465,11 @@ class Auto extends Base {
 			Db::startTrans();
 			$orderInfo = [];
 			$orderInfo = Db::name('order_sell')->where(['id' => $vv['id']])->find();
-			$coin_name = 'usdt';
-			$rs1       = Db::name('order_sell')->update(['status' => 5, 'id' => $vv['id']]);
-			$realAmt   = $orderInfo['deal_num'] + $orderInfo['fee'];
-			$rs2       = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $orderInfo['id'], "支付超时->自动下架->buy");
-			//$rs2         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec($coin_name . 'd', $realAmt);
-			//$rs3         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc($coin_name, $realAmt);
+			$rs1     = Db::name('order_sell')->update(['status' => 5, 'id' => $vv['id']]);
+			$realAmt = $orderInfo['deal_num'] + $orderInfo['fee'];
+			$rs2     = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $orderInfo['id'], "支付超时->自动下架->buy");
+			//$rs2         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec('usdt' . 'd', $realAmt);
+			//$rs3         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdt', $realAmt);
 			if ($rs1 && $rs2) {
 				Db::commit();
 			} else {

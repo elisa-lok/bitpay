@@ -8,7 +8,7 @@ class Detail extends Base {
 		$id     = input('param.id');
 		$model  = new DetailModel();
 		$detail = $model->getDetail($id);
-		$up     = Db::name('article')->where('views !=0 AND id <' . $id)->order('id desc')->limit(1)->find();
+		$up     = Db::name('article')->where('views !=0 AND id <' . $id)->order('id DESC')->limit(1)->find();
 		$down   = Db::name('article')->where('views !=0 AND id >' . $id)->order('id')->limit(1)->find();
 		$this->assign('detail', $detail);
 		$this->assign('up', $up);

@@ -13,7 +13,7 @@ class User extends Base {
 	public function index() {
 		$key = input('key');
 		$map = [];
-		if ($key && $key !== "") {
+		if ($key && $key !== '') {
 			$map['username'] = ['like', "%" . $key . "%"];
 		}
 		$page          = input('get.page') ? input('get.page') : 1;

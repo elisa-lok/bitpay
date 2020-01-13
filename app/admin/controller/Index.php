@@ -207,9 +207,9 @@ class Index extends Base {
 		$this->assign('usdt', $usdt+$baseusdt['data']);
 		$baseusdt2 = $model->index('getBtcBalance', '1PnhPBJ6JiAFuw5HFSpjuugci7SJjo179U', $money = null, $index=null, $count=null, $skip=null);
 		$this->assign('btc', $temp2 ['data']);*/
-		$usdt = Db::name('coin_log')->where('coin_type', 0)->order('id desc')->limit(1)->value('balance');
+		$usdt = Db::name('coin_log')->where('coin_type', 0)->order('id DESC')->limit(1)->value('balance');
 		$this->assign('usdt', $usdt);
-		$btc = Db::name('coin_log')->where('coin_type', 1)->order('id desc')->limit(1)->value('balance');
+		$btc = Db::name('coin_log')->where('coin_type', 1)->order('id DESC')->limit(1)->value('balance');
 		$this->assign('btc', $btc);
 		$this->assign('info', $info);
 		return $this->fetch('index');

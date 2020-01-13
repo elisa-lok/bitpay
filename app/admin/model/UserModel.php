@@ -10,7 +10,7 @@ class UserModel extends Model {
 	 * 根据搜索条件获取用户列表信息
 	 */
 	public function getUsersByWhere($map, $nowPage, $limits) {
-		return $this->field('think_admin.*,title')->join('think_auth_group', 'think_admin.groupid = think_auth_group.id')->where($map)->page($nowPage, $limits)->order('id desc')->select();
+		return $this->field('think_admin.*,title')->join('think_auth_group', 'think_admin.groupid = think_auth_group.id')->where($map)->page($nowPage, $limits)->order('id DESC')->select();
 	}
 
 	/**

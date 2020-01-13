@@ -13,7 +13,7 @@ class Role extends Base {
 	public function index() {
 		$key = input('key');
 		$map = [];
-		if ($key && $key !== "") {
+		if ($key && $key !== '') {
 			$map['title'] = ['like', "%" . $key . "%"];
 		}
 		$user    = new UserType();

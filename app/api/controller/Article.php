@@ -15,7 +15,7 @@ class Article {
 	 */
 	public function list($rows, $pagesize) {
 		if ($rows != '' || $pagesize != '') {
-			$info = Db::name('article')->order('id desc')->limit($rows . ',' . $pagesize)->field('title,photo,create_time')->select();
+			$info = Db::name('article')->order('id DESC')->limit($rows . ',' . $pagesize)->field('title,photo,create_time')->select();
 			if ($info) {
 				$data['code']  = 200;
 				$data['datas'] = $info;

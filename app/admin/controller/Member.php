@@ -13,7 +13,7 @@ class Member extends Base {
 	public function group() {
 		$key = input('key');
 		$map = [];
-		if ($key && $key !== "") {
+		if ($key && $key !== '') {
 			$map['group_name'] = ['like', "%" . $key . "%"];
 		}
 		$group   = new MemberGroupModel();
@@ -98,7 +98,7 @@ class Member extends Base {
 	public function index() {
 		$key           = input('key');
 		$map['closed'] = 0;//0未删除，1已删除
-		if ($key && $key !== "") {
+		if ($key && $key !== '') {
 			$map['account|nickname|mobile'] = ['like', "%" . $key . "%"];
 		}
 		$member  = new MemberModel();

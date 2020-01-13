@@ -9,7 +9,7 @@ class Message extends Base {
 		}
 		$model                = new MessageModel();
 		$where['merchant_id'] = session('uid');
-		$order                = 'id desc';
+		$order                = 'id DESC';
 		$this->assign('list', $model->getQuestion($where, $order));
 		$where['reply'] = 'not null';
 		$this->assign('replylist', $model->getQuestion($where, $order));

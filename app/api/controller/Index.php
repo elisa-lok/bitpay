@@ -18,22 +18,6 @@ class Index {
 		return $this->fetch();
 	}
 
-	public function test() {
-		$dataArr = [
-			'amount'     => 100,
-			'username'   => 'haha',
-			'orderid'    => 'E12345678996385223',
-			'appid'      => $this->appid,
-			'return_url' => $this->returnUrl,
-			'notify_url' => $this->notifyUrl
-		];
-		$sign = $this->sign($dataArr);
-		$dataArr['sign'] = $sign;
-		$res  = $this->curl($this->rechargeRmbUrl, $dataArr);
-		$data = json_decode($res, TRUE);
-		return $data;
-	}
-
 	/**
 	 * [sign 签名验签]
 	 * @author max

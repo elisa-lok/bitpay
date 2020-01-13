@@ -305,14 +305,13 @@ class Cron extends Base {
 			Db::startTrans();
 			$orderInfo = [];
 			$orderInfo = Db::name('order_buy')->where(['id' => $vv['id']])->find();
-			$coin_name = 'usdt';
 			//$seller = Db::name('merchant')->where(array('id'=>$vv['sell_id']))->find();
 			$buymerchant = Db::name('merchant')->where(['id' => $vv['buy_id']])->find();
-			//$table = "movesay_".$coin_name."_log";
+			//$table = "movesay_".'usdt'."_log";
 			$rs1     = Db::name('order_buy')->update(['status' => 5, 'id' => $vv['id']]);
 			$realAmt = $orderInfo['deal_num'] + $orderInfo['fee'];
-			$rs2     = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec($coin_name . 'd', $realAmt);
-			$rs3     = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc($coin_name, $realAmt);
+			$rs2     = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec('usdt' . 'd', $realAmt);
+			$rs3     = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdt', $realAmt);
 			if ($rs1 && $rs2 && $rs3) {
 				Db::commit();
 				//请求回调接口,失败
@@ -339,11 +338,10 @@ class Cron extends Base {
 			$orderInfo   = [];
 			$orderInfo   = Db::name('order_sell')->where(['id' => $vv['id']])->find();
 			$buymerchant = Db::name('merchant')->where(['id' => $vv['buy_id']])->find();
-			$coin_name   = 'usdt';
-			$rs1         = Db::name('order_sell')->update(['status' => 5, 'id' => $vv['id']]);
-			$realAmt     = $orderInfo['deal_num'] + $orderInfo['fee'];
-			$rs2         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec($coin_name . 'd', $realAmt);
-			$rs3         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc($coin_name, $realAmt);
+			$rs1     = Db::name('order_sell')->update(['status' => 5, 'id' => $vv['id']]);
+			$realAmt = $orderInfo['deal_num'] + $orderInfo['fee'];
+			$rs2     = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec('usdt' . 'd', $realAmt);
+			$rs3     = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdt', $realAmt);
 			if ($rs1 && $rs2 && $rs3) {
 				Db::commit();
 				$data['amount']  = $orderInfo['deal_num'];

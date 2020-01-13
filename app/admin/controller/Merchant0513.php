@@ -16,7 +16,7 @@
 // 		$key       = input('key');
 // 		$regType  = input('reg_type');
 // 		$map['id'] = ['gt', 0];
-// 		if ($key && $key !== "") {
+// 		if ($key && $key !== '') {
 // 			$map['name|mobile'] = $key;
 // 		}
 // 		$map['reg_type'] = $regType;
@@ -43,7 +43,7 @@
 // 	public function agentreward() {
 // 		$key         = input('key');
 // 		$map['a.id'] = ['gt', 0];
-// 		if ($key && $key !== "") {
+// 		if ($key && $key !== '') {
 // 			$uid        = Db::name('merchant')->where('name|mobile', $key)->value('id');
 // 			$map['uid'] = $uid;
 // 		}
@@ -68,7 +68,7 @@
 // 	public function traderreward() {
 // 		$key         = input('key');
 // 		$map['a.id'] = ['gt', 0];
-// 		if ($key && $key !== "") {
+// 		if ($key && $key !== '') {
 // 			$uid        = Db::name('merchant')->where('name|mobile', $key)->value('id');
 // 			$map['uid'] = $uid;
 // 		}
@@ -93,7 +93,7 @@
 // 	public function usdtlog() {
 // 		$key              = input('key');
 // 		$map['coin_type'] = 0;
-// 		if ($key && $key !== "") {
+// 		if ($key && $key !== '') {
 // 			$map['name|mobile'] = $id;
 // 		}
 // 		$member  = new MerchantModel();
@@ -117,7 +117,7 @@
 // 	public function btclog() {
 // 		$key              = input('key');
 // 		$map['coin_type'] = 1;
-// 		if ($key && $key !== "") {
+// 		if ($key && $key !== '') {
 // 			$map['name|mobile'] = $id;
 // 		}
 // 		$member  = new MerchantModel();
@@ -230,7 +230,7 @@
 // 		$regType = input('param.reg_type');
 // 		$minfo    = $member->getOneByWhere($id, 'id');
 // 		$matchTrader = explode(',', $minfo['pptrader']);
-// 		$traders  = $member->field('id, name')->where('trader_check', 1)->order('id asc')->select();
+// 		$traders  = $member->field('id, name')->where('trader_check', 1)->order('id ASC')->select();
 // 		foreach ($traders as $k => &$v) {
 // 			if (in_array($v['id'], $matchTrader)) {
 // 				$v['ispp'] = 1;
@@ -256,7 +256,7 @@
 // 	public function tibi() {
 // 		$key                                   = input('key');
 // 		$map['think_merchant_withdraw.status'] = ['egt', 0];
-// 		if ($key && $key !== "") {
+// 		if ($key && $key !== '') {
 // 			$where['name|mobile'] = $key;
 // 			$id                   = Db::name('merchant')->where($where)->value('id');
 // 			$map['merchant_id']   = $id;
@@ -392,7 +392,7 @@
 // 		$key                                   = input('key');
 // 		$type                                  = input('addresstype');
 // 		$map['think_merchant_user_address.id'] = ['gt', 0];
-// 		if ($key && $key !== "") {
+// 		if ($key && $key !== '') {
 // 			$where['name|mobile'] = $key;
 // 			$id                   = Db::name('merchant')->where($where)->value('id');
 // 			$map['merchant_id']   = $id;
@@ -402,7 +402,7 @@
 // 		if ($type == 2) {
 // 			$count   = Db::name('merchant')->where('usdtb', 'exp', 'is not Null')->count();
 // 			$allPage = intval(ceil($count / $limits));
-// 			$lists   = Db::name('merchant')->where('usdtb', 'exp', 'is not Null')->page($nowPage, $limits)->order('id desc')->select();
+// 			$lists   = Db::name('merchant')->where('usdtb', 'exp', 'is not Null')->page($nowPage, $limits)->order('id DESC')->select();
 // 			foreach ($lists as $k => &$v) {
 // 				$v['addtime']  = getTime($v['addtime']);
 // 				$v['username'] = $v['name'];
@@ -432,12 +432,12 @@
 // 		$keyuser                                = input('keyuser');
 // 		$status                                 = input('status');
 // 		$map['think_merchant_user_withdraw.id'] = ['gt', 0];
-// 		if ($key && $key !== "") {
+// 		if ($key && $key !== '') {
 // 			$where['name|mobile'] = $key;
 // 			$id                   = Db::name('merchant')->where($where)->value('id');
 // 			$map['merchant_id']   = $id;
 // 		}
-// 		if ($keyuser && $keyuser !== "") {
+// 		if ($keyuser && $keyuser !== '') {
 // 			$map['username'] = $keyuser;
 // 		}
 // 		if (!empty($status)) {
@@ -577,12 +577,12 @@
 // 		$keyuser                                = input('keyuser');
 // 		$status                                 = input('status');
 // 		$map['think_merchant_user_recharge.id'] = ['gt', 0];
-// 		if ($key && $key !== "") {
+// 		if ($key && $key !== '') {
 // 			$where['name|mobile'] = $key;
 // 			$id                   = Db::name('merchant')->where($where)->value('id');
 // 			$map['merchant_id']   = $id;
 // 		}
-// 		if ($keyuser && $keyuser !== "") {
+// 		if ($keyuser && $keyuser !== '') {
 // 			$m                 = new AddressModel();
 // 			$address           = $m->getAddressByUsername($keyuser);
 // 			$map['to_address'] = ['in', $address];
@@ -615,7 +615,7 @@
 // 		//$keyuser = input('keyuser');
 // 		$status                            = input('status');
 // 		$map['think_merchant_recharge.id'] = ['gt', 0];
-// 		if ($key && $key !== "") {
+// 		if ($key && $key !== '') {
 // 			$where['name|mobile'] = $key;
 // 			$id                   = Db::name('merchant')->where($where)->value('id');
 // 			$map['merchant_id']   = $id;
@@ -647,7 +647,7 @@
 // 		//$keyuser = input('keyuser');
 // 		$status                  = input('status');
 // 		$map['think_ad_sell.id'] = ['gt', 0];
-// 		if ($key && $key !== "") {
+// 		if ($key && $key !== '') {
 // 			$where['name|mobile'] = $key;
 // 			$id                   = Db::name('merchant')->where($where)->value('id');
 // 			$map['userid']        = $id;
@@ -695,7 +695,7 @@
 // 		//$keyuser = input('keyuser');
 // 		$status                 = input('status');
 // 		$map['think_ad_buy.id'] = ['gt', 0];
-// 		if ($key && $key !== "") {
+// 		if ($key && $key !== '') {
 // 			$where['name|mobile'] = $key;
 // 			$id                   = Db::name('merchant')->where($where)->value('id');
 // 			$map['userid']        = $id;
@@ -882,7 +882,7 @@
 // 		$key                       = input('key');
 // 		$status                    = input('status');
 // 		$map['think_order_buy.id'] = ['gt', 0];
-// 		if ($key && $key !== "") {
+// 		if ($key && $key !== '') {
 // 			$where['name|mobile'] = $key;
 // 			$id                   = Db::name('merchant')->where($where)->value('id');
 // 			$map['sell_id']       = $id;
@@ -918,7 +918,7 @@
 // 		if ($regType) {
 // 			$map['c.reg_type'] = $regType;
 // 		}
-// 		if ($key && $key !== "") {
+// 		if ($key && $key !== '') {
 // 			$where['name|mobile'] = $key;
 // 			$id                   = Db::name('merchant')->where($where)->value('id');
 // 			$map['buy_id']        = $id;

@@ -8,7 +8,7 @@ class MerchantModel extends Model {
 	protected $createTime = 'addtime';
 
 	public function getMerchantByWhere($map, $nowPage, $limits) {
-		return $this->where($map)->page($nowPage, $limits)->order('id desc')->select();
+		return $this->where($map)->page($nowPage, $limits)->order('id DESC')->select();
 	}
 
 	public function getUserByParam($param, $field) {
@@ -122,11 +122,7 @@ class MerchantModel extends Model {
 	}
 
 	public function getOrderByWhere($map, $nowPage, $limits) {
-		$join = [
-			['__MERCHANT__ b', 'b.id=a.buy_id', 'LEFT'],
-			['__MERCHANT__ c', 'c.id=a.sell_id', 'LEFT'],
-			['__AD_SELL__ d', 'd.id=a.sell_sid', 'LEFT'],
-		];
+		$join = [['__MERCHANT__ b', 'b.id=a.buy_id', 'LEFT'], ['__MERCHANT__ c', 'c.id=a.sell_id', 'LEFT'], ['__AD_SELL__ d', 'd.id=a.sell_sid', 'LEFT'],];
 		return Db::name('order_buy')->field('a.*, b.name, c.name as trader, d.ad_no')->alias('a')->join($join)->where($map)->page($nowPage, $limits)->order('a.id desc')->select();
 	}
 
@@ -153,7 +149,7 @@ class MerchantModel extends Model {
 	}
 
 	public function getStatistics($map, $nowPage, $limits) {
-		return Db::name('statistics')->where($map)->page($nowPage, $limits)->order('id desc')->select();
+		return Db::name('statistics')->where($map)->page($nowPage, $limits)->order('id DESC')->select();
 	}
 
 	public function getMerchantStatistics($map, $nowPage, $limits, $order = ['id' => 'desc']) {

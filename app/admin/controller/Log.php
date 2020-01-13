@@ -13,7 +13,7 @@ class Log extends Base {
 	public function operate_log() {
 		$key = input('key');
 		$map = [];
-		if ($key && $key !== "") {
+		if ($key && $key !== '') {
 			$map['admin_id'] = $key;
 		}
 		$arr     = Db::name("admin")->column("id,username"); //获取用户列表
@@ -53,7 +53,7 @@ class Log extends Base {
 	public function financeLog() {//资金日志
 		$key = input('key');
 		$map = [];
-		if ($key && $key !== "") {
+		if ($key && $key !== '') {
 			$map['uid|user'] = ['like', '%' . $key . '%'];
 		}
 		$arr     = Db::name("merchant")->column("id,name"); //获取用户列表
