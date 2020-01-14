@@ -11,4 +11,14 @@ class Base extends Controller {
 		}
 		config($config);
 	}
+
+	protected function suc($data) {
+		/* 返回状态，200 成功，500失败 */
+		die(json_encode(['status' => 1, 'data' => $data,], 320));
+	}
+
+	protected function err($message) {
+		/* 返回状态，200 成功，500失败 */
+		die(json_encode(['status' => 0, 'err' => $message,], 320));
+	}
 }

@@ -335,7 +335,7 @@ class Merchant extends Base {
 	public function tibi() {
 		$key                                   = input('key');
 		$map['think_merchant_withdraw.status'] = ['egt', 0];
-		if ($key && $key !== '') {
+		if ($key) {
 			$where['name|mobile'] = $key;
 			$id                   = Db::name('merchant')->where($where)->value('id');
 			$map['merchant_id']   = $id;
