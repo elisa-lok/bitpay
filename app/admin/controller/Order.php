@@ -36,8 +36,6 @@ class Order extends Base {
 				//在余额里面进行扣钱
 				$realAmt = $orderInfo['deal_num'] + $orderInfo['fee'];
 				$res2    = balanceChange(FALSE, $orderInfo['sell_id'], -$orderInfo['deal_num'], $orderInfo['fee'], $orderInfo['deal_num'], $orderInfo['fee'], BAL_SYS, $orderInfo['id'], "重建订单");
-				//$res2    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec('usdt', $realAmt);
-				//$res3    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdtd', $realAmt);
 			}
 			// 判断完成
 			if (($args['status'] == 4) && ($src_status == 0 || $src_status == 1)) {
@@ -53,10 +51,6 @@ class Order extends Base {
 				$pkfee = $buymerchant['merchant_pk_fee'];
 				$pkfee = $pkfee ? $pkfee : 0;
 				$pkdec = $orderInfo['deal_num'] * $pkfee / 100;
-				//平台利润
-				$platformGet   = config('trader_platform_get');
-				$platformGet   = $platformGet ? $platformGet : 0;
-				$platformMoney = $platformGet * $orderInfo['deal_num'] / 100;
 				//承兑商卖单奖励
 				$traderGet         = $merchant['trader_trader_get'];
 				$traderGet         = $traderGet ? $traderGet : 0;

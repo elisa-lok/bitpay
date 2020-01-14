@@ -2,7 +2,9 @@
 namespace app\home\controller;
 use app\home\model\BaseModel;
 use app\home\model\LogModel;
+use think\Cache;
 use think\Controller;
+use think\Db;
 use think\Request;
 
 class Base extends Controller {
@@ -61,5 +63,22 @@ class Base extends Controller {
 			cache('db_config_data', $config);
 		}
 		config($config);
+	}
+
+	protected function rollbackAndMsg($msg, $cacheKey) {
+		$cacheKey && Cache::rm($cacheKey);
+		Db::rollback();
+		$this->error($msg);
+		die;
+	}
+
+	protected function getAdvNo() {
+		$code = '';
+		for ($i = 1; $i <= 5; $i++) {
+			$code .= chr(rand(97, 122));
+		}
+		$adv_no  = $code . time();
+		$advsell = Db::name('ad_sell')->where(['ad_no' => $adv_no])->find();
+		return empty($advsell) ? $adv_no : $this->getAdvNo();
 	}
 }

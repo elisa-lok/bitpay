@@ -120,9 +120,9 @@
                                         </td>
                                         <td>
                                             {eq name="vo.status" value="0"}
-                                            <a id="{$vo.id}" class="btn btn-sm btn-danger biaoji">标记付款</a>
+                                            <a id="{$vo.id}" class="btn btn-sm btn-danger tagPay">标记付款</a>
                                             {/eq}
-                                            <a id="{$vo.id}" class="btn btn-sm btn-success shensu">申诉</a>
+                                            <a id="{$vo.id}" class="btn btn-sm btn-success appeal">申诉</a>
                                         </td>
                                     </tr>
                                     {/volist}
@@ -173,7 +173,7 @@
             }
         });
     })
-    $('.biaoji').click(function() {
+    $('.tagPay').click(function() {
         layer.load(0, { shade: [0.5, '#8F8F8F'] });
         $.post("{:url('home/merchant/uptradeinner')}", { id: $(this).attr('id'), type: type }, function(data) {
             shelf = data.url;
@@ -186,7 +186,7 @@
             }
         });
     });
-    $('.shensu').click(function() {
+    $('.appeal').click(function() {
         //alert($(this).attr('id'));
         var id = $(this).attr('id');
         layer.prompt({
@@ -194,7 +194,7 @@
             formType: 2
         }, function(val) {
             if (val) {
-                $.post("{:url('home/merchant/shensu_ajax_trader')}", { id: id, content: val }, function(data) {
+                $.post("{:url('home/merchant/appeal_ajax_trader')}", { id: id, content: val }, function(data) {
                     if (data.code == 1) {
                         layer.alert(data.msg, function(index) {
                             self.location.reload();

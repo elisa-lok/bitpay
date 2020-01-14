@@ -1,5 +1,7 @@
 {include file="Public:header_new"}
-<style> .cards-item{ border:1px dashed #cccccc; padding:10px; margin-bottom:5px; background:#fbfbfb; }  .cards-item .form-group{ width:80%; margin-bottom:5px; }  .cards-item .btn-remove{ float:right; border:1px solid #cccccc; padding:5px; border-radius:2px;}</style>
+<style> .cards-item{ border:1px dashed #cccccc; padding:10px; margin-bottom:5px; background:#fbfbfb; }
+.cards-item .form-group{ width:80%; margin-bottom:5px; }
+.cards-item .btn-remove{ float:right; border:1px solid #cccccc; padding:5px; border-radius:2px;}</style>
 <div class="content-wrapper" id="pjax-container" style="min-height: 706px;">
 	<section class="content-header"><h1>订单列表</h1></section>
 	<section class="content">
@@ -104,7 +106,7 @@
 									</td>
 									<td>
 										{eq name="vo.status" value="1"} <a id="{$vo.id}" class="btn btn-sm btn-danger release">放行</a> {/eq} {eq name="vo.status" value="0"} <a id="{$vo.id}" class="btn btn-sm btn-danger release2">放行</a> {/eq}
-										<a id="{$vo.id}" class="btn btn-sm btn-success shensu">申诉</a>
+										<a id="{$vo.id}" class="btn btn-sm btn-success appeal">申诉</a>
 									</td>
 								</tr>
 								{/volist}
@@ -194,7 +196,7 @@
 				});
 			});
 		});
-		$('.shensu').click(function () {
+		$('.appeal').click(function () {
 			//alert($(this).attr('id'));
 			var id = $(this).attr('id');
 			layer.prompt({
@@ -202,7 +204,7 @@
 				formType: 2
 			}, function (val) {
 				if (val) {
-					$.post("{:url('home/merchant/shensu_ajax')}", {id: id, content: val}, function (data) {
+					$.post("{:url('home/merchant/appeal_ajax')}", {id: id, content: val}, function (data) {
 						if (data.code == 1) {
 							layer.alert(data.msg, function (index) {
 								self.location.reload();
@@ -263,8 +265,8 @@
 				if (!rows) {
 					return false;
 				}
-				var href = $(this).attr('href').replace('__rows__', rows);
-				location.href = href;
+				var link = $(this).attr('href').replace('__rows__', rows);
+				location.href = link;
 			});
 			$('.grid-refresh').on('click', function () {
 				//$.pjax.reload('#pjax-container');
