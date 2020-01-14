@@ -292,7 +292,7 @@ class Merchant extends Base {
 		$data = input('post.');
 		(empty($data['amount']) || $data['amount'] <= 0) && $this->err('请输入正确的充值金额');
 		$data['amount'] < 100 && $this->err('你的充值金额不能小于100');
-		$data['amount'] > 5000 && $this->err('你的充值金额不能大于5000');
+		$data['amount'] > 10000 && $this->err('你的充值金额不能大于10000');
 		empty($data['username']) && $this->err('用户名不正确');
 		(strlen($data['username']) >= 15) && $this->err('用户名不能超过15个字符');
 		empty($data['orderid']) && $this->err('订单号不能为空');
