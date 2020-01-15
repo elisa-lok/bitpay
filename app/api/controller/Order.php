@@ -206,19 +206,13 @@ class Order extends Base {
 			//开始判断挂单剩余
 			//$total     = Db::name('order_buy')->where('sell_sid', $v['id'])->whereNotIn('status', '5,9')->sum('deal_num');
 			$actualAmt = number_format($data['amount'] / $v['price'], 8, '.', ''); //todo 修改成动态价格查询匹配的价格
-			if ($v['remain_amount'] < $actualAmt) {
-				continue;
-			}
+			if ($v['remain_amount'] < $actualAmt) continue;
 			//判断可匹配用户
 			if ($matchTraderEmpty) {
-				$find = Db::name('merchant')->where('pptrader', 'like', '%' . $v['traderid'] . '%')->find();
-				if (!empty($find)) {
-					continue;
-				}
+				if( Db::name('merchant')->where('pptrader', 'like', '%' . $v['traderid'] . '%')->find()) continue;
 			}
-			if ($v['usdtd'] < $actualAmt) {
-				continue;
-			}
+			// 冻结余额不足
+			if ($v['usdtd'] < $actualAmt) continue;
 			//判断未完成的单子
 			$traderCounter = Db::name('order_buy')->where('sell_id', $v['traderid'])->where('status', 'in', [0, 1])->count();
 			if ($traderCounter < $minCount) {
@@ -231,9 +225,7 @@ class Order extends Base {
 			// 同金额不允许匹配
 			if ($traderCounter > 0) {
 				$sameAmtCount = Db::name('order_buy')->where('sell_id', $v['traderid'])->where('status', 'in', [0, 1])->where('raw_amount', $data['amount'])->count();
-				if ($sameAmtCount > 0) {
-					continue;
-				}
+				if ($sameAmtCount > 0) continue;
 			}
 			if (Cache::has('sell_order_lock_' . $v['id'])) continue; //锁单不允许同一张单同时在卖
 			Cache::set('sell_order_lock_' . $v['id'], $v['id'], 5);
@@ -342,7 +334,6 @@ class Order extends Base {
 		$reserverSign = strtoupper(sha1($reserverStr));
 		($sign != $reserverSign) && exit(json_encode(['status' => 0, 'err' => '签名错误' . __LINE__]));
 	}
-
 }
 
 ?>

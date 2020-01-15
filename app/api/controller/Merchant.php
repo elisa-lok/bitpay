@@ -19,17 +19,6 @@ class Merchant extends Base {
 		$this->suc($return);
 	}
 
-	public function check_code(int $len = 5, string $char = '') {
-		$c       = '0123456789';
-		$char    = $char == '' ? $c : $char;
-		$charLen = strlen($char);
-		$str     = '';
-		for ($i = 0; $i < $len; $i++) {
-			$str .= $char[rand(0, $charLen - 1)];
-		}
-		return $str;
-	}
-
 	/**
 	 * 生成地址
 	 * @param $username 用户名

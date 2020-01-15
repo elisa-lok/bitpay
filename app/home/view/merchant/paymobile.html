@@ -103,7 +103,7 @@
 							</div>
 							<p style="color:blue;margin-top: 20px;font-size:18px;">温馨提示:<br>如果扫码时出现支付宝风控,请勿担心,可以继续付款。如有问题请联系客服人员。<br>由扫码支付改为转账支付，请放心充值，有任何问题请咨询客服！</p>
 							<div class='mt10 payma'>
-								<img src="/uploads/face/{$merchant.c_alipay_img}" style=''/>
+								<img src="/uploads/face/{$merchant.c_alipay_img}"/>
 							</div>
 							<div class="mt10" style="color: red;">
 								<!--<p id="alipay_click">打开支付宝,"扫一扫"付款</p>
@@ -126,23 +126,32 @@
 						{eq name="vo" value="wx"}
 						<div class='wechatpay erweima {gt name="key" value="0"}hide{/gt}'>
 							<p class='f14 p10'>请用<img src="__IMG__/wechatpay.png"/>完成支付</p>
-							<div class='mt10 bankinfo'>
-								<p class='mt10 f14' style="color:red;" id="copy_wxpay_name" data-clipboard-target="#wx_name">真实姓名：<em id="wx_name">{gt name='remaintime' value='0'}{$merchant.wxpay_name}{/gt}</em><a id="cp_wxpay_name">&nbsp;(点击复制)</a></p>
-								<p class='mt10 f14' style="color:red;margin-top: 0.2rem;" id="copy_wxpay_acc" data-clipboard-target="#wx_acc">微信手机：<em id="wx_acc">{gt name='remaintime' value='0'}{$merchant.wxpay_acc}{/gt}</em><a id="cp_wxpay_acc">&nbsp;(点击复制)</a></p>
+							<p style="color:blue;margin-top: 20px;font-size:18px;">温馨提示:<br>请把图片截图，打开微信扫一扫</p>
+							<div class='mt10 payma'>
+								<img src="/uploads/face/{$merchant.c_wechat_img}"/>
 							</div>
-							<p style="color:blue;margin-top: 20px;font-size:18px;">温馨提示:点击相应资料可进行复制<br>复制上述资料->微信收付款->转账到银行卡或手机号码->进行付款<br>下方为操作教程</p>
-							<div class="mt10" style="color: red;">
-								<p>1.微信升级到7.0.7或以上版本<br>点击右上角+号, 点击收付款</p>
-								<p><img src="__IMG__/wxpay/wx1.jpg"></p>
-								<p class="mt10">2.在二维码的下方菜单点击"向银行卡或手机号转账</p>
-								<p><img src="__IMG__/wxpay/wx2.jpg"></p>
-								<p class="mt10">3.点击"向手机号转账"</p>
-								<p><img src="__IMG__/wxpay/wx5.jpg"></p>
-								<p class="mt10">4.填写收款方手机号</p>
-								<p><img src="__IMG__/wxpay/wx6.jpg"></p>
-								<p class="mt10">5.输入真实姓名与金额转账即可</p>
-								<p><img src="__IMG__/wxpay/wx7.jpg"></p>
+							<div class="ti_t">
+								<div><p>截屏将二维码<br>保存至本地相册</p></div>
+								<div><p>打开<span class="pay_type">微信</span><br>选择扫一扫</p></div>
+								<div><p>从本地相册选择<br>选取截屏二维码</p></div>
 							</div>
+							<!--<div class='mt10 bankinfo'>-->
+							<!--	<p class='mt10 f14' style="color:red;" id="copy_wxpay_name" data-clipboard-target="#wx_name">真实姓名：<em id="wx_name">{gt name='remaintime' value='0'}{$merchant.wxpay_name}{/gt}</em><a id="cp_wxpay_name">&nbsp;(点击复制)</a></p>-->
+							<!--	<p class='mt10 f14' style="color:red;margin-top: 0.2rem;" id="copy_wxpay_acc" data-clipboard-target="#wx_acc">微信手机：<em id="wx_acc">{gt name='remaintime' value='0'}{$merchant.wxpay_acc}{/gt}</em><a id="cp_wxpay_acc">&nbsp;(点击复制)</a></p>-->
+							<!--</div>-->
+							<!--<p style="color:blue;margin-top: 20px;font-size:18px;">温馨提示:点击相应资料可进行复制<br>复制上述资料->微信收付款->转账到银行卡或手机号码->进行付款<br>下方为操作教程</p>-->
+							<!--<div class="mt10" style="color: red;">-->
+							<!--	<p>1.微信升级到7.0.7或以上版本<br>点击右上角+号, 点击收付款</p>-->
+							<!--	<p><img src="__IMG__/wxpay/wx1.jpg"></p>-->
+							<!--	<p class="mt10">2.在二维码的下方菜单点击"向银行卡或手机号转账</p>-->
+							<!--	<p><img src="__IMG__/wxpay/wx2.jpg"></p>-->
+							<!--	<p class="mt10">3.点击"向手机号转账"</p>-->
+							<!--	<p><img src="__IMG__/wxpay/wx5.jpg"></p>-->
+							<!--	<p class="mt10">4.填写收款方手机号</p>-->
+							<!--	<p><img src="__IMG__/wxpay/wx6.jpg"></p>-->
+							<!--	<p class="mt10">5.输入真实姓名与金额转账即可</p>-->
+							<!--	<p><img src="__IMG__/wxpay/wx7.jpg"></p>-->
+							<!--</div>-->
 						</div>
 						{/eq}
 
@@ -150,7 +159,7 @@
 						<div class='ysf erweima {gt name="key" value="0"}hide{/gt}'>
 							<p class='f14 p10'>请用<img src="__IMG__/yun.png" width="32" height="32"/>扫码完成支付</p>
 							<div class='mt10 payma'>
-								<img src="/uploads/face/{$merchant.c_ysf_img}" style=''/>
+								<img src="/uploads/face/{$merchant.c_ysf_img}"/>
 							</div>
 							<p class='warn'>注意! 付错金额，重复支付，充值将不到账！</p>
 							<!--<p class='p10 warn'>支付完成后，请点击下方的"我已付款"按钮</p>-->
@@ -188,7 +197,7 @@
 </body>
 <script src="https://cdn.staticfile.org/sweetalert/2.1.2/sweetalert.min.js"></script>
 <script type="text/javascript" src="__JS__/jquery.qrcode.min.js"></script>
-<!--<script>{if $order.status == 0 && $remaintime > 1 }$("#qrcode").qrcode({render: "canvas", size: 180, text: '{$merchant.c_alipay_img}'});{/if}</script>-->
+<!--<script>{if $order.status == 0 && $remaintime > 1 }$("#qrcode").qrcode({render: "canvas", size: 180, text: '{if condition="isset($merchant.c_alipay_img)"}{$merchant.c_alipay_img}{/if}'});{/if}</script>-->
 <style>
 	.swal-text {
 	background-color: #FEFAE3;

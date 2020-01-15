@@ -2,7 +2,9 @@
 namespace app\admin\controller;
 use app\admin\model\Node;
 use com\Auth;
+use think\Cache;
 use think\Controller;
+use think\Db;
 
 class Base extends Controller {
 	public function _initialize() {
@@ -48,5 +50,12 @@ class Base extends Controller {
 			cache('db_config_data', $config);
 		}
 		config($config);
+	}
+
+	protected function rollbackAndMsg($msg, $cacheKey) {
+		$cacheKey && Cache::rm($cacheKey);
+		Db::rollback();
+		$this->error($msg);
+		die;
 	}
 }

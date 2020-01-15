@@ -21,4 +21,15 @@ class Base extends Controller {
 		/* 返回状态，200 成功，500失败 */
 		die(json_encode(['status' => 0, 'err' => $message,], 320));
 	}
+
+	protected function check_code(int $len = 5, string $char = '') {
+		$c       = '0123456789';
+		$char    = $char == '' ? $c : $char;
+		$charLen = strlen($char);
+		$str     = '';
+		for ($i = 0; $i < $len; $i++) {
+			$str .= $char[rand(0, $charLen - 1)];
+		}
+		return $str;
+	}
 }
