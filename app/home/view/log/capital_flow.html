@@ -1,0 +1,172 @@
+{include file="Public:header_new"}
+<style> .cards-item{border:1px dashed #cccccc;padding:10px;margin-bottom:5px;background:#fbfbfb;}  .cards-item .form-group{width:80%;margin-bottom:5px;}  .cards-item .btn-remove{float:right;border:1px solid #cccccc;padding:5px;border-radius:2px;}</style>
+<div class="content-wrapper" id="pjax-container" style="min-height: 706px;">
+	<section class="content-header"><h1>接口订单列表 </h1></section>
+	<section class="content">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="box box-info">
+					<div class="box-header">
+						<h3 class="box-title"></h3>
+						<div class="pull-right">
+							<div class="btn-group pull-right" style="margin-right: 10px">
+								<!--<a class="btn btn-sm btn-twitter" href='{:url("home/merchant/OutUserPkOrder")}' target="_blank"><i class="fa fa-download"></i> 导出</a>&nbsp;
+								<a data-href="" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#filter-modal"><i class="fa fa-filter"></i>&nbsp;&nbsp;筛选</a>
+								--><a href="/log/CapitalFlow" class="btn btn-sm btn-facebook"><i class="fa fa-undo"></i>&nbsp;&nbsp;重置</a>
+							</div>
+							<div class="modal fade" id="filter-modal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+								<div class="modal-dialog" role="document">
+									<div class="modal-content">
+										<div class="modal-header">
+											<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+												<span aria-hidden="true">×</span> <span class="sr-only">Close</span>
+											</button>
+											<h4 class="modal-title" id="myModalLabel">筛选</h4>
+										</div>
+										<form action="/merchant/pkorder" method="get">
+											<div class="modal-body">
+												<div class="form">
+													<div class="form-group">
+														<div class="form-group">
+															<label>订单号</label>
+															<div class="input-group">
+																<div class="input-group-addon">
+																	<i class="fa fa-pencil"></i>
+																</div>
+																<input type="text" class="form-control username" placeholder="输入订单号,可模糊查找" name="ordersn">
+															</div>
+														</div>
+													</div>
+													<div class="form-group">
+														<div class="form-group">
+															<label>状态</label> <select class="form-control status select2-hidden-accessible" name="status" style="width: 100%;" tabindex="-1" aria-hidden="true">
+															<option value=""></option>
+															<option value="0">待付款</option>
+															<option value="1">待放行</option>
+															<option value="4">已完成</option>
+															<option value="5">已关闭</option>
+															<option value="6">申诉中</option>
+														</select>
+														</div>
+													</div>
+													<div class="form-group">
+														<div class="form-group">
+															<label>订单时间</label>
+															<div class="input-group">
+																<div class="input-group-addon">
+																	<i class="fa fa-calendar"></i>
+																</div>
+																<input type="text" class="form-control" id="created_at_start" placeholder="起止时间" name="created_at[start]"><span class="input-group-addon" style="border-left: 0; border-right: 0;">-</span>
+																<input type="text" class="form-control" id="created_at_end" placeholder="起止时间" name="created_at[end]">
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="modal-footer">
+												<button type="submit" class="btn btn-primary submit">提交</button>
+												<button type="reset" class="btn btn-warning pull-left">重置</button>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+						<span><a class="btn btn-sm btn-primary grid-refresh"><i class="fa fa-refresh"></i> 刷新</a></span>
+					</div>
+					<!-- /.box-header -->
+					<!-- form start -->
+					<div class="tab-content table-responsive">
+						<div id="tab_886859313">
+							<table class="table">
+								<thead>
+								<tr>
+									<th>流水ID</th>
+									<th>商户ID</th>
+									<th>前金额</th>
+									<th>后金额</th>
+									<th>变动数量</th>
+									<th>手续费</th>
+									<th>冻结前</th>
+									<th>冻结后</th>
+									<th>冻结变动</th>
+									<th>类型</th>
+									<th>关联单号</th>
+									<th>备注</th>
+									<th>时间</th>
+								</tr>
+								</thead>
+								<tbody>
+								{volist name="list" id="vo"}
+								<tr>
+									<td>{$vo.bal_log_id}</td>
+									<td>{$vo.merchant_id}</td>
+									<td>{$vo.amt_before}</td>
+									<td>{$vo.amt_after}</td>
+									<td style="font-weight:bold;color:{if $vo.amt_change >0}red{else}green{/if}">{if $vo.amt_change >0}+{/if}{$vo.amt_change}</td>
+									<td>{$vo.amt_fee}</td>
+									<td>{$vo.frozen_amt_before}</td>
+									<td>{$vo.frozen_amt_after}</td>
+									<td style="font-weight:bold;color:{if $vo.frozen_amt_change >0}red{else}green{/if}">{if $vo.frozen_amt_change >0}+{/if}{$vo.frozen_amt_change}</td>
+									<td>{$vo.action_type}</td>
+									<td>{$vo.relate_id}</td>
+									<td>{$vo.memo}</td>
+									<td>{$vo.create_time}</td>
+								</tr>
+								{/volist}
+								</tbody>
+							</table>
+						</div>
+						<div class="box-footer clearfix"></div>
+						<div class="text-center text-black" >共{$count}条数据 {if $cur_page > 1}<a style="font-weight:bold;color:black" href="/log/capitalFlow?page={$cur_page-1}">上一页  | </a>{/if}{if $cur_page < $total_page}<a class="text-black" style="font-weight:bold;color:black" href="/log/capitalFlow?page={$cur_page+1}">下一页</a>{/if}</div>
+					</div>
+				</div>
+				<script></script>
+			</div>
+		</div>
+	</section>
+	<script src="/static/admin/js/layer/layer.js"></script>
+	<script data-exec-on-popstate="">
+		$(function () {
+			$('#created_at_start').datetimepicker({"format": "YYYY-MM-DD HH:mm:ss", "locale": "zh_CN"});
+			$('#created_at_end').datetimepicker({"format": "YYYY-MM-DD HH:mm:ss", "locale": "zh_CN", "useCurrent": false});
+			$("#created_at_start").on("dp.change", function (e) {
+				$('#created_at_end').data("DateTimePicker").minDate(e.date);
+			});
+			$("#created_at_end").on("dp.change", function (e) {
+				$('#created_at_start').data("DateTimePicker").maxDate(e.date);
+			});
+			$('#end_at_start').datetimepicker({"format": "YYYY-MM-DD HH:mm:ss", "locale": "zh_CN"});
+			$('#end_at_end').datetimepicker({"format": "YYYY-MM-DD HH:mm:ss", "locale": "zh_CN", "useCurrent": false});
+			$("#end_at_start").on("dp.change", function (e) {
+				$('#end_at_end').data("DateTimePicker").minDate(e.date);
+			});
+			$("#end_at_end").on("dp.change", function (e) {
+				$('#end_at_start').data("DateTimePicker").maxDate(e.date);
+			});
+			$("#filter-modal .submit").click(function () {
+				$("#filter-modal").modal('toggle');
+				$('body').removeClass('modal-open');
+				$('.modal-backdrop').remove();
+			});
+			$(".status").select2({
+				placeholder: "选择"
+			});
+			$('.export-selected').click(function (e) {
+				e.preventDefault();
+				var rows = selectedRows().join(',');
+				if (!rows) {
+					return false;
+				}
+				var link = $(this).attr('href').replace('__rows__', rows);
+				location.href = link;
+			});
+			$('.grid-refresh').on('click', function () {
+				window.location.reload();
+			});
+			$('.grid-per-pager').on("change", function (e) {
+				//$.pjax({url: this.value, container: '#pjax-container'});
+			});
+		});
+	</script>
+</div>{include file="Public:footer_new"/}{include file="Public:header_new"}

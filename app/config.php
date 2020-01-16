@@ -37,7 +37,7 @@ return [
 	'log'                        => [
 		'type'  => 'File',// 日志记录方式，内置 file socket 支持扩展
 		'path'  => LOG_PATH,// 日志保存目录
-		'level' => ['error', 'critical', 'alert', 'emergency', 'sql'],// 日志记录级别 debug, info, notice, warning, error, critical, alert, emergency,sql
+		'level' => ['error', 'critical', 'alert', 'emergency'],// 日志记录级别 debug, info, notice, warning, error, critical, alert, emergency,sql
 	],
 	// | 缓存设置
 	// 'cache'                      => ['type' => 'file', 'path' => CACHE_PATH, 'prefix' => '', 'expire' => 0,],

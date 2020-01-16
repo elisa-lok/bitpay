@@ -1170,9 +1170,7 @@ class Merchant extends Base {
 		$type      = input('post.type');
 		$orderInfo = Db::name('order_buy')->where('id', $id)->find();
 		(!$orderInfo) && showJson(['code' => 0, 'msg' => '订单不存在']);
-		if ($orderInfo['status'] == 4) {
-			//showJson(['code'=>0, 'msg'=>'订单已完成，请刷新']);
-		}
+		//($orderInfo['status'] == 4) && showJson(['code'=>0, 'msg'=>'订单已完成，请刷新']);
 		($type != 1 && $type != 2) && showJson(['code' => 0, 'msg' => '回调选择错误']);
 		$buyer  = Db::name('merchant')->where('id', $orderInfo['buy_id'])->find();
 		$trader = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
@@ -1194,7 +1192,7 @@ class Merchant extends Base {
 			$rs4      = $rs5 = 1;
 			if ($sellInfo) {
 				// 如果挂单已下架 回滚余额
-				$rs4 = balanceChange(FALSE, $orderInfo['sell_id'], $orderInfo['deal_num'], 0, -$orderInfo['deal_num'], 0, BAL_CANCEL, $orderInfo['id'], "申述成功");
+				$rs4 = balanceChange(FALSE, $orderInfo['sell_id'], $orderInfo['deal_num'], 0, -$orderInfo['deal_num'], 0, BAL_CANCEL, $orderInfo['orderid'], "申诉成功");
 				// $rs4 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num']);
 				// $rs5 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $orderInfo['deal_num']);
 			}
@@ -1254,11 +1252,11 @@ class Merchant extends Base {
 		$mum  = $orderInfo['deal_num'] - $sfee;
 		Db::startTrans();
 		try {
-			$rs1 = balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$orderInfo['deal_num'], 0, BAL_SOLD, $orderInfo['id'], "申述成功->buy");
+			$rs1 = balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$orderInfo['deal_num'], 0, BAL_SOLD, $orderInfo['id'], "申诉成功->buy");
 			// $rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num'] + $orderInfo['fee']);
 			$rs2 = Db::name('order_sell')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'buyer_fee' => $sfee]);
 			// $rs3      = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('usdt', $mum);
-			$rs3      = balanceChange(FALSE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], "申述成功->buy");
+			$rs3      = balanceChange(FALSE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], "申诉成功->buy");
 			$rs4      = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('transact_buy', 1);
 			$total    = Db::name('order_sell')->field('sum(dktime-ctime) as total')->where('buy_id', $orderInfo['buy_id'])->where('status', 4)->select();
 			$tt       = $total[0]['total'];
@@ -1440,11 +1438,11 @@ class Merchant extends Base {
 		Db::startTrans();
 		try {
 			$rs1 = TRUE;
-			//$rs1 = balanceChange(false, $orderInfo['buy_id'], $orderInfo['deal_num'] + $orderInfo['fee'], 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], "申述失败操作->buy");
+			//$rs1 = balanceChange(false, $orderInfo['buy_id'], $orderInfo['deal_num'] + $orderInfo['fee'], 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], "申诉失败操作->buy");
 			//$rs1 = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setDec('usdtd', $orderInfo['deal_num'] + $orderInfo['fee']);
 			$rs2 = Db::name('order_sell')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time()]);
 			//$rs3 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $orderInfo['deal_num'] + $orderInfo['fee']);
-			$rs3 = balanceChange(FALSE, $orderInfo['sell_id'], $orderInfo['deal_num'] + $orderInfo['fee'], 0, -$orderInfo['deal_num'], $orderInfo['fee'], BAL_BOUGHT, $orderInfo['id'], "申述失败操作->buy");
+			$rs3 = balanceChange(FALSE, $orderInfo['sell_id'], $orderInfo['deal_num'] + $orderInfo['fee'], 0, -$orderInfo['deal_num'], $orderInfo['fee'], BAL_BOUGHT, $orderInfo['id'], "申诉失败操作->buy");
 			if ($rs1 && $rs2 && $rs3) {
 				financeLog($orderInfo['sell_id'], ($orderInfo['deal_num'] + $orderInfo['fee']), '卖出USDT_取消', 1, session('username'));//添加日志
 				// 提交事务

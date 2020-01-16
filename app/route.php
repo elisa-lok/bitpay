@@ -26,6 +26,7 @@ Route::rule('merchant/newadbuy', 'home/merchant/newadbuy', 'GET|POST');
 Route::rule('merchant/orderlist', 'home/merchant/orderlist', 'GET|POST');
 Route::rule('home/merchant/deal', 'home/order/deal', 'GET|POST');
 Route::rule('home/merchant/deal_merchant', 'home/order/deal_merchant', 'GET|POST');
+Route::rule('log/capitalFlow', 'home/log/capitalFlow', 'GET|POST');
 // Route::rule('merchant/editad','home/merchant/editad', 'GET|POST'); //编辑广告
 Route::rule('merchant/pay', 'home/merchant/pay', 'GET|POST');
 // Route::rule('merchant/editadbuy','home/merchant/editadbuy', 'GET|POST');
