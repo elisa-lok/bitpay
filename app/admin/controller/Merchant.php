@@ -1061,7 +1061,7 @@ class Merchant extends Base {
 				$lists[$k]['bankinfo'] = "收款人:" . $bank['truename'] . "<br>开户行:" . $bank['c_bank'] . $bank['c_bank_detail'] . "<br>收款账号:" . $bank['c_bank_card'];
 			}
 			if ($sorder['pay_method2'] > 0) {
-				$alipay                  = Db::name('merchant_zfb')->where(['id' => $sorder['pay_method2']])->find();
+				$alipay               = Db::name('merchant_zfb')->where(['id' => $sorder['pay_method2']])->find();
 				$lists[$k]['zfbinfo'] = '/uploads/face/' . $alipay['c_bank_detail'];
 				// $str.='|<a onclick="showzfb({{d[i].zfbinfo}})">支付宝</a>';
 			}
@@ -1125,7 +1125,7 @@ class Merchant extends Base {
 				$lists[$k]['bankinfo'] = "收款人:" . $bank['truename'] . "<br>开户行:" . $bank['c_bank'] . $bank['c_bank_detail'] . "<br>收款账号:" . $bank['c_bank_card'];
 			}
 			if ($v['pay2'] > 0) {
-				$alipay                  = Db::name('merchant_zfb')->where(['id' => $v['pay2']])->find();
+				$alipay               = Db::name('merchant_zfb')->where(['id' => $v['pay2']])->find();
 				$lists[$k]['zfbinfo'] = '/uploads/face/' . $alipay['c_bank_detail'];
 				// $str.='|<a onclick="showzfb({{d[i].zfbinfo}})">支付宝</a>';
 			}
@@ -1284,10 +1284,11 @@ class Merchant extends Base {
 	}
 
 	public function ssfail() {
-		$id        = input('post.id');
-		$type      = input('post.type');
+		$id   = input('post.id');
+		$type = input('post.type');
+		!in_array($type, ['1', '2']) && $this->error('参数不正确');
 		$amount    = input('post.amount');
-		$orderInfo = Db::name('order_buy')->where('id', $id)->find();
+		$orderInfo = Db::name('order_buy')->lock()->where('id', $id)->find();
 		(!$orderInfo) && showJson(['code' => 0, 'msg' => '订单不存在']);
 		($type != 1 && $type != 2) && showJson(['code' => 0, 'msg' => '回调选择错误']);
 		($amount == '' || ($amount > $orderInfo['deal_amount'])) && showJson(['code' => 0, 'msg' => '回调金额错误']);
@@ -1296,145 +1297,132 @@ class Merchant extends Base {
 		$lock = Cache::set($id, TRUE, 60);
 		!$lock && $this->error('锁定操作失败，请重试。');
 		$oldNum = $orderInfo['deal_num'];
-		if ($amount * 100 != $orderInfo['deal_amount'] * 100) {
-			$orderInfo['deal_num'] = round($amount / $orderInfo['deal_price'], 8);
-		}
-		$sfee   = 0;
-		$mum    = $orderInfo['deal_num'] - $sfee;
-		$buyer  = Db::name('merchant')->where('id', $orderInfo['buy_id'])->find();
-		$seller = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
+		($amount != $orderInfo['deal_amount']) && ($orderInfo['deal_num'] = number_format($amount / $orderInfo['deal_price'], 8, '.', ''));
+		$mchModel = Db::name('merchant');
+		$buyer    = $mchModel->where('id', $orderInfo['buy_id'])->find();
+		$seller   = $mchModel->where('id', $orderInfo['sell_id'])->find();
 		($seller['usdtd'] < $oldNum) && showJson(['code' => 0, 'msg' => '承兑商冻结不足']);
-		($amount * 100 > $orderInfo['deal_amount'] * 100 && $seller['usdt'] < ($orderInfo['deal_num'] - $oldNum)) && showJson(['code' => 0, 'msg' => '承兑商余额不足']);
+		($amount > $orderInfo['deal_amount'] && $seller['usdt'] < ($orderInfo['deal_num'] - $oldNum)) && showJson(['code' => 0, 'msg' => '承兑商余额不足']);
 		//盘口费率
-		$pkfee = $buyer['merchant_pk_fee'];
-		$pkfee = $pkfee ? $pkfee : 0;
-		$pkdec = $orderInfo['deal_num'] * $pkfee / 100;
+		$pkFeeRate = $buyer['merchant_pk_fee'];
+		$pkFeeRate = $pkFeeRate ? $pkFeeRate : 0;
+		$totalFee  = $orderInfo['deal_num'] * $pkFeeRate / 100;
 		//承兑商卖单奖励
 		$sellerGet         = $seller['trader_trader_get'];
 		$sellerGet         = $sellerGet ? $sellerGet : 0;
-		$sellerMoney       = $sellerGet * $orderInfo['deal_num'] / 100;
-		$sellerParentMoney = $sellerMParentMoney = $tpexist = $mpexist = 0;
-		$model2            = new MerchantModel();
-		if ($seller['pid']) {
-			$sellerP = $model2->getUserByParam($seller['pid'], 'id');
-			if ($sellerP['agent_check'] == 1 && $sellerP['trader_parent_get']) {
-				//承兑商代理利润
-				$tpexist           = 1;
-				$sellerParentGet   = $sellerP['trader_parent_get'];
-				$sellerParentGet   = $sellerParentGet ? $sellerParentGet : 0;
-				$sellerParentMoney = $sellerParentGet * $orderInfo['deal_num'] / 100;
+		$sellerAwardMoney  = $sellerGet * $orderInfo['deal_num'] / 100;
+		$sellerParentMoney = $buyerParentMoney = $buyerAgentExist = 0;
+		// 承兑商代理
+		$firstParent      = $secondParent = $thirdParent = NULL;
+		$sellerFirstMoney = $sellerSecondMoney = $sellerThirdMoney = 0;
+		if ($seller['pid'] > 0) {
+			// 一级
+			$firstParent      = $mchModel->where('id', $seller['pid'])->find();
+			$sellerFirstMoney = ($firstParent && $firstParent['agent_check'] == 1) ? $orderInfo['deal_num'] * (float)$firstParent['trader_parent_get'] / 100 : $sellerFirstMoney;
+			$sellerFirstMoney < 0 && $this->error('配置异常, 请联系管理员,错误码:231');
+			// 二级
+			if ($firstParent && $firstParent['pid'] > 0) {
+				$secondParent      = $mchModel->where('id', $firstParent['pid'])->find();
+				$sellerSecondMoney = ($secondParent && $secondParent['agent_check'] == 1) ? ($orderInfo['deal_num'] * ($secondParent['trader_parent_get'] - $firstParent['trader_parent_get']) / 100) : $sellerSecondMoney;
+				$sellerSecondMoney < 0 && $this->error('配置异常, 请联系管理员,错误码:232');
 			}
+			// 三级
+			if ($secondParent && $secondParent['pid']) {
+				$thirdParent      = $mchModel->where('id', $secondParent['pid'])->find();
+				$sellerThirdMoney = ($thirdParent && $thirdParent['agent_check'] == 1) ? ($orderInfo['deal_num'] * ($thirdParent['trader_parent_get'] - $secondParent['trader_parent_get']) / 100) : $sellerThirdMoney;
+				$sellerThirdMoney < 0 && $this->error('配置异常, 请联系管理员,错误码:233');
+			}
+			$sellerParentMoney = $sellerFirstMoney + $sellerSecondMoney + $sellerThirdMoney;
 		}
+		// 买家代理, 商户
 		if ($buyer['pid']) {
-			$buyerP = $model2->getUserByParam($buyer['pid'], 'id');
-			$buyerP['enable_new_get'] == 0 ? $sellerMParentGet = $buyerP['trader_merchant_parent_get'] : $sellerMParentGet = $buyer['trader_merchant_parent_get_new'];
-			if ($buyerP['agent_check'] == 1 && $sellerMParentGet) {
+			$buyerParent    = $mchModel->where('id', $buyer['pid'])->find();
+			$buyerParentGet = $buyerParent['enable_new_get'] == 0 ? $buyerParent['trader_merchant_parent_get'] : $buyer['trader_merchant_parent_get_new'];
+			if ($buyerParent['agent_check'] == 1 && $buyerParentGet > 0) {
 				//商户代理利润
-				$mpexist = 1;
-				//$sellerMParentGet   = $buyerP['trader_merchant_parent_get'];
-				$sellerMParentGet   = $sellerMParentGet ? $sellerMParentGet : 0;
-				$sellerMParentMoney = $sellerMParentGet * $orderInfo['deal_num'] / 100;
+				$buyerAgentExist  = 1;
+				$buyerParentGet   = $buyerParentGet ? $buyerParentGet : 0;
+				$buyerParentMoney = $buyerParentGet * $orderInfo['deal_num'] / 100;
+				($sellerParentMoney + $buyerParentMoney + $sellerAwardMoney > $totalFee) && $this->error('配置异常, 请联系管理员,错误码:234');
 			}
 		}
 		//平台，承兑商代理，商户代理，承兑商，商户只能得到这么多，多的给平台
-		$moneyArr           = getMoneyByLevel($pkdec, $platformMoney, $sellerParentMoney, $sellerMParentMoney, $sellerMoney);
-		$mum                = $mum - $pkdec;
-		$platformMoney      = $moneyArr[0];
-		$sellerParentMoney  = $moneyArr[1];
-		$sellerMParentMoney = $moneyArr[2];
-		$sellerMoney        = $moneyArr[3];
+		$sum = $orderInfo['deal_num'] - $totalFee;
+		//实际到账金额
+		$platformMoney = $totalFee - $sellerParentMoney - $buyerParentMoney - $sellerAwardMoney;
+		$platformMoney < 0 && $this->error('配置异常, 请联系管理员,错误码:235');
 		Db::startTrans();
 		try {
-			// $adInfo = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->find();
+			// 把多余的币回归到原来订单里面去
 			$backAmount = $amount / $orderInfo['deal_price'];  // 返回的数量
-			// 回滚
-			$res1 = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->setInc('remain_amount', $backAmount);
-			$res2 = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->setDec('trading_volume', $backAmount);
-			$rs1  = balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$backAmount, 0, BAL_BOUGHT, $orderInfo['id'], "申述失败操作");
-			//$rs1  = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $backAmount);
-			// $rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $oldNum);
-			if ($amount * 100 != $orderInfo['deal_amount'] * 100) {
-				$rs2 = Db::name('order_buy')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'platform_fee' => $moneyArr[0], 'deal_amount' => $amount, 'deal_num' => $orderInfo['deal_num']]);
-			} else {
-				$rs2 = Db::name('order_buy')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'platform_fee' => $moneyArr[0]]);
-			}
-			$rs22 = TRUE;
-			if ($amount * 100 > $orderInfo['deal_amount'] * 100) {
-				//$rs22    = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdt', $orderInfo['deal_num'] - $oldNum);
-				$samount = $orderInfo['deal_num'] - $oldNum;
-			}
-			if ($amount * 100 < $orderInfo['deal_amount'] * 100) {
-				//$rs22    = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $oldNum - $orderInfo['deal_num']);
-				$samount = $oldNum - $orderInfo['deal_num'];
-			}
-			//$rs3      = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('usdt', $mum);
-			$rs3      = balanceChange(FALSE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], "申述失败操作");
-			$rs4      = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('transact', 1);
-			$total    = Db::name('order_buy')->field('sum(finished_time-dktime) as total')->where('sell_id', $orderInfo['sell_id'])->where('status', 4)->select();
-			$tt       = $total[0]['total'];
-			$transact = Db::name('merchant')->where('id', $orderInfo['sell_id'])->value('transact');
-			$rs5      = Db::name('merchant')->where('id', $orderInfo['sell_id'])->update(['averge' => intval($tt / $transact)]);
+			($backAmount > 0) && Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->update(['remain_amount' => Db::raw('remain_amount + ' . $backAmount), 'trading_volume' => Db::raw('trading_volume - ' . $backAmount)]);
+			$rs1 = balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$backAmount, 0, BAL_SOLD, $orderInfo['id'], '申诉失败操作');
+			// 更新买单信息
+			$updateCondition = $amount != $orderInfo['deal_amount'] ? ['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'platform_fee' => $platformMoney, 'deal_amount' => $amount, 'deal_num' => $orderInfo['deal_num']] : [
+				'id'            => $orderInfo['id'],
+				'status'        => 4,
+				'finished_time' => time(),
+				'platform_fee'  => $platformMoney
+			];
+			// 更新订单信息
+			!Db::name('order_buy')->update($updateCondition) && $this->rollbackAndMsg('更新订单失败', $id);
+			!Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('transact', 1) && $this->rollbackAndMsg('更新次数失败', $id);
 			//承兑商卖单奖励
 			$rs6 = $rs7 = $rs8 = $rs9 = $rs10 = $rs11 = $res3 = TRUE;
-			if ($sellerMoney > 0) {
-				// $rs6 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $sellerMoney);
-				$rs6 = balanceChange(FALSE, $orderInfo['sell_id'], $sellerMoney, 0, 0, 0, BAL_COMMISSION, $orderInfo['id'], "申述失败操作");
-				$rs7 = Db::name('trader_reward')->insert(['uid' => $orderInfo['sell_id'], 'orderid' => $orderInfo['id'], 'amount' => $sellerMoney, 'type' => 0, 'create_time' => time()]);
+			// 卖家卖单奖励
+			if ($sellerAwardMoney > 0) {
+				!balanceChange(FALSE, $orderInfo['sell_id'], $sellerAwardMoney, 0, 0, 0, BAL_COMMISSION, $orderInfo['orderid'], '申诉订单失败') && $this->rollbackAndMsg('订单操作失败,,错误码:10003', $id);
+				!(Db::name('trader_reward')->insert(['uid' => $orderInfo['sell_id'], 'orderid' => $orderInfo['id'], 'amount' => $sellerAwardMoney, 'type' => 0, 'create_time' => time()])) && $this->rollbackAndMsg('订单操作失败,错误码:10004', $id);
 			}
-			//承兑商代理利润
-			if ($sellerParentMoney > 0 && $tpexist) {
-				$rsArr = agentReward($seller['pid'], $orderInfo['sell_id'], $sellerParentMoney, 3);//3
-				$rs8   = $rsArr[0];
-				$rs9   = $rsArr[1];
+			//卖家代理利润
+			if ($sellerFirstMoney > 0) {
+				// 一级
+				$rsArr = agentReward($firstParent['id'], $orderInfo['sell_id'], $sellerFirstMoney, 3, $id);
+				!$rsArr[0] && $this->rollbackAndMsg('订单操作失败,错误码:10005', $id);
+				!$rsArr[1] && $this->rollbackAndMsg('订单操作失败,错误码:10006', $id);
+				// 二级
+				if ($sellerSecondMoney > 0) {
+					$rsArr = agentReward($secondParent['id'], $orderInfo['sell_id'], $sellerSecondMoney, 3, $id);
+					!$rsArr[0] && $this->rollbackAndMsg('订单操作失败,错误码:10007', $id);
+					!$rsArr[1] && $this->rollbackAndMsg('订单操作失败,错误码:10008', $id);
+				}
+				// 三级
+				if ($sellerThirdMoney > 0) {
+					$rsArr = agentReward($thirdParent['id'], $orderInfo['sell_id'], $sellerThirdMoney, 3, $id);
+					!$rsArr[0] && $this->rollbackAndMsg('订单操作失败,错误码:10009', $id);
+					!$rsArr[1] && $this->rollbackAndMsg('订单操作失败,错误码:10010', $id);
+				}
 			}
-			//商户代理利润
-			if ($sellerMParentMoney > 0 && $mpexist) {
-				$rsArr = agentReward($buyer['pid'], $orderInfo['buy_id'], $sellerMParentMoney, 4);//4
-				$rs10  = $rsArr[0];
-				$rs11  = $rsArr[1];
+			// 买家获取币并更新信息
+			!balanceChange(FALSE, $orderInfo['buy_id'], $sum, 0, 0, 0, BAL_BOUGHT, $orderInfo['orderid'], '申诉订单失败') && $this->rollbackAndMsg('订单操作失败,错误码:10011', $id);
+			!$mchModel->where('id', $orderInfo['buy_id'])->update(['transact' => Db::raw('transact+1')]) && $this->rollbackAndMsg('订单操作失败,错误码:10012', $id);
+			// 买家代理
+			if ($buyerParentMoney > 0 && $buyerAgentExist) {
+				$rsArr = agentReward($buyer['pid'], $orderInfo['buy_id'], $buyerParentMoney, 4, $id);//4
+				!$rsArr[0] && $this->rollbackAndMsg('订单操作失败,错误码:10013', $id);
+				!$rsArr[1] && $this->rollbackAndMsg('订单操作失败,错误码:10014', $id);
 			}
 			// 平台利润
 			if ($platformMoney > 0) {
-				$rsArr = agentReward(-1, 0, $platformMoney, 5);//5
-				$res3  = $rsArr[1];
+				$rsArr = agentReward(-1, 0, $platformMoney, 5, $id);//5
+				!$rsArr[1] && $this->rollbackAndMsg('订单操作失败,错误码:10015', $id);
 			}
-			if ($rs1 && $rs2 && $rs3 && $rs4 && $rs5 && $rs6 && $rs7 && $rs8 && $rs9 && $rs10 && $rs11 && $rs22 && $res1 && $res2 && $res3) {
-				// 提交事务
-				Db::commit();
-				financeLog($orderInfo['sell_id'], $mum, '卖出USDT_释放', 0, session('username'));               //添加日志
-				financeLog($orderInfo['buy_id'], $mum, '买入USDT_2', 0, session('username'));                 //添加日志
-				financeLog($orderInfo['sell_id'], $sellerMoney, '卖出USDT_承兑商卖单奖励_2', 1, session('username'));//添加日志
-				// financeLog($orderInfo['buy_id'],$mum,'买入USDT',0);//添加日志
-				getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $orderInfo['deal_num']);
-				//请求回调接口
-				$data['amount'] = $orderInfo['deal_num'];
-				if ($amount * 100 != $orderInfo['deal_amount'] * 100) {
-					$data['rmb'] = $amount;
-				} else {
-					$data['rmb'] = $orderInfo['deal_amount'];
-				}
-				$data['orderid'] = $orderInfo['orderid'];
-				$data['appid']   = $buyer['appid'];
-				if ($type == 1) {
-					$status = 1;
-				} elseif ($type == 2) {
-					$status = 0;
-				}
-				$data['status'] = $status;
-				//$status && askNotify($data, $orderInfo['notify_url'], $buyer['key']);
-				Cache::rm($id);
-				$this->success('操作成功');
-			} else {
-				// 回滚事务
-				Db::rollback();
-				Cache::rm($id);
-				$this->error('操作失败');
-			}
-		} catch (DbException $e) {
-			// 回滚事务
-			Db::rollback();
+			// 提交事务
+			Db::commit();
+			getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $sum, $orderInfo['deal_num']);
+			//请求回调接口
+			$data = [
+				'amount'  => $orderInfo['deal_num'],
+				'rmb'     => $amount != $orderInfo['deal_amount'] ? $amount : $orderInfo['deal_amount'],
+				'orderid' => $orderInfo['orderid'],
+				'appid'   => $buyer['appid'],
+				'status'  => $type == 1 ? 1 : 0
+			];
+			//$status && askNotify($data, $orderInfo['notify_url'], $buyer['key']);
 			Cache::rm($id);
-			$this->error('操作失败，参考信息：' . $e->getMessage());
+			$this->success('操作成功');
+		} catch (DbException $e) {
+			$this->rollbackAndMsg('操作失败，参考信息：' . $e->getMessage(), $id);
 		}
 	}
 

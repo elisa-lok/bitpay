@@ -49,7 +49,7 @@ Route::rule('logout', 'home/login/logout', 'GET');
 Route::rule('merchant/traderreward', 'home/merchant/traderreward', 'GET|POST');
 Route::rule('merchant/pkorder', 'home/merchant/pkorder', 'GET');
 // 交易接口
-Route::rule('api/merchant/requestTraderRechargeRmb', 'api/order/tradeCrypto', 'POST');
+Route::rule('api/merchant/requestTraderRecharge', 'api/order/tradeCrypto', 'POST');
 Route::rule('api/merchant/requestTraderRechargeRmb', 'api/order/tradeFiat', 'POST');
 // CLI
 Route::rule('auto/sellCountDown', 'home/auto/sellCountDown', 'GET');
