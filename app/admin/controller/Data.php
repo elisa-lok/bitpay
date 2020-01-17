@@ -80,7 +80,7 @@ class Data extends Base {
 					Session::set('backup_tables', NULL);
 					Session::set('backup_file', NULL);
 					Session::set('backup_config', NULL);
-					writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】备份数据库:成功', 1);
+					writelog($this->uid, $this->username, '用户【' . $this->username . '】备份数据库:成功', 1);
 					return $this->success('备份完成！');
 				}
 			} else {
@@ -113,11 +113,11 @@ class Data extends Base {
 		} else {
 			$list = $Db->query("OPTIMIZE TABLE `{$ids}`");
 			if ($list) {
-				writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】优化数据库:成功', 1);
+				writelog($this->uid, $this->username, '用户【' . $this->username . '】优化数据库:成功', 1);
 				$this->success("数据表'{$ids}'优化完成！");
 				//return json("数据表'{$ids}'优化完成！");
 			} else {
-				writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】备份数据库:失败', 0);
+				writelog($this->uid, $this->username, '用户【' . $this->username . '】备份数据库:失败', 0);
 				$this->error("数据表'{$ids}'优化出错请重试！");
 			}
 		}
@@ -144,11 +144,11 @@ class Data extends Base {
 		} else {
 			$list = $Db->query("REPAIR TABLE `{$ids}`");
 			if ($list) {
-				writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】修复数据库:成功', 1);
+				writelog($this->uid, $this->username, '用户【' . $this->username . '】修复数据库:成功', 1);
 				$this->success("数据表'{$ids}'修复完成！");
 				//return json("数据表'{$ids}'优化完成！");
 			} else {
-				writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】修复数据库:失败', 0);
+				writelog($this->uid, $this->username, '用户【' . $this->username . '】修复数据库:失败', 0);
 				$this->error("数据表'{$ids}'修复出错请重试！");
 			}
 		}
@@ -203,10 +203,10 @@ class Data extends Base {
 		$path = realpath(Config::get('data_backup_path')) . DIRECTORY_SEPARATOR . $name;
 		array_map("unlink", glob($path));
 		if (count(glob($path))) {
-			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】删除备份:失败', 0);
+			writelog($this->uid, $this->username, '用户【' . $this->username . '】删除备份:失败', 0);
 			return $this->error('备份文件删除失败，请检查权限！');
 		} else {
-			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】删除备份:成功', 1);
+			writelog($this->uid, $this->username, '用户【' . $this->username . '】删除备份:成功', 1);
 			return $this->success('备份文件删除成功！');
 		}
 	}
@@ -250,7 +250,7 @@ class Data extends Base {
 					$data = ['part' => $part, 'start' => 0];
 					$this->success("正在还原...#{$part}", '', $data);
 				} else {
-					writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】还原数据库:成功', 0);
+					writelog($this->uid, $this->username, '用户【' . $this->username . '】还原数据库:成功', 0);
 					Session::set('backup_list', NULL);
 					$this->success('数据库还原完成！');
 				}
@@ -265,7 +265,7 @@ class Data extends Base {
 				}
 			}
 		} else {
-			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】还原数据库:失败', 0);
+			writelog($this->uid, $this->username, '用户【' . $this->username . '】还原数据库:失败', 0);
 			return $this->error('参数错误！');
 		}
 	}

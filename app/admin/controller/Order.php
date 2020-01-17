@@ -255,9 +255,9 @@ class Order extends Base {
 					if ($res1 && $rs1 && $rs2 && $rs3 && $rs4 && $rs5) {
 						// 提交事务
 						Db::commit();
-						financeLog($orderInfo['buy_id'], $mum, '买入USDT_f2', 0, session('username'));         //添加日志
-						financeLog($orderInfo['sell_id'], $realAmt, '卖出USDT_f2', 1, session('username'));    //添加日志
-						getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $realAmt, session('username'));
+						financeLog($orderInfo['buy_id'], $mum, '买入USDT_f2', 0, $this->username);         //添加日志
+						financeLog($orderInfo['sell_id'], $realAmt, '卖出USDT_f2', 1, $this->username);    //添加日志
+						getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $realAmt, $this->username);
 						showMsg('操作成功', 1);
 					} else {
 						// 回滚事务

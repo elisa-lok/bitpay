@@ -31,7 +31,7 @@ class Config extends Base {
 				$configModel->SaveConfig($map, $value);
 			}
 		}
-		writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】更改设置:成功', 1);
+		writelog($this->uid, $this->username, '用户【' . $this->username . '】更改设置:成功', 1);
 		cache('db_config_data', NULL);
 		$this->success('保存成功！');
 	}

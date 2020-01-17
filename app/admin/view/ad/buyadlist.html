@@ -15,7 +15,7 @@
                         <a href="{:url('add_member')}"><button class="btn btn-outline btn-primary" type="button">添加会员</button></a>
                     </div>
                 </div>  -->
-                    <form name="admin_list_sea" class="form-search" method="post" action="{:url('buyadlist')}">
+                    <form name="admin_list_sea" class="form-search" method="post" action="{:url('ad/buyadlist')}">
                         <div class="col-sm-6">
                             <div class="input-group">
                                 <input type="text" id="key" class="form-control" style="width:40%;" name="key" value="{$val}" placeholder="输入承兑商姓名/手机号" />
@@ -124,7 +124,7 @@
         var key=$('#key').val();
         var oid=$('#oid').val();
         var status = $('#status option:selected').val();
-        $.getJSON('{:url("Merchant/buyadlist")}', {page: curr || 1,key:key,oid:oid, status:status}, function(data){
+        $.getJSON('{:url("ad/buyadlist")}', {page: curr || 1,key:key,oid:oid, status:status}, function(data){
             $(".spiner-example").css('display','none'); //数据加载完关闭动画
             if(data==''){
                 $("#list-content").html('<td colspan="10" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>');
@@ -152,20 +152,20 @@
     }
 //通过
 function mydelete(id){
-	lunhui.myconfirm(id, '{:url("deletebuyad")}', '确认删除吗？');
+	lunhui.myconfirm(id, '{:url("ad/deletebuyad")}', '确认删除吗？');
 }
 //拒绝
 function down(id){
-	lunhui.myconfirm(id, '{:url("downbuyad")}', '确认下架吗？');
+	lunhui.myconfirm(id, '{:url("ad/downbuyad")}', '确认下架吗？');
 }
 function up(id){
-	lunhui.myconfirm(id, '{:url("upbuyad")}', '确认下架吗？');
+	lunhui.myconfirm(id, '{:url("ad/upbuyad")}', '确认下架吗？');
 }
 function frozen(id){
-	lunhui.myconfirm(id, '{:url("frozenbuyad")}', '确认冻结吗？');
+	lunhui.myconfirm(id, '{:url("ad/frozenbuyad")}', '确认冻结吗？');
 }
 function unfrozen(id){
-	lunhui.myconfirm(id, '{:url("unfrozenbuyad")}', '确认解冻吗？');
+	lunhui.myconfirm(id, '{:url("ad/unfrozenbuyad")}', '确认解冻吗？');
 }
 </script>
 </body>

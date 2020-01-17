@@ -36,11 +36,11 @@ class Order extends Base {
 		empty($data['notify_url']) && $this->err('异步回调页面地址错误');
 		$find = Db::name('order_buy')->where('orderid', $data['orderid'])->find();
 		!empty($find) && $this->err('订单号已存在，请勿重复提交');
-		$pk_num      = config('pk_waiting_finished_num');//盘口订单限制
+		$pkNum       = config('pk_waiting_finished_num');//盘口订单限制
 		$traderLimit = config('trader_pp_max_unfinished_order');
-		if ($pk_num > 0) {
+		if ($pkNum > 0) {
 			$count = Db::name('order_buy')->where('buy_id', $this->merchant['id'])->where('status', 'in', [0, 1])->count();
-			if ($count >= $pk_num) {
+			if ($count >= $pkNum) {
 				$this->err('您有未完成的订单');
 			}
 		}
@@ -172,11 +172,11 @@ class Order extends Base {
 		(empty($data['type']) || !in_array($data['type'], ['wxpay', 'alipay', 'unionpay', 'bank', 'all'])) && $this->err('支付方式不正确');
 		$find = Db::name('order_buy')->where('orderid', $data['orderid'])->find();
 		!empty($find) && $this->err('订单号已存在，请勿重复提交');
-		$pk_num      = config('pk_waiting_finished_num');
+		$pkNum       = config('pk_waiting_finished_num');
 		$traderLimit = config('trader_pp_max_unfinished_order');
-		if ($pk_num > 0) {
+		if ($pkNum > 0) {
 			$count = Db::name('order_buy')->where('buy_id', $this->merchant['id'])->where('status', 'in', [0, 1])->count();
-			($count >= $pk_num) && $this->err('您有未完成的订单');
+			($count >= $pkNum) && $this->err('您有未完成的订单');
 		}
 		//设置承兑商在线状态
 		$ids = Db::name('login_log')->where('online=1 and unix_timestamp(now())-update_time<1800')->column('merchant_id');
@@ -206,12 +206,12 @@ class Order extends Base {
 			//开始判断挂单剩余
 			//$total     = Db::name('order_buy')->where('sell_sid', $v['id'])->whereNotIn('status', '5,9')->sum('deal_num');
 			$actualAmt = number_format($data['amount'] / $v['price'], 8, '.', ''); //todo 修改成动态价格查询匹配的价格
-			if ($v['remain_amount'] < $actualAmt) continue;
+			// 冻结余额不足, 或者订单余量不足, 跳过
+			if ($v['remain_amount'] < $actualAmt || $v['usdtd'] < $actualAmt) continue;
 			//判断可匹配用户
 			if ($matchTraderEmpty) {
-				if( Db::name('merchant')->where('pptrader', 'like', '%' . $v['traderid'] . '%')->find()) continue;
+				if (Db::name('merchant')->where('pptrader', 'like', '%' . $v['traderid'] . '%')->find()) continue;
 			}
-			// 冻结余额不足
 			if ($v['usdtd'] < $actualAmt) continue;
 			//判断未完成的单子
 			$traderCounter = Db::name('order_buy')->where('sell_id', $v['traderid'])->where('status', 'in', [0, 1])->count();
@@ -219,9 +219,7 @@ class Order extends Base {
 				$minCount     = $traderCounter;
 				$minSellOrder = $v;
 			}
-			if ($traderLimit && $traderCounter >= $traderLimit) {
-				continue;
-			}
+			if ($traderLimit && $traderCounter >= $traderLimit) continue;
 			// 同金额不允许匹配
 			if ($traderCounter > 0) {
 				$sameAmtCount = Db::name('order_buy')->where('sell_id', $v['traderid'])->where('status', 'in', [0, 1])->where('raw_amount', $data['amount'])->count();

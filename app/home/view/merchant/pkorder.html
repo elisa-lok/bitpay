@@ -1,29 +1,7 @@
 {include file="Public:header_new"}
-<style>
-	.cards-item {
-		border: 1px dashed #cccccc;
-		padding: 10px;
-		margin-bottom: 5px;
-		background: #fbfbfb;
-	}
-
-	.cards-item .form-group {
-		width: 80%;
-		margin-bottom: 5px;
-	}
-
-	.cards-item .btn-remove {
-		float: right;
-		border: 1px solid #cccccc;
-		padding: 5px;
-		border-radius: 2px;
-	}
-</style>
+<style> .cards-item{border:1px dashed #cccccc;padding:10px;margin-bottom:5px;background:#fbfbfb;}  .cards-item .form-group{width:80%;margin-bottom:5px;}  .cards-item .btn-remove{float:right;border:1px solid #cccccc;padding:5px;border-radius:2px;}</style>
 <div class="content-wrapper" id="pjax-container" style="min-height: 706px;">
-	<section class="content-header">
-		<h1>
-			盘口订单列表 </h1>
-	</section>
+	<section class="content-header"><h1>盘口订单列表 </h1></section>
 	<section class="content">
 		<div class="row">
 			<div class="col-md-12">
@@ -34,7 +12,6 @@
 							<div class="btn-group pull-right" style="margin-right: 10px">
 								<!--<a class="btn btn-sm btn-twitter" href="{:url('home/log/outputOrder')}"><i class="fa fa-download"></i> 导出</a>-->
 								<a data-href="" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#filter-modal1"><i class="fa  btn-twitter"></i>&nbsp;&nbsp;导出</a>
-
 							</div>
 							<div class="btn-group pull-right" style="margin-right: 10px">
 								<a data-href="" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#filter-modal"><i class="fa fa-filter"></i>&nbsp;&nbsp;筛选</a> <a href="/merchant/pkorder" class="btn btn-sm btn-facebook"><i class="fa fa-undo"></i>&nbsp;&nbsp;重置</a>
@@ -96,7 +73,6 @@
 									</div>
 								</div>
 							</div>
-
 							<div class="modal fade" id="filter-modal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 								<div class="modal-dialog" role="document">
 									<div class="modal-content">
@@ -234,42 +210,31 @@
 			$("#end_at_end").on("dp.change", function (e) {
 				$('#end_at_start').data("DateTimePicker").maxDate(e.date);
 			});
-
 			$("#filter-modal .submit").click(function () {
 				$("#filter-modal").modal('toggle');
 				$('body').removeClass('modal-open');
 				$('.modal-backdrop').remove();
 			});
-
 			$(".status").select2({
 				placeholder: "选择"
 			});
-
-
 			$('.export-selected').click(function (e) {
 				e.preventDefault();
-
 				var rows = selectedRows().join(',');
 				if (!rows) {
 					return false;
 				}
-
 				var href = $(this).attr('href').replace('__rows__', rows);
 				location.href = href;
 			});
-
-
 			$('.grid-refresh').on('click', function () {
 				//$.pjax.reload('#pjax-container');
 				//toastr.success('刷新成功 !');
 				window.location.reload();
 			});
-
-
 			$('.grid-per-pager').on("change", function (e) {
 				//$.pjax({url: this.value, container: '#pjax-container'});
 			});
-
 		});
 	</script>
 </div>{include file="Public:footer_new"/}

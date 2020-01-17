@@ -232,7 +232,7 @@ class Index extends Base {
 			$base_address = Db::name('config')->where('name', 'base_address')->value('value');
 			//$baseusdt = $model->index('getbalance', '$1PnhPBJ6JiAFuw5HFSpjuugci7SJjo179U', $money = null, $index=null, $count=null, $skip=null);
 			$baseusdt = $model->index('getbalance', $base_address, $money = NULL, $index = NULL, $count = NULL, $skip = NULL);
-			Db::name('coin_log')->insert(['admin_id' => session('adminuid'), 'balance' => $usdt + $baseusdt['data'], 'create_time' => time()]);
+			Db::name('coin_log')->insert(['admin_id' => $this->uid, 'balance' => $usdt + $baseusdt['data'], 'create_time' => time()]);
 			//$base_address = Db::name('config')->where('name', 'base_address')->value('value');
 			$this->success($usdt + $baseusdt['data']);
 		}
@@ -242,7 +242,7 @@ class Index extends Base {
 		if (request()->isPost()) {
 			$model = new Usdt();
 			$temp2 = $model->index('getbtcbalance', $address = NULL, $money = NULL, $index = NULL, $count = NULL, $skip = NULL);
-			Db::name('coin_log')->insert(['admin_id' => session('adminuid'), 'balance' => $temp2['data'], 'create_time' => time(), 'coin_type' => 1]);
+			Db::name('coin_log')->insert(['admin_id' => $this->uid, 'balance' => $temp2['data'], 'create_time' => time(), 'coin_type' => 1]);
 			$this->success($temp2['data']);
 		}
 	}
@@ -267,7 +267,7 @@ class Index extends Base {
 	public function editpwd() {
 		if (request()->isAjax()) {
 			$param = input('post.');
-			$user  = Db::name('admin')->where('id=' . session('adminuid'))->find();
+			$user  = Db::name('admin')->where('id=' . $this->uid)->find();
 			if (md5(md5($param['old_password']) . config('auth_key')) != $user['password']) {
 				return json(['code' => -1, 'url' => '', 'msg' => '旧密码错误']);
 			} else {

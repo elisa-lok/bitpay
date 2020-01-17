@@ -7,39 +7,40 @@ use think\Controller;
 use think\Db;
 
 class Base extends Controller {
+	public $uid;
+	public $username;
+
 	public function _initialize() {
 		if (!session('adminuid') || !session('username')) {
 			$this->redirect('login/index');
 		}
-		$auth       = new Auth();
-		$module     = strtolower(request()->module());
-		$controller = strtolower(request()->controller());
-		$action     = strtolower(request()->action());
-		$url        = $module . "/" . $controller . "/" . $action;
+		$this->uid      = session('adminuid');
+		$this->username = session('username');
+		$auth           = new Auth();
+		$module         = strtolower(request()->module());
+		$controller     = strtolower(request()->controller());
+		$action         = strtolower(request()->action());
+		$url            = $module . "/" . $controller . "/" . $action;
 		//跳过检测以及主页权限
-		if (session('adminuid') != 1) {
+		if ($this->uid != 1) {
 			if (!in_array($url, ['admin/index/index', 'admin/index/indexpage', 'admin/upload/upload', 'admin/index/uploadface', 'admin/merchant/index', 'admin/merchant/orderlistbuy'])) {
-				if (!$auth->check($url, session('adminuid'))) {
-					// $this->error('抱歉，您没有操作权限','admin/index/index');
-					die('抱歉，您没有操作权限!');
-				}
+				// $this->error('抱歉，您没有操作权限','admin/index/index');
+				(!$auth->check($url, $this->uid)) && die('抱歉，您没有操作权限!');
 			}
 		}
 		$node = new Node();
 		$this->assign([
-			'username' => session('username'),
+			'username' => $this->username,
 			'portrait' => session('portrait'),
 			'rolename' => session('rolename'),
 			'menu'     => $node->getMenu(session('rule'))
 		]);
 		$this->setConfig();
-		if (config('web_site_close') == 0 && session('adminuid') != 1) {
+		if (config('web_site_close') == 0 && $this->uid != 1) {
 			$this->error('站点已经关闭，请稍后访问~');
 		}
-		if (config('admin_allow_ip') && session('adminuid') != 1) {
-			if (in_array(request()->ip(), explode('#', config('admin_allow_ip')))) {
-				$this->error('403:禁止访问');
-			}
+		if (config('admin_allow_ip') && $this->uid != 1) {
+				(in_array(request()->ip(), explode('#', config('admin_allow_ip'))))&&$this->error('403:禁止访问');
 		}
 	}
 

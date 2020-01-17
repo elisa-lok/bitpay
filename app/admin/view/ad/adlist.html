@@ -122,7 +122,7 @@
         var key=$('#key').val();
         var oid=$('#oid').val();
         var status = $('#status option:selected').val();
-        $.getJSON('{:url("Merchant/adlist")}', {page: curr || 1,key:key,oid:oid, status:status}, function(data){
+        $.getJSON('{:url("ad/adlist")}', {page: curr || 1,key:key,oid:oid, status:status}, function(data){
             $(".spiner-example").css('display','none'); //数据加载完关闭动画
             if(data==''){
                 $("#list-content").html('<td colspan="10" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>');
@@ -150,20 +150,20 @@
     }
 //通过
 function mydelete(id){
-	lunhui.myconfirm(id, '{:url("deletead")}', '确认删除吗？');
+	lunhui.myconfirm(id, '{:url("ad/deletead")}', '确认删除吗？');
 }
 //拒绝
 function down(id){
-	lunhui.myconfirm(id, '{:url("downad")}', '确认下架吗？');
+	lunhui.myconfirm(id, '{:url("ad/downad")}', '确认下架吗？');
 }
 function up(id){
-	lunhui.myconfirm(id, '{:url("upad")}', '确认下架吗？');
+	lunhui.myconfirm(id, '{:url("ad/upad")}', '确认下架吗？');
 }
 function frozen(id){
-	lunhui.myconfirm(id, '{:url("frozenad")}', '确认冻结吗？');
+	lunhui.myconfirm(id, '{:url("ad/frozenad")}', '确认冻结吗？');
 }
 function unfrozen(id){
-	lunhui.myconfirm(id, '{:url("unfrozenad")}', '确认解冻吗？');
+	lunhui.myconfirm(id, '{:url("ad/unfrozenad")}', '确认解冻吗？');
 }
 function showtxid(txid){
 	var str="<a href='https://www.omniexplorer.info/search/"+txid+"' target='_blank'>"+txid+"</a>";
