@@ -9,7 +9,6 @@ use app\home\model\AdModel;
 use app\home\model\BankModel;
 use app\home\model\DetailModel;
 use app\home\model\MerchantModel;
-use app\home\model\OrderBuyModel;
 use app\home\model\OrderModel;
 use app\home\model\RechargeModel;
 use app\home\model\TibiModel;
@@ -75,25 +74,6 @@ class Merchant extends Base {
 			//return $this->fetch();
 		}
 		$this->assign('flag', 1);
-		return $this->fetch();
-	}
-
-	public function payinfo_bak() {
-		$id    = input('post.id');
-		$order = Db::name('order_sell')->where('id', $id)->where('buy_id', $this->uid)->find();
-		empty($order) && die('订单信息错误');
-		$ad                       = Db::name('ad_buy')->where('id', $order['buy_bid'])->find();
-		$merchant                 = Db::name('merchant')->where('id', $order['sell_id'])->find();
-		$merchant['c_wechat_img'] = str_replace("\\", "/", $merchant['c_wechat_img']);
-		$merchant['c_alipay_img'] = str_replace("\\", "/", $merchant['c_alipay_img']);
-		if (isset($arr[0]) && $arr[0] > 4) {
-			$bank                    = Db::name('merchant_bankcard')->where('id', $arr[0])->find();
-			$merchant['c_bank_card'] = $bank['c_bank_card'];
-			$merchant['name']        = $bank['truename'];
-		}
-		$this->assign('merchant', $merchant);
-		$this->assign('order', $order);
-		$this->assign('ad', $ad);
 		return $this->fetch();
 	}
 
@@ -2472,74 +2452,6 @@ class Merchant extends Base {
 		return $this->fetch();
 	}
 
-	public function OutUserPkOrder() {
-		/* [
-		['order_no','订单编号'],
-		['buy_username','买家'],
-		['raw_amount','订单金额'],
-		['raw_num','订单数量'],
-		['deal_amount','交易金额'],
-		['deal_num','交易数量'],
-		['deal_price','交易价格'],
-		['rec','到账数量'],
-		['rec_amount','	到账金额'],
-		['fee','手续费数量'],
-		['fee_amount','手续费金额'],
-		['fee_rate','费率'],
-		['ctime','创建时间'],
-		['status','交易状态'],
-		] */
-		!$this->uid && $this->error('请登陆操作');
-		$where['buy_id'] = $this->uid;
-		$get             = input('get.');
-		$order           = 'id DESC';
-		$model           = new OrderBuyModel();
-		$status          = input('get.status');
-		if (isset($status) && $status > 0) {
-			$where['status'] = $status;
-		}
-		if (!empty($get['created_at']['start']) && !empty($get['created_at']['end'])) {
-			$start          = strtotime($get['created_at']['start']);
-			$end            = strtotime($get['created_at']['end']);
-			$where['ctime'] = ['between', [$start, $end]];
-		}
-		$list = $model->getAllByWhere($where, $order);
-		if ($list) {
-			$usdtPriceWay = config('usdt_price_way');
-			$dealerFee    = 0; //承兑商费用
-			$newList      = collection($list)->toArray();
-			$sellerIds    = array_unique(array_column($newList, 'sell_id'));
-			$mcModel      = Db::name('merchant');
-			$agentIds     = $mcModel->where('id', 'in', array_unique($sellerIds))->column('pid', 'id');
-			$agFeeRate    = 0;
-			$agentIds && ($agFeeRate = $mcModel->where('id', 'in', array_values($agentIds))->column('trader_parent_get', 'id'));
-			$addFee    = config('usdt_price_add');
-			$statusArr = [0 => '代付款', 1 => '待放行', 4 => '已完成', 5 => '已关闭', 6 => '申诉中', 9 => '订单失败'];
-			foreach ($list as $k => $v) {
-				$list[$k]['fee_amount'] = $list[$k]['fee'] = $list[$k]['rec_amount'] = $list[$k]['rec'] = $list[$k]['fee_rate'] = 0;
-				if ($v['status'] == 4) {
-					$agentFeeRate = isset($agentIds[$v['sell_id']]) && isset($agFeeRate[$agentIds[$v['sell_id']]]) ? $agFeeRate[$agentIds[$v['sell_id']]] / 100 : 0;
-					($usdtPriceWay == 2) && ($dealerFee = (strpos($addFee, '%') !== FALSE ? $v['deal_price'] * (((float)$addFee) / 100) : $addFee));
-					$list[$k]['fee_amount'] = $v['deal_amount'] - (($v['deal_num'] - $v['platform_fee'] - number_format($v['deal_num'] * $agentFeeRate, 8, '.', '')) * ($v['deal_price'] - $dealerFee)); //费用金额
-					$list[$k]['fee']        = $list[$k]['fee_amount'] / $v['deal_price'];
-					$list[$k]['rec_amount'] = $v['deal_amount'] - $list[$k]['fee_amount'];                                  // 到账费用
-					$list[$k]['rec']        = $v['deal_num'] - $list[$k]['fee'];                                            // 到账数量
-					$list[$k]['fee_rate']   = number_format($list[$k]['fee_amount'] * 100 / $v['deal_amount'], 1, '.', ''); // 到账数量
-				}
-				isset($statusArr[$v['status']]) && ($list[$k]['status'] = $statusArr[$v['status']]);
-				$list[$k]['ctime'] = date("Y-m-d H:i:s", $v['ctime']);
-			}
-		}
-		//文件名称
-		$data                = collection($list)->toArray();
-		$Excel['fileName']   = "订单列表" . date('Y年m月d日-His', time());//or $xlsTitle
-		$Excel['cellName']   = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'];
-		$Excel['H']          = ['A' => 10, 'B' => 15, 'C' => 15, 'D' => 35, 'E' => 35, 'F' => 15, 'G' => 15, 'H' => 20, 'I' => 30, 'J' => 20, 'K' => 15, 'L' => 20, 'M' => 15, 'N' => 20];//横向水平宽度
-		$Excel['V']          = ['1' => 40, '2' => 26];                                                                                                                                    //纵向垂直高度
-		$Excel['sheetTitle'] = "订单列表";                                                                                                                                                    //大标题，自定义
-		$Excel['xlsCell']    = Data::headPkorder();
-		PHPExcel::excelPut($Excel, $data);
-	}
 
 	public function orderlist() {
 		!$this->uid && $this->error('请登录操作', url('home/login/login'));
