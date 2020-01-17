@@ -151,7 +151,6 @@
 									<td>{$vo.remain}</td>
 									<td>{$vo['add_time']|date="Y-m-d H:i:s",###}</td>
 									<td>
-										<a href="/merchant/editadbuy?id={$vo.id}" class="btn btn-sm btn-success">编辑</a>
 										{eq name="vo.state" value="1"}
 										<a id="{$vo.id}" class="btn btn-sm btn-danger down">下架</a>
 										{/eq}

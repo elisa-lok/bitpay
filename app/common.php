@@ -696,12 +696,12 @@ function getTopAgentFeeRate($uid, $timeout = 900) {
 		$user      = $userModel->where('id', $uid)->find();
 		// 非承兑商不算利
 		if (!$user || $user['pid'] < 1 || $user['reg_type'] != 2) {
-			$pidRate = Db::name('config')->where('name', 'usdt_price_add_buy')->value('value');
+			$pidRate = Db::name('config')->where('name', 'usdt_price_add')->value('value');
 		} else {
 			$firstParent = $userModel->where('id', $user['pid'])->find();
 			// 上级不存在
 			if (!$firstParent) {
-				$pidRate = Db::name('config')->where('name', 'usdt_price_add_buy')->value('value');
+				$pidRate = Db::name('config')->where('name', 'usdt_price_add')->value('value');
 			} elseif ($firstParent['pid'] < 1) {
 				$pidRate = $firstParent['tariff'];
 			} else {

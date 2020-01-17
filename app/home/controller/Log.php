@@ -73,14 +73,13 @@ class Log extends Base {
 			$agentIds     = $mcModel->where('id', 'in', array_unique($sellerIds))->column('pid', 'id');
 			$agFeeRate    = 0;
 			$agentIds && ($agFeeRate = $mcModel->where('id', 'in', array_values($agentIds))->column('trader_parent_get', 'id'));
-			$addFee    = config('usdt_price_add');
+			$dealerFee    = (($usdtPriceWay == 2) ? (float)config('usdt_price_add') / 100 : 0);
 			$statusArr = [0 => '代付款', 1 => '待放行', 4 => '已完成', 5 => '已关闭', 6 => '申诉中', 9 => '订单失败'];
 			foreach ($list as $k => $v) {
 				$list[$k]['fee_amount'] = $list[$k]['fee'] = $list[$k]['rec_amount'] = $list[$k]['rec'] = $list[$k]['fee_rate'] = 0;
 				if ($v['status'] == 4) {
 					$agentFeeRate = isset($agentIds[$v['sell_id']]) && isset($agFeeRate[$agentIds[$v['sell_id']]]) ? $agFeeRate[$agentIds[$v['sell_id']]] / 100 : 0;
-					($usdtPriceWay == 2) && ($dealerFee = (strpos($addFee, '%') !== FALSE ? $v['deal_price'] * (((float)$addFee) / 100) : $addFee));
-					$list[$k]['fee_amount'] = $v['deal_amount'] - (($v['deal_num'] - $v['platform_fee'] - number_format($v['deal_num'] * $agentFeeRate, 8, '.', '')) * ($v['deal_price'] - $dealerFee)); //费用金额
+					$list[$k]['fee_amount'] = $v['deal_amount'] - (($v['deal_num'] - $v['platform_fee'] - number_format($v['deal_num'] * $agentFeeRate, 8, '.', '')) * ($v['deal_price'] *  (1 - $dealerFee))); //费用金额
 					$list[$k]['fee']        = $list[$k]['fee_amount'] / $v['deal_price'];
 					$list[$k]['rec_amount'] = $v['deal_amount'] - $list[$k]['fee_amount'];                                  // 到账费用
 					$list[$k]['rec']        = $v['deal_num'] - $list[$k]['fee'];                                            // 到账数量
