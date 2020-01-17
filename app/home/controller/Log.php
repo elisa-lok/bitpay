@@ -66,7 +66,6 @@ class Log extends Base {
 		$list = $model->getAllByWhere($where, $order);
 		if ($list) {
 			$usdtPriceWay = config('usdt_price_way');
-			$dealerFee    = 0; //承兑商费用
 			$newList      = collection($list)->toArray();
 			$sellerIds    = array_unique(array_column($newList, 'sell_id'));
 			$mcModel      = Db::name('merchant');

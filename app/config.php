@@ -44,15 +44,15 @@ return [
 	'cache'                      => ['type' => 'redis', 'host' => '127.0.0.1', 'prefix' => 'cache_', 'expire' => 0],
 	// | 会话设置
 	'session'                    => [
-		'session_name' => 'sid_',// SESSION 前缀
-		'type'         => 'redis',// 驱动方式 支持redis memcache memcached
-		'auto_start'   => TRUE,// 是否自动开启 SESSION
-		'expire'       => 2592000,
+		'name'       => 'sid',
+		'type'       => 'redis',// 驱动方式 支持redis memcache memcached
+		'auto_start' => TRUE,// 是否自动开启 SESSION
+		'expire'     => 5184000,
 	],
 	// | Cookie设置
 	'cookie'                     => [
 		'prefix'    => '',        // cookie 名称前缀
-		'expire'    => 2592000,    // cookie 保存时间
+		'expire'    => 5184000,    // cookie 保存时间
 		'path'      => '/',        // cookie 保存路径
 		'domain'    => '',        // cookie 有效域名
 		'secure'    => FALSE,    // cookie 启用安全传输
