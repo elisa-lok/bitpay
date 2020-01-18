@@ -160,16 +160,12 @@ class Merchant extends Base {
 			$file = request()->file('avatar');
 			if ($file) {
 				$info = $file->validate(['size' => 3145728, 'ext' => 'jpg,png'])->move(ROOT_PATH . 'public' . DS . 'uploads/face');
-				if ($info) {
-					$param['headpic'] = $info->getSaveName();
-				} else {
-					$this->error('请上传正确的图片：' . $file->getError());
-				}
+				$info && $this->error('请上传正确的图片：' . $file->getError());
+				$param['headpic'] = $info->getSaveName();
 			}
-			//$smscode = input('post.code');
 			$name       = input('post.name');
-			$password   = input('post.password');
-			$payPsw     = input('post.paypassword');
+			$password   = trim(input('post.password'));
+			$payPsw     = trim(input('post.paypassword'));
 			$repassword = input('post.password_confirmation');
 			$repayPsw   = input('post.paypassword_confirmation');
 			($password != $repassword && !empty($password)) && $this->error('登录密码错误！');
@@ -2065,8 +2061,6 @@ class Merchant extends Base {
 			$merchant['unionpay_acc']  = $unionpay['c_bank'];
 			$payArr[]                  = 'ysf';
 		}
-		var_dump($payArr, $alipayId, $merchant);
-		die;
 		$this->assign('payarr', $payArr);
 		$this->assign('merchant', $merchant);
 		//平均确认时间
