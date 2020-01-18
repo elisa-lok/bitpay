@@ -2017,9 +2017,9 @@ class Merchant extends Base {
 		$merchant = Db::name('merchant')->where('id', $order['sell_id'])->find();
 		$payArr   = [];
 		// 防封域名
-		$domain = Db::name('sys_domain')->where('state', 1)->field('domain')->select();
-		$domain = array_column($domain, 'domain');
-		shuffle($domain);
+		// $domain = Db::name('sys_domain')->where('state', 1)->field('domain')->select();
+		// $domain = array_column($domain, 'domain');
+		// shuffle($domain);
 		if ($bankId > 0) {
 			$bank                    = Db::name('merchant_bankcard')->where('id', $bankId)->find();
 			$merchant['c_bank_card'] = $bank['c_bank_card'];
@@ -2074,7 +2074,7 @@ class Merchant extends Base {
 			$second  = $average % 60;
 		}
 		$this->assign('min', $min);
-		$this->assign('domain', ($domain[0] ? $domain[0] : $_SERVER['SERVER_NAME']));
+		$this->assign('domain', $_SERVER['SERVER_NAME']);
 		$this->assign('second', $second);
 		//$this->assign('logUrl', $longUrl);
 		return $this->fetch('paymobile');
