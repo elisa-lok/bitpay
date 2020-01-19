@@ -82,7 +82,7 @@ class Order extends Base {
 			//平台，承兑商代理，商户代理，承兑商，商户只能得到这么多，多的给平台
 			$sum = $orderInfo['deal_num'] - $totalFee;
 			//实际到账金额
-			$platformMoney = number_format($totalFee - $sellerParentMoney - $buyerParentMoney - $sellerAwardMoney,8,'.', '');;
+			$platformMoney = $totalFee - $sellerParentMoney - $buyerParentMoney - $sellerAwardMoney;
 			$platformMoney < 0 && $this->error('配置异常, 请联系管理员,错误码:235');
 			Db::startTrans();
 			try {

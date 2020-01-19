@@ -27,15 +27,15 @@ class Order extends Base {
 			// Cache::has($orderInfo['id']) && showMsg('操作频繁', 0);
 			Cache::set($orderInfo['id'], TRUE, 30);
 			Db::startTrans();
-			!Db::name('order_buy')->where('id=' . $edit)->update($updateArr)&& $this->rollbackShowMsg('订单更新失败', $orderInfo['id']); // 更新订单
+			!Db::name('order_buy')->where('id=' . $edit)->update($updateArr) && $this->rollbackShowMsg('订单更新失败', $orderInfo['id']); // 更新订单
 			// 判断剩余额度
 			$res2 = $res3 = $res4 = $res5 = $res6 = $res7 = 1;
 			// 重建订单信息
 			if ($args['refactor']) {
-				!in_array($orderInfo['status'], ['5', '9']) && $this->rollbackShowMsg('该状态不能重建订单',  $orderInfo['id']);
+				!in_array($orderInfo['status'], ['5', '9']) && $this->rollbackShowMsg('该状态不能重建订单', $orderInfo['id']);
 				//在余额里面进行扣钱
 				$realAmt = $orderInfo['deal_num'] + $orderInfo['fee'];
-				!balanceChange(FALSE, $orderInfo['sell_id'], -$orderInfo['deal_num'], $orderInfo['fee'], $orderInfo['deal_num'], $orderInfo['fee'], BAL_SYS, $orderInfo['id'], "重建订单") && $this->rollbackShowMsg('余额更新失败: code:220',$orderInfo['id']);
+				!balanceChange(FALSE, $orderInfo['sell_id'], -$orderInfo['deal_num'], $orderInfo['fee'], $orderInfo['deal_num'], $orderInfo['fee'], BAL_SYS, $orderInfo['id'], "重建订单") && $this->rollbackShowMsg('余额更新失败: code:220', $orderInfo['id']);
 			}
 			// 判断完成
 			if (($args['status'] == 4) && ($srcStatus == 0 || $srcStatus == 1)) {
@@ -92,7 +92,7 @@ class Order extends Base {
 				//平台，承兑商代理，商户代理，承兑商，商户只能得到这么多，多的给平台
 				$sum = $orderInfo['deal_num'] - $totalFee;
 				//实际到账金额
-				$platformMoney = number_format($totalFee - $sellerParentMoney - $buyerParentMoney - $sellerAwardMoney,8,'.', '');;
+				$platformMoney = $totalFee - $sellerParentMoney - $buyerParentMoney - $sellerAwardMoney;
 				$platformMoney < 0 && $this->error('配置异常, 请联系管理员,错误码:235');
 				try {
 					// 订单更新
@@ -229,9 +229,7 @@ class Order extends Base {
 			// 判断完成
 			if (($args['status'] == 4) && ($srcStatus == 0 || $srcStatus == 1)) {
 				$merchant = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
-				if ($merchant['usdtd'] < $orderInfo['deal_num'] + $orderInfo['fee']) {
-					$this->error('您的冻结不足，交易失败');
-				}
+				($merchant['usdtd'] < $orderInfo['deal_num'] + $orderInfo['fee']) && $this->error('您的冻结不足，交易失败');
 				$fee  = config('usdt_buy_trader_fee');
 				$fee  = $fee ? $fee : 0;
 				$sfee = $orderInfo['deal_num'] * $fee / 100;
@@ -254,8 +252,6 @@ class Order extends Base {
 					if ($res1 && $rs1 && $rs2 && $rs3 && $rs4 && $rs5) {
 						// 提交事务
 						Db::commit();
-						financeLog($orderInfo['buy_id'], $mum, '买入USDT_f2', 0, $this->username);         //添加日志
-						financeLog($orderInfo['sell_id'], $realAmt, '卖出USDT_f2', 1, $this->username);    //添加日志
 						getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $realAmt, $this->username);
 						showMsg('操作成功', 1);
 					} else {
