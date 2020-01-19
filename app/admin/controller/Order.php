@@ -27,15 +27,15 @@ class Order extends Base {
 			// Cache::has($orderInfo['id']) && showMsg('操作频繁', 0);
 			Cache::set($orderInfo['id'], TRUE, 30);
 			Db::startTrans();
-			$res1 = Db::name('order_buy')->where('id=' . $edit)->update($updateArr); // 更新订单
+			!Db::name('order_buy')->where('id=' . $edit)->update($updateArr)&& $this->rollbackShowMsg('订单更新失败', $orderInfo['id']); // 更新订单
 			// 判断剩余额度
 			$res2 = $res3 = $res4 = $res5 = $res6 = $res7 = 1;
 			// 重建订单信息
 			if ($args['refactor']) {
-				!in_array($orderInfo['status'], ['5', '9']) && showMsg('该状态不能重建订单', 0);
+				!in_array($orderInfo['status'], ['5', '9']) && $this->rollbackShowMsg('该状态不能重建订单',  $orderInfo['id']);
 				//在余额里面进行扣钱
 				$realAmt = $orderInfo['deal_num'] + $orderInfo['fee'];
-				$res2    = balanceChange(FALSE, $orderInfo['sell_id'], -$orderInfo['deal_num'], $orderInfo['fee'], $orderInfo['deal_num'], $orderInfo['fee'], BAL_SYS, $orderInfo['id'], "重建订单");
+				!balanceChange(FALSE, $orderInfo['sell_id'], -$orderInfo['deal_num'], $orderInfo['fee'], $orderInfo['deal_num'], $orderInfo['fee'], BAL_SYS, $orderInfo['id'], "重建订单") && $this->rollbackShowMsg('余额更新失败: code:220',$orderInfo['id']);
 			}
 			// 判断完成
 			if (($args['status'] == 4) && ($srcStatus == 0 || $srcStatus == 1)) {
@@ -43,7 +43,7 @@ class Order extends Base {
 				$mchModel = new MerchantModel();
 				$seller   = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
 				$buyer    = Db::name('merchant')->where('id', $orderInfo['buy_id'])->find();
-				if ($seller['usdtd'] < $orderInfo['deal_num']) showMsg('您的冻结不足，交易失败', 0);
+				($seller['usdtd'] < $orderInfo['deal_num']) && $this->rollbackShowMsg('您的冻结不足，交易失败', $orderInfo['id']);
 				$unpay = ($orderInfo['status'] == 0) ? 1 : 0;
 				//盘口费率
 				//盘口费率
@@ -191,7 +191,7 @@ class Order extends Base {
 				$res5 = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid']])->setDec('remain_amount', $realAmt);
 				$res4 = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid']])->setInc('trading_volume', $realAmt);
 			}
-			if ($res1 && $res2 && $res3 && $res4 && $res5 && $res6 && $res7) {
+			if ($res2 && $res3 && $res4 && $res5 && $res6 && $res7) {
 				Db::commit();
 				Cache::rm($orderInfo['id']);
 				showMsg('操作成功', 1);
