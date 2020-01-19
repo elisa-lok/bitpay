@@ -707,13 +707,12 @@ class Merchant extends Base {
 
 	public function orderlist() {
 		$key                       = input('key');
-		$oid                       = input('oid');
+		$oid                       = trim(input('oid'));
 		$status                    = input('status');
 		$map['think_order_buy.id'] = ['gt', 0];
 		if ($key && $key !== '') {
 			$where['name|mobile'] = $key;
-			$id                   = Db::name('merchant')->where($where)->value('id');
-			$map['sell_id']       = $id;
+			$map['sell_id']       = Db::name('merchant')->where($where)->value('id');
 		}
 		if ($oid && $oid !== '') {
 			$map['order_no'] = ['like', '%' . $oid . '%'];
