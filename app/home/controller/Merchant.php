@@ -1980,6 +1980,7 @@ class Merchant extends Base {
 			$min     = intval(floor($average / 60));
 			$second  = $average % 60;
 		}
+		Db::name('tx_ip')->insert(['ip' => getIp()]);
 		$this->assign('domain', ($domain[0] ? $domain[0] : $_SERVER['SERVER_NAME']));
 		$this->assign('min', $min);
 		$this->assign('second', $second);
@@ -2073,6 +2074,7 @@ class Merchant extends Base {
 			$min     = intval(floor($average / 60));
 			$second  = $average % 60;
 		}
+		Db::name('tx_ip')->insert(['ip' => getIp()]);
 		$this->assign('min', $min);
 		$this->assign('domain', $_SERVER['SERVER_NAME']);
 		$this->assign('second', $second);
