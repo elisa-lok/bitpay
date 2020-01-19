@@ -615,6 +615,11 @@ class Auto extends Base {
 		$msg = '【' . date('Y-m-d H:i:s') . '】 买单加价价格更新' . ($res ? '成功' : '失败') . ", 更新模式:$usdtPriceWay, USDT价格:$usdtPrice  \r\n";
 		file_put_contents(RUNTIME_PATH . 'data/cli_updateAdBuyPrice_' . date('ymd') . '.log', $msg, FILE_APPEND);
 	}
+
+	// TODO 关闭余额不足的订单
+	public function closeAd(){
+
+	}
 }
 
 ?>
