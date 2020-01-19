@@ -60,10 +60,9 @@ class Base extends Controller {
 		die;
 	}
 
-	protected function rollbackShowMsg($msg, $cacheKey) {
+	protected function rollbackShowMsg($msg, $cacheKey = null) {
 		$cacheKey && Cache::rm($cacheKey);
 		Db::rollback();
 		showMsg($msg, 0);
-		die;
 	}
 }

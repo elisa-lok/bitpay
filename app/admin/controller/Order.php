@@ -224,8 +224,7 @@ class Order extends Base {
 				$updateArr['finished_time'] = 0;
 			}
 			Db::startTrans();
-			$res1 = Db::name('order_sell')->where('id=' . $edit)->update($updateArr); // 更新订单
-			$res2 = TRUE;
+			!Db::name('order_sell')->where('id=' . $edit)->update($updateArr) && $this->rollbackShowMsg('更新卖家信息失败');
 			// 判断完成
 			if (($args['status'] == 4) && ($srcStatus == 0 || $srcStatus == 1)) {
 				$merchant = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
@@ -237,28 +236,22 @@ class Order extends Base {
 				try {
 					$realAmt = number_format($orderInfo['deal_num'] + $orderInfo['fee'], 8, '.', '');
 					// 减少商户冻结
-					$rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $realAmt);
+					!Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $realAmt) && $this->rollbackShowMsg('减少商户冻结失败');
 					// 更新完成时间
-					$rs2 = Db::name('order_sell')->update(['id' => $orderInfo['id'], 'finished_time' => time(), 'buyer_fee' => $sfee]);
+					!Db::name('order_sell')->update(['id' => $orderInfo['id'], 'finished_time' => time(), 'buyer_fee' => $sfee]) && $this->rollbackShowMsg('更新时间失败');
 					// 增加买家余额
-					$rs3 = balanceChange(FALSE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $edit, '买入');
+					!balanceChange(FALSE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $edit, '买入') && $this->rollbackShowMsg('修改买家余额失败');;
 					// 增加买家求购成功次数
-					$rs4 = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('transact_buy', 1);
+					!Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('transact_buy', 1) && $this->rollbackShowMsg('更新买家求购次数失败');
 					// 查询平均打款时间
-					$total    = Db::name('order_sell')->field('sum(dktime-ctime) as total')->where('buy_id', $orderInfo['buy_id'])->where('status', 4)->select();
-					$tt       = $total[0]['total'];
-					$transact = Db::name('merchant')->where('id', $orderInfo['buy_id'])->value('transact_buy');
-					$rs5      = Db::name('merchant')->where('id', $orderInfo['buy_id'])->update(['averge_buy' => intval($tt / $transact)]);
-					if ($res1 && $rs1 && $rs2 && $rs3 && $rs4 && $rs5) {
-						// 提交事务
-						Db::commit();
-						getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $realAmt, $this->username);
-						showMsg('操作成功', 1);
-					} else {
-						// 回滚事务
-						Db::rollback();
-						showMsg('操作失败', 0);
-					}
+					// $total    = Db::name('order_sell')->field('sum(dktime-ctime) as total')->where('buy_id', $orderInfo['buy_id'])->where('status', 4)->select();
+					// $tt       = $total[0]['total'];
+					// $transact = Db::name('merchant')->where('id', $orderInfo['buy_id'])->value('transact_buy');
+					// !Db::name('merchant')->where('id', $orderInfo['buy_id'])->update(['averge_buy' => intval($tt / $transact)]) && $this->rollbackShowMsg('更新买家平均订单失败');
+					// 提交事务
+					Db::commit();
+					getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $realAmt, $this->username);
+					showMsg('操作成功', 1);
 				} catch (DbException $e) {
 					// 回滚事务
 					Db::rollback();
@@ -268,15 +261,10 @@ class Order extends Base {
 				// 判断取消
 				if (($args['status'] == 5) && ($srcStatus == 0 || $srcStatus == 1)) {
 					$realAmt = number_format($orderInfo['deal_num'] + $orderInfo['fee'], 8, '.', '');
-					$res2    = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_SYS, $edit, '系统编辑订单');
+					!balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_SYS, $edit, '系统编辑订单') && $this->rollbackShowMsg('更新卖家金额失败');
 				}
-				if ($res1 && $res2) {
-					Db::commit();
-					showMsg('操作成功', 1);
-				} else {
-					Db::rollback();
-					showMsg('操作失败', 0);
-				}
+				Db::commit();
+				showMsg('操作成功', 1);
 			}
 		}
 		$this->assign('data', $orderInfo);
