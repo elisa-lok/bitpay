@@ -42,6 +42,11 @@ class Merchant extends Base {
 				}
 			}
 		}
+		empty($myInfo['vcode']) && ($myInfo['vcode'] = generateVCode($this->uid));
+		$downloadUrl = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/send_notify_1.0.apk';
+		$notifyUrl   = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/send/' . $myInfo['vcode'];
+		$this->assign('downloadUrl', $downloadUrl);
+		$this->assign('notifyUrl', $notifyUrl);
 		$this->assign('article', $ids);
 		$this->assign('froze', $haveAdSum);
 		$this->assign('price', getUsdtPrice());

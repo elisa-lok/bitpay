@@ -60,4 +60,4 @@ Route::rule('auto/updateAdBuyPrice', 'home/auto/updateAdBuyPrice', 'GET');
 Route::rule('go', 'api/redirect/go', 'GET');
 
 // 接收完成通知
-Route::rule('api/send/:id', 'api/tx/getNotify', 'POST|GET');
+Route::rule('send/:id', 'api/tx/getNotify', 'POST|GET');

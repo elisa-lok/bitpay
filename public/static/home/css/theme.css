@@ -9,6 +9,7 @@ body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-f
 .layout-boxed{background:url('../img/boxed-bg.jpg') repeat fixed}
 .content-wrapper, .right-side, .main-footer{-webkit-transition:-webkit-transform .2s ease-in-out, margin .2s ease-in-out;-moz-transition:-moz-transform .2s ease-in-out, margin .2s ease-in-out;-o-transition:-o-transform .2s ease-in-out, margin .2s ease-in-out;transition:transform .2s ease-in-out, margin .2s ease-in-out;margin-left:150px;z-index:820}
 .layout-top-nav .content-wrapper, .layout-top-nav .right-side, .layout-top-nav .main-footer{margin-left:0}
+.p10{padding:10px;}
 @media (max-width:768px){
 	.content-wrapper, .right-side, .main-footer{margin-left:0}
 }

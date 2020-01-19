@@ -76,7 +76,7 @@ class Login extends Controller {
 			'token'           => md5($hasUser['username'] . $hasUser['password'])
 		];
 		Db::name('admin')->where('id', $hasUser['id'])->update($param);
-		writelog($hasUser['id'], $this->username, '用户【' . $this->username . '】登录成功', 1);
+		writelog($hasUser['id'], session('username'), '用户【' . session('username') . '】登录成功', 1);
 		return json(['code' => 1, 'url' => url('index/index'), 'msg' => '登录成功！']);
 	}
 

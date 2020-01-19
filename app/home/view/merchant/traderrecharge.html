@@ -1,10 +1,7 @@
 {include file="Public:header_new"/}
 <div class="content-wrapper" id="pjax-container" style="min-height: 414px;">
     <section class="content-header">
-        <h1>
-            承兑商
-            <small>充值</small>
-        </h1>
+        <h1>充值</h1>
         <!-- breadcrumb start -->
         <!-- breadcrumb end -->
     </section>
@@ -12,126 +9,111 @@
         <div class="row">
             <div class="col-md-12">
                 <style>
-                    .config-forms>form{
-       margin: 10px;
-       border-bottom: 1px solid #eee;
-   }
-   .config-forms>form:last-child{
-       border-bottom: none;
-   }
-   @media (max-width: 768px){
-    #pt-qrcode{position:static!important;}
-   }
-
-</style>
+                    .config-forms > form {margin: 10px;border-bottom: 1px solid #eeeeee;}
+                    .config-forms > form:last-child {border-bottom: none;}
+                    @media (max-width: 768px) {#pt-qrcode {position: static !important;}}
+                </style>
                 <div class="box box-info">
                     <div class="box-body config-forms">
                         <form action="/merchant/merchantSet" method="post" class="form-horizontal" autocomplete="off">
                             <div class="form-group">
-                                <label class="col-md-2 control-label">USDT充值
-                                    {php}
-                                    if(config('wallettype')=='erc'){
-                                    echo '(ERC20 协议)';
-                                    }
-                                    if(config('wallettype')=='omni'){
-                                    echo '(OMNI 协议)';
-                                    }
-                                    {/php}
-                                </label>
-                                <div class="col-md-2"></div>
+                                <label class="col-md-4">USDT充值 {php} if(config('wallettype')=='erc'){ echo '(ERC20 协议)'; } if(config('wallettype')=='omni'){ echo '(OMNI 协议)'; } {/php} </label>
                             </div>
                             <div class="form-group" style="position:relative;">
                                 <div style="padding-left:15px;font-weight:bold;">
                                     <p>这是您的钱包地址，请将您的USDT资产转入此地址：</p>
                                 </div>
-                                <div class="" style="padding-left:15px;font-weight:bold;">
-                                    <p id="wallet" style="width:50%;background:#FFFFFA;border: 1px solid #FCDBC8;font-size: 18px;
-    color: #4f94e7;
-    padding: 20px;">{$qianbao}</p>
-                                </div>
-                                <div id="pt-qrcode" style="position:absolute;bottom:0;right:30%;display: inline-block;">
-                                    <div id="qrcode" style="display: inline-block;">
-                                    </div>
-                                    <p id="qrcode-t" style="font-size:13px;text-align: center;">USDT钱包地址</p>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="col-md-4 text-center" id="pt-qrcode">
+                                    <div id="qrcode"></div>
+                                    <p id="qrcode-t">USDT钱包地址</p>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-md-6 control-label" style="text-align:left;">
-                                    转入说明：<br />
-                                    1. 转入是自动的， USDT资产 转账需要整个 USDT资产 网络进行确认，达到 {$confirms} 个确认后您的 USDT资产 会自动充值到您的账户中<br />
-                                    2. 此地址是您唯一且独自使用的转入地址，您可以同时进行多次充值， 也可将此地址做为您在矿池的付款地址
-                                </label>
+                                <div class="input-group input-group-md col-md-12" style="max-width:550px;border-radius:6px;box-shadow:0 2px 5px rgba(0, 0, 0, 0.2);">
+                                    <input id="wallet_address" class="form-control input-lg text-center border-none" type="text" placeholder="{$qianbao}" value="{$qianbao}" readonly>
+                                    <span id="copy_wallet" class="input-group-addon bg-orange text-shadow border-none" data-clipboard-target="#wallet_address" onclick="copyTarget(this.id)">复制</span>
+                                </div>
                             </div>
-                            <div class="tab-content table-responsive">
-                                <div class="box-body table-responsive no-padding" id="tab_886859313">
-                                    <table class="table">
-                                        <thead>
+                            <div class="form-group">
+                                <label class="col-md-12 control-label" style="text-align:left;"> 转入说明：<br/> 1. 转入是自动的， USDT资产 转账需要整个 USDT资产 网络进行确认，达到 {$confirms} 个确认后您的 USDT资产 会自动充值到您的账户中<br/> 2. 此地址是您唯一且独自使用的转入地址，您可以同时进行多次充值， 也可将此地址做为您在矿池的付款地址 </label>
+                            </div>
+                            <div class="form-group">
+                                <div class="tab-content table-responsive">
+                                    <div class="box-body table-responsive no-padding" id="tab_886859313">
+                                        <table class="table">
+                                            <thead>
                                             <tr>
                                                 <th>转入时间</th>
-                                                <!-- <th>转入币种</th> -->
+                                                <!--<th>转入币种</th>-->
                                                 <th>转入数量</th>
                                                 <th>手续费</th>
                                                 <th>到账数量</th>
                                                 <th>状态</th>
                                                 <th>详情</th>
                                             </tr>
-                                        </thead>
-                                        <tbody>
+                                            </thead>
+                                            <tbody>
                                             {volist name="list" id="vo"}
                                             <tr>
                                                 <td>{:date("Y-m-d H:i:s", $vo['addtime'])}</td>
-                                                <!-- <td>{$vo.coinname|strtoupper}</td> -->
+                                                <!--<td>{$vo.coinname|strtoupper}</td>-->
                                                 <td>{$vo.num}</td>
                                                 <td>{$vo.fee}</td>
                                                 <td>{$vo.mum}</td>
                                                 <td>
-                                                    {eq name="vo.status" value="1"}
-                                                    转入成功
-                                                    {else/}
-                                                    等待处理,还需要{$confirms-$vo['confirmations']}个确认
-                                                    {/eq}
+                                                    {eq name="vo.status" value="1"} 转入成功 {else/} 等待处理,还需要{$confirms-$vo['confirmations']}个确认 {/eq}
                                                 </td>
-                                                <td><a href="javascript:;" onclick="showtxid('{$vo.txid}')" class="btn btn-primary btn-xs">
-                                        查看TXID</a></td>
+                                                <td><a href="javascript:;" onclick="showtxid('{$vo.txid}')" class="btn btn-primary btn-xs"> 查看TXID</a></td>
                                             </tr>
                                             {/volist}
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="box-footer clearfix">
-                                    {$list->render()}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="box-footer clearfix">
+                                        {$list->render()}
+                                    </div>
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
                 <script type="text/javascript" src="__JS__/jquery.qrcode.min.js"></script>
-                <script>
-                $('#qrcode').qrcode({
-                    render: "table",
-                    size: 100,
-                    text: "{$qianbao}"
-                });
-                </script>
+                <script>$('#qrcode').qrcode({render: "canvas", size: 150, text: "{$qianbao}"});</script>
             </div>
         </div>
     </section>
-     <script src="/static/admin/js/layer/layer.js"></script>
-    <script data-exec-on-popstate="">
-    function showtxid(txid){
-    {php}
-    if(config('wallettype')=='omni'){
-        $url='https://www.omniexplorer.info/search/';
-    }
-    if(config('wallettype')=='erc'){
-        $url='https://etherscan.io/tx/';
-    }
-    {/php}
+    <script src="/static/admin/js/layer/layer.js"></script>
+    <script src="__JS__/pay/clipboard.min.js"></script>
+    <script>
+        var clipboard, copyTimeout;
+        function copyTarget(targetId) {
+            targetId = "#" + targetId;
+            targetText = $(targetId).html();
+            clipboard = new ClipboardJS(targetId);
+            clipboard.on('success', function (e) {
+                $(targetId).html("复制成功");
+                clearTimeout(copyTimeout);
+                copyTimeout = setTimeout(function () {
+                    $(targetId).html(targetText);
+                }, 800);
+                e.clearSelection()
+            });
+        }
+        function showtxid(txid) {
+            {php}
+            if (config('wallettype') == 'omni') {
+                $url = 'https://www.omniexplorer.info/search/';
+            }
+            if (config('wallettype') == 'erc') {
+                $url = 'https://etherscan.io/tx/';
+            }
+            {/php}
 
-    var str="<a href='{$url}"+txid+"' target='_blank'>查看交易详情:"+txid+"</a>";
-  // var str="<a href='https://www.omniexplorer.info/search/"+txid+"' target='_blank'>"+txid+"</a>";
-  layer.alert(str);
-}
+                var str = "<a href='{$url}" + txid + "' target='_blank'>查看交易详情:" + txid + "</a>";
+                // var str="<a href='https://www.omniexplorer.info/search/"+txid+"' target='_blank'>"+txid+"</a>";
+                layer.alert(str);
+            }
     </script>
-</div>
-{include file="Public:footer_new"/}
+</div>{include file="Public:footer_new"/}
