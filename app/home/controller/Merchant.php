@@ -1512,11 +1512,9 @@ class Merchant extends Base {
 		$act  = (int)input('post.act');
 		($act != 1 && $act != 2) && $this->error('参数错误');
 		($type != 0 && $type != 1) && $this->error("挂单类型错误！");
-		$model           = new AdModel();
-		$model2          = new MerchantModel();
-		$where['id']     = $id;
-		$where['userid'] = $this->uid;
-		$adInfo          = Db::name('ad_sell')->where($where)->lock()->find();
+		$model  = new AdModel();
+		$model2 = new MerchantModel();
+		$adInfo = Db::name('ad_sell')->where(['id' => $id, 'userid' => $this->uid])->lock()->find();
 		!$adInfo && $this->error("挂单不存在！");
 		($adInfo['state'] == 4) && $this->error("此挂单已冻结禁止上下架操作！");
 		// 锁定操作 代码执行完成前不可继续操作 60秒后可再次点击操作
@@ -1531,9 +1529,10 @@ class Merchant extends Base {
 			// $haveAdSum = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->sum('amount');
 			// $haveAdSum = $haveAdSum ? $haveAdSum : 0;
 			$haveAdSum = 0;
-			(($adInfo['remain_amount'] + $haveAdSum) > $merchant['usdt']) && $this->rollbackAndMsg('开启失败：账户余额不足', $id);
+			(($adInfo['remain_amount'] + $haveAdSum) > $merchant['usdt']) && $this->rollbackAndMsg('开启失败：账户余额不足',$id);
 			!balanceChange(FALSE, $this->uid, -$adInfo['remain_amount'], 0, $adInfo['remain_amount'], 0, BAL_ENTRUST, $id) && $this->rollbackAndMsg('开启失败：扣款失败', $id);
 		} else {
+			$merchant['usdtd'] < $adInfo['remain_amount'] && $this->rollbackAndMsg('冻结不足', $id);
 			!balanceChange(FALSE, $this->uid, $adInfo['remain_amount'], 0, -$adInfo['remain_amount'], 0, BAL_REDEEM, $id) && $this->rollbackAndMsg('下架失败：退款失败', $id);
 		}
 		$result = $model->updateOne(['id' => $id, 'state' => $act]);
@@ -1559,11 +1558,8 @@ class Merchant extends Base {
 		$where['id']     = $id;
 		$where['userid'] = $this->uid;
 		$adInfo          = $model->getOne($where);
-		if (!$adInfo) {
-			$this->error("挂单不存在！");
-		} else {
-			($adInfo['state'] == 4) && $this->error("此挂单已冻结禁止上下架操作！");
-		}
+		!$adInfo && $this->error("挂单不存在！");
+		($adInfo['state'] == 4) && $this->error("此挂单已冻结禁止上下架操作！");
 		$merchant = $model2->getUserByParam($this->uid, 'id');
 		if ($act == 1) {
 			$haveAdSum = Db::name('ad_buy')->where('userid', $this->uid)->where('state', 1)->count();

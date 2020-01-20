@@ -170,6 +170,7 @@ class Order extends Base {
 		empty($data['return_url']) && $this->err('同步通知页面地址错误');
 		empty($data['notify_url']) && $this->err('异步回调页面地址错误');
 		(empty($data['type']) || !in_array($data['type'], ['wxpay', 'alipay', 'unionpay', 'bank', 'all'])) && $this->err('支付方式不正确');
+		$data['type'] == 'all' && ($data['type'] = 'alipay');
 		$find = Db::name('order_buy')->where('orderid', $data['orderid'])->find();
 		!empty($find) && $this->err('订单号已存在，请勿重复提交');
 		$pkNum       = config('pk_waiting_finished_num');
@@ -183,11 +184,9 @@ class Order extends Base {
 		Db::query('UPDATE think_merchant SET online=0');
 		Db::name('merchant')->where('id', 'in', $ids)->update(['online' => 1]);
 		//系统自动选择在线的承兑商和能够交易这个金额的承兑商
-		$where = ['state' => 1, 'min_limit' => ['elt', $data['amount']], 'max_limit' => ['egt', $data['amount']]];
-		if ($data['type'] != 'all') {
-			$method                        = ['bank' => 'pay_method', 'alipay' => 'pay_method2', 'wxpay' => 'pay_method3', 'unionpay' => 'pay_method4'];
-			$where[$method[$data['type']]] = ['gt', 0];
-		}
+		$where                         = ['state' => 1, 'min_limit' => ['elt', $data['amount']], 'max_limit' => ['egt', $data['amount']]];
+		$method                        = ['bank' => 'pay_method', 'alipay' => 'pay_method2', 'wxpay' => 'pay_method3', 'unionpay' => 'pay_method4'];
+		$where[$method[$data['type']]] = ['gt', 0];
 		//判断是否商户匹配交易
 		$matchTrader    = $this->merchant['pptrader'];
 		$matchTraderArr = explode(',', $matchTrader);
@@ -209,9 +208,7 @@ class Order extends Base {
 			// 冻结余额不足, 或者订单余量不足, 跳过
 			if ($v['remain_amount'] < $actualAmt || $v['usdtd'] < $actualAmt) continue;
 			//判断可匹配用户
-			if ($matchTraderEmpty) {
-				if (Db::name('merchant')->where('pptrader', 'like', '%' . $v['traderid'] . '%')->find()) continue;
-			}
+			if ($matchTraderEmpty && Db::name('merchant')->where('pptrader', 'like', '%' . $v['traderid'] . '%')->find()) continue;
 			if ($v['usdtd'] < $actualAmt) continue;
 			//判断未完成的单子
 			$traderCounter = Db::name('order_buy')->where('sell_id', $v['traderid'])->where('status', 'in', [0, 1])->count();
@@ -278,11 +275,7 @@ class Order extends Base {
 					sendNotice($onlineAd['id'], '你有订单已匹配, 请及时处理', $content);
 				}
 				$http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
-				if ($data['type'] != 'all') {
-					$url = $http_type . $_SERVER['HTTP_HOST'] . '/home/merchant/pay_a?id=' . $orderAddRes . '&appid=' . $data['appid'] . '&type=' . $data['type'];
-				} else {
-					$url = $http_type . $_SERVER['HTTP_HOST'] . '/merchant/pay?id=' . $orderAddRes . '&appid=' . $data['appid'] . '&type=' . $data['type'];
-				}
+				$url       = $http_type . $_SERVER['HTTP_HOST'] . '/home/merchant/pay_a?id=' . $orderAddRes . '&appid=' . $data['appid'] . '&type=' . $data['type'];
 				Cache::rm('sell_order_lock_' . $onlineAd['id']);
 				$this->suc($url);
 			} else {

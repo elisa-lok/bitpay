@@ -7,6 +7,7 @@ use think\captcha\Captcha;
 use think\db;
 
 class Login extends Base {
+	// 注册
 	public function register() {
 		if (request()->isPost()) {
 			$regType = input('post.reg_type');
@@ -20,88 +21,46 @@ class Login extends Base {
 			$repayPsw   = input('post.paypassword_confirmation');
 			$nickname   = input('post.nickname');
 			//$smscode = input('post.smscode');
-			if (empty($nickname) || strlen($nickname) > 20) {
-				$this->error('请填写正确的昵称');
-			}
-			if (!checkName($name)) {
-				$this->error('请输入您的正确姓名');
-			}
-			/*if(empty($smscode)){
-				$this->error('请填写短信验证码');
-			}*/
+			(empty($nickname) || strlen($nickname) > 20) && $this->error('请填写正确的昵称');
+			!checkName($name) && $this->error('请输入您的正确姓名');
+			// empty($smscode) && $this->error('请填写短信验证码');
 			$model  = new MerchantModel();
 			$idfind = $model->getOneByParam($idCard, 'idcard');
-			if (!$idfind) {
-				$this->error('注册失败：身份证号码已注册');
-			}
+			!$idfind && $this->error('注册失败：身份证号码已注册');
 			$nameind = $model->getOneByParam($name, 'name');
-			if (!$nameind) {
-				$this->error('注册失败：姓名已注册');
-			}
+			!$nameind && $this->error('注册失败：姓名已注册');
 			$mobileFind = $model->getOneByParam($mobile, 'mobile');
-			if (!$mobileFind) {
-				$this->error('注册失败：手机号已注册');
-			}
-			if (empty($idCard)) {
-				$this->error('请填写身份证号');
-			}
-			if (empty($mobile)) {
-				$this->error('请填写手机号');
-			}
-			if (empty($password)) {
-				$this->error('请填写登录密码');
-			}
-			if ($password != $repassword) {
-				$this->error('登录确认密码错误');
-			}
-			if ($payPsw != $repayPsw) {
-				$this->error('交易确认密码错误');
-			}
+			!$mobileFind && $this->error('注册失败：手机号已注册');
+			empty($idCard) && $this->error('请填写身份证号');
+			empty($mobile) && $this->error('请填写手机号');
+			empty($password) && $this->error('请填写登录密码');
+			($password != $repassword) && $this->error('登录确认密码错误');
+			($payPsw != $repayPsw) && $this->error('交易确认密码错误');
 			$inviteCode = input('post.invite_code');
-			$pid         = 0;
-			if (!$inviteCode) {
-				$inviteCode = session('invite');
-			}
-			if (empty($inviteCode) && config('reg_invite_on') == 1) {
-				$this->error('注册失败：邀请码必填');
-			}
+			$pid        = 0;
+			!$inviteCode && ($inviteCode = session('invite'));
+			(empty($inviteCode) && config('reg_invite_on') == 1) && $this->error('注册失败：邀请码必填');
 			if ($inviteCode) {
 				$puser = Db::name('merchant')->where('invite', $inviteCode)->find();
-				if ($puser) {
-					$pid = $puser['id'];
-				}
+				$puser && ($pid = $puser['id']);
 			}
-			if ($pid == 0 && config('reg_invite_on') == 1) {
-				$this->error('注册失败：邀请码填写错误');
-			}
+			($pid == 0 && config('reg_invite_on') == 1) && $this->error('注册失败：邀请码填写错误');
 			/*$files = request()->file('image');
 			$imgarr = array();
 			foreach($files as $file){
 				// 移动到框架应用根目录/public/uploads/ 目录下
 				$info = $file->validate(['size'=>3145728,'ext'=>'jpg,png,jpeg,gif'])->move(ROOT_PATH . 'public' . DS . 'uploads/idcard');
-				if($info){
+			!$info&&$this->error($file->getError());
 					$imgarr[] = $info->getSaveName();
-				}else{
-					// 上传失败获取错误信息
-					$this->error($file->getError());
-				}
 			}
-			if(count($imgarr) != 2){
-				$this->error('请同时上传身份证正面和反面照片');
-			}
-
+				(count($imgarr) != 2)&&$this->error('请同时上传身份证正面和反面照片');
 			$idCard_zheng = $imgarr[0];
 			$idCard_fan = $imgarr[1];
-
-
-			if(empty($idCard_zheng) || empty($idCard_fan)){
-				$this->error('请上传照片');
-			}*/
+				(empty($idCard_zheng) || empty($idCard_fan))&&$this->error('请上传照片');
+		    */
 			while (TRUE) {
 				$appId = generate_password();
-				if ($model->getOneByParam($appId, 'appid')) {
-					break;
-				}
+				if ($model->getOneByParam($appId, 'appid')) break;
 			}
 			// if ($smscode != session($mobile.'_code')) {
 			//     $this->error('短信验证码错误!');
@@ -125,28 +84,18 @@ class Login extends Base {
 		}
 		if (!session('uid')) {
 			return $this->fetch();
-		} else {
-			header('Location: /merchant/index');
-			die;
 		}
+		header('Location: /merchant/index');
+		die;
 	}
 
 	public function jiancega($username) {
-		if (empty($username)) {
-			$this->error(0);
-		}
+		empty($username) && $this->error(0);
 		$user = Db::name('merchant')->where('mobile|name', $username)->find();
-		if (!$user) {
-			$this->error(0);
-		}
-		if (empty($user['ga'])) {
-			$this->error(0);
-		}
-		$arr         = explode('|', $user['ga']);
-		$ga_is_login = $arr[1];
-		if (!$ga_is_login) {
-			$this->error(0);
-		}
+		!$user && $this->error(0);
+		empty($user['ga']) && $this->error(0);
+		$arr = explode('|', $user['ga']);
+		!$arr[1] && $this->error(0);
 		$this->success(1);
 	}
 
@@ -156,9 +105,7 @@ class Login extends Base {
 			$password = input('post.password');
 			$verify   = input('post.verify');
 			$device   = input('post.device');
-			if (!captcha_check($verify)) {
-				$this->error('图片验证码错误');
-			}
+			!captcha_check($verify) && $this->error('图片验证码错误');
 			$ga     = input('post.goole');
 			$model  = new MerchantModel();
 			$return = $model->login($username, $password);
@@ -175,14 +122,9 @@ class Login extends Base {
 					$ga_is_login = $arr[1];
 					// 判断是否需要验证
 					if ($ga_is_login) {
-						if (!$ga) {
-							$this->error('请输入谷歌验证码！');
-						}
+						!$ga && $this->error('请输入谷歌验证码！');
 						// 判断登录有无验证码
-						$aa = $ga_n->verifyCode($secret, $ga, 1);
-						if (!$aa) {
-							$this->error('谷歌验证码错误！');
-						}
+						!$ga_n->verifyCode($secret, $ga, 1) && $this->error('谷歌验证码错误！');
 					}
 				}
 				$model = new LogModel();
@@ -197,17 +139,13 @@ class Login extends Base {
 					session('user', $return['data']);
 					writeMerchantlog($return['data']['id'], $username, '用户【' . $username . '】登录成功', 1);
 					$this->success($return['msg']);
-				} else {
-					$this->error($flag['msg']);
 				}
+				$this->error($flag['msg']);
 			}
 		}
-		if (!session('uid')) {
-			return $this->fetch();
-		} else {
-			header('Location: /merchant/index');
-			die;
-		}
+		if (!session('uid')) return $this->fetch();
+		header('Location: /merchant/index');
+		die;
 	}
 
 	public function findpwd() {
@@ -217,60 +155,30 @@ class Login extends Base {
 			$goole      = input('post.goole');
 			$password   = input('post.password');
 			$repassword = input('post.repassword');
-			if (empty($username)) {
-				$this->error('请填写姓名或手机号');
-			}
-			if (empty($verify)) {
-				$this->error('请填写图片验证码');
-			}
-			if (empty($goole)) {
-				$this->error('请填写谷歌验证码');
-			}
-			if (!captcha_check($verify)) {
-				$this->error('图片验证码错误');
-			}
-			if (empty($password)) {
-				$this->error('请填写新密码');
-			}
-			if ($password != $repassword) {
-				$this->error('确认密码错误');
-			}
+			empty($username) && $this->error('请填写姓名或手机号');
+			empty($verify) && $this->error('请填写图片验证码');
+			empty($goole) && $this->error('请填写谷歌验证码');
+			!captcha_check($verify) && $this->error('图片验证码错误');
+			empty($password) && $this->error('请填写新密码');
+			($password != $repassword) && $this->error('确认密码错误');
 			//谷歌验证
 			$merchant = Db::name('merchant')->where('name|mobile', $username)->find();
-			if (empty($merchant)) {
-				$this->error('姓名或手机号错误');
-			}
-			if (empty($merchant['ga'])) {
-				$this->error('你未设置谷歌验证');
-			}
+			empty($merchant) && $this->error('姓名或手机号错误');
+			empty($merchant['ga']) && $this->error('你未设置谷歌验证');
 			$ga_n = new GoogleAuthenticator();
 			$arr  = explode('|', $merchant['ga']);
 			// 存储的信息为谷歌密钥
 			$secret = $arr[0];
-			$aa     = $ga_n->verifyCode($secret, $goole, 1);
-			if (!$aa) {
-				$this->error('谷歌验证码错误！');
-			}
+			!$ga_n->verifyCode($secret, $goole, 1) && $this->error('谷歌验证码错误！');
 			(Db::name('merchant')->where('id', $merchant['id'])->update(['password' => md5($password)])) ? $this->success('修改成功', url('home/login/login')) : $this->error('修改失败，请稍后再试');
 		}
-		if (!session('uid')) {
-			return $this->fetch();
-		} else {
-			header('Location: /merchant/index');
-			die;
-		}
+		if (!session('uid')) return $this->fetch();
+		header('Location: /merchant/index');
+		die;
 	}
 
 	public function verify() {
-		$config           = [
-			// 验证码字体大小
-			'fontSize' => 30,
-			// 验证码位数
-			'length'   => 4,
-			// 关闭验证码杂点
-			'useNoise' => FALSE,
-			// 'bg' =>  array(100,100,100),
-		];
+		$config           = ['fontSize' => 30, 'length' => 4, 'useNoise' => FALSE,];
 		$captcha          = new Captcha($config);
 		$captcha->codeSet = '2345689';
 		return $captcha->entry();
@@ -288,14 +196,8 @@ class Login extends Base {
 			$mobile     = input('post.mobile');
 			$model      = new MerchantModel();
 			$mobileFind = $model->getOneByParam($mobile, 'mobile');
-			if (!$mobileFind) {
-				$this->error('注册失败：手机号已注册');
-			}
-			if (session($mobile . '_code')) {
-				if (time() - session($mobile . '_time') < 120) { //秒,2分钟
-					$this->error('获取验证码间隔小于2分钟,请稍后再试.');
-				}
-			}
+			!$mobileFind && $this->error('注册失败：手机号已注册');
+			session($mobile . '_code') && (time() - session($mobile . '_time') < 120) && $this->error('获取验证码间隔小于2分钟,请稍后再试.');
 			if (preg_match('/^13[\d]{9}$|^14[5,7]{1}\d{8}$|^15[^4]{1}\d{8}$|^17[\d]{9}$|^18[\d]{9}$/', $mobile)) {
 				$code    = rand(100000, 999999);
 				$content = '您的验证码为:' . $code . '.验证码有效时间为2分钟.如不是本人操作,请忽略.';
@@ -305,12 +207,10 @@ class Login extends Base {
 					session($mobile . '_code', $code); //验证码超时
 					session($mobile . '_time', time());
 					$this->success('手机验证码已发送,请注意查收.');
-				} else {
-					$this->error('短信验证码发送失败,请稍后再试!');
 				}
-			} else {
-				$this->error('手机号码输入错误!请检查后重新输入!');
+				$this->error('短信验证码发送失败,请稍后再试!');
 			}
+			$this->error('手机号码输入错误!请检查后重新输入!');
 		}
 	}
 
@@ -319,14 +219,8 @@ class Login extends Base {
 			$mobile     = input('post.mobile');
 			$model      = new MerchantModel();
 			$mobileFind = $model->getOneByParam($mobile, 'mobile');
-			if ($mobileFind) {
-				$this->error('账户不存在!');
-			}
-			if (session($mobile . '_mcode')) {
-				if (time() - session($mobile . '_time') < 120) { //秒,2分钟
-					$this->error('获取验证码间隔小于2分钟,请稍后再试.');
-				}
-			}
+			$mobileFind && $this->error('账户不存在!');
+			session($mobile . '_mcode') && (time() - session($mobile . '_time') < 120) && $this->error('获取验证码间隔小于2分钟,请稍后再试.');
 			if (preg_match('/^13[\d]{9}$|^14[5,7]{1}\d{8}$|^15[^4]{1}\d{8}$|^17[\d]{9}$|^18[\d]{9}$/', $mobile)) {
 				$code    = rand(100000, 999999);
 				$content = '您的验证码为:' . $code . '.验证码有效时间为2分钟.如不是本人操作,请忽略.';
@@ -336,12 +230,10 @@ class Login extends Base {
 					session($mobile . '_mcode', $code); //验证码超时
 					session($mobile . '_time', time());
 					$this->success('手机验证码已发送,请注意查收.');
-				} else {
-					$this->error('短信验证码发送失败,请稍后再试!');
 				}
-			} else {
-				$this->error('手机号码输入错误!请检查后重新输入!');
+				$this->error('短信验证码发送失败,请稍后再试!');
 			}
+			$this->error('手机号码输入错误!请检查后重新输入!');
 		}
 	}
 }
