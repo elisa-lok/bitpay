@@ -1507,44 +1507,30 @@ class Merchant extends Base {
 	//挂单上下架
 	public function setShelf() {
 		!$this->uid && $this->error('请登录操作');
-		$id   = input('post.id');
-		$type = input('post.type');
-		$act  = (int)input('post.act');
-		($act != 1 && $act != 2) && $this->error('参数错误');
-		($type != 0 && $type != 1) && $this->error("挂单类型错误！");
-		$model  = new AdModel();
-		$model2 = new MerchantModel();
-		$adInfo = Db::name('ad_sell')->where(['id' => $id, 'userid' => $this->uid])->lock()->find();
-		!$adInfo && $this->error("挂单不存在！");
-		($adInfo['state'] == 4) && $this->error("此挂单已冻结禁止上下架操作！");
-		// 锁定操作 代码执行完成前不可继续操作 60秒后可再次点击操作
+		$id  = (int)input('post.id');
+		$act = (int)input('post.act');
+		!in_array($act, [1, 2, 3]) && $this->error('参数错误');
 		Cache::has($id) && $this->error('操作频繁,请稍后重试');
-		$lock = Cache::set($id, TRUE, 60);
-		!$lock && $this->error('锁定操作失败，请重试。');
+		Cache::set($id, TRUE, 2);
+		$adInfo = Db::name('ad_sell')->where(['id' => $id, 'userid' => $this->uid])->lock()->find();
+		!$adInfo && $this->error('挂单不存在！');
+		($adInfo['state'] == 4) && $this->error('此挂单已冻结禁止上下架操作！');
 		$merchant = Db::name('merchant')->where('id', $this->uid)->lock()->find();
-		$adInfo['state'] == 1 && $act != 2 && $this->error('下架失败, 订单已下架');
-		$adInfo['state'] == 2 && $act != 1 && $this->error('上架失败, 订单已上架');
-		Db::startTrans();
-		if ($act == 1) {
-			// $haveAdSum = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->sum('amount');
-			// $haveAdSum = $haveAdSum ? $haveAdSum : 0;
-			$haveAdSum = 0;
-			(($adInfo['remain_amount'] + $haveAdSum) > $merchant['usdt']) && $this->rollbackAndMsg('开启失败：账户余额不足',$id);
-			!balanceChange(FALSE, $this->uid, -$adInfo['remain_amount'], 0, $adInfo['remain_amount'], 0, BAL_ENTRUST, $id) && $this->rollbackAndMsg('开启失败：扣款失败', $id);
-		} else {
-			$merchant['usdtd'] < $adInfo['remain_amount'] && $this->rollbackAndMsg('冻结不足', $id);
-			!balanceChange(FALSE, $this->uid, $adInfo['remain_amount'], 0, -$adInfo['remain_amount'], 0, BAL_REDEEM, $id) && $this->rollbackAndMsg('下架失败：退款失败', $id);
-		}
-		$result = $model->updateOne(['id' => $id, 'state' => $act]);
-		if ($result['code'] == 1) {
-			$count = $model->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
-			$model2->updateOne(['id' => $this->uid, 'ad_on_sell' => $count ? $count : 0]);
+		if (($act == 1 && $adInfo['state'] == 2) || ($act == 2 && $adInfo['state'] == 1)) {
+			!Db::name('ad_sell')->where(['id' => $id, 'userid' => $this->uid, 'state' => $adInfo['state']])->update(['state' => $act]) && $this->error('操作失败,code: 101');
+		} elseif ($act == 3 && ($adInfo['state'] == 1 || $adInfo['state'] == 2)) {
+			// $merchant['usdtd'] < $adInfo['remain_amount'] && $this->error('冻结不足', $id);
+			Db::startTrans();
+			!Db::name('ad_sell')->where(['id' => $id, 'userid' => $this->uid])->update(['state' => $act]) && $this->rollbackAndMsg('操作失败', $id);
+			!balanceChange(FALSE, $this->uid, $adInfo['remain_amount'], 0, -$adInfo['remain_amount'], 0, BAL_REDEEM, $id) && $this->rollbackAndMsg('撤单失败：退款失败', $id);
 			Cache::rm($id);
+			$count = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
+			!Db::name('merchant')->update(['id' => $this->uid, 'ad_on_sell' => $count ? $count : 0]) && $this->rollbackAndMsg('撤单失败：更新订单数失败', $id);
 			Db::commit();
-			$this->success("操作成功");
 		} else {
-			$this->rollbackAndMsg('操作失败', $id);
+			$this->error('错误: 请刷新后重试');
 		}
+		$this->success('操作成功');
 	}
 
 	public function setShelfbuy() {
@@ -1850,50 +1836,6 @@ class Merchant extends Base {
 		PHPExcel::excelPut($Excel, $data);
 	}
 
-	public function pay_bak() {
-		$id    = input('get.id');
-		$appId = input('get.appid');
-		$order = Db::name('order_buy')->where('id', $id)->find();
-		(empty($order)) && $this->error('订单参数错误1');
-		$merchant = Db::name('merchant')->where('id', $order['buy_id'])->find();
-		(empty($merchant)) && $this->error('订单参数错误2');
-		($merchant['appid'] != $appId) && $this->error('请求路径appid错误');
-		$this->assign('remaintime', $order['ltime'] * 60 + $order['ctime'] - time());
-		$pay    = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method');
-		$payArr = explode(',', $pay);
-		$this->assign('payarr', $payArr);
-		$this->assign('id', $id);
-		$this->assign('appid', $appId);
-		$this->assign('money', round($order['deal_amount'], 2));
-		$this->assign('amount', $order['deal_num']);
-		$this->assign('no', $order['order_no']);
-		$merchant = Db::name('merchant')->where('id', $order['sell_id'])->find();
-		$bank     = [];
-		if ($payArr[0] > 4) {
-			$bank                    = Db::name('merchant_bankcard')->where('id', $payArr[0])->find();
-			$merchant['c_bank_card'] = $bank['c_bank_card'];
-			$merchant['name']        = $bank['truename'];
-		}
-		$this->assign('merchant', $merchant);
-		//平均确认时间
-		if (!$merchant['transact']) {
-			$min    = 0;
-			$second = 0;
-		} else {
-			$total   = Db::name('order_buy')->field('sum(finished_time-dktime) as total')->where('sell_id', $order['sell_id'])->where('status', 4)->select();
-			$average = intval($total[0]['total'] / $merchant['transact']);
-			$min     = intval(floor($average / 60));
-			$second  = $average % 60;
-		}
-		$this->assign('min', $min);
-		$this->assign('second', $second);
-		if (go_mobile()) {
-			return $this->fetch('paymobile');
-		} else {
-			return $this->fetch('paymobile');
-		}
-	}
-
 	public function pay_a() {
 		$id    = input('get.id');
 		$appId = input('get.appid');
@@ -1908,7 +1850,6 @@ class Merchant extends Base {
 		$alipayId   = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method2');//5
 		$wxpayId    = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method3');//4
 		$unionpayId = Db::name('ad_sell')->where('id', $order['sell_sid'])->value('pay_method4');//2
-		$arr        = [];
 		$this->assign('id', $id);
 		$this->assign('order', $order);
 		$this->assign('appid', $appId);

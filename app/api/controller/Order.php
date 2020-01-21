@@ -175,10 +175,10 @@ class Order extends Base {
 		!empty($find) && $this->err('订单号已存在，请勿重复提交');
 		$pkNum       = config('pk_waiting_finished_num');
 		$traderLimit = config('trader_pp_max_unfinished_order');
-		if ($pkNum > 0) {
-			$count = Db::name('order_buy')->where('buy_id', $this->merchant['id'])->where('status', 'in', [0, 1])->count();
-			($count >= $pkNum) && $this->err('您有未完成的订单');
-		}
+		// if ($pkNum > 0) {
+		// 	$count = Db::name('order_buy')->where('buy_id', $this->merchant['id'])->where('status', 'in', [0, 1])->count();
+		// 	($count >= $pkNum) && $this->err('您有未完成的订单');
+		// }
 		//设置承兑商在线状态
 		$ids = Db::name('login_log')->where('online=1 and unix_timestamp(now())-update_time<1800')->column('merchant_id');
 		Db::query('UPDATE think_merchant SET online=0');

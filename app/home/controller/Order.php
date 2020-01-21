@@ -34,8 +34,8 @@ class Order extends Base {
 			($seller['usdtd'] < $orderInfo['deal_num']) && $this->error('您的冻结不足，交易失败');
 			// 锁定操作 代码执行完成前不可继续操作 60秒后可再次点击操作
 			Cache::has($id) && $this->error('操作频繁,请稍后重试');
-			$lock = Cache::set($id, TRUE, 60);
-			!$lock && $this->error('锁定操作失败，请重试。');
+			Cache::set($id, TRUE, 60);
+
 			//盘口费率
 			$pkFeeRate = $buyer['merchant_pk_fee'];
 			$pkFeeRate = $pkFeeRate ? $pkFeeRate : 0;

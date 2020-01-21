@@ -165,6 +165,8 @@ class Ad extends Base {
 			showJson(['code' => 0, 'msg' => '删除失败']);
 		}
 	}
+	// todo 整合一个方法
+	public function setSellAdState(){}
 
 	public function downad() {
 		$id   = input('id');

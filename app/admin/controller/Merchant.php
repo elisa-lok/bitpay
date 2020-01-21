@@ -866,8 +866,8 @@ class Merchant extends Base {
 		($trader['usdtd'] < $orderInfo['deal_num']) && showJson(['code' => 0, 'msg' => '承兑商冻结不足']);
 		// 锁定操作 代码执行完成前不可继续操作 60秒后可再次点击操作
 		Cache::has($id) && $this->error('操作频繁,请稍后重试');
-		$lock = Cache::set($id, TRUE, 60);
-		!$lock && $this->error('锁定操作失败，请重试。');
+		Cache::set($id, TRUE, 60);
+
 		Db::startTrans();
 		try {
 			//$rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num']);
@@ -981,8 +981,8 @@ class Merchant extends Base {
 		($amount == '' || ($amount > $orderInfo['deal_amount'])) && showJson(['code' => 0, 'msg' => '回调金额错误']);
 		// 锁定操作 代码执行完成前不可继续操作 60秒后可再次点击操作
 		Cache::has($id) && $this->error('操作频繁,请稍后重试');
-		$lock = Cache::set($id, TRUE, 60);
-		!$lock && $this->error('锁定操作失败，请重试。');
+		Cache::set($id, TRUE, 60);
+
 		$oldNum = $orderInfo['deal_num'];
 		($amount != $orderInfo['deal_amount']) && ($orderInfo['deal_num'] = number_format($amount / $orderInfo['deal_price'], 8, '.', ''));
 		$mchModel = Db::name('merchant');

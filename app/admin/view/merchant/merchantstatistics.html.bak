@@ -35,7 +35,7 @@
                         <thead>
                             <tr class="long-tr">
                             	<th>ID</th>
-                                <th width="">所属部门</th>
+                                <th>所属部门</th>
                                 <th>手机号</th>
                                 <th><a data-toggle="tooltip" title="usdt" data-placement="top">USDT活动数量</a></th>
                                 <th><a data-toggle="tooltip" title="usdtd" data-placement="top">USDT冻结数量</a></th>

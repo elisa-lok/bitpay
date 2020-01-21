@@ -11,7 +11,7 @@ class Base extends Controller {
 	public $uid;
 
 	public function _initialize() {
-		header("Content-type: text/html; charset=utf-8");
+		header('Content-Type: text/html; charset=utf-8');
 		!sql_check() && $this->error('您提交的参数非法,系统已记录您的本次操作！');
 		$model = new BaseModel();
 		$cate  = $model->getAllCate();
@@ -27,7 +27,7 @@ class Base extends Controller {
 		}
 		isset($_GET['invite']) && session('invite', $_GET['invite']);
 		$controller = $request->controller();
-		if ($controller != 'Login' && session('uid') && $action != 'pay') {
+		if ($controller != 'Login' && session('uid') && !in_array($action, ['pay', 'pay_a'])) {
 			$logId = session('logid');
 			if (!$logId) {
 				header('Location: /home/login/loginout');
@@ -65,7 +65,7 @@ class Base extends Controller {
 		config($config);
 	}
 
-	protected function rollbackAndMsg($msg, $cacheKey) {
+	protected function rollbackAndMsg($msg, $cacheKey= null) {
 		$cacheKey && Cache::rm($cacheKey);
 		Db::rollback();
 		$this->error($msg);

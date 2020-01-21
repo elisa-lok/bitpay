@@ -398,6 +398,7 @@ function apilog($uid, $duid, $api_name, $request_param, $return_param) {
 }
 
 function getUsdtPrice($ignore = FALSE, $ttl = 5) {
+	if(APP_DEBUG) return 7;
 	$price = Cache::get('usdt_price');
 	if (!$price) {
 		$url  = $ignore ? 'https://otc-api.huobi.pro/v1/data/market/detail' : 'https://otc-api.hbg.com/v1/data/market/detail';

@@ -125,7 +125,7 @@
 	<script src="/static/admin/js/layer/layer.js"></script>
 	<script>
 		var type = 1;
-		function closetanchu() {
+		function closePopUp() {
 			layer.closeAll('loading');
 		}
 		$('.payinfo').click(function () {
@@ -159,7 +159,7 @@
 			layer.load(0, {shade: [0.5, '#8f8f8f']});
 			$.post("{:url('home/merchant/uptradeinner')}", {id: $(this).attr('id'), type: type}, function (data) {
 				shelf = data.url;
-				setTimeout("closetanchu()", 4000);
+				setTimeout("closePopUp()", 4000);
 				if (data.code == 1) {
 					layer.msg(data.msg, {icon: 1});
 					window.location.reload();

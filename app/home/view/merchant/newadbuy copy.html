@@ -169,14 +169,14 @@
     		$('#max_limit').val(max);
     	}
     }
-    function closetanchu(){
+    function closePopUp(){
 		layer.closeAll('loading');
 	}
     $('.down').click(function(){
 		layer.load(0, {shade: [0.5,'#8F8F8F']});
         $.post("{:url('home/merchant/setShelfbuy')}",{id : $(this).attr('id'), type:type, act:2},function(data){
 			shelf = data.url;
-			setTimeout("closetanchu()",4000);
+			setTimeout("closePopUp()",4000);
             if(data.code==1){
                 layer.msg(data.msg,{icon : 1 });
 				window.location.reload();
@@ -189,7 +189,7 @@
         layer.load(0, {shade: [0.5,'#8F8F8F']});
         $.post("{:url('home/merchant/setShelfbuy')}",{id : $(this).attr('id'), type:type, act:1},function(data){
             shelf = data.url;
-            setTimeout("closetanchu()",4000);
+            setTimeout("closePopUp()",4000);
             if(data.code==1){
                 layer.msg(data.msg,{icon : 1 });
                 window.location.reload();
@@ -200,7 +200,7 @@
     });
     $('.dong').click(function(){
         layer.load(0, {shade: [0.5,'#8F8F8F']});
-        setTimeout("closetanchu()",3000);
+        setTimeout("closePopUp()",3000);
         layer.msg('请联系管理员解除冻结!',{icon : 2 });
     });
 </script></div>
