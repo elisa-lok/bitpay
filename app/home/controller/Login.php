@@ -109,39 +109,34 @@ class Login extends Base {
 			$ga     = input('post.goole');
 			$model  = new MerchantModel();
 			$return = $model->login($username, $password);
-			if ($return['code'] != 1) {
-				$this->error($return['msg']);
-			} else {
-				$user = $return['data'];
-				if ($user['ga']) {
-					$ga_n = new GoogleAuthenticator();
-					$arr  = explode('|', $user['ga']);
-					// 存储的信息为谷歌密钥
-					$secret = $arr[0];
-					// 存储的登录状态为1需要验证，0不需要验证
-					$ga_is_login = $arr[1];
-					// 判断是否需要验证
-					if ($ga_is_login) {
-						!$ga && $this->error('请输入谷歌验证码！');
-						// 判断登录有无验证码
-						!$ga_n->verifyCode($secret, $ga, 1) && $this->error('谷歌验证码错误！');
-					}
+			($return['code'] != 1) && $this->error($return['msg']);
+			$user = $return['data'];
+			if ($user['ga']) {
+				$ga_n = new GoogleAuthenticator();
+				$arr  = explode('|', $user['ga']);
+				// 存储的信息为谷歌密钥
+				$secret = $arr[0];
+				// 存储的登录状态为1需要验证，0不需要验证
+				if ($arr[1]) {
+					!$ga && $this->error('请输入谷歌验证码！');
+					!$ga_n->verifyCode($secret, $ga, 1) && $this->error('谷歌验证码错误！');// 判断登录有无验证码
 				}
-				$model = new LogModel();
-				$flag  = $model->insertOne(['merchant_id' => $return['data']['id'], 'login_time' => time(), 'update_time' => time(), 'online' => 1]);
-				if ($device) {
-					session('device', $device);
-					Db::name('merchant')->where(['id' => $return['data']['id']])->update(['device' => $device]);
-				}
-				if ($flag['code'] > 0) {
-					session('logid', $flag['code']);
-					session('uid', $return['data']['id']);
-					session('user', $return['data']);
-					writeMerchantlog($return['data']['id'], $username, '用户【' . $username . '】登录成功', 1);
-					$this->success($return['msg']);
-				}
-				$this->error($flag['msg']);
 			}
+			$model = new LogModel();
+			$flag  = $model->insertOne(['merchant_id' => $return['data']['id'], 'login_time' => time(), 'update_time' => time(), 'online' => 1]);
+			if ($device) {
+				session('device', $device);
+				Db::name('merchant')->where(['id' => $return['data']['id']])->update(['device' => $device]);
+			}
+			if ($flag['code'] > 0) {
+				session_regenerate_id(true);
+				session('logid', $flag['code']);
+				session('uid', $return['data']['id']);
+				session('user', $return['data']);
+				writeMerchantlog($return['data']['id'], $username, '用户【' . $username . '】登录成功', 1);
+				$this->success($return['msg']);
+			}
+			$this->error($flag['msg']);
 		}
 		if (!session('uid')) return $this->fetch();
 		header('Location: /merchant/index');
@@ -188,6 +183,7 @@ class Login extends Base {
 		session('logid', NULL);
 		session('uid', NULL);
 		session('user', NULL);
+		session('username', NULL);
 		$this->redirect('/');
 	}
 

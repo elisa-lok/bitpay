@@ -404,7 +404,7 @@ function getUsdtPrice($ignore = FALSE, $ttl = 5) {
 		$data = curl_get($url, $ttl);//获取火币价格
 		$res  = json_decode($data, TRUE);
 		//$sellPrice = $data_arr['data']['detail'][2]['sell'];
-		$price = $res['success'] == TRUE ? $res['data']['detail'][2]['buy'] : ($ignore ? 7.00 : getUsdtPrice(TRUE));
+		$price = isset($res['success']) &&  $res['success'] == TRUE ? $res['data']['detail'][2]['buy'] : ($ignore ? 7.00 : getUsdtPrice(TRUE));
 		($price != 7.00) && Cache::set('usdt_price', $price, 600);
 	}
 	return $price;

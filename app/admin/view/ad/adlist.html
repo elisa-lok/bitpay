@@ -1,174 +1,141 @@
 {include file="public/header" /}
 <body class="gray-bg">
 <div class="wrapper wrapper-content">
-    <!-- Panel Other -->
-    <div class="ibox float-e-margins">
-        <div class="ibox-title">
-            <h5>承兑商挂单列表</h5>
-        </div>
-        <div class="ibox-content">
-            <!--搜索框开始-->
-            <div class="row">
-                <div class="col-sm-12">
-
-                    <form name="admin_list_sea" class="form-search" method="post" action="{:url('adlist')}">
-                        <div class="col-sm-6">
-                            <div class="input-group">
-                                <input type="text" id="key" class="form-control" style="width:40%;" name="key" value="{$val}" placeholder="输入承兑商姓名/手机号" />
-                                <input type="text" id="oid" class="form-control" style="width:40%;" name="oid" value="{$oid}" placeholder="输入订单号" />
-                                <select name="status" class="form-control" id="status" style="width:20%;">
-                                	<option value="0" {empty name="status"}selected{/empty}>选择状态</option>
-                                	<option value="1" {eq name="status" value="1"}selected{/eq}>进行中</option>
-                                	<option value="2" {eq name="status" value="2"}selected{/eq}>已下架</option>
-                                	<option value="4" {eq name="status" value="4"}selected{/eq}>已冻结</option>
-                                </select>
-                                <span class="input-group-btn">
+	<!-- Panel Other -->
+	<div class="ibox float-e-margins">
+		<div class="ibox-title"><h5>承兑商挂单列表</h5></div>
+		<div class="ibox-content">
+			<!--搜索框开始-->
+			<div class="row">
+				<div class="col-sm-12">
+					<form name="admin_list_sea" class="form-search" method="post" action="{:url('adlist')}">
+						<div class="col-sm-6">
+							<div class="input-group">
+								<input type="text" id="key" class="form-control" style="width:40%;" name="key" value="{$val}" placeholder="输入承兑商姓名/手机号"/> <input type="text" id="oid" class="form-control" style="width:40%;" name="oid" value="{$oid}" placeholder="输入订单号"/>
+								<select name="status" class="form-control" id="status" style="width:20%;">
+									<option value="0" {empty name="status" }selected{
+									/empty}>选择状态</option>
+									<option value="1" {eq name="status" value="1" }selected{
+									/eq}>进行中</option>
+									<option value="2" {eq name="status" value="2" }selected{
+									/eq}>已下架</option>
+									<option value="4" {eq name="status" value="4" }selected{
+									/eq}>已冻结</option>
+								</select> <span class="input-group-btn">
                                     <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> 搜索</button>
                                 </span>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <!--搜索框结束-->
-            <div class="hr-line-dashed"></div>
-            <div class="example-wrap">
-                <div class="example">
-                    <table class="table table-bordered table-hover">
-                        <thead>
-                            <tr class="long-tr">
-                            	<th>编号</th>
-                                <th width="">承兑商</th>
-                                <th>收款方式</th>
-                                <th>价格</th>
-                                <th>总量</th>
-                                <th>交易量</th>
-                                <th>剩余数量</th>
-                                <th>限额</th>
-                                <th>发布时间</th>
-                                <th>状态</th>
-								<th>操作</th>
-                            </tr>
-                        </thead>
-                        <script id="list-template" type="text/html">
-                            {{# for(var i=0;i<d.length;i++){  }}
-                            <tr class="long-td">
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+			<!--搜索框结束-->
+			<div class="hr-line-dashed"></div>
+			<div class="example-wrap">
+				<div class="example">
+					<table class="table table-bordered table-hover">
+						<thead>
+						<tr class="long-tr">
+							<th>编号</th>
+							<th width="">承兑商</th>
+							<th>收款方式</th>
+							<th>价格</th>
+							<th>总量</th>
+							<th>交易量</th>
+							<th>剩余数量</th>
+							<th>限额</th>
+							<th>发布时间</th>
+							<th>状态</th>
+							<th>操作</th>
+						</tr>
+						</thead>
+						<script id="list-template" type="text/html">
+							{{# for(var i=0;i
+							<d.length;i++){  }}
+							<tr class="long-td">
 								<td>{{d[i].ad_no}}</td>
-                                <td>{{d[i].name}}</td>
-                                <td>{{d[i].payway}}</td>
-                                <td>{{d[i].price}}</td>
-                                <td>{{d[i].amount}}</td>
-                                <td>{{d[i].trading_volume}}</td>
-                                <td>{{d[i].remain}}</td>
+								<td>{{d[i].name}}</td>
+								<td>{{d[i].payway}}</td>
+								<td>{{d[i].price}}</td>
+								<td>{{d[i].amount}}</td>
+								<td>{{d[i].trading_volume}}</td>
+								<td>{{d[i].remain}}</td>
 								<td>{{d[i].min_limit}}-{{d[i].max_limit}}</td>
-                                <td>{{d[i].add_time}}</td>
-                                <td>
-                                {{# if(d[i].state == 1){ }}
-                                	进行中
-                                {{# }else if(d[i].state == 2){ }}
-                                	已下架
-                                {{# }else if(d[i].state == 4){ }}
-                                	已冻结
-                                {{# } }}
-                                </td>
+								<td>{{d[i].add_time}}</td>
 								<td>
-<a href="javascript:;" onclick="mydelete('{{d[i].id}}')" class="btn btn-primary btn-outline btn-xs">
-                                        删除</a>
-{{# if(d[i].state == 1){ }}
-	<a href="javascript:;" onclick="down('{{d[i].id}}')" class="btn btn-primary btn-outline btn-xs">
-                                        下架</a>
-	<a href="javascript:;" onclick="frozen('{{d[i].id}}')" class="btn btn-primary btn-outline btn-xs">
-                                        冻结</a>
-{{# }else if(d[i].state == 2){ }}
-	<a href="javascript:;" onclick="up('{{d[i].id}}')" class="btn btn-primary btn-outline btn-xs">
-                                        上架</a>
-{{# }else if(d[i].state == 4){ }}
-<a href="javascript:;" onclick="unfrozen('{{d[i].id}}')" class="btn btn-primary btn-outline btn-xs">
-                                        解冻</a>
-{{# } }}
-</td>
-                            </tr>
-                            {{# } }}
-                        </script>
-                        <tbody id="list-content"></tbody>
-                    </table>
-                    <div id="AjaxPage" style=" text-align: right;"></div>
-                    <div id="allpage" style=" text-align: right;"></div>
-                </div>
-            </div>
-            <!-- End Example Pagination -->
-        </div>
-    </div>
+									{{# if(d[i].state == 1){ }} 进行中 {{# }else if(d[i].state == 2){ }} 已下架 {{# }else if(d[i].state == 4){ }} 已冻结 {{# } }}
+								</td>
+								<td>
+									<a href="javascript:;" onclick="mydelete('{{d[i].id}}')" class="btn btn-primary btn-outline btn-xs"> 删除</a> {{# if(d[i].state == 1){ }} <a href="javascript:;" onclick="down('{{d[i].id}}')" class="btn btn-primary btn-outline btn-xs"> 下架</a>
+									<a href="javascript:;" onclick="frozen('{{d[i].id}}')" class="btn btn-primary btn-outline btn-xs"> 冻结</a> {{# }else if(d[i].state == 2){ }}
+									<a href="javascript:;" onclick="up('{{d[i].id}}')" class="btn btn-primary btn-outline btn-xs"> 上架</a> {{# }else if(d[i].state == 4){ }}
+									<a href="javascript:;" onclick="unfrozen('{{d[i].id}}')" class="btn btn-primary btn-outline btn-xs"> 解冻</a> {{# } }}
+								</td>
+							</tr>{{# } }}
+						</script>
+						<tbody id="list-content"></tbody>
+					</table>
+					<div id="AjaxPage" style=" text-align: right;"></div>
+					<div id="allpage" style=" text-align: right;"></div>
+				</div>
+			</div>
+			<!-- End Example Pagination -->
+		</div>
+	</div>
 </div>
-<!-- End Panel Other -->
-</div>
-
+<!-- End Panel Other --></div>
 <!-- 加载动画 -->
 <div class="spiner-example">
-    <div class="sk-spinner sk-spinner-three-bounce">
-        <div class="sk-bounce1"></div>
-        <div class="sk-bounce2"></div>
-        <div class="sk-bounce3"></div>
-    </div>
+	<div class="sk-spinner sk-spinner-three-bounce">
+		<div class="sk-bounce1"></div>
+		<div class="sk-bounce2"></div>
+		<div class="sk-bounce3"></div>
+	</div>
 </div>
-
 {include file="public/footer" /}
-
 <script type="text/javascript">
-
-    //laypage分页
-    Ajaxpage();
-    function Ajaxpage(curr){
-        var key=$('#key').val();
-        var oid=$('#oid').val();
-        var status = $('#status option:selected').val();
-        $.getJSON('{:url("ad/adlist")}', {page: curr || 1,key:key,oid:oid, status:status}, function(data){
-            $(".spiner-example").css('display','none'); //数据加载完关闭动画
-            if(data==''){
-                $("#list-content").html('<td colspan="10" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>');
-            }else{
-                var tpl = document.getElementById('list-template').innerHTML;
-                laytpl(tpl).render(data, function(html){
-                    document.getElementById('list-content').innerHTML = html;
-                });
-                laypage({
-                    cont: $('#AjaxPage'),//容器。值支持id名、原生dom对象，jquery对象,
-                    pages:'{$allpage}',//总页数
-                    skip: true,//是否开启跳页
-                    skin: '#1AB5B7',//分页组件颜色
-                    curr: curr || 1,
-                    groups: 3,//连续显示分页数
-                    jump: function(obj, first){
-                        if(!first){
-                            Ajaxpage(obj.curr)
-                        }
-                        $('#allpage').html('第'+ obj.curr +'页，共'+ obj.pages +'页');
-                    }
-                });
-            }
-        });
-    }
-//通过
-function mydelete(id){
-	lunhui.myconfirm(id, '{:url("ad/deletead")}', '确认删除吗？');
-}
-//拒绝
-function down(id){
-	lunhui.myconfirm(id, '{:url("ad/downad")}', '确认下架吗？');
-}
-function up(id){
-	lunhui.myconfirm(id, '{:url("ad/upad")}', '确认下架吗？');
-}
-function frozen(id){
-	lunhui.myconfirm(id, '{:url("ad/frozenad")}', '确认冻结吗？');
-}
-function unfrozen(id){
-	lunhui.myconfirm(id, '{:url("ad/unfrozenad")}', '确认解冻吗？');
-}
-function showtxid(txid){
-	var str="<a href='https://www.omniexplorer.info/search/"+txid+"' target='_blank'>"+txid+"</a>";
-	layer.alert(str);
-}
+	//laypage分页
+	Ajaxpage();
+	function Ajaxpage(curr) {
+		var key = $('#key').val();
+		var oid = $('#oid').val();
+		var status = $('#status option:selected').val();
+		$.getJSON('{:url("ad/adlist")}', {page: curr || 1, key: key, oid: oid, status: status}, function (data) {
+			$(".spiner-example").css('display', 'none'); //数据加载完关闭动画
+			if (data == '') {
+				$("#list-content").html('<td colspan="10" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>');
+			} else {
+				var tpl = document.getElementById('list-template').innerHTML;
+				laytpl(tpl).render(data, function (html) {
+					document.getElementById('list-content').innerHTML = html;
+				});
+				laypage({
+					cont  : $('#AjaxPage'),//容器。值支持id名、原生dom对象，jquery对象,
+					pages : '{$allpage}',//总页数
+					skip  : true,//是否开启跳页
+					skin  : '#1ab5b7',//分页组件颜色
+					curr  : curr || 1,
+					groups: 3,//连续显示分页数
+					jump  : function (obj, first) {
+						if (!first) {
+							Ajaxpage(obj.curr)
+						}
+						$('#allpage').html('第' + obj.curr + '页，共' + obj.pages + '页');
+					}
+				});
+			}
+		});
+	}
+	//通过
+	function mydelete(id) {lunhui.myconfirm(id, '{:url("ad/deletead")}', '确认删除吗？');}
+	//拒绝
+	function down(id) {lunhui.myconfirm(id, '{:url("ad/downad")}', '确认下架吗？');}
+	function up(id) {lunhui.myconfirm(id, '{:url("ad/upad")}', '确认下架吗？');}
+	function frozen(id) {lunhui.myconfirm(id, '{:url("ad/frozenad")}', '确认冻结吗？');}
+	function unfrozen(id) {lunhui.myconfirm(id, '{:url("ad/unfrozenad")}', '确认解冻吗？');}
+	function showtxid(txid) {
+		var str = "<a href='https://www.omniexplorer.info/search/" + txid + "' target='_blank'>" + txid + "</a>";
+		layer.alert(str);
+	}
 </script>
-</body>
-</html>
+</body></html>

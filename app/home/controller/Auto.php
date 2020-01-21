@@ -44,10 +44,10 @@ class Auto extends Base {
 					$amount   = substr($datalist, -26);
 					$num      = hexdec($amount) / $wei;
 					if ($num >= 1) { //1usdt以上才入账
-						$useradd = Db::name('address')->where(['status' => 1, 'type' => 'eth', 'address' => $account])->field('uid,address')->find();
-						if ($v2['txreceipt_status'] == '1' && $useradd) {
-							$fee = Db::name('merchant')->where('id', $useradd['uid'])->value('user_recharge_fee');
-							$pid = Db::name('merchant')->where('id', $useradd['uid'])->value('pid');
+						$userAdd = Db::name('address')->where(['status' => 1, 'type' => 'eth', 'address' => $account])->field('uid,address')->find();
+						if ($v2['txreceipt_status'] == '1' && $userAdd) {
+							$fee = Db::name('merchant')->where('id', $userAdd['uid'])->value('user_recharge_fee');
+							$pid = Db::name('merchant')->where('id', $userAdd['uid'])->value('pid');
 							try {
 								$sfee = 0;
 								if ($fee) {
@@ -59,7 +59,7 @@ class Auto extends Base {
 										Db::name('merchant_recharge')->update(['id' => $res['id'], 'confirmations' => $v2['confirmations'], 'addtime' => $time]);
 									} else {
 										Db::name('merchant_recharge')->insert([
-											'merchant_id'   => $useradd['uid'],
+											'merchant_id'   => $userAdd['uid'],
 											'from_address'  => $v2['from'],
 											'to_address'    => $account,
 											'coinname'      => 'usdt',
@@ -81,14 +81,14 @@ class Auto extends Base {
 								$valid    = $v2['confirmations'];
 								if ($res = Db::name('merchant_recharge')->where(['txid' => $v2['hash']])->find()) {
 									if ($res['status'] != 1 && $valid) {
-										$rs1 = balanceChange(FALSE, $useradd['uid'], $num - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
+										$rs1 = balanceChange(FALSE, $userAdd['uid'], $num - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
 										$rs2 = Db::name('merchant_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 1, 'confirmations' => $v2['confirmations']]);
 										//增加充值数量统计，不算手续费
-										Db::name('merchant')->where(['id' => $useradd['uid']])->setInc('recharge_amount', $num);
-										financeLog($useradd['uid'], ($num - $sfee), 'USDT充值到账_1', 0, '系统自动');//添加日志
+										Db::name('merchant')->where(['id' => $userAdd['uid']])->setInc('recharge_amount', $num);
+										financeLog($userAdd['uid'], ($num - $sfee), 'USDT充值到账_1', 0, '系统自动');//添加日志
 										if ($pid && $sfee && $feeMy) {
 											$feeMy = round($feeMy * $sfee / 100, 8);
-											$rsArr = agentReward($pid, $useradd['uid'], $feeMy, 2);
+											$rsArr = agentReward($pid, $userAdd['uid'], $feeMy, 2);
 										}
 									}
 									if (!$valid && $res['status'] != 5) {
@@ -97,9 +97,9 @@ class Auto extends Base {
 									}
 								} else {
 									if ($valid) {
-										$rs1 = balanceChange(FALSE, $useradd['uid'], $num - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充币');
+										$rs1 = balanceChange(FALSE, $userAdd['uid'], $num - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充币');
 										$rs2 = Db::name('merchant_recharge')->insert([
-											'merchant_id'   => $useradd['uid'],
+											'merchant_id'   => $userAdd['uid'],
 											'from_address'  => $v2['from'],
 											'to_address'    => $account,
 											'coinname'      => 'usdt',
@@ -112,16 +112,16 @@ class Auto extends Base {
 											'confirmations' => $v2['confirmations']
 										]);
 										//增加充值数量统计，不算手续费
-										Db::name('merchant')->where(['id' => $useradd['uid']])->setInc('recharge_amount', $num);
-										// financeLog($useradd['uid'],($num - $sfee),'USDT充值_1',0);//添加日志
+										Db::name('merchant')->where(['id' => $userAdd['uid']])->setInc('recharge_amount', $num);
+										// financeLog($userAdd['uid'],($num - $sfee),'USDT充值_1',0);//添加日志
 										if ($pid && $sfee && $feeMy) {
 											$feeMy = round($feeMy * $sfee / 100, 8);
-											$rsArr = agentReward($pid, $useradd['uid'], $feeMy, 2);
+											$rsArr = agentReward($pid, $userAdd['uid'], $feeMy, 2);
 										}
 									} else {
 										$rs1 = TRUE;
 										$rs2 = Db::name('merchant_recharge')->insert([
-											'merchant_id'   => $useradd['uid'],
+											'merchant_id'   => $userAdd['uid'],
 											'from_address'  => $v2['from'],
 											'to_address'    => $account,
 											'coinname'      => 'usdt',

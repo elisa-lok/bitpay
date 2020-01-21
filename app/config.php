@@ -8,6 +8,7 @@ if (APP_DEBUG) {
 // 资金记录, 0管理员修改,1挂单上架,2挂单下架,3.交易卖出,4交易买入,5充入,6提走,7奖励
 const BAL_SYS = 0, BAL_ENTRUST = 1, BAL_REDEEM = 2, BAL_SOLD = 3, BAL_BOUGHT = 4, BAL_RECHARGE = 5, BAL_WITHDRAW = 6, BAL_REWARD = 7, BAL_COMMISSION = 8, BAL_CANCEL = 9;
 const BAL_REC = [BAL_SYS => '系统修改', BAL_ENTRUST => '挂单上架', BAL_REDEEM => '挂单下架', BAL_SOLD => '交易卖出', BAL_BOUGHT => '交易买入', BAL_RECHARGE => '充入', BAL_WITHDRAW => '提出', BAL_REWARD => '奖励', BAL_COMMISSION => '佣金', BAL_CANCEL => '交易取消'];
+
 return [
 	// | auth配置
 	'auth_config'                => [
@@ -43,12 +44,11 @@ return [
 	// 'cache'                      => ['type' => 'file', 'path' => CACHE_PATH, 'prefix' => '', 'expire' => 0,],
 	'cache'                      => ['type' => 'redis', 'host' => '127.0.0.1', 'prefix' => 'cache_', 'expire' => 0],
 	// | 会话设置
-	'session'                    => [
-		'name'       => 'sid',
-		'type'       => 'redis',// 驱动方式 支持redis memcache memcached
-		'auto_start' => TRUE,// 是否自动开启 SESSION
-		'expire'     => 5184000,
-	],
+	// 'session'                    => [
+	// 	'type'       => 'redis',// 驱动方式 支持redis memcache memcached
+	// 	'auto_start' => TRUE,// 是否自动开启 SESSION
+	// 	'expire'     => 5184000,
+	// ],
 	// | Cookie设置
 	'cookie'                     => [
 		'prefix'    => '',        // cookie 名称前缀
