@@ -275,7 +275,7 @@ class Order extends Base {
 					sendNotice($onlineAd['id'], '你有订单已匹配, 请及时处理', $content);
 				}
 				$http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
-				$url       = $http_type . $_SERVER['HTTP_HOST'] . '/home/merchant/pay_a?id=' . $orderAddRes . '&appid=' . $data['appid'] . '&type=' . $data['type'];
+				$url       = $http_type . $_SERVER['HTTP_HOST'] . '/api/pay?id=' . $orderAddRes . '&appid=' . $data['appid'] . '&type=' . $data['type'];
 				Cache::rm('sell_order_lock_' . $onlineAd['id']);
 				$this->suc($url);
 			} else {

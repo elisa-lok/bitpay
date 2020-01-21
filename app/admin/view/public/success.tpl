@@ -1,19 +1,17 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>跳转提示</title>
-	<script src="/static/admin/js/jquery.min.js?v=2.1.4"></script>
-	<script src="/static/admin/js/layer/layer.js"></script>   
+    <meta charset="UTF-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover minimal-ui">
+    <title>提示</title>
+    <script src="https://cdn.staticfile.org/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <style>html{background-color: rgb(51, 0, 0); background-image:radial-gradient(#65FDF0, #1D6FA3); background-attachment: fixed; background-size: cover; background-repeat: repeat; background-position: center center;}</style>
 </head>
 <body>
-   
-    <script> layer.msg('<?php echo $msg?>',{icon:1,shade:0.1});</script>
-	
-    <script type="text/javascript">    
-        	setTimeout(function(){
-				location.href = '<?php echo($url);?>';
-			},2000);    
-    </script>
+<script type="text/javascript">
+	swal("\n",{title : "<?php echo $msg??$message; ?>", buttons: false, icon : "success"});
+	setTimeout(function () {location.href ="<?php echo $url??'/' ?>";}, 4000);
+</script>
 </body>
 </html>

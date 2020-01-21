@@ -11,7 +11,7 @@
 <body>
 <script type="text/javascript">
 	swal("\n",{title : "<?php echo $msg??$message; ?>", buttons: false, icon : "error"});
-	setTimeout(function () {location.href ="<?php echo $url??'/' ?>";}, 4000);
+	<?php if(isset($url)){ echo 'setTimeout(function () {location.href ="'.$url.'";}, 3000);';} ?>
 </script>
 </body>
 </html>

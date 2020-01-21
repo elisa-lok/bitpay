@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>订单</title>
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<link rel="stylesheet" href="/static/home/css/paymobile.css">
+	<script type="text/javascript" charset="utf-8" src="/static/home/js/jquery.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/home/js/rem.js"></script>
+	<script src="/static/home/js/pay/clipboard.min.js"></script>
+	<style> .warn{color:red;text-shadow:0 2px 2px rgba(0, 0, 0, .2);font-size:16px;}  .mt10{margin-top:15px}  .bankinfo{display:block;}  .footer{cursor:pointer;position:fixed;left:0;bottom:0;width:100%;height:50px;background-color:#bf0000;z-index:9999;color:#ffffff;line-height:50px;box-shadow:0 -2px 5px rgba(0, 0, 0, .2);}</style>
+</head>
+<body>
+<div class='main'>
+	<div class='content'>
+		<!-- 内容开始 -->
+		<div class="paycontent">
+			<p class="red_p">付错金额，重复支付，充值将不到账！ <span class="red_arrow"></span></p>
+			<!-- 确认信息开始 -->
+			<div class="confirminfo">
+				<div class="infodetail">
+					<p class='p1050'>需支付金额：<span class="red">￥<font class='f14'>{$money}</font></span></p>
+					<p class='p1050' id="copy1" data-clipboard-target="#adno">订单号：<span class="red"><font class='f14' id="adno">{$no}</font></span><a id="fz">&nbsp;(点击复制)</a></p>
+				</div>
+			</div>
+			<!-- 确认信息结束 -->
+			<!-- 收银台开始 -->
+			<div class="paydesk mt20">
+				<p style="text-align: right">
+					支付倒计时：<span class="red"><em id='minute'>00</em>:<em id='second'>00</em></span>
+				</p>
+				<ul class="paymethod mt10">
+					{volist name="payarr" id="vo"} {if condition="$money gt 10000"} {eq name="vo" value="bank"}
+					<li class="p10 {eq name='key' value='0'}active{/eq}" data-class='bank' data-type="2">
+						<img src="/static/home/images/bank.png"/>银联卡
+					</li>
+					{/eq} {else /} {eq name="vo" value="zfb"}
+					<li class="p10 {eq name='key' value='0'}active{/eq}" onclick="" data-class='alipay' data-type="{$vo}">
+						<img src="/static/home/images/alipay.png"/>支付宝
+					</li>
+					{/eq} {eq name="vo" value="bank"}
+					<li class="p10 {eq name='key' value='0'}active{/eq}" data-class='bank' data-type="2">
+						<img src="/static/home/images/bank.png"/>银联卡
+					</li>
+					{/eq} {eq name="vo" value="wx"}
+					<li class="p10 {eq name='key' value='0'}active{/eq}" data-class='wechatpay' data-type="4">
+						<img src="/static/home/images/wechatpay.png"/>微信
+					</li>
+					{/eq} {eq name="vo" value="ysf"}
+					<li class="p10 {eq name='key' value='0'}active{/eq}" data-class='ysf' data-type="4">
+						<img src="/static/home/images/yun.png" width="32" height="32"/>云闪付
+					</li>
+					{/eq} {/if} {/volist}
+				</ul>
+				<div class='trade-knowledge mt20'>
+					<div class='sellerinfo'>
+						{volist name="payarr" id="vo"} {eq name="vo" value="bank"}
+						<div class='bank erweima {gt name="key" value="0"}hide{/gt}'>
+							<p class='f14 p10'>请用<img src="/static/home/images/bank.png"/>完成支付</p>
+							<div class='mt10 bankinfo'>
+								<p class='mt10 f14' style="color:red;" id="copy2" data-clipboard-target="#name">真实姓名：<em id="name">{gt name='remaintime' value='0'}{$merchant.name}{/gt}</em><a id="fz1">&nbsp;(点击复制)</a></p>
+								<p class='mt10 f14' style="color:red;margin-top: 0.2rem;" id="copy3" data-clipboard-target="#card">银行卡号：<em id="card">{gt name='remaintime' value='0'}{$merchant.c_bank_card}{/gt}</em><a id="fz2">&nbsp;(点击复制)</a></p>
+								<p class='mt10 f14' id="copy4" data-clipboard-target="#khh" style="color:red;margin-top: 0.2rem;">开户银行：<em id="khh">{gt name='remaintime' value='0'}{$merchant.bank}{/gt}</em><a id="fz3">&nbsp;(点击复制)</a></p><br>
+							</div>
+							<p style="color:blue;margin-top: 20px;font-size:18px;">温馨提示:点击相应资料可进行复制</p>
+						</div>
+						{/eq} {eq name="vo" value="zfb"}
+						<div class='alipay erweima {gt name="key" value="0"}hide{/gt}'>
+							<p class='f14 p10'>请用<img src="/static/home/images/alipay2.png" class='w80'/>完成支付</p>
+							<div class='mt10 bankinfo' style="">
+								<p class='mt10 f14' style="color:red; font-size: 18px" id="copy_alipay_name" data-clipboard-target="#alipay_name">支付宝姓名：<em id="alipay_name">{gt name='remaintime' value='0'}{$merchant.alipay_name}{/gt}</em><a id="cp_alipay_name">&nbsp;(点击复制)</a>
+								</p>
+								<!--<p class='mt10 f14' style="color:red;margin-top: 0.2rem;font-size: 18px" id="copy_alipay_acc" data-clipboard-target="#alipay_acc">支付宝账号：<em id="alipay_acc">{gt name='remaintime' value='0'}{/gt}</em><a id="cp_alipay_acc">&nbsp;(点击复制)</a></p>-->
+							</div>
+							<p style="color:blue;margin-top: 20px;font-size:18px;">温馨提示:<br>如果扫码时出现支付宝风控,请勿担心,可以继续付款。如有问题请联系客服人员。<br>由扫码支付改为转账支付，请放心充值，有任何问题请咨询客服！</p>
+							<div class='mt10 payma'>
+								<img src="/uploads/face/{$merchant.c_alipay_img}"/>
+							</div>
+							<div class="mt10" style="color: red;">
+								<!--<p id="alipay_click">打开支付宝,"扫一扫"付款</p>
+								<a  id='alipay_link' href="">
+								<p id="qrcode"></p>点我打开支付宝付款</a>-->
+								<!--<p class="mt10">2.点击“转到支付宝账户”</p>
+								<p><img src="/static/home/images/alipay/ali2.jpg"></p>
+								<p class="mt10">3.输入收款方手机号</p>
+								<p><img src="/static/home/images/alipay/ali3.jpg"></p>
+								<p class="mt10">4.输入转账金额与输入对方姓名</p>
+								<p><img src="/static/home/images/alipay/ali4.jpg"></p>-->
+							</div>
+							<div class="ti_t">
+								<div><p>截屏将二维码<br>保存至本地相册</p></div>
+								<div><p>打开<span class="pay_type">支付宝</span><br>选择扫一扫</p></div>
+								<div><p>从本地相册选择<br>选取截屏二维码</p></div>
+							</div>
+						</div>
+						{/eq} {eq name="vo" value="wx"}
+						<div class='wechatpay erweima {gt name="key" value="0"}hide{/gt}'>
+							<p class='f14 p10'>请用<img src="/static/home/images/wechatpay.png"/>完成支付</p>
+							<p style="color:blue;margin-top: 20px;font-size:18px;">温馨提示:<br>请把图片截图，打开微信扫一扫</p>
+							<div class='mt10 payma'>
+								<img src="/uploads/face/{$merchant.c_wechat_img}"/>
+							</div>
+							<div class="ti_t">
+								<div><p>截屏将二维码<br>保存至本地相册</p></div>
+								<div><p>打开<span class="pay_type">微信</span><br>选择扫一扫</p></div>
+								<div><p>从本地相册选择<br>选取截屏二维码</p></div>
+							</div>
+							<!--<div class='mt10 bankinfo'>-->
+							<!--	<p class='mt10 f14' style="color:red;" id="copy_wxpay_name" data-clipboard-target="#wx_name">真实姓名：<em id="wx_name">{gt name='remaintime' value='0'}{$merchant.wxpay_name}{/gt}</em><a id="cp_wxpay_name">&nbsp;(点击复制)</a></p>-->
+							<!--	<p class='mt10 f14' style="color:red;margin-top: 0.2rem;" id="copy_wxpay_acc" data-clipboard-target="#wx_acc">微信手机：<em id="wx_acc">{gt name='remaintime' value='0'}{$merchant.wxpay_acc}{/gt}</em><a id="cp_wxpay_acc">&nbsp;(点击复制)</a></p>-->
+							<!--</div>-->
+							<!--<p style="color:blue;margin-top: 20px;font-size:18px;">温馨提示:点击相应资料可进行复制<br>复制上述资料->微信收付款->转账到银行卡或手机号码->进行付款<br>下方为操作教程</p>-->
+							<!--<div class="mt10" style="color: red;">-->
+							<!--	<p>1.微信升级到7.0.7或以上版本<br>点击右上角+号, 点击收付款</p>-->
+							<!--	<p><img src="/static/home/images/wxpay/wx1.jpg"></p>-->
+							<!--	<p class="mt10">2.在二维码的下方菜单点击"向银行卡或手机号转账</p>-->
+							<!--	<p><img src="/static/home/images/wxpay/wx2.jpg"></p>-->
+							<!--	<p class="mt10">3.点击"向手机号转账"</p>-->
+							<!--	<p><img src="/static/home/images/wxpay/wx5.jpg"></p>-->
+							<!--	<p class="mt10">4.填写收款方手机号</p>-->
+							<!--	<p><img src="/static/home/images/wxpay/wx6.jpg"></p>-->
+							<!--	<p class="mt10">5.输入真实姓名与金额转账即可</p>-->
+							<!--	<p><img src="/static/home/images/wxpay/wx7.jpg"></p>-->
+							<!--</div>-->
+						</div>
+						{/eq} {eq name="vo" value="ysf"}
+						<div class='ysf erweima {gt name="key" value="0"}hide{/gt}'>
+							<p class='f14 p10'>请用<img src="/static/home/images/yun.png" width="32" height="32"/>扫码完成支付</p>
+							<div class='mt10 payma'>
+								<img src="/uploads/face/{$merchant.c_ysf_img}"/>
+							</div>
+							<p class='warn'>注意! 付错金额，重复支付，充值将不到账！</p>
+							<!--<p class='p10 warn'>支付完成后，请点击下方的"我已付款"按钮</p>-->
+							<!-- 支付方法 -->
+							<div class='tc'>
+								<p class="ti_p">
+									<span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon2 icon_ysf" id="type_icon"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon3"></span>
+								</p>
+								<div class="ti_t">
+									<div><p>截屏将二维码<br>保存至本地相册</p></div>
+									<div><p>打开<span class="pay_type">云闪付</span><br>选择扫一扫</p></div>
+									<div><p>从本地相册选择<br>选取截屏二维码</p></div>
+								</div>
+							</div>
+							<!-- 支付方法 -->
+						</div>
+						{/eq} {/volist}
+					</div>
+				</div>
+			</div>
+			<!-- 收银台结束 -->
+		</div>
+	</div>
+	<input type="hidden" name="paymethod" value="{$payarr[0]}"/> {gt name='remaintime' value='0'} <a href="{$order.return_url}">
+	<div class='footer paybutton' style="background-color: #00af43;font-size:1.5em;"><b>返回</b></div>
+</a> {else/} <a href="{$order.return_url}">
+	<div class='footer paybutton' style="background-color: #aaaaaa;font-size:1.5em;"><b>已关闭 点我返回</b></div>
+</a> {/gt}
+</div>
+</body>
+<script src="https://cdn.staticfile.org/sweetalert/2.1.2/sweetalert.min.js"></script>
+<script type="text/javascript" src="/static/home/js/jquery.qrcode.min.js"></script>
+<!--<script>{if $order.status == 0 && $remaintime > 1 }$("#qrcode").qrcode({render: "canvas", size: 180, text: '{if condition="isset($merchant.c_alipay_img)"}{$merchant.c_alipay_img}{/if}'});{/if}</script>-->
+<style>
+	.swal-text{
+		background-color:#fefae3;
+		padding:10px;
+		border:1px solid #f0e1a1;
+		display:block;
+		margin:16px;
+		text-align:left;
+		color:#ff0000;
+		font-size:16px;
+	}</style>
+<script>
+	swal({title: "你需支付¥{$money}元", text: "温馨提示：\n* 注意! 付错金额，重复支付，充值将不到账！\n* 支付完成后，请务必点击下方的\"我已付款\"按钮 \n*如果扫码时出现支付宝风控,请勿担心,可以继续付款。如有问题请联系客服人员。\n*由扫码支付改为转账支付，请放心充值，有任何问题请咨询客服！", icon: "warning"});
+	var copy1T;
+	var clipboard1 = new ClipboardJS('#copy1');
+	if (clipboard1) {
+		clipboard1.on('success', function (e) {
+			$("#fz").html("&nbsp;(复制成功)")
+			clearTimeout(copy1T);
+			copy1T = setTimeout(function () {
+				$("#fz").html("&nbsp;(点击复制)")
+			}, 2000)
+			e.clearSelection()
+		});
+	}
+	var clipboard2 = new ClipboardJS('#copy2');
+	if (clipboard2) {
+		clipboard2.on('success', function (e) {
+			$("#fz1").html("&nbsp;(复制成功)")
+			clearTimeout(copy1T);
+			copy1T = setTimeout(function () {
+				$("#fz1").html("&nbsp;(点击复制)")
+			}, 2000)
+			e.clearSelection()
+		});
+	}
+	var clipboard3 = new ClipboardJS('#copy3');
+	if (clipboard3) {
+		clipboard3.on('success', function (e) {
+			$("#fz2").html("&nbsp;(复制成功)")
+			clearTimeout(copy1T);
+			copy1T = setTimeout(function () {
+				$("#fz2").html("&nbsp;(点击复制)")
+			}, 2000)
+			e.clearSelection()
+		});
+	}
+	var clipboard4 = new ClipboardJS('#copy4');
+	if (clipboard4) {
+		clipboard4.on('success', function (e) {
+			$("#fz3").html("&nbsp;(复制成功)")
+			clearTimeout(copy1T);
+			copy1T = setTimeout(function () {$("#fz3").html("&nbsp;(点击复制)")}, 2000)
+			e.clearSelection()
+		});
+	}
+	var alipayNameCopy = new ClipboardJS('#copy_alipay_name');
+	if (alipayNameCopy) {
+		alipayNameCopy.on('success', function (e) {
+			$("#cp_alipay_name").html("&nbsp;(复制成功)")
+			clearTimeout(copy1T);
+			copy1T = setTimeout(function () {$("#cp_alipay_name").html("&nbsp;(点击复制)")}, 2000)
+			e.clearSelection()
+		});
+	}
+	var alipayAccCopy = new ClipboardJS('#copy_alipay_acc');
+	if (alipayAccCopy) {
+		alipayAccCopy.on('success', function (e) {
+			$("#cp_alipay_acc").html("&nbsp;(复制成功)")
+			clearTimeout(copy1T);
+			copy1T = setTimeout(function () {$("#cp_alipay_acc").html("&nbsp;(点击复制)")}, 2000)
+			e.clearSelection()
+		});
+	}
+	var wxpayNameCopy = new ClipboardJS('#copy_wxpay_name');
+	if (wxpayNameCopy) {
+		wxpayNameCopy.on('success', function (e) {
+			$("#cp_wxpay_name").html("&nbsp;(复制成功)")
+			clearTimeout(copy1T);
+			copy1T = setTimeout(function () {$("#cp_wxpay_name").html("&nbsp;(点击复制)")}, 2000)
+			e.clearSelection()
+		});
+	}
+	var wxpayAccCopy = new ClipboardJS('#copy_wxpay_acc');
+	if (wxpayAccCopy) {
+		wxpayAccCopy.on('success', function (e) {
+			$("#cp_wxpay_acc").html("&nbsp;(复制成功)")
+			clearTimeout(copy1T);
+			copy1T = setTimeout(function () {$("#cp_wxpay_acc").html("&nbsp;(点击复制)")}, 2000)
+			e.clearSelection()
+		});
+	}
+	var flag;
+	$('.usdt').mouseover(function () {
+		$('.descusdt').show();
+	});
+	$('.usdt').mouseout(function () {
+		$('.descusdt').hide();
+	});
+	$('.paymethod li').click(function () {
+		var type = $(this).attr('data-type');
+		var showclass = $(this).attr('data-class');
+		$('.paymethod li').removeClass('active');
+		$(this).addClass('active');
+		$('input[name="paymethod"]').val(type);
+		$('.erweima').hide();
+		$('.' + showclass).show();
+	})
+	var remaintime = {$remaintime |
+	default
+	= 0}
+	;
+	if (remaintime > 0) {
+		resetTime(remaintime);
+	}
+	CheckOutTime();
+	function resetTime(time) {
+		var timer = null;
+		var t = time;
+		var m = 0;
+		var s = 0;
+		m = Math.floor(t / 60 % 60);
+		m < 10 && (m = '0' + m);
+		s = Math.floor(t % 60);
+		function countDown() {
+			s--;
+			s < 10 && (s = '0' + s);
+			if (s.length >= 3) {
+				s = 59;
+				m = "0" + (Number(m) - 1);
+			}
+			if (m.length >= 3) {
+				m = '00';
+				s = '00';
+				clearInterval(timer);
+			}
+			$('#minute').html(m);
+			$('#second').html(s);
+		}
+		timer = setInterval(countDown, 1000);
+	}
+	function CheckOutTime() {
+		var id = {$id |
+	default
+		= 0
+	}
+		;
+		$.post('{:url("home/merchant/CheckOutTime")}', {id: id}, function (data) {
+			if (data.code === 1) {
+				clearTimeout(flag);
+				$('.payma img').attr('src', '/static/home/images/outtime.png');
+				$('.bankinfo').hide();
+				$('.infodetail p span').html('订单已关闭');
+				$('.paybutton').attr('disabled', true);
+				$('#qrcode').remove();
+			} else {
+				flag = setTimeout('CheckOutTime()', 3000);
+			}
+		})
+	}
+	function uptrade() {
+		swal({
+			title  : "确认已付款 ¥{$money}元 ？",
+			text   : "注意! 付错金额，重复支付，充值将不到账！",
+			icon   : "warning",
+			buttons: {
+				cancel : {
+					text      : "取消",
+					value     : false,
+					visible   : true,
+					className : "",
+					closeModal: true,
+				},
+				confirm: {
+					text      : "确认",
+					value     : true,
+					visible   : true,
+					className : "",
+					closeModal: true
+				}
+			}
+		}).then(function (result) {
+			if (!result) {return false}
+			var appid = "{$appid|default=''}";
+			var id = {$id |
+		default
+			= 0
+		}
+			;
+			var payway = $(".paydesk ul .active").index();
+			$.post('{:url("home/merchant/uptrade")}', {id: id, appid: appid, payway: payway}, function (data) {
+				if (data.code == 1) {
+					swal("操作成功", "请等待交易确认", "success");
+					setTimeout(function () {window.location.href = data.msg}, 2000);
+				} else {
+					swal({title: data.msg, icon: "error",});
+				}
+			})
+		})
+	}
+	/*$logUrl*/
+	/* if(/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
+	 $('#alipay_link').attr('href', 'alipays://platformapi/startapp?appId=20000067&url='+window.location.protocol+'//{$domain}/go/url/变量{|base64_encode}');
+	 $('#alipay_click').text("手机点击二维码即可付款");
+	 }*/
+	/*setTimeout(function () {
+	 var appid = "{$appid|default=''}";
+	 var id = {$id |default= 0};
+	 var payway = $(".paydesk ul .active").index();
+	 $.post('{:url("home/merchant/uptrade")}', {id: id, appid: appid, payway: payway}, function (data) {
+	 if (data.code == 1) {
+	 console.log(data)
+	 } else {
+	 console.log(data)
+	 }
+	 })
+	 }, 15000);*/
+</script>
+</html>
