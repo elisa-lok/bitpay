@@ -48,7 +48,7 @@ class Merchant extends Base {
 		$this->assign('downloadUrl', $downloadUrl);
 		$this->assign('notifyUrl', $notifyUrl);
 		$this->assign('article', $ids);
-		$this->assign('froze', $haveAdSum);
+		$this->assign('froze', round($haveAdSum, 8));
 		$this->assign('price', getUsdtPrice());
 		return $this->fetch();
 	}
@@ -1302,6 +1302,8 @@ class Merchant extends Base {
 		$alipay              = new ZfbModel();
 		$wx                  = new WxModel();
 		$unionpay            = new YsfModel();
+		$model               = new MerchantModel();
+		$user                = $model->getUserByParam($this->uid, 'id');
 		if (request()->isPost()) {
 			$amount = input('post.amount');
 			($amount <= 0) && $this->error('请输入正确的出售数量');
@@ -1312,8 +1314,6 @@ class Merchant extends Base {
 			($minLimit > $maxLimit) && $this->error('最小限额不能大于最大限额！');
 			$price = $usdtPriceWay == 0 ? input('post.price') : $priceLimit;
 			($price > $usdtPriceMax || $price < $usdtPriceMin) && $this->error('价格区间：' . $usdtPriceMin . '~' . $usdtPriceMax);
-			$model = new MerchantModel();
-			$user  = $model->getUserByParam($this->uid, 'id');
 			($user['trader_check'] != 1) && $this->error('您的承兑商资格未通过');
 			//$haveAdSum = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->sum('amount');
 			$haveAdSum = 0;
@@ -1370,30 +1370,34 @@ class Merchant extends Base {
 				Db::rollback();
 				$this->error("挂单失败,无法冻结余额。");
 			}
-		} else {
-			$this->assign('usdt_price', $usdtCurrentPrice);
-			$this->assign('usdt_price_min', $usdtPriceMin);
-			$this->assign('usdt_price_max', $usdtPriceMax);
-			$this->assign('usdt_price_way', $usdtPriceWay);
-			$model2          = new AdModel();
-			$where['userid'] = $this->uid;
-			$list            = $model2->getAd($where, 'id DESC');
-			foreach ($list as $k => $v) {
-				//$dealNum = Db::name('order_buy')->where(['sell_sid' => $v['id'], 'status' => ['neq', 5], 'status' => ['neq', 9]])->sum('deal_num');
-				$dealNum            = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 7)->sum('deal_num');
-				$dealNum            = $dealNum ? $dealNum : 0;
-				$list[$k]['deal']   = $dealNum;
-				$list[$k]['remain'] = $v['amount'] - $list[$k]['deal'];
-			}
-			$this->assign('list', $list);
-			$this->assign('priceLimit', $priceLimit);
-			$banks = $m->where('merchant_id', $this->uid)->order('id DESC')->select();
-			$this->assign('zfb', $alipay->getBank(['merchant_id' => $this->uid], 'id DESC'));
-			$this->assign('wx', $wx->getBank(['merchant_id' => $this->uid], 'id DESC'));
-			$this->assign('ysf', $unionpay->getBank(['merchant_id' => $this->uid], 'id DESC'));
-			$this->assign('banks', $banks);
-			return $this->fetch();
 		}
+		$this->assign('balance', round($user['usdt'], 8));
+		$this->assign('frozen', round($user['usdtd'], 8));
+		$this->assign('usdt_price', $usdtCurrentPrice);
+		$this->assign('usdt_price_min', $usdtPriceMin);
+		$this->assign('usdt_price_max', $usdtPriceMax);
+		$this->assign('usdt_price_way', $usdtPriceWay);
+		$model2          = new AdModel();
+		$where['userid'] = $this->uid;
+		$list            = $model2->getAd($where, 'id DESC');
+		foreach ($list as $k => $v) {
+			//$dealNum = Db::name('order_buy')->where(['sell_sid' => $v['id'], 'status' => ['neq', 5], 'status' => ['neq', 9]])->sum('deal_num');
+			$dealNum            = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 7)->sum('deal_num');
+			$dealNum            = $dealNum ? $dealNum : 0;
+			$list[$k]['deal']   = round($dealNum, 8);
+			$list[$k]['remain'] = round($v['amount'] - $list[$k]['deal'], 8);
+			$list[$k]['trading_volume'] =round($v['trading_volume'], 8);
+			$list[$k]['remain_amount'] =round($v['remain_amount'], 8);
+			$list[$k]['price'] =round($v['price'], 8);
+		}
+		$this->assign('list', $list);
+		$this->assign('priceLimit', $priceLimit);
+		$banks = $m->where('merchant_id', $this->uid)->order('id DESC')->select();
+		$this->assign('zfb', $alipay->getBank(['merchant_id' => $this->uid], 'id DESC'));
+		$this->assign('wx', $wx->getBank(['merchant_id' => $this->uid], 'id DESC'));
+		$this->assign('ysf', $unionpay->getBank(['merchant_id' => $this->uid], 'id DESC'));
+		$this->assign('banks', $banks);
+		return $this->fetch();
 	}
 
 	public function newadbuy() {

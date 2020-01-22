@@ -29,7 +29,7 @@
 								<div class="form-group">
 									<label class="col-sm-3 control-label"><em class="text-danger">*</em> 出售数量：</label>
 									<div class="col-sm-6">
-										<input type="text" class="form-control" name="amount" id="amount" onblur="calculate()"/>
+										<input type="text" class="form-control" name="amount" id="amount" placeholder="可用 {$balance}, 冻结 {$frozen}" onchange="calculate()"/>
 									</div>
 								</div>
 								{eq name="usdt_price_way" value="1"}
@@ -109,8 +109,9 @@
 								<tr>
 									<th>编号</th>
 									<th>价格</th>
-									<th>交易数量</th>
-									<th>剩余数量</th>
+									<th>总量</th>
+									<th>已成交</th>
+									<th>剩余</th>
 									<th>创建时间</th>
 									<th>状态</th>
 									<th>操作</th>
@@ -121,6 +122,7 @@
 								<tr>
 									<td>{$vo.ad_no}</td>
 									<td>¥ {$vo.price}</td>
+									<td>¥ {$vo.amount}</td>
 									<td>{$vo.trading_volume}</td>
 									<td>{$vo.remain_amount}</td>
 									<td>{$vo['add_time']|date="Y-m-d H:i:s",###}</td>
