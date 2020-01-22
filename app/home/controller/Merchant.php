@@ -1306,18 +1306,18 @@ class Merchant extends Base {
 		$user                = $model->getUserByParam($this->uid, 'id');
 		if (request()->isPost()) {
 			$amount = input('post.amount');
-			($amount <= 0) && $this->error('请输入正确的出售数量');
+			($amount <= 0) && showMsg('请输入正确的出售数量',0);
 			$minLimit = input('post.min_limit');
-			($minLimit <= 0) && $this->error('请输入正确的最小限额');
+			($minLimit <= 0) && showMsg('请输入正确的最小限额',0);
 			$maxLimit = input('post.max_limit');
-			($maxLimit <= 0) && $this->error('请输入正确的最大限额');
-			($minLimit > $maxLimit) && $this->error('最小限额不能大于最大限额！');
+			($maxLimit <= 0) && showMsg('请输入正确的最大限额',0);
+			($minLimit > $maxLimit) && showMsg('最小限额不能大于最大限额！',0);
 			$price = $usdtPriceWay == 0 ? input('post.price') : $priceLimit;
-			($price > $usdtPriceMax || $price < $usdtPriceMin) && $this->error('价格区间：' . $usdtPriceMin . '~' . $usdtPriceMax);
-			($user['trader_check'] != 1) && $this->error('您的承兑商资格未通过');
-			Db::name('ad_sell')->where('userid', $this->uid)->whereIn('state', '1,2')->count() > 0 && $this->error('只允许一张挂单, 你有未完成订单');
-			($user['usdt'] < $amount) && $this->error('账户余额不足');
-			(empty($_POST['bank']) && empty($_POST['zfb']) && empty($_POST['wx']) && empty($_POST['ysf'])) && $this->error('请选择收款方式');
+			($price > $usdtPriceMax || $price < $usdtPriceMin) && showMsg('价格区间：' . $usdtPriceMin . '~' . $usdtPriceMax, 0);
+			($user['trader_check'] != 1) && showMsg('您的承兑商资格未通过');
+			Db::name('ad_sell')->where('userid', $this->uid)->whereIn('state', '1,2')->count() > 0 && showMsg('只允许一张挂单, 你有未完成订单');
+			($user['usdt'] < $amount) && showMsg('账户余额不足');
+			(empty($_POST['bank']) && empty($_POST['zfb']) && empty($_POST['wx']) && empty($_POST['ysf'])) && showMsg('请选择收款方式');
 			$codes = ['zfb' => (int)$_POST['zfb'], 'bank' => (int)$_POST['bank'], 'wx' => (int)$_POST['wx'], 'ysf' => (int)$_POST['ysf']];
 			//查询用户的银行卡信息
 			$where1['merchant_id'] = $this->uid;
@@ -1333,10 +1333,10 @@ class Merchant extends Base {
 			$where4['merchant_id'] = $this->uid;
 			$where4['id']          = $codes['ysf'];
 			$isUnionPay            = $unionpay->getOne($where4);
-			($codes['bank'] && !$isBank) && $this->error('请先设置您的银行卡账户信息');
-			($codes['zfb'] && !$isAlipay) && $this->error('请先设置您的支付宝账户信息');
-			($codes['wx'] && !$isWxpay) && $this->error('请先设置您的微信账户信息');
-			($codes['ysf'] && !$isUnionPay) && $this->error('请先设置您的云闪付账户信息');
+			($codes['bank'] && !$isBank) && showMsg('请先设置您的银行卡账户信息',0);
+			($codes['zfb'] && !$isAlipay) &&showMsg('请先设置您的支付宝账户信息',0);
+			($codes['wx'] && !$isWxpay) &&showMsg('请先设置您的微信账户信息',0);
+			($codes['ysf'] && !$isUnionPay) && showMsg('请先设置您的云闪付账户信息',0);
 			Db::startTrans();
 			// 减少余额 增加冻结余额
 			$adNo = $this->getAdvNo();
@@ -1364,10 +1364,10 @@ class Merchant extends Base {
 				//增加在售挂单数
 				$count = $model2->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
 				$model->updateOne(['id' => $this->uid, 'ad_on_sell' => $count]);
-				($flag['code'] == 1) ? $this->success($flag['msg']) : $this->error($flag['msg']);
+				($flag['code'] == 1) ? showMsg($flag['msg'], 1) : showMsg($flag['msg'], 0);
 			} else {
 				Db::rollback();
-				$this->error("挂单失败,无法冻结余额。");
+				showMsg('挂单失败,无法冻结余额',0);
 			}
 		}
 		$this->assign('balance', round($user['usdt'], 8));

@@ -13,7 +13,7 @@ class Order extends Base {
 		if (request()->isPost()) {
 			$args      = input('post.');
 			$srcStatus = $orderInfo['status'];
-			($orderInfo['status'] == $args['status']) && ($orderInfo['deal_amount'] == $args['deal_amount']) && showMsg('操作成功'); //状态未改变
+			($orderInfo['status'] == $args['status']) && ($orderInfo['deal_amount'] == $args['deal_amount']) && showMsg('操作成功',1); //状态未改变
 			$updateArr = ['status' => $args['status']];
 			if ($args['deal_amount'] != $orderInfo['deal_amount']) {
 				$updateArr['deal_amount'] = $args['deal_amount'];

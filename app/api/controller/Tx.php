@@ -132,7 +132,7 @@ class Tx {
 			//请求回调接口
 			$data = ['amount' => $orderInfo['deal_num'], 'rmb' => $orderInfo['deal_amount'], 'orderid' => $orderInfo['orderid'], 'appid' => $buyer['appid'], 'status' => 1];
 			askNotify($data, $orderInfo['notify_url'], $buyer['key']);
-			showMsg('交易成功');
+			showMsg('交易成功', 1);
 		} catch (DbException $e) {
 			$this->rollbackShowMsg('交易失败，参考信息：' . $e->getMessage(), $id, TRUE);
 		}

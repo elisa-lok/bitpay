@@ -168,10 +168,10 @@ class Ad extends Base {
 			!balanceChange(FALSE,$orderInfo['userid'], -$orderInfo['remain_amount'], 0, $orderInfo['remain_amount'], 0, BAL_REDEEM, $id) && $this->rollbackShowMsg('冻结余额失败');
 			Db::commit();
 		} else {
-			showMsg('参数错误');
+			showMsg('参数错误', 0);
 		}
 		writelog($this->uid, $this->username, '用户【' . $this->username . '】处理订单:' . $id . ', state: ' . $state . '成功', 1);
-		showMsg('处理成功');
+		showMsg('处理成功', 1);
 	}
 
 	public function upbuyad() {

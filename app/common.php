@@ -522,7 +522,7 @@ function getStatisticsOfOrder($buyerid, $sellerid, $buyamount, $sellamount) {
 	Db::name('merchant')->where('id', $buyerid)->update(['order_buy_success_num' => Db::raw('order_buy_success_num + 1'), 'order_buy_usdt_amount' => Db::raw('order_buy_usdt_amount + ' . $buyamount)]);
 }
 
-function showMsg($msg = '', $code = 1, $data = [], $url = '#') {
+function showMsg($msg = '', $code = 0, $data = [], $url = '#') {
 	header('Content-Type:application/json; charset=utf-8');
 	die(json_encode(['code' => $code, 'msg' => $msg, 'data' => $data, 'url' => $url], 320));
 }
