@@ -1525,7 +1525,7 @@ class Merchant extends Base {
 		} elseif ($act == 3 && ($adInfo['state'] == 1 || $adInfo['state'] == 2)) {
 			// $merchant['usdtd'] < $adInfo['remain_amount'] && $this->error('冻结不足', $id);
 			Db::startTrans();
-			!Db::name('ad_sell')->where(['id' => $id, 'userid' => $this->uid])->update(['state' => $act]) && $this->rollbackAndMsg('操作失败', $id);
+			!Db::name('ad_sell')->where(['id' => $id, 'userid' => $this->uid])->update(['state' => $act, 'finished_time' => time()]) && $this->rollbackAndMsg('订单操作失败', $id);
 			!balanceChange(FALSE, $this->uid, $adInfo['remain_amount'], 0, -$adInfo['remain_amount'], 0, BAL_REDEEM, $id) && $this->rollbackAndMsg('撤单失败：退款失败', $id);
 			Cache::rm($id);
 			$count = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();

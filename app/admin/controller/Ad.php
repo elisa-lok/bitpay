@@ -4,7 +4,6 @@ use app\admin\model\MerchantModel;
 use think\db;
 
 class Ad extends Base {
-
 	public function adlist() {
 		$key = input('key');
 		$oid = input('oid');
@@ -102,16 +101,6 @@ class Ad extends Base {
 			$lists[$k]['add_time'] = date("Y/m/d H:i:s", $v['add_time']);
 			// $temp = explode(',', $v['pay_method']);
 			$str = '';
-			// if(in_array(2, $temp) || $temp[0] > 4){
-			//     $str.='|银行转账';
-			// }
-			// if(in_array(3, $temp)){
-			//     $str.='|支付宝';
-			// }
-			// if(in_array(4, $temp)){
-			//     $str.='|微信支付';
-			// }
-			//20190817新
 			if ($v['pay_method'] > 0) {
 				$str .= '银行卡';
 			}
@@ -140,50 +129,6 @@ class Ad extends Base {
 		return $this->fetch();
 	}
 
-	public function deletead() {
-		$id   = input('id');
-		$find = Db::name('ad_sell')->where('id', $id)->find();
-		(empty($find)) && showJson(['code' => 0, 'msg' => '参数错误']);
-		$rs = Db::name('ad_sell')->delete($id);
-		if ($rs) {
-			showJson(['code' => 1, 'msg' => '删除成功']);
-		} else {
-			showJson(['code' => 0, 'msg' => '删除失败']);
-		}
-	}
-
-	public function deletebuyad() {
-		$id   = input('id');
-		$find = Db::name('ad_buy')->where('id', $id)->find();
-		(empty($find)) && showJson(['code' => 0, 'msg' => '参数错误']);
-		$rs = Db::name('ad_buy')->delete($id);
-		if ($rs) {
-			writelog($this->uid, $this->username, '用户【' . $this->username . '】删除挂单:' . $id . '成功', 1);
-			showJson(['code' => 1, 'msg' => '删除成功']);
-		} else {
-			writelog($this->uid, $this->username, '用户【' . $this->username . '】删除:' . $id . '失败', 0);
-			showJson(['code' => 0, 'msg' => '删除失败']);
-		}
-	}
-	// todo 整合一个方法
-	public function setSellAdState(){}
-
-	public function downad() {
-		$id   = input('id');
-		$find = Db::name('ad_sell')->where('id', $id)->lock()->find();
-		!$find && showJson(['code' => 0, 'msg' => '参数错误']);
-		$find['state'] != 1 && showJson(['code' => 0, 'msg' => '订单已经下架']);
-		$rs = Db::name('ad_sell')->update(['id' => $id, 'state' => 2]);
-		if ($rs) {
-			!balanceChange(TRUE, $find['userid'], $find['remain_amount'], 0, -$find['remain_amount'], 0, BAL_REDEEM, $find['id'], "后台下架") && showJson(['code' => 0, 'msg' => '下架失败']);
-			writelog($this->uid, $this->username, '用户【' . $this->username . '】下架挂单:' . $id . '成功', 1);
-			showJson(['code' => 1, 'msg' => '下架成功']);
-		} else {
-			writelog($this->uid, $this->username, '用户【' . $this->username . '】下架挂单:' . $id . '失败', 0);
-			showJson(['code' => 0, 'msg' => '下架失败']);
-		}
-	}
-
 	public function downbuyad() {
 		$id   = input('id');
 		$find = Db::name('ad_buy')->where('id', $id)->find();
@@ -198,26 +143,35 @@ class Ad extends Base {
 		}
 	}
 
-	public function upad() {
-		$id   = input('id');
-		$find = Db::name('ad_sell')->where('id', $id)->lock()->find();
-		!$find && showJson(['code' => 0, 'msg' => '参数错误']);
-		$find['state'] != 2 && showJson(['code' => 0, 'msg' => '订单状态不能上架']);
-		$user = Db::name('merchant')->where('id', $find['userid'])->find();
-		if ($find['remain_amount'] > $user['usdt']) {
-			writelog($this->uid, $this->username, '用户【' . $this->username . '】上架挂单:' . $id . '失败', 0);
-			showJson(['code' => 0, 'msg' => '上架失败']);
+	// todo 卖单状态
+	public function sellState() {
+		$id    = (int)input('id');
+		$state = (int)input('state');
+		!in_array($state, [1, 2, 3, 4]) && showMsg('状态错误', 0);
+		$orderInfo = Db::name('ad_sell')->where('id', $id)->lock()->find();
+		!$orderInfo && showMsg('订单不存在', 0);
+		if (in_array($state, [1, 2, 4]) && in_array($orderInfo['state'], [1, 2, 4])) {
+			//单纯更改状态
+			!Db::name('ad_sell')->where(['id' => $id, 'userid' => $orderInfo['userid'], 'state' => $orderInfo['state']])->update(['state' => $state]) && showMsg('更改订单状态失败', 0);
+		} elseif (in_array($orderInfo['state'], [1, 2, 4]) && $state == 3) {
+			// $merchant['usdtd'] < $adInfo['remain_amount'] && $this->error('冻结不足', $id);
+			Db::startTrans();
+			!Db::name('ad_sell')->where(['id' => $id, 'userid' => $orderInfo['userid']])->update(['state' => $state, 'finished_time' => time()]) && $this->rollbackShowMsg('订单操作失败');
+			!balanceChange(FALSE,$orderInfo['userid'], $orderInfo['remain_amount'], 0, -$orderInfo['remain_amount'], 0, BAL_REDEEM, $id) && $this->rollbackShowMsg('撤单失败：退款失败');
+			$count = Db::name('ad_sell')->where('userid',$orderInfo['userid'])->where('state', 1)->where('amount', 'gt', 0)->count();
+			Db::name('merchant')->update(['id' => $orderInfo['userid'], 'ad_on_sell' => $count ? $count : 0]);
+			Db::commit();
+		} elseif (in_array($state, [1, 2, 4]) && $orderInfo['state'] == 3) {
+			Db::startTrans();
+			// 更改订单状态
+			!Db::name('ad_sell')->where(['id' => $id, 'userid' => $orderInfo['userid'], 'state' => $orderInfo['state']])->update(['state' => $state]) && $this->rollbackShowMsg('更改订单状态失败', 0);
+			!balanceChange(FALSE,$orderInfo['userid'], -$orderInfo['remain_amount'], 0, $orderInfo['remain_amount'], 0, BAL_REDEEM, $id) && $this->rollbackShowMsg('冻结余额失败');
+			Db::commit();
 		} else {
-			$rs = Db::name('ad_sell')->update(['id' => $id, 'state' => 1]);
-			if ($rs) {
-				!balanceChange(TRUE, $find['userid'], -$find['remain_amount'], 0, $find['remain_amount'], 0, BAL_ENTRUST, $find['id'], "后台上架")&&showJson(['code' => 0, 'msg' => '上架失败']);
-				writelog($this->uid, $this->username, '用户【' . $this->username . '】上架挂单:' . $id . '成功', 1);
-				showJson(['code' => 1, 'msg' => '上架成功']);
-			} else {
-				writelog($this->uid, $this->username, '用户【' . $this->username . '】上架挂单:' . $id . '失败', 0);
-				showJson(['code' => 0, 'msg' => '上架失败']);
-			}
+			showMsg('参数错误');
 		}
+		writelog($this->uid, $this->username, '用户【' . $this->username . '】处理订单:' . $id . ', state: ' . $state . '成功', 1);
+		showMsg('处理成功');
 	}
 
 	public function upbuyad() {
@@ -234,20 +188,6 @@ class Ad extends Base {
 		}
 	}
 
-	public function frozenad() {
-		$id   = input('id');
-		$find = Db::name('ad_sell')->where('id', $id)->find();
-		(empty($find)) && showJson(['code' => 0, 'msg' => '参数错误']);
-		$rs = Db::name('ad_sell')->update(['id' => $id, 'state' => 4]);
-		if ($rs) {
-			writelog($this->uid, $this->username, '用户【' . $this->username . '】冻结挂单:' . $id . '成功', 1);
-			showJson(['code' => 1, 'msg' => '冻结成功']);
-		} else {
-			writelog($this->uid, $this->username, '用户【' . $this->username . '】冻结挂单:' . $id . '失败', 0);
-			showJson(['code' => 0, 'msg' => '冻结失败']);
-		}
-	}
-
 	public function frozenbuyad() {
 		$id   = input('id');
 		$find = Db::name('ad_buy')->where('id', $id)->find();
@@ -259,24 +199,6 @@ class Ad extends Base {
 		} else {
 			writelog($this->uid, $this->username, '用户【' . $this->username . '】冻结挂单:' . $id . '失败', 0);
 			showJson(['code' => 0, 'msg' => '冻结失败']);
-		}
-	}
-
-	public function unfrozenad() {
-		$id   = input('id');
-		$find = Db::name('ad_sell')->where('id', $id)->find();
-		(empty($find)) && showJson(['code' => 0, 'msg' => '参数错误']);
-		$rs = Db::name('ad_sell')->update(['id' => $id, 'state' => 2]);
-		if ($rs) {
-			// 解冻后是下架 所以回滚余额
-			if (!balanceChange(TRUE, $find['user_id'], $find['remain_amount'], 0, -$find['remain_amount'], 0, BAL_REDEEM, $find['id'], "后台解冻")) showJson(['code' => 0, 'msg' => '解冻失败']);
-			//Db::name('merchant')->where('id', $find['user_id'])->setInc('usdt', $find['remain_volume']);
-			//Db::name('merchant')->where('id', $find['user_id'])->setDec('usdtd', $find['remain_volume']);
-			writelog($this->uid, $this->username, '用户【' . $this->username . '】冻结挂单:' . $id . '成功', 1);
-			showJson(['code' => 1, 'msg' => '解冻成功']);
-		} else {
-			writelog($this->uid, $this->username, '用户【' . $this->username . '】冻结挂单:' . $id . '失败', 0);
-			showJson(['code' => 0, 'msg' => '解冻失败']);
 		}
 	}
 

@@ -86,8 +86,6 @@ class Index extends Base {
 		//今日新增会员
 		$today              = strtotime(date('Y-m-d 00:00:00'));//今天开始日期
 		$map['create_time'] = ['egt', $today];
-		$member             = Db::name('member')->where($map)->count();
-		$this->assign('member', $member);
 		$info = [
 			'web_server' => $_SERVER['SERVER_SOFTWARE'],
 			'onload'     => ini_get('upload_max_filesize'),

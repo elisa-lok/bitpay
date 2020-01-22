@@ -10,8 +10,8 @@
 </head>
 <body>
 <script type="text/javascript">
-	swal("\n",{title : "<?php echo $msg??$message; ?>", buttons: false, icon : "success"});
-	setTimeout(function () {location.href ="<?php echo $url??'/' ?>";}, 4000);
+	swal("\n",{title : "<?php echo $msg??$message; ?>", timer: 8000 buttons: false, icon : "success"});
+	setTimeout(function () {location.href ="<?php echo $url??'history.go(-1)' ?>";}, 2000);
 </script>
 </body>
 </html>

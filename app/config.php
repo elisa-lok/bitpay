@@ -33,7 +33,7 @@ return [
 	'dispatch_error_tmpl'        => APP_PATH . 'admin/view/public/error.tpl',
 	//默认成功跳转对应的模板文件
 	'dispatch_success_tmpl'      => APP_PATH . 'admin/view/public/success.tpl',
-	'exception_tmpl'             => APP_PATH . 'admin/view/public/error.tpl',
+	//'exception_tmpl'             => APP_PATH . 'admin/view/public/error.tpl',
 	// | 日志设置
 	'log'                        => [
 		'type'  => 'File',// 日志记录方式，内置 file socket 支持扩展
