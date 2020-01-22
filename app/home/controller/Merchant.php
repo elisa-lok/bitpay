@@ -1315,9 +1315,8 @@ class Merchant extends Base {
 			$price = $usdtPriceWay == 0 ? input('post.price') : $priceLimit;
 			($price > $usdtPriceMax || $price < $usdtPriceMin) && $this->error('价格区间：' . $usdtPriceMin . '~' . $usdtPriceMax);
 			($user['trader_check'] != 1) && $this->error('您的承兑商资格未通过');
-			//$haveAdSum = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->sum('amount');
-			$haveAdSum = 0;
-			($user['usdt'] < $amount + $haveAdSum) && $this->error('账户余额不足');
+			Db::name('ad_sell')->where('userid', $this->uid)->whereIn('state', '1,2')->count() > 0 && $this->error('只允许一张挂单, 你有未完成订单');
+			($user['usdt'] < $amount) && $this->error('账户余额不足');
 			(empty($_POST['bank']) && empty($_POST['zfb']) && empty($_POST['wx']) && empty($_POST['ysf'])) && $this->error('请选择收款方式');
 			$codes = ['zfb' => (int)$_POST['zfb'], 'bank' => (int)$_POST['bank'], 'wx' => (int)$_POST['wx'], 'ysf' => (int)$_POST['ysf']];
 			//查询用户的银行卡信息

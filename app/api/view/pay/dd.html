@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0">
+	<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Expires" content="0">
+	<title>在线交易</title>
+	<style type="text/css">
+		/******base.css******/  *{margin:0;padding:0;box-sizing:border-box;background-repeat:no-repeat;-webkit-tap-highlight-color:rgba(255, 255, 255, 0)}  html, body{font-family:"SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, 'Microsoft JhengHei', 'Microsoft Yahei', sans-serif !important;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-size:14px;color:#031c23;height:100vh; /*background: #f4f7fb;*/}  [v-cloak]{display:none;}  a{text-decoration:none;}  button{font-size:16px;border:none;outline:none;-webkit-appearance:none;font-family:"SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, 'Microsoft JhengHei', 'Microsoft Yahei', sans-serif !important;}  input{border:none;outline:none;resize:none;-webkit-appearance:none;border-radius:0;cursor:pointer;}  input::-ms-clear{display:none;}  ::-webkit-input-placeholder{color:#c2c2c2;font-size:14px;}  :-moz-placeholder{color:#c2c2c2;font-size:14px;}  ::-moz-placeholder{color:#c2c2c2;font-size:14px;}  ::-ms-input-placeholder{color:#c2c2c2;font-size:14px;}  :-ms-input-placeholder{color:#c2c2c2;font-size:14px;}  a:hover{text-decoration:none;}  ul li{list-style:none;}  .clear{clear:both;}  .left{float:left;}  .right{float:right;}  .none{display:none !important;}  .mask{position:fixed;left:0;top:0;height:100vh;width:100%;background:rgba(49, 49, 49, 0.6);z-index:99;display:none;}  header{height:44px;background:#ffffff;width:100%;z-index:10;}  .head_box{padding:8px 20px;height:100%;text-align:center;margin:auto;}  .head_box img{height:28px;}  .text_div{color:#5b5b5b;line-height:20px;margin-bottom:77px;}  /******save.css******/  .container{text-align:center;height:100vh;overflow:auto;}  .container .title{padding-top:5px;font-size:28px;line-height:40px;}  .container .order{font-size:14px;line-height:20px;margin-top:15px;}  .container .zf_p{color:#657685;font-size:14px;margin:auto;line-height:22px;}  .container .wid_p{width:100%;}  .radio_box{width:140px;height:140px;position:relative;display:inline-block;margin-bottom:30px;}  .radio_box2{width:88px;height:88px;position:relative;display:inline-block;margin-bottom:30px;}  #bg_canvas{position:absolute;top:0;left:0;}  #percent_canvas{position:absolute;top:-1px;left:-1px;}  #bg_canvas1{position:absolute;top:0;left:0;}  #percent_canvas1{position:absolute;top:-1px;left:-1px;}  .center_div{position:absolute;width:94px;height:94px;border-radius:50%;background:#03ba7a;left:23px;top:23px;line-height:94px;font-size:36px;color:#ffffff;text-align:center;}  .center_div2{position:absolute;width:86px;height:86px;border-radius:50%;color:#03ba7a;left:1px;top:1px;line-height:86px;font-size:36px;text-align:center;}  .c_p{color:#657685;line-height:20px;width:160px;margin:auto;padding-bottom:5px;border-bottom:1px solid #eaeaea;margin-bottom:10px;}  .c_p .countdown{color:#ff4255;}  .container .zf_p .money{font-size:32px;line-height:45px;color:black;margin-top:5px;}  .container .copy_button2{display:inline-block;color:#0083e0;font-size:14px;background:transparent;height:24px;vertical-align:baseline;}  .container .gray{color:#657685;}  .zf_icon{display:inline-block;width:16px;height:16px;margin-right:8px;background-image:url(../image/icons_zf@2x.png);background-size:cover;vertical-align:text-bottom;}  .yhk{background-position:-52px -1px;}  .wx{background-position:0 0;}  .zfb{background-position:-26px 0;}  .ewm_box{display:inline-block;width:100%;margin-top:5px;position:relative;min-height:225px;margin-bottom:20px;}  .ewm_box .cancel_div{position:absolute;z-index:80;width:100%;height:100%;text-align:center;text-align-last:center; /*display: none;*//*background: rgba(0, 0, 0, 0.6);*/}  .ewm_box .cancel_div p{line-height:40px;position:absolute;top:50%;margin-top:-20px;text-align:center;width:100%;color:#ffffff;font-size:18px;}  .ewm_box .cancel_div img{top:20%;width:225px;}  .ewm_box .text-block p{line-height:50px;margin-top:10px;font-size:22px;}  .open_button{width:210px;height:44px;background:#ffffff;border:1px solid #6eb7ff;color:#0083e0;border-radius:22px;box-shadow:0 3px 10px 0 rgba(21, 32, 54, 0.2);margin:10px;}  .ewm_box .tishi_span{position:absolute;width:100%;height:32px;line-height:32px;text-align:center;font-size:14px;background:rgba(250, 85, 92, 0.9);color:#ffffff;left:0;top:0;}  .save_text{color:#031c23;font-size:24px;line-height:36px;}  .yhk_box{margin-top:30px;}  .yhk_box .blue_box{background:#e9f3fb;height:50px;margin-bottom:10px;text-align:left;line-height:50px;padding-left:17px;position:relative;}  .yhk_box .copy_button{position:absolute;width:60px;height:50px;background:#0083e0;color:#ffffff;right:0;padding:9px 14px;line-height:16px;cursor:pointer;border-radius:0;}  .yhk_box .dan{background:#95cbf2;}  .yellow{color:#e5b420;margin-bottom:11px;}  .big_button{width:160px;height:44px;border-radius:50px;color:#ffffff;cursor:pointer;line-height:20px;margin:0 5px;background:#e0e1e4;}  .save_button{height:35px;width:150px;cursor:pointer;border-radius:20px;margin-top:20px;box-shadow:0 3px 10px 0 rgba(21, 32, 54, 0.2);}  .green_button{background:#00b978;}  .cancel_button{background:#fa555c;}  .tishi_div{width:336px;margin:auto;text-align:left;line-height:25px;color:#657685;margin-top:20px;}  .tishi_icon{width:16px;height:16px;background-image:url(../image/icon_tishi@2x.png);background-size:cover;position:absolute;left:20px;top:17px;}  @media screen and (min-width:768px){  .green_div{width:600px;margin:auto;}  .blue_button{display:none;}  }  .tishi_tc{width:245px;height:147px;position:fixed;top:30%;left:50%;margin-left:-122.5px;background:#ffffff;z-index:100;border-radius:8px;overflow:hidden;display:none;}  .tishi_tc .info{margin-top:40px;margin-bottom:38px;line-height:20px;font-size:14px;padding:0 10px;text-align:center;height:25px;}  #alert_tc2{width:220px;height:130px;position:fixed;top:30%;left:50%;margin-left:-110px;background:#ffffff;z-index:100;border-radius:8px;overflow:hidden;display:none;}  #alert_tc2 .info{margin-top:23px;margin-bottom:38px;line-height:24px;font-size:16px;padding:0 10px;text-align:center;height:25px;}  .tishi_tc .red{color:#fa555c;}  .tishi_tc .button_div{height:44px;border-top:1px #f3f3f3 solid;}  .tishi_tc .button_div button{width:100%;color:#0083e0;cursor:pointer;height:100%;background:#ffffff;border-right:1px solid #f3f3f3;}  .tishi_tc .button_div button:active{background:#e9f3fb;border-right:1px solid #f3f3f3;}  #box{padding-bottom:15px;margin:0;background:#ffffff;}  #box .red_p{text-align:center;font-size:18px;line-height:32px;background:#fa555c;color:#ffffff;font-weight:600;position:relative;}  #box .red_p .red_arrow{position:absolute;width:8px;height:8px;background:#fa555c;left:50%;bottom:-4px;transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg);-o-transform:rotate(45deg);-webkit-transform:rotate(45deg);}  .chat_div{text-align:left;color:#031c23;padding:20px 20px 0;}  .chat_div .order_title{height:42px;line-height:42px;color:#031c23;font-size:18px;margin-bottom:10px;position:relative;z-index:2;}  .chat_div .order_title2{height:40px;line-height:40px;color:#031c23;font-size:18px;z-index:2;padding-left:20px;padding-right:20px;position:fixed;bottom:60px;left:0;background:#ffffff;border-radius:0 20px 20px 0;box-shadow:0 3px 10px 0 rgba(21, 32, 54, 0.2);}  .chat_div .order_title2 .red_point{position:absolute;width:8px;height:8px;border-radius:50%;background:rgba(250, 85, 92, 1);right:12px;top:6px;}  .chat_div .fill{width:16px;vertical-align:sub;margin-right:8px;}  .chat_div .chat_box{background:#dde3ea;position:relative;border-radius:5px;overflow:auto;display:flex;flex-direction:column;}  .chat_div .chat_box .box{height:100%;width:100%;padding:10px 16px;overflow:hidden;min-height:220px;}  .chat_div .chat_box .self_box{text-align:right;margin-bottom:10px;}  .chat_div .chat_box .other_box{text-align:left;margin-bottom:10px;}  .chat_div .chat_box .self_box .info{display:inline-block;min-width:48px;max-width:252px;max-height:252px;padding:9px 12px;line-height:17px;background:#0083e0;border-radius:6px;margin-bottom:2px;color:#ffffff;font-size:14px;position:relative;word-wrap:break-word;text-align:left;box-shadow:0 3px 0 rgba(192, 197, 204, 1);}  .chat_div .chat_box .other_box .info{display:inline-block;min-width:48px;max-width:252px;padding:9px 12px;line-height:17px;background:#ffffff;border-radius:6px;margin-bottom:2px;color:#031c23;font-size:12px;position:relative;word-wrap:break-word;text-align:left;box-shadow:0 3px 0 rgba(192, 197, 204, 1);}  .chat_div .chat_box .info img{width:100%;}  .chat_div .chat_box .self_box .info .info_arrow{position:absolute;display:none;width:12px;right:-12px;bottom:-3px;}  .chat_div .chat_box .other_box .info .info_arrow{position:absolute;display:none;width:12px;left:-12px;bottom:-3px;}  .chat_div .chat_box .self_box .info:last-child{border-radius:6px 6px 0 6px;}  .chat_div .chat_box .other_box .info:last-child{border-radius:6px 6px 6px 0;}  .chat_div .chat_box .self_box .info:last-child .info_arrow{display:inline-block;}  .chat_div .chat_box .other_box .info:last-child .info_arrow{display:inline-block;}  .chat_div .chat_box .botto_div{min-height:40px;max-height:66px;padding:5px;background:#dde3ea;position:relative;bottom:0;font-size:0;width:100%;display:inline-flex;}  .chat_div .chat_box .botto_div input{width:40px;height:40px;padding:4px;right:6px;bottom:4px;opacity:0;}  .chat_div .chat_box .botto_div img{width:40px;height:40px;padding:4px;right:6px;bottom:4px;}  .chat_div .chat_box .botto_div .textarea{background:#ffffff;border-radius:19px;width:230px;margin-right:5px;padding:10px 15px;display:inline-block;flex:1;}  .chat_div .chat_box .botto_div button{background:#ffffff;border-radius:19px;padding:10px;display:inline-block;}  .chat_div .chat_box .botto_div .textarea textarea{background:#ffffff;width:100%;-webkit-appearance:none;outline:none;resize:none;border:none;font-size:14px;line-height:18px;height:18px;min-height:18px;max-height:36px;overflow:hidden;line-height:17px;font-family:"SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, 'Microsoft JhengHei', 'Microsoft Yahei', sans-serif;}  .chat_div .chat_box .time{line-height:17px;font-size:14px;color:#a6aeb9;margin-bottom:10px;text-align:center;}  #state_box2{padding-bottom:64px;}  #state_box3{padding-top:60px;}  .importTc{position:fixed;width:100%;height:100%;z-index:101;background:rgba(49, 49, 49, 0.8);padding:30px 15px;display:flex;align-items:center;justify-content:center;}  #importTc .tc_container{width:100%;height:100%;max-width:340px;max-height:550px;background:#ffffff;border-radius:8px;position:relative;padding:25px 15px;display:flex;flex-direction:column;}  #fkTc .tc_container{width:100%;max-width:340px;background:#ffffff;border-radius:8px;position:relative;padding:25px 15px;display:flex;flex-direction:column;overflow:hidden;}  #fkTc .button_div{position:absolute;bottom:0;width:100%;left:0;display:flex;}  .tc_container .button_div button{width:50%;height:44px;border-top:1px solid #f3f3f3;color:#ffffff;background:#ffffff;cursor:pointer;}  .tc_container .button_div button:active{background:#f3f3f3;}  .tc_container .button_div button:first-child{background-color:#fa555c;}  .tc_container .button_div button:last-child{background-color:#09bb07;}  #cancelTc .tc_container{width:100%;height:100%;max-width:300px;max-height:340px;background:#ffffff;border-radius:8px;position:relative;padding:25px 15px;display:flex;flex-direction:column;overflow:hidden;}  #cancelTc .select_div{padding:0 20px;line-height:28px;}  #cancelTc .select_div .checkbox{border:1px solid #b4bcc4;border-radius:50%;width:14px;margin-right:10px;vertical-align:middle;height:14px;}  #cancelTc .select_div .active .checkbox{border:none;background-image:url(../../images/tick.png);background-size:cover;}  #cancelTc .select_div .active{color:#0083e0;}  #cancelTc .button_div{position:absolute;bottom:0;width:100%;left:0;display:flex;}  #cancelTc .button_div button{width:50%;height:44px;border-top:1px solid #f3f3f3;background:#ffffff;}  #cancelTc .button_div button:active{background:#f3f3f3;}  #cancelTc .button_div button:first-child{background-color:#fa555c;}  #cancelTc .button_div button:last-child{background-color:#09bb07;}  #cancelTc .select_div #otherText{height:80px;line-height:20px;width:100%;-webkit-appearance:none;padding:10px;resize:none;margin:10px 0 0 0;outline:none;border:1px solid #dde3ea;border-radius:8px;}  .importTc .tc_container .close{position:absolute;top:0;right:0;width:44px;height:44px;}  #importTc .tc_container .bottom{padding-top:15px;height:135px;}  #fkTc .tc_container .bottom .text{line-height:44px;margin-bottom:40px;}  #fkTc .tc_container .bottom .text input{height:44px;border:1px solid #eaeaea;border-radius:8px;font-size:18px;width:140px;text-align:center !important;}  #fkTc .tc_container .bottom .text .left{width:120px;}  .importTc .tc_container .bottom .check_icon{height:14px;width:14px;display:inline-block;margin-right:6px;border:1px solid #b4bcc4;border-radius:3px;vertical-align:middle;}  .importTc .tc_container .bottom .active{background-image:url(../image/icons_OTC@2x.png);background-size:164px 56px;border:none;background-position-x:-150px;}  .importTc .tc_container .bottom .blue{color:#0083e0;height:17px;font-size:12px;text-align:center;margin-bottom:10px;}  .importTc .tc_container .bottom .button{width:78%;height:44px;border-radius:10px;background:#fa555c;color:#ffffff;margin-right:10px;box-shadow:0 2px 5px rgba(0, 0, 0, 0.2);}  #fkTc .tc_container .bottom .cancel_button{background:#09bb07;color:#ffffff;line-height:24px;width:38%;border-radius:10px;height:44px;box-shadow:0 2px 5px rgba(0, 0, 0, 0.2);}  .importTc .tc_container .content{overflow:auto;flex:1;padding-bottom:10px;}  .importTc .tc_container .content p{color:#607787;font-size:14px;line-height:20px;margin-bottom:20px;}  .importTc .tc_container .content p .red{margin:0 5px;color:#fa555c;}  .importTc .tc_container .close img{width:12px;margin:16px;}  .importTc .tc_container .im_title{font-size:18px;text-align:center;line-height:25px;margin-bottom:15px;}  .top_info{padding:15px 20px 10px;color:#657685;width:335px;display:block;margin:0 auto;}  .top_info #orderState{color:#fa555c;line-height:33px;font-size:24px;}  .top_info #js_time{color:#fa555c;font-size:16px;margin-left:6px;line-height:20px;}  .ts_icon{position:absolute;width:96px;right:-10px;top:90px;z-index:81;}  .ti_p{margin-top:15px;padding:0 20px;}  .ti_p .ticon{display:inline-block;width:22px;height:18px;background-image:url(../../images/icons_shouyintai@2x.png);background-size:cover;}  .ti_p .icon1{background-position-x:0}  .ti_p .icon2{width:26px;}  .ti_p .icon_wx{background-position-x:-26px}  .ti_p .icon_zfb{background-position-x:-84px}  .ti_p .icon_qq{background-position-x:-112px}  .ti_p .icon_ysf{background-position-x:-144px;}  .ti_p .icon3{background-position-x:-56px}  .ti_p .arrow{margin-left:8px;vertical-align:super;}  .ti_p .arrow span:first-child{display:inline-block;width:48px;height:1px;background:#c9e1ff;vertical-align:super;}  .ti_p .arrow span:last-child{display:inline-block;border-top:6px transparent solid;border-bottom:6px transparent solid;border-left:10px #c9e1ff solid;border-right:10px transparent solid;}  #box1{position:relative;}  #box{width:100%;}  .ti_t{margin-top:5px;padding:0 20px;display:flex;justify-content:space-between;}  .ti_t > div{line-height:20px;font-size:12px;text-align:center;}  .ti_t > div:nth-child(1){width:84px;}  .ti_t > div:nth-child(2){width:60px;}  .account_p{background:#e9f3fb;height:75px;padding:10px 10px 10px 20px;margin-top:15px;}  .account_p .right{color:#031c23;}  .bottom_div{position:fixed;z-index:90;height:44px;padding:0;margin:0;bottom:0;left:0;background-image:linear-gradient(135deg, #fa555c 10%, #09bb07 100%);width:100%;}  .bottom_div .fk_button{height:44px;margin:0;padding:0;width:60%;cursor:pointer;color:#ffffff;background:#fa555c;}  .bottom_div .cancel_button{height:44px;width:38.9%;margin:0;padding:0;background:#09bb07;cursor:pointer;color:#ffffff;}  .bottom_div .press_button{height:44px;border-radius:3px;width:100%;cursor:pointer;background:#657685;color:#ffffff;display:none;}  .fcTishi{position:fixed;top:424px;border:1px solid #fa555c;border-radius:0 24px 24px 0;width:150px;height:48px;background:#fff0f1;box-shadow:0 3px 8px 0 rgba(0, 0, 0, 0.15);display:flex;align-items:center;color:#fa555c;font-size:12px;padding:1px 1px 1px 6px;box-sizing:border-box;justify-content:space-between;z-index:90;}  .hide{display:none;}  .fcTishi p{width:172px;text-align:left;}  .fcTishi img{cursor:pointer;}  #yun_div{max-width:335px;margin:0 auto 0;border:1px #dde3ea dashed;background:#e9f3fb;}  #wx_div{max-width:335px;margin:0 auto 0;border:1px #dde3ea dashed;background:#e9f3fb;line-height:44px;font-size:18px;color:#128ce3;font-weight:600;}  .yun_text{height:73px;padding:15px 0 0 20px;text-align:left;}  .yun_text p{font-size:18px;margin-bottom:3px;}  .yun_text > div{line-height:28px;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:28px;position:relative;}  .yun_text > div span{margin-right:10px;}  .moreBank{background:transparent;font-size:12px;color:#0083e0;position:absolute;height:28px;right:0;cursor:pointer;}  #bankTc .tc_container{width:100%;max-width:340px;background:#ffffff;border-radius:8px;position:relative;display:flex;flex-direction:column;}  #bankTc .tc_container .yun_top{height:85px;background:#1a5c97;border-radius:8px 8px 0 0;padding-top:15px;text-align:center;color:#ffffff;font-size:20px;line-height:28px;}  #bankTc .tc_container .yun_bottom{padding:10px 0 30px;}  #bankTc .tc_container .yun_bottom img{width:100%;}  /******success.css******/  .container{height:100%;text-align:center;}  .title{font-size:28px;line-height:40px;}  .text_p{margin-bottom:20px;}  .order_box{width:335px;margin:auto;background:#fcf7e8;border:1px solid #e5b420;height:200px;padding:40px 0 35px;margin-bottom:20px;}  .order_title{color:#657685;margin-bottom:10px;}  #order{line-height:40px;font-size:28px;margin-bottom:20px;}  .ibox{width:100%;margin:auto;background:#fcf7e8;border:1px solid #e5b420;min-height:200px;padding-bottom:15px;}  .copy_button{width:180px;height:35px;border-radius:20px;background:#e5b420;color:#ffffff;box-shadow:0 3px 10px 0 rgba(21, 32, 54, 0.2)}  .dan{background:#e2cb84}  .tishi_p{color:#657685;line-height:20px;}  .cp-btn{width:80px;height:32px;border-radius:20px;background:#e5b420;color:#ffffff;box-shadow:0 2px 5px rgba(21, 32, 54, 0.2);cursor:pointer;}  .cp-btn:hover, .cp-btn:active{text-shadow:0 5px 10px rgba(0, 0, 0, .2);box-shadow:0 3px 10px rgba(21, 32, 54, 0.2);-webkit-transition:-webkit-transform .3s ease-out;transition:transform .3s;}  .text-center{text-align:center !important;text-align-last:center !important;}  .text-left{text-align:left !important;text-align-last:left !important;}  .text-right{text-align:right !important;text-align-last:right !important;}  .tb{width:100%;font-size:16px;border:none;}  .tb td{padding-top:12px;padding-bottom:12px;}  .h28{height:28px}
+		#index {max-width: 768px;width: 100%;display: block;min-height: 100%;margin: 0 auto;}
+		#box1 {margin: 0;}
+		.loading { position: fixed; top: 50%; left: 50%; margin: -20px 0 0 -20px; width: 40px; height: 40px; border: 2px solid; border-color: #333333 #333333 transparent; border-radius: 50%; box-sizing: border-box; animation: loading 1s linear infinite; }
+		@keyframes loading { 0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);} }
+	</style>
+</head>
+<body>
+<div class="importTc" id="bankTc" style="display:none">
+	<div class="tc_container">
+		<i class="close"> <img src="/static/home/images/icon_close.png"> </i>
+		<div class="yun_top">
+			<img src="/static/home/images/icin_ysf_white@2x.png">
+			<p class="yun_title">推荐使用</p>
+		</div>
+		<div class="yun_bottom">
+			<p style="font-size:18px;margin-bottom:20px;text-align: center;">支持扫码交易的手机银行APP</p>
+			<img src="/static/home/images/icons_ysfapp@2x.png">
+		</div>
+	</div>
+</div>
+<!-- popup confirm modal start -->
+<div class="importTc" id="fkTc" style="display:none">
+	<div class="tc_container">
+		<p class="im_title">确认转账</p>
+		<i class="close"> <img src="/static/home/images/icon_close.png"> </i>
+		<div class="content">
+			<p>1. 请选择填写付款留言，注明您已经完成付款的金额、姓名或昵称，以便可以更快的确认交易到账。 </p>
+			<p>2. 若您尚未转账给对方，请不要点击 <span class="red">「确认已付款」</span>按钮，以免造成交易纠纷以及可能的信用降级。</p>
+		</div>
+		<div class="bottom">
+			<div class="text">
+				<div><span class="left text-center" style="width:40%;">实际转账金额</span><input type="text" id="confrimMoney" style="width:55%;">
+					<div class="clear"></div>
+				</div>
+				<div class="text-center" id="payNotice" style="line-height: 20px;color: #ff0000;">&nbsp;</div>
+			</div>
+		</div>
+		<div class="button_div">
+			<button class="button" id="confirmTx">确定已付款</button>
+			<button class="cancel_button">取消</button>
+		</div>
+	</div>
+</div>
+<!-- popup confirm  modal end -->
+<!-- popup cancel  modal start -->
+<div class="importTc" id="cancelTc" style="display:none">
+	<div class="tc_container">
+		<p class="im_title">取消交易</p>
+		<i class="close"> <img src="/static/home/images/icon_close.png"> </i>
+		<div class="select_div">
+			<p class="active"><input type="checkbox" class="checkbox" checked id="select1" data-mode="1"><label for="select1">我不想交易了</label></p>
+			<p><input type="checkbox" class="checkbox" id="select2" data-mode="2"><label for="select2">我是新手，没搞清楚怎么交易</label></p>
+			<p><input type="checkbox" class="checkbox" id="select3" data-mode="3"><label for="select3">对方收款方式异常，我付不了款</label></p>
+			<p><input type="checkbox" class="checkbox" id="select4" data-mode="4"><label for="select4">其他</label></p>
+			<textarea name="" id="otherText" placeholder="请输入取消理由,且不超过20个字符" disabled></textarea>
+			<p class="text-center" id="cancelNotice">&nbsp;</p>
+		</div>
+		<div class="button_div">
+			<button class="back">我再想想</button>
+			<button class="cancel" id="cancelTx">确认取消</button>
+		</div>
+	</div>
+</div>
+<div class="tishi_tc" id="alert_tc2" style="display:none;">
+	<p class="info" id="tc_info2">请 <span class="red">转账</span> 付款 <span class="red money">{$order.deal_amount}</span>元 <br>付错金额的损失自己承担! </p>
+	<div class="button_div">
+		<button class="sure" onclick="hideTc2()">我知道了</button>
+	</div>
+</div>
+<!-- popup cancel  modal end -->
+<div id="index">
+	<div class="loading"></div>
+	<div class="container" style="display: none">
+		<div id="state_box" hidden style="padding: 20px; height: 100vh; background: rgb(255, 255, 255); flex-direction: column; justify-content: center;">
+			<div class="img_box text-center" style="margin-bottom:30px">
+				<img class="h28" src="/static/home/images/logo_zhifubao@2x.png" hidden>
+				<img class="h28" src="/static/home/images/logo_zhifubao@2x.png" hidden>
+				<img class="h28" src="/static/home/images/logo_bank@2x.png" hidden>
+				<img class="h28" src="/static/home/images/logo_weixin@2x.png" hidden>
+				<img class="h28" src="/static/home/images/logo_ysf@2x.png" hidden>
+			</div>
+			<div class="text_div">
+				<p>正在连接交易页面，15秒后自动重连，不需要关闭窗口！</p>
+				<p>……</p>
+			</div>
+		</div>
+		<div id="info_box">
+			<div id="state_box2" style="display: block;">
+				<header class="bankIcon">
+					<div class="head_box">
+						<img id="bank_logo" class="bank" src="/static/home/images/logo_bank@2x.png" hidden>
+						<img id="wxpay_log" class="wxpay" src="/static/home/images/logo_weixin@2x.png" hidden>
+						<img id="alipay_logo" class="alipay alipayToCard" src="/static/home/images/logo_zhifubao@2x.png" hidden>
+						<img id="unionpay_logo" class="unionpay" src="/static/home/images/logo_ysf@2x.png" hidden>
+					</div>
+				</header>
+				<div class="bottom_div">
+					<div style="display: flex;justify-content: center;" id="fkDiv">
+						<button class="fk_button">我已付款 <span id="money2">{$order.deal_amount}</span>元</button>
+						<button class="cancel_button">取消</button>
+					</div>
+					<button class="press_button" id="pressButton" hidden>催款</button>
+				</div>
+
+				<div id="box">
+					<p class="red_p warning-text">输错金额和多次交易 自己承担损失 <span class="red_arrow"></span></p>
+					<div class="zf_p">
+						<div class="clear"></div>
+						<div id="box1">
+							<div id="order-info">
+								<p class="money" style="color: black;">请付 <span id="money">{$order.deal_amount}</span> 元 </p>
+								<button class="copy_button2" id="copy4" data-clipboard-target="#money" style="background: #ffffff;font-size: 14px;margin:auto;display: block;height:24px;" onclick="copyTarget(this.id)">
+									复制金额
+								</button>
+								<p class="order">
+									<span>订单号：</span><span><span id="order_id">{$order.orderid}</span><button class="copy_button2" data-clipboard-target="#order_id" id="copy5" style="background: transparent;margin-left:10px" onclick="copyTarget(this.id)">复制</button></span>
+								</p>
+							</div>
+
+							<div class="ewm_box">
+								<div class="cancel_div" hidden>
+									<img id="icon1" src="/static/home/images/icon_czcg@2x.png" hidden/>
+									<img id="icon2" src="/static/home/images/icon_ddcs@2x.png" hidden/>
+									<img id="icon3" src="/static/home/images/icon_ddqx@2x.png" hidden/>
+									<img id="icon4" src="/static/home/images/icon_ddfk@2x.png" hidden/>
+								</div>
+								{if $order.status < 1}
+								<div class="text-block ibox">
+									<span class="right countdown" style="margin:20px;">支付倒计时: <span id="js_time">00:10:00</span></span>
+									{if $order.pay_type == 'alipay'}
+									<table class="tb">
+										<tr>
+											<td class="text-right">支付宝姓名:</td>
+											<td class="text-center" id="user_alipay_name">{$user.alipay.truename}</td>
+											<td><button class="cp-btn" id="cp_user_alipay_name" data-clipboard-target="#user_alipay_name" onclick="copyTarget(this.id)">复制</button></td>
+										</tr>
+										<tr>
+											<td class="text-right">备注码:</td>
+											<td class="text-center" id="trade_code">{$order.check_code}</td>
+											<td><button class="cp-btn" id="cp_trade_code" data-clipboard-target="#trade_code" onclick="copyTarget(this.id)">复制</button></td>
+										</tr>
+										<a href="javascript:;" id="alipay_link"><div style="margin:65px auto 0 auto;max-width:60%" id="alipay_pay"></div><span id="alipay_click">请用支付宝扫一扫</span></a>
+									</table>
+									{elseif $order.pay_type == 'wxpay'}
+									<table class="tb">
+										<tr>
+											<td class="text-right">微信手机:</td>
+											<td class="text-center" id="user_account">{$user.wxpay.c_bank}</td>
+											<td><button class="cp-btn" id="cp_user_account" data-clipboard-target="#user_account" onclick="copyTarget(this.id)">复制</button></td>
+										</tr>
+										<tr>
+											<td class="text-right">微信姓名:</td>
+											<td class="text-center" id="user_name">{$user.wxpay.truename}</td>
+											<td><button class="cp-btn" id="cp_user_name" data-clipboard-target="#user_name" onclick="copyTarget(this.id)">复制</button></td>
+										</tr>
+									</table>
+									{elseif $order.pay_type == 'unionpay'}
+									<table class="tb">
+										<tr>
+											<td class="text-right">云闪付手机:</td>
+											<td class="text-center" id="user_unionpay_name">{$user.unionpay.truename}</td>
+											<td><button class="cp-btn" id="cp_user_unionpay_name" data-clipboard-target="#user_unionpay_name" onclick="copyTarget(this.id)">复制</button></td>
+										</tr>
+										<tr>
+											<td class="text-right">云闪付姓名:</td>
+											<td class="text-center" id="user_unionpay_account">{$user.unionpay.c_bank}</td>
+											<td><button class="cp-btn" id="cp_user_unionpay_account" data-clipboard-target="#user_unionpay_account" onclick="copyTarget(this.id)">复制</button></td>
+										</tr>
+									</table>
+									{elseif $order.pay_type == 'bank'}
+									<table class="tb">
+										<tr>
+											<td class="text-right">姓名:</td>
+											<td class="text-center" id="user_bank_name">{$user.bank.truename}</td>
+											<td><button class="cp-btn" id="cp_user_bank_name" data-clipboard-target="#user_name" onclick="copyTarget(this.id)">复制</button></td>
+										</tr>
+										<tr>
+											<td class="text-right">账号:</td>
+											<td class="text-center" id="user_bank_account">{$user.bank.c_bank_card}</td>
+											<td><button class="cp-btn" id="cp_user_bank_account" data-clipboard-target="#user_bank_account" onclick="copyTarget(this.id)">复制</button></td>
+										</tr>
+										<tr>
+											<td class="text-right">银行:</td>
+											<td class="text-center" id="user_bank">{$user.bank.c_bank}</td>
+											<td><button class="cp-btn" id="cp_user_bank" data-clipboard-target="#user_bank" onclick="copyTarget(this.id)">复制</button></td>
+										</tr>
+										<tr>
+											<td class="text-right">支行:</td>
+											<td class="text-center" id="user_subbranch">{$user.bank.c_bank_detail}</td>
+											<td><button class="cp-btn" id="cp_user_subbranch" data-clipboard-target="#user_subbranch" onclick="copyTarget(this.id)">复制</button></td>
+										</tr>
+									</table>
+									{elseif $order.pay_type == 'alipayToCard'}
+									<div style="margin:65px auto 0 auto;max-width:60%">
+										<a href="alipays://platformapi/startapp?appId=20000067&url={$user.alipayToCard.Short_link}"><div id="qrcode"></div>点我打开支付宝付款</a>
+										{/if}
+									</div>
+									{/if}
+									<p class="check_code_txt"><small><span style="color:red">*</span>备注码可以更快识别你的订单,请勿更改</small></p>
+								</div>
+								<div>
+									<img class="h28 bankIcon wxpay" src="/static/home/images/logo_weixin@2x.png" hidden>
+									<img class="h28 bankIcon bank" src="/static/home/images/logo_bank@2x.png" hidden>
+									<img class="h28 bankIcon alipay" src="/static/home/images/logo_zhifubao@2x.png" hidden>
+									<img class="h28 bankIcon unionpay" src="/static/home/images/logo_ysf@2x.png" hidden>
+									<img class="h28 bankIcon alipayToCard" src="/static/home/images/logo_zhifubao@2x.png" hidden>
+
+									<p class="ti_p bankIcon wxpay" style="display:none"><span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span>
+										<span class="ticon icon2 icon_wx"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon3"></span></p>
+									<p class="ti_p bankIcon bank" style="display:none"><span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span>
+										<span class="ticon icon2 icon_ysf"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon3"></span></p>
+									<p class="ti_p bankIcon alipay" style="display:none"><span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span>
+										<span class="ticon icon2 icon_zfb"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon3"></span></p>
+									<p class="ti_p bankIcon unionpay" style="display:none"><span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon2 icon_ysf"></span><span class="arrow"><span></span><span></span></span>
+										<span class="ticon icon3"></span></p>
+									<p class="ti_p bankIcon alipayToCard" style="display:none"><span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span>
+										<span class="ticon icon2 icon_zfb"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon3"></span></p>
+
+									<div class="ti_t bankIcon wxpay" style="display:none">
+										<div><p>打开微信收付款<br></p></div>
+										<div><p>选择向银行卡或手机号转账</p></div>
+										<div><p>输入手机号<br>验证姓名和输入金额</p></div>
+									</div>
+									<div class="ti_t bankIcon bank" style="display:none">
+										<div><p>打开网银APP<br></p></div>
+										<div><p>选择转账</p></div>
+										<div><p>输入姓名,账号<br>输入金额转账</p></div>
+									</div>
+									<div class="ti_t bankIcon alipay" style="display:none">
+										<div><p>打开支付宝<br>扫一扫</p></div>
+										<div><p>输入账号<br>与金额</p></div>
+										<div><p>验证姓名<br>确认</p></div>
+									</div>
+									<div class="ti_t bankIcon unionpay" style="display:none">
+										<div><p>打开云闪付<br></p></div>
+										<div><p></p></div>
+										<div><p>输入手机号<br>验证姓名和输入金额</p></div>
+									</div>
+									<div class="ti_t bankIcon alipayToCard" style="display:none">
+										<div><p>截屏将二维码<br></p></div>
+										<div><p>打开支付宝<br>选择扫一扫</p></div>
+										<div><p>从本地相册选择<br>选取截屏二维码</p></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+				<div id="state_box3" hidden>
+					<p class="title">交易成功</p>
+					<p class="text_p">系统很快为您的交易入账</p>
+					<div class="order_box">
+						<p class="order_title">您的交易单号</p>
+						<p class="order_number" id="order">{$order.orderid}</p>
+						<button class="copy_button" id="copy3" data-clipboard-target="#order" onclick="copyTarget(this.id)">复制单号</button>
+					</div>
+					<p class="tishi_p">当您的交易未在5分钟入账</p>
+					<p class="tishi_p">您可以通过此订单号联系在线客服</p>
+					<p class="tishi_p">系统将在5秒后自动跳转回页面...</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="/static/home/js/pay/jquery-2.2.4.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/home/js/pay/clipboard.min.js"></script>
+<script type="text/javascript" src="/static/home/js/jquery.qrcode.min.js"></script>
+{if $order.pay_type == 'alipay'}
+<script>$('#alipay_pay').qrcode({render: "canvas", size: 180, text: '{$user.alipay.alipay_pay}'});</script>
+{elseif $order.pay_type == 'alipayToCard'}
+<script>$('#qrcode').qrcode({render: "canvas", size: 180, text: "{$user.alipayToCard.Short_link}"});</script>
+{/if}
+<script type="text/javascript" charset="utf-8">
+	var txId = '{$order.id}', txStatus = {$order.status}, txPayType = '{$order.pay_type}';
+	/************************************ copy ************************************/
+	var clipboard, copyTimeout, imTime;
+	var payTypeArr = ['bank', 'alipay', 'wxpay', 'unionpay', 'alipayToCard'];
+	var PayIndex = '.' + payTypeArr[payTypeArr.indexOf(txPayType)];
+	$(PayIndex).show();
+
+	function copyTarget(targetId) {
+		targetId = "#" + targetId;
+		targetText = $(targetId).html();
+		clipboard = new ClipboardJS(targetId);
+		clipboard.on('success', function (e) {
+			$(targetId).html("复制成功");
+			clearTimeout(copyTimeout);
+			copyTimeout = setTimeout(function () {
+				$(targetId).html(targetText);
+			}, 300);
+			e.clearSelection()
+		});
+	}
+
+	/************************************ copy end ************************************/
+	var confirmText;
+	// 确认支付点击
+	$('#confirmTx').click(function () {
+		let payNotify = $('#payNotice');
+		let confirmMoney = parseFloat($("#confrimMoney").val());
+		if (confirmMoney < 1) {
+			payNotify.html("支付金额不能小于1");
+			setTimeout(function () {
+				payNotify.html('&nbsp;')
+			}, 2000)
+			return;
+		}
+		$.ajax({
+			type    : "POST",
+			url     : '{:url("api/otc/confirmTx")}',
+			data    : {id: txId, appid: '{$appid}', pay_money: $("#money").text()},
+			dataType: "json",
+			success : function (data) {
+				if (data.code == 1) {
+					$('.importTc').hide();
+					$('#state_box2').remove();
+					$('#state_box3').show();
+					setTimeout(function () {
+						window.location.href = data.msg
+					}, 4000)
+				} else {
+					payNotify.html(data.msg);
+					setTimeout(function () {
+						payNotify.html('&nbsp;')
+					}, 2000)
+				}
+			}, error: function (err) {
+				console.log(err);
+				payNotify.html('未知錯誤');
+				setTimeout(function () {
+					payNotify.html('&nbsp;')
+				}, 2000)
+			}
+		});
+	});
+
+	// 确认失败点击
+	$('#cancelTx').click(function () {
+		let a = $(".select_div p.active input").attr('data-mode');
+		let reason = (a == 4) ? $("#otherText").val() : $(".select_div p.active label").text();
+		if (reason.length < 1 || reason.length > 20) {
+			alert(a == 4 ? "请输入取消理且不超过20个字符" : "请选择取消理由");
+			return;
+		}
+		let cancelNotice = $('#cancelNotice');
+		$.ajax({
+			type    : "POST",
+			url     : '{:url("api/otc/cancelTx")}',
+			data    : {id: txId, appid: '{$appid}', reason: reason},
+			dataType: "json",
+			success : function (data) {
+				if (data.code == 1) {
+					cancelNotice.html("取消成功,稍后将返回页面");
+					setTimeout(function () {
+						window.location.href = data.msg
+					}, 2000)
+				} else {
+					cancelNotice.html(data.msg);
+					setTimeout(function () {
+						cancelNotice.html('&nbsp;')
+					}, 2000)
+				}
+			}, error: function (err) {
+				console.log(err);
+				cancelNotice.html('未知錯誤');
+				setTimeout(function () {
+					cancelNotice.html('&nbsp;')
+				}, 2000)
+			}
+		});
+	});
+	// 确认失败点击
+	$('#pressButton').click(function () {
+		alert('操作成功');
+		window.location.href = '{$order.return_url}';
+	});
+
+	var countDownTimer, checkTimer, $fkTc = $("#fkTc"), $cancelTc = $("#cancelTc"), endTime = {$order.end_time};
+
+	function countDown() {
+		if (endTime < parseInt(new Date().getTime() / 1000) || txStatus == 5) {
+			hideElement();
+			$(".cancel_div #icon3").show();
+			$(".warning-text").text("订单已关闭");
+		} else if (txStatus == 1) {
+			hideElement();
+			$(".warning-text").text("您已付款,正等待确认");
+			$(".cancel_div #icon4").show();
+		} else {
+			countDownTimer = setInterval(function () {
+				let nowTime = parseInt(new Date().getTime() / 1000);
+				restTime = endTime - nowTime;
+				var day = 0, hour = 0, minute = 0, second = 0; //时间默认值
+				if (restTime > 0) {
+					day = Math.floor(restTime / (60 * 60 * 24));
+					hour = Math.floor(restTime / (60 * 60)) - (day * 24);
+					minute = Math.floor(restTime / 60) - (day * 24 * 60) - (hour * 60);
+					second = Math.floor(restTime) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60);
+				}
+				if (hour <= 0 && minute <= 0 && second <= 0) {
+					hideElement();
+					$(".cancel_div #icon2").show();
+					$(".cancel_div #icon1").hide();
+					$(".cancel_div #icon3").hide();
+					$(".cancel_div #icon4").hide();
+					$(".warning-text").text("订单已关闭");
+					return;
+				}
+				if (minute <= 9) minute = '0' + minute;
+				if (second <= 9) second = '0' + second;
+				$("#js_time").text(hour + ":" + minute + ":" + second)
+			}, 1000)
+		}
+	}
+
+	function hideElement() {
+		$(".cancel_div").show();
+		$(".bankIcon").remove();
+		$("#order-info").remove();
+		$("#fkDiv").hide();
+		$("#pressButton").show();
+		$(".check_code_txt").hide();
+		$(".ibox").remove();
+		clearInterval(countDownTimer);
+	}
+
+	function checkOutTime() {
+		$.post('{:url("api/otc/checkOutTime")}', {id: txId}, function (data) {
+			if (data.code === 1) {
+				hideElement();
+				clearInterval(checkTimer);
+				$(".cancel_div #icon3").show();
+				$(".cancel_div #icon1").hide();
+				$(".cancel_div #icon2").hide();
+				$(".cancel_div #icon4").hide();
+				$(".warning-text").text("订单已关闭");
+			} else {
+				checkTimer = setTimeout('checkOutTime()', 3000);
+			}
+		})
+	}
+
+	// ******************** 检查超时 end ********************
+
+	// ******************** 弹窗 ********************
+	$(".fk_button").click(function () {
+		$fkTc.show();
+		$fkTc.find("#confrimMoney").val($("#money").text());
+	});
+	// 取消按钮点击
+	$(".bottom_div .cancel_button").click(function () {
+		$fkTc.hide();
+		$cancelTc.show();
+	});
+
+	$("#bankTc .close").click(function () {
+		$("#bankTc").hide();
+	});
+	// 取消弹框的页面选择
+	$cancelTc.find('.select_div>p').click(function () {
+		$(this).siblings().removeClass("active").find('.checkbox')[0].checked = false;
+		$(this).addClass("active").find(".checkbox").checked = true;
+		if ($(this).index() != 3) {
+			$("#otherText").val("");
+			$("#otherText")[0].disabled = true;
+		} else {
+			$("#otherText")[0].disabled = false;
+		}
+	});
+	// 关闭取消弹框
+	$cancelTc.find('.close,.back').click(function () {
+		$cancelTc.hide();
+		$fkTc.hide();
+	});
+
+	$fkTc.find('.close,.cancel_button').click(function () {
+		$fkTc.hide();
+		imTime = setTimeout(function () {
+			console.log($cancelTc.is(':hidden'))
+			if ($cancelTc.is(':hidden')) {
+				$fkTc.show();
+				$fkTc.find("#confrimMoney").val($("#money").text());
+				$cancelTc.hide();
+			}
+		}, 30000)
+	});
+	// -----------------------------------------
+	$(document).ready(function () {
+		countDown();
+		checkOutTime();
+		$('.loading').hide();
+		$('.container').show();
+	});
+	// Detect whether mobile device
+	if(/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
+		{if $order.pay_type == 'alipay'}
+		$('#alipay_link').attr('href', 'alipays://platformapi/startapp?appId=20000067&url='+window.location.protocol+'//'+window.location.host+'/go/url/{$user.alipay.alipay_pay|base64_encode}');
+		$('#alipay_click').text("点击打开支付宝");
+		{/if}
+		}
+
+</script>
+</body>
+</html>

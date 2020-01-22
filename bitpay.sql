@@ -459,7 +459,7 @@ insert  into `think_config`(`id`,`name`,`value`) values
 (2,'web_site_description',''),
 (3,'web_site_keyword',''),
 (4,'web_site_icp',''),
-(5,'web_site_cnzz',''),
+(5,'web_site_api',''),
 (6,'web_site_copy','Copyright  2019  All rights reserved.'),
 (7,'web_site_close','1'),
 (8,'list_rows','20'),
