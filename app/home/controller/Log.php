@@ -85,7 +85,7 @@ class Log extends Base {
 					$list[$k]['fee_rate']   = number_format($list[$k]['fee_amount'] * 100 / $v['deal_amount'], 1, '.', ''); // 到账数量
 				}
 				isset($statusArr[$v['status']]) && ($list[$k]['status'] = $statusArr[$v['status']]);
-				$list[$k]['ctime'] = date("Y-m-d H:i:s", $v['ctime']);
+				$list[$k]['ctime'] = date('Y-m-d H:i:s', $v['ctime']);
 			}
 		}
 		//文件名称

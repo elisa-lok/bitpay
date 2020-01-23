@@ -54,7 +54,7 @@
 // 		$allPage = intval(ceil($count / $limits));
 // 		$lists   = $member->getRewardByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => $v) {
-// 			$lists[$k]['create_time'] = date("Y-m-d H:i:s", $v['create_time']);
+// 			$lists[$k]['create_time'] = date('Y-m-d H:i:s', $v['create_time']);
 // 		}
 // 		$this->assign('Nowpage', $nowPage); //当前页
 // 		$this->assign('allpage', $allPage); //总页数
@@ -79,7 +79,7 @@
 // 		$allPage = intval(ceil($count / $limits));
 // 		$lists   = $member->getTraderRewardByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => $v) {
-// 			$lists[$k]['create_time'] = date("Y-m-d H:i:s", $v['create_time']);
+// 			$lists[$k]['create_time'] = date('Y-m-d H:i:s', $v['create_time']);
 // 		}
 // 		$this->assign('Nowpage', $nowPage); //当前页
 // 		$this->assign('allpage', $allPage); //总页数
@@ -103,7 +103,7 @@
 // 		$allPage = intval(ceil($count / $limits));
 // 		$lists   = $member->getUsdtByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => $v) {
-// 			$lists[$k]['create_time'] = date("Y-m-d H:i:s", $v['create_time']);
+// 			$lists[$k]['create_time'] = date('Y-m-d H:i:s', $v['create_time']);
 // 		}
 // 		$this->assign('Nowpage', $nowPage); //当前页
 // 		$this->assign('allpage', $allPage); //总页数
@@ -127,7 +127,7 @@
 // 		$allPage = intval(ceil($count / $limits));
 // 		$lists   = $member->getUsdtByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => $v) {
-// 			$lists[$k]['create_time'] = date("Y-m-d H:i:s", $v['create_time']);
+// 			$lists[$k]['create_time'] = date('Y-m-d H:i:s', $v['create_time']);
 // 		}
 // 		$this->assign('Nowpage', $nowPage); //当前页
 // 		$this->assign('allpage', $allPage); //总页数
@@ -630,7 +630,7 @@
 // 		$allPage = intval(ceil($count / $limits));
 // 		$lists   = $member->getTraderRechargeByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => $v) {
-// 			$lists[$k]['addtime'] = date("Y-m-d H:i:s", $v['addtime']);
+// 			$lists[$k]['addtime'] = date('Y-m-d H:i:s', $v['addtime']);
 // 		}
 // 		$this->assign('Nowpage', $nowPage); //当前页
 // 		$this->assign('allpage', $allPage); //总页数
@@ -662,7 +662,7 @@
 // 		$allPage = intval(ceil($count / $limits));
 // 		$lists   = $member->getAdByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => $v) {
-// 			$lists[$k]['add_time'] = date("Y-m-d H:i:s", $v['add_time']);
+// 			$lists[$k]['add_time'] = date('Y-m-d H:i:s', $v['add_time']);
 // 			$temp                  = explode(',', $v['pay_method']);
 // 			$str                   = '';
 // 			if (in_array(2, $temp)) {
@@ -710,7 +710,7 @@
 // 		$allPage = intval(ceil($count / $limits));
 // 		$lists   = $member->getAdBuyByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => $v) {
-// 			$lists[$k]['add_time'] = date("Y-m-d H:i:s", $v['add_time']);
+// 			$lists[$k]['add_time'] = date('Y-m-d H:i:s', $v['add_time']);
 // 			$temp                  = explode(',', $v['pay_method']);
 // 			$str                   = '';
 // 			if (in_array(2, $temp)) {
@@ -897,8 +897,8 @@
 // 		$allPage = intval(ceil($count / $limits));
 // 		$lists   = $member->getOrderByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => $v) {
-// 			$lists[$k]['ctime']         = date("Y-m-d H:i:s", $v['ctime']);
-// 			$lists[$k]['finished_time'] = date("Y-m-d H:i:s", $v['finished_time']);
+// 			$lists[$k]['ctime']         = date('Y-m-d H:i:s', $v['ctime']);
+// 			$lists[$k]['finished_time'] = date('Y-m-d H:i:s', $v['finished_time']);
 // 		}
 // 		$this->assign('Nowpage', $nowPage); //当前页
 // 		$this->assign('allpage', $allPage); //总页数
@@ -933,8 +933,8 @@
 // 		$allPage = intval(ceil($count / $limits));
 // 		$lists   = $member->getOrderBuyByWhere($map, $nowPage, $limits);
 // 		foreach ($lists as $k => $v) {
-// 			$lists[$k]['ctime']         = date("Y-m-d H:i:s", $v['ctime']);
-// 			$lists[$k]['finished_time'] = date("Y-m-d H:i:s", $v['finished_time']);
+// 			$lists[$k]['ctime']         = date('Y-m-d H:i:s', $v['ctime']);
+// 			$lists[$k]['finished_time'] = date('Y-m-d H:i:s', $v['finished_time']);
 // 		}
 // 		$this->assign('Nowpage', $nowPage); //当前页
 // 		$this->assign('allpage', $allPage); //总页数
@@ -1228,7 +1228,7 @@
 // 		$allPage = intval(ceil($count / $limits));
 // 		$lists   = $member->getStatistics($map, $nowPage, $limits);
 // 		foreach ($lists as $k => $v) {
-// 			$lists[$k]['create_time'] = date("Y-m-d H:i:s", $v['create_time']);
+// 			$lists[$k]['create_time'] = date('Y-m-d H:i:s', $v['create_time']);
 // 		}
 // 		$this->assign('Nowpage', $nowPage); //当前页
 // 		$this->assign('allpage', $allPage); //总页数

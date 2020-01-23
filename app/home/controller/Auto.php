@@ -142,7 +142,7 @@ class Auto extends Base {
 									throw new Exception('write databses fail');
 								}
 							} catch (Exception $e) {
-								file_put_contents(RUNTIME_PATH . "data/traderzrdebug.txt", " - " . $v2['hash'] . "|" . date("Y-m-d H:i:s", $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
+								file_put_contents(RUNTIME_PATH . "data/traderzrdebug.txt", " - " . $v2['hash'] . "|" . date('Y-m-d H:i:s', $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
 								Db::rollback();
 							}
 						}
@@ -274,7 +274,7 @@ class Auto extends Base {
 						throw new Exception('write databses fail');
 					}
 				} catch (Exception $e) {
-					file_put_contents(RUNTIME_PATH . "data/zrdebug.txt", " - " . $v2['txid'] . "|" . date("Y-m-d H:i:s", $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
+					file_put_contents(RUNTIME_PATH . "data/zrdebug.txt", " - " . $v2['txid'] . "|" . date('Y-m-d H:i:s', $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
 					Db::rollback();
 				}
 			}
@@ -406,14 +406,34 @@ class Auto extends Base {
 						throw new Exception('write databses fail');
 					}
 				} catch (Exception $e) {
-					file_put_contents(RUNTIME_PATH . "data/traderzrdebug.txt", " - " . $v2['txid'] . "|" . date("Y-m-d H:i:s", $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
+					file_put_contents(RUNTIME_PATH . "data/traderzrdebug.txt", " - " . $v2['txid'] . "|" . date('Y-m-d H:i:s', $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
 					Db::rollback();
 				}
 			}
 		}
 	}
 
-	public function selldaojishi() {
+	public function coverusdt() {//OMNI汇总USDT
+		$list = Db::name('merchant')->where(['usdtb' => ['neq', NULL]])->select();
+		if ($list) {
+			$model = new Usdt();
+			foreach ($list as $k => $v) {
+				$usdt = $model->index('getbalance', $v['usdtb'], $money = NULL, $index = NULL, $count = NULL, $skip = NULL);
+				if ($usdt['code'] == 1 && $usdt['data'] >= 50) {//只有大于50才做汇总
+					$return = $model->index('cover', $v['usdtb'], $usdt['data'], $index = NULL, $count = NULL, $skip = NULL);
+					if ($return['code'] == 0) {
+						$msg = '汇总失败(用户:' . $v['mobile'] . ',地址:' . $v['usdtb'] . '):' . $return['msg'];
+					} else {
+						$msg = '汇总成功(用户:' . $v['mobile'] . ',地址:' . $v['usdtb'] . ',数量:' . $usdt['data'] . '):' . $return['data'];
+					}
+					file_put_contents(RUNTIME_PATH . "data/usdtcover.txt", " - " . $msg . "|" . date('Y-m-d H:i:s') . " + " . PHP_EOL, FILE_APPEND);
+				}
+			}
+		}
+	}
+
+	// 卖单倒计时
+	public function sellCountDown() {
 		$list = Db::name('order_buy')->where("" . time() . "-ctime>ltime*60 and status=0 ")->select();
 		if (!$list) {
 			return;
@@ -423,31 +443,29 @@ class Auto extends Base {
 			if (Cache::has($vv['id'])) continue;
 			Cache::set($vv['id'], TRUE, 60);
 			Db::startTrans();
-			$orderInfo = [];
 			$orderInfo = Db::name('order_buy')->where(['id' => $vv['id']])->find();
 			//$seller = Db::name('merchant')->where(array('id'=>$vv['sell_id']))->find();
-			$buymerchant = Db::name('merchant')->where(['id' => $vv['buy_id']])->find();
+			$buyer = Db::name('merchant')->where(['id' => $vv['buy_id']])->find();
 			//$table = "movesay_".'usdt'."_log";
 			$rs1     = Db::name('order_buy')->update(['status' => 5, 'id' => $vv['id']]);
 			$realAmt = $orderInfo['deal_num'] + $orderInfo['fee'];
-			// 回滚挂单
-			$rs2 = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->setInc('remain_amount', $realAmt);   // 增加剩余量
-			$rs3 = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->setDec('trading_volume', $realAmt);  // 减少交易量
+			// 回滚挂单,  增加剩余量, 减少交易量
+			$rs2 = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->update(['remain_amount' => Db::raw('remain_amount + ' . $realAmt), 'trading_volume' => Db::raw('trading_volume -' . $realAmt)]);
 			// 获取挂单
 			$sellInfo = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->find();
-			$rs4      = $rs5 = 1;
-			if ($sellInfo['state'] == 2) {
+			$rs3      = $rs4 = 1;
+			if ($sellInfo['state'] == 3) {
 				// 如果挂单已下架 回滚余额
-				$rs4 = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $orderInfo['id'], "支付超时->自动下架");
+				$rs3 = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $orderInfo['id'], "支付超时->自动下架");
 			}
-			if ($rs1 && $rs2 && $rs3 && $rs4 && $rs5) {
+			if ($rs1 && $rs2 && $rs3) {
 				Db::commit();
 				//请求回调接口,失败
 				$data['amount']  = $orderInfo['deal_num'];
 				$data['orderid'] = $orderInfo['orderid'];
-				$data['appid']   = $buymerchant['appid'];
+				$data['appid']   = $buyer['appid'];
 				$data['status']  = 0;
-				askNotify($data, $orderInfo['notify_url'], $buymerchant['key']);
+				askNotify($data, $orderInfo['notify_url'], $buyer['key']);
 			} else {
 				Db::rollback();
 				$msg = '【' . date('Y-m-d H:i:s') . '】 订单' . $vv['id'] . '回滚失败, 买家ID: ' . $vv['buy_id'] . ' , 卖家ID: ' . $vv['sell_id'] . ", 失败步骤: $rs1,$rs2,$rs3";
@@ -456,20 +474,17 @@ class Auto extends Base {
 		}
 	}
 
-	public function buydaojishi() {
+	public function buyCountDown() {
 		$list = Db::name('order_sell')->where("" . time() . "-ctime>ltime*60 and status=0 ")->select();
 		if (!$list) {
 			return;
 		}
 		foreach ($list as $key => $vv) {
 			Db::startTrans();
-			$orderInfo = [];
 			$orderInfo = Db::name('order_sell')->where(['id' => $vv['id']])->find();
-			$rs1     = Db::name('order_sell')->update(['status' => 5, 'id' => $vv['id']]);
-			$realAmt = $orderInfo['deal_num'] + $orderInfo['fee'];
-			$rs2     = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $orderInfo['id'], "支付超时->自动下架->buy");
-			//$rs2         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setDec('usdt' . 'd', $realAmt);
-			//$rs3         = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdt', $realAmt);
+			$rs1       = Db::name('order_sell')->update(['status' => 5, 'id' => $vv['id']]);
+			$realAmt   = $orderInfo['deal_num'] + $orderInfo['fee'];
+			$rs2       = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $orderInfo['id'], "支付超时->自动下架->buy");
 			if ($rs1 && $rs2) {
 				Db::commit();
 			} else {
@@ -482,7 +497,7 @@ class Auto extends Base {
 
 	public function statistics() {
 		//平台利润，所有平台的手续费,用户充值手续费+用户提币手续费+商户提币手续费+场外交易商户手续(不计算为0)+场外交易平台利润+承兑商求购商户手续费+承兑商求购承兑商手续费
-		$feeMap['status']  = 1;
+		$feeMap            = ['status' => 1];
 		$fee1              = getTotalInfo($feeMap, 'merchant_user_recharge', 'fee');
 		$fee2              = getTotalInfo($feeMap, 'merchant_user_withdraw', 'fee');
 		$fee3              = getTotalInfo($feeMap, 'merchant_withdraw', 'fee');
@@ -511,18 +526,18 @@ class Auto extends Base {
 		$adMap['state']  = 1;
 		$adMap['amount'] = ['gt', 0];
 		$adSellSum       = Db::name('ad_sell')->where($adMap)->count();
-		$adtotal         = Db::name('ad_sell')->where($adMap)->sum('amount');
-		$adids           = Db::name('ad_sell')->where($adMap)->column('id');
-		$dealNums        = Db::name('order_buy')->where('sell_sid', 'in', $adids)->where('status', 'neq', 5)->where('status', 'neq', 9)->sum('deal_num');
+		$adTotal         = Db::name('ad_sell')->where($adMap)->sum('amount');
+		$adIds           = Db::name('ad_sell')->where($adMap)->column('id');
+		$dealNums        = Db::name('order_buy')->where('sell_sid', 'in', $adIds)->where('status', 'neq', 5)->where('status', 'neq', 9)->sum('deal_num');
 		//现存挂单出售总USDT，计算所有挂卖的剩余数量
-		$orderSellSum = $adtotal - $dealNums;
+		$orderSellSum = $adTotal - $dealNums;
 		//求购笔数，承兑商挂买数量
-		$adBuySum     = Db::name('ad_buy')->where($adMap)->count();
-		$adbuytotal   = Db::name('ad_buy')->where($adMap)->sum('amount');
-		$adbuyids     = Db::name('ad_buy')->where($adMap)->column('id');
-		$dealbuy_nums = Db::name('order_sell')->where('buy_bid', 'in', $adbuyids)->where('status', 'neq', 5)->sum('deal_num');
+		$adBuySum   = Db::name('ad_buy')->where($adMap)->count();
+		$adBuyTotal = Db::name('ad_buy')->where($adMap)->sum('amount');
+		$adBuyIds   = Db::name('ad_buy')->where($adMap)->column('id');
+		$dealBuyNum = Db::name('order_sell')->where('buy_bid', 'in', $adBuyIds)->where('status', 'neq', 5)->sum('deal_num');
 		//求购总数量，计算所有挂买的剩余数量
-		$orderBuySum = $adbuytotal - $dealbuy_nums;
+		$orderBuySum = $adBuyTotal - $dealBuyNum;
 		$rs          = Db::name('statistics')->insert([
 			'platform_profit'      => $feePlatform,
 			'agent_reward'         => $feeAgent,
@@ -536,56 +551,7 @@ class Auto extends Base {
 			'order_buy_amount'     => $orderBuySum,
 			'create_time'          => time()
 		]);
-		if ($rs) {
-			return '更新统计表think_statistics成功';
-		} else {
-			return '更新统计表think_statistics失败';
-		}
-	}
-
-	public function downad() {
-		$remain = config('ad_down_remain_amount');//充值手续费
-		//挂卖下架
-		// $sellids = Db::name('ad_sell')->field('id, amount, userid')->where('state', 1)->where('amount', 'gt', 0)->select();
-		// foreach ($sellids as $k => $v) {
-		// 	$total = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 7)->sum('deal_num');
-		// 	if ($v['amount'] <= $total + $remain) {
-		// 		//开始下架
-		// 		Db::name('ad_sell')->where('id', $v['id'])->setField('state', 2);
-		// 		$nowads = Db::name('ad_sell')->where('userid', $v['userid'])->where('state', 1)->where('amount', 'gt', 0)->count();
-		// 		Db::name('merchant')->where('id', $v['userid'])->setField('ad_on_sell', $nowads ? $nowads : 0);
-		// 	}
-		// }
-		//购买挂单下架
-		$buyids = Db::name('ad_buy')->field('id, amount, userid')->where('state', 1)->where('amount', 'gt', 0)->select();
-		foreach ($buyids as $k => $v) {
-			$total = Db::name('order_sell')->where('buy_bid', $v['id'])->where('status', 'neq', 5)->sum('deal_num');
-			if ($v['amount'] <= $total + $remain) {
-				//开始下架
-				Db::name('ad_buy')->where('id', $v['id'])->setField('state', 2);
-				$nowads = Db::name('ad_buy')->where('userid', $v['userid'])->where('state', 1)->where('amount', 'gt', 0)->count();
-				Db::name('merchant')->where('id', $v['userid'])->setField('ad_on_buy', $nowads ? $nowads : 0);
-			}
-		}
-	}
-
-	public function coverusdt() {//OMNI汇总USDT
-		$list = Db::name('merchant')->where(['usdtb' => ['neq', NULL]])->select();
-		if ($list) {
-			$model = new Usdt();
-			foreach ($list as $k => $v) {
-				$usdt = $model->index('getbalance', $v['usdtb'], $money = NULL, $index = NULL, $count = NULL, $skip = NULL);
-				if ($usdt['code'] == 1 && $usdt['data'] >= 50) {//只有大于50才做汇总
-					$return = $model->index('cover', $v['usdtb'], $usdt['data'], $index = NULL, $count = NULL, $skip = NULL);
-					if ($return['code'] == 0) {
-						$msg = '汇总失败(用户:' . $v['mobile'] . ',地址:' . $v['usdtb'] . '):' . $return['msg'];
-					} else {
-						$msg = '汇总成功(用户:' . $v['mobile'] . ',地址:' . $v['usdtb'] . ',数量:' . $usdt['data'] . '):' . $return['data'];
-					}
-					file_put_contents(RUNTIME_PATH . "data/usdtcover.txt", " - " . $msg . "|" . date("Y-m-d H:i:s", $time) . " + " . PHP_EOL, FILE_APPEND);
-				}
-			}
-		}
+		return $rs ? '更新统计表think_statistics成功' : '更新统计表think_statistics失败';
 	}
 
 	public function updateAdSellPrice() {
@@ -616,9 +582,45 @@ class Auto extends Base {
 		file_put_contents(RUNTIME_PATH . 'data/cli_updateAdBuyPrice_' . date('ymd') . '.log', $msg, FILE_APPEND);
 	}
 
-	// TODO 关闭余额不足的订单
-	public function closeAd(){
+	public function downAd() {
+		$remain = config('ad_down_remain_amount');//充值手续费
+		//挂卖下架
+		/*$sellids = Db::name('ad_sell')->field('id, amount, userid')->where('state', 1)->where('amount', 'gt', 0)->select();
+		foreach ($sellids as $k => $v) {
+			$total = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 7)->sum('deal_num');
+			if ($v['amount'] <= $total + $remain) {
+				//开始下架
+				Db::name('ad_sell')->where('id', $v['id'])->setField('state', 2);
+				$nowAds = Db::name('ad_sell')->where('userid', $v['userid'])->where('state', 1)->where('amount', 'gt', 0)->count();
+				Db::name('merchant')->where('id', $v['userid'])->setField('ad_on_sell', $nowAds ? $nowAds : 0);
+			}
+		}*/
+		//购买挂单下架
+		$buyIds = Db::name('ad_buy')->field('id, amount, userid')->where('state', 1)->where('amount', 'gt', 0)->select();
+		foreach ($buyIds as $k => $v) {
+			$total = Db::name('order_sell')->where('buy_bid', $v['id'])->where('status', 'neq', 5)->sum('deal_num');
+			if ($v['amount'] <= $total + $remain) {
+				//开始下架
+				Db::name('ad_buy')->where('id', $v['id'])->setField('state', 2);
+				$nowAds = Db::name('ad_buy')->where('userid', $v['userid'])->where('state', 1)->where('amount', 'gt', 0)->count();
+				Db::name('merchant')->where('id', $v['userid'])->setField('ad_on_buy', $nowAds ? $nowAds : 0);
+			}
+		}
+	}
 
+	// TODO 关闭余额不足的订单
+	public function closeAd() {
+		$orders = Db::name('ad_sell')->where(['state' => 1])->select();
+		foreach ($orders as $v) {
+			if ($v['remain_amount'] * $v['price'] < $v['min_limit']) {
+				Db::startTrans();
+				if (!Db::name('ad_sell')->where(['id' => $v['id'], 'userid' => $this->uid])->update(['state' => 3, 'finished_time' => time()])) continue;
+				if (!balanceChange(FALSE, $this->uid, $v['remain_amount'], 0, -$v['remain_amount'], 0, BAL_REDEEM, $orders['orderid'])) continue;
+				$count = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
+				Db::name('merchant')->update(['id' => $this->uid, 'ad_on_sell' => $count ? $count : 0]);
+				Db::commit();
+			}
+		}
 	}
 }
 

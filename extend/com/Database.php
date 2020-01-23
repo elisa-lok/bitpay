@@ -1,8 +1,8 @@
 <?php
 
 namespace com;
-use think\Db;
 use think\Config;
+use think\Db;
 use think\Session;
 
 //数据导出模型
@@ -82,7 +82,7 @@ class Database{
         $sql .= "-- Database : " . Config::get('database.database') . "\n";
         $sql .= "-- \n";
         $sql .= "-- Part : #{$this->file['part']}\n";
-        $sql .= "-- Date : " . date("Y-m-d H:i:s") . "\n";
+        $sql .= "-- Date : " . date('Y-m-d H:i:s') . "\n";
         $sql .= "-- -----------------------------\n\n";
         $sql .= "SET FOREIGN_KEY_CHECKS = 0;\n\n";
         return $this->write($sql);

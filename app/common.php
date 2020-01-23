@@ -30,7 +30,7 @@ function msubstr($str, $start = 0, $length, $charset = "utf-8", $suffix = TRUE) 
 }
 
 function getTime($time) {
-	return date("Y-m-d H:i:s", $time);
+	return date('Y-m-d H:i:s', $time);
 }
 
 /**

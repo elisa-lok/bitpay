@@ -239,7 +239,7 @@ class Merchant extends Base {
 		$Excel['sheetTitle'] = "用户钱包地址记录";                                  //大标题，自定义
 		$Excel['xlsCell']    = Data::headAddress();
 		foreach ($data as $k => $v) {
-			$data[$k]['addtime'] = date("Y-m-d H:i:s", $v['addtime']);
+			$data[$k]['addtime'] = date('Y-m-d H:i:s', $v['addtime']);
 		}
 		PHPExcel::excelPut($Excel, $data);
 	}
@@ -358,7 +358,7 @@ class Merchant extends Base {
 			} elseif ($v['status'] == 2) {
 				$data[$k]['status'] = '商户已收款';
 			}
-			$data[$k]['addtime'] = date("Y-m-d H:i:s", $v['addtime']);
+			$data[$k]['addtime'] = date('Y-m-d H:i:s', $v['addtime']);
 		}
 		PHPExcel::excelPut($Excel, $data);
 	}
@@ -434,9 +434,9 @@ class Merchant extends Base {
 			} elseif ($v['status'] == 2) {
 				$data[$k]['status'] = '已拒绝';
 			}
-			$data[$k]['addtime'] = date("Y-m-d H:i:s", $v['addtime']);
+			$data[$k]['addtime'] = date('Y-m-d H:i:s', $v['addtime']);
 			if (!empty($v['endtime'])) {
-				$data[$k]['endtime'] = date("Y-m-d H:i:s", $v['endtime']);
+				$data[$k]['endtime'] = date('Y-m-d H:i:s', $v['endtime']);
 			}
 		}
 		PHPExcel::excelPut($Excel, $data);
@@ -511,9 +511,9 @@ class Merchant extends Base {
 			} elseif ($v['status'] == 3) {
 				$data[$k]['status'] = '已撤销';
 			}
-			$data[$k]['addtime'] = date("Y-m-d H:i:s", $v['addtime']);
+			$data[$k]['addtime'] = date('Y-m-d H:i:s', $v['addtime']);
 			if (!empty($v['endtime'])) {
-				$data[$k]['endtime'] = date("Y-m-d H:i:s", $v['endtime']);
+				$data[$k]['endtime'] = date('Y-m-d H:i:s', $v['endtime']);
 			}
 		}
 		PHPExcel::excelPut($Excel, $data);
@@ -1308,7 +1308,7 @@ class Merchant extends Base {
 			$amount = input('post.amount');
 			($amount <= 0) && showMsg('请输入正确的出售数量',0);
 			$minLimit = input('post.min_limit');
-			($minLimit <= 0) && showMsg('请输入正确的最小限额',0);
+			($minLimit <= 100) && showMsg('最小限额不能小于100',0);
 			$maxLimit = input('post.max_limit');
 			($maxLimit <= 0) && showMsg('请输入正确的最大限额',0);
 			($minLimit > $maxLimit) && showMsg('最小限额不能大于最大限额！',0);
@@ -1834,7 +1834,7 @@ class Merchant extends Base {
 			} elseif ($v['status'] == 9) {
 				$data[$k]['status'] = '订单失败';
 			}
-			$data[$k]['ctime'] = date("Y-m-d H:i:s", $v['ctime']);
+			$data[$k]['ctime'] = date('Y-m-d H:i:s', $v['ctime']);
 		}
 		PHPExcel::excelPut($Excel, $data);
 	}

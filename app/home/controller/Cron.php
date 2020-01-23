@@ -159,7 +159,7 @@ class Cron extends Base {
 						throw new Exception('write databses fail');
 					}
 				} catch (Exception $e) {
-					file_put_contents(RUNTIME_PATH . "data/zrdebug.txt", " - " . $v2['txid'] . "|" . date("Y-m-d H:i:s", $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
+					file_put_contents(RUNTIME_PATH . "data/zrdebug.txt", " - " . $v2['txid'] . "|" . date('Y-m-d H:i:s', $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
 					Db::rollback();
 				}
 			}
@@ -289,7 +289,7 @@ class Cron extends Base {
 						throw new Exception('write databses fail');
 					}
 				} catch (Exception $e) {
-					file_put_contents(RUNTIME_PATH . "data/traderzrdebug.txt", " - " . $v2['txid'] . "|" . date("Y-m-d H:i:s", $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
+					file_put_contents(RUNTIME_PATH . "data/traderzrdebug.txt", " - " . $v2['txid'] . "|" . date('Y-m-d H:i:s', $time) . "|" . $e->getMessage() . " + " . PHP_EOL, FILE_APPEND);
 					Db::rollback();
 				}
 			}
@@ -388,18 +388,18 @@ class Cron extends Base {
 		$adMap['state']  = 1;
 		$adMap['amount'] = ['gt', 0];
 		$adSellSum       = Db::name('ad_sell')->where($adMap)->count();
-		$adtotal         = Db::name('ad_sell')->where($adMap)->sum('amount');
-		$adids           = Db::name('ad_sell')->where($adMap)->column('id');
-		$dealNums        = Db::name('order_buy')->where('sell_sid', 'in', $adids)->where('status', 'neq', 5)->where('status', 'neq', 9)->sum('deal_num');
+		$adTotal         = Db::name('ad_sell')->where($adMap)->sum('amount');
+		$adIds           = Db::name('ad_sell')->where($adMap)->column('id');
+		$dealNums        = Db::name('order_buy')->where('sell_sid', 'in', $adIds)->where('status', 'neq', 5)->where('status', 'neq', 9)->sum('deal_num');
 		//现存挂单出售总USDT，计算所有挂卖的剩余数量
-		$orderSellSum = $adtotal - $dealNums;
+		$orderSellSum = $adTotal - $dealNums;
 		//求购笔数，承兑商挂买数量
 		$adBuySum     = Db::name('ad_buy')->where($adMap)->count();
-		$adbuytotal   = Db::name('ad_buy')->where($adMap)->sum('amount');
-		$adbuyids     = Db::name('ad_buy')->where($adMap)->column('id');
-		$dealbuy_nums = Db::name('order_sell')->where('buy_bid', 'in', $adbuyids)->where('status', 'neq', 5)->sum('deal_num');
+		$adBuyTotal   = Db::name('ad_buy')->where($adMap)->sum('amount');
+		$adBuyIds     = Db::name('ad_buy')->where($adMap)->column('id');
+		$dealBuyNum = Db::name('order_sell')->where('buy_bid', 'in', $adBuyIds)->where('status', 'neq', 5)->sum('deal_num');
 		//求购总数量，计算所有挂买的剩余数量
-		$orderBuySum = $adbuytotal - $dealbuy_nums;
+		$orderBuySum = $adBuyTotal - $dealBuyNum;
 		$rs          = Db::name('statistics')->insert([
 			'platform_profit'      => $feePlatform,
 			'agent_reward'         => $feeAgent,
@@ -425,19 +425,19 @@ class Cron extends Base {
 			if ($v['amount'] <= $total + $remain) {
 				//开始下架
 				Db::name('ad_sell')->where('id', $v['id'])->setField('state', 2);
-				$nowads = Db::name('ad_sell')->where('userid', $v['userid'])->where('state', 1)->where('amount', 'gt', 0)->count();
-				Db::name('merchant')->where('id', $v['userid'])->setField('ad_on_sell', $nowads ? $nowads : 0);
+				$nowAds = Db::name('ad_sell')->where('userid', $v['userid'])->where('state', 1)->where('amount', 'gt', 0)->count();
+				Db::name('merchant')->where('id', $v['userid'])->setField('ad_on_sell', $nowAds ? $nowAds : 0);
 			}
 		}
 		//购买挂单下架
-		$buyids = Db::name('ad_buy')->field('id, amount, userid')->where('state', 1)->where('amount', 'gt', 0)->select();
-		foreach ($buyids as $k => $v) {
+		$buyIds = Db::name('ad_buy')->field('id, amount, userid')->where('state', 1)->where('amount', 'gt', 0)->select();
+		foreach ($buyIds as $k => $v) {
 			$total = Db::name('order_sell')->where('buy_bid', $v['id'])->where('status', 'neq', 5)->sum('deal_num');
 			if ($v['amount'] <= $total + $remain) {
 				//开始下架
 				Db::name('ad_buy')->where('id', $v['id'])->setField('state', 2);
-				$nowads = Db::name('ad_buy')->where('userid', $v['userid'])->where('state', 1)->where('amount', 'gt', 0)->count();
-				Db::name('merchant')->where('id', $v['userid'])->setField('ad_on_buy', $nowads ? $nowads : 0);
+				$nowAds = Db::name('ad_buy')->where('userid', $v['userid'])->where('state', 1)->where('amount', 'gt', 0)->count();
+				Db::name('merchant')->where('id', $v['userid'])->setField('ad_on_buy', $nowAds ? $nowAds : 0);
 			}
 		}
 	}

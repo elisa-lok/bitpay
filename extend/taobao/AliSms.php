@@ -19,7 +19,7 @@ class AliSms {
 			'method'             => $this->method,
 			'format'             => $this->format,
 			'app_key'            => config('alidayu_appkey'),
-			'timestamp'          => date("Y-m-d H:i:s"),
+			'timestamp'          => date('Y-m-d H:i:s'),
 			'v'                  => $this->v,
 			'sign_method'        => $this->sign_method,
 			'sms_type'           => $this->sms_type,
