@@ -619,7 +619,7 @@ class Merchant extends Base {
 	public function cancel() {
 		if (request()->isPost()) {
 			$id = input('post.id');
-			(empty($id)) && $this->error('参数错误');
+			!$id && $this->error('参数错误');
 			$model  = new TibiModel();
 			$return = $model->cancel($id);
 			return json($return);
@@ -802,7 +802,7 @@ class Merchant extends Base {
 			($flag['code'] == 1) ? $this->success('编辑成功') : $this->error($flag['msg']);
 		} else {
 			$id = $_GET['id'];
-			(!$id) && $this->error('参数错误');
+			!$id && $this->error('参数错误');
 			$merchant = $model->getUserByParam($id, 'id');
 			(empty($merchant) || $merchant['pid'] != $this->uid) && $this->error('商户不存在');
 			$this->assign('merchant', $merchant);
@@ -1872,9 +1872,9 @@ class Merchant extends Base {
 		$id    = input('post.id');
 		$appId = input('post.appid');
 		$order = Db::name('order_buy')->where('id', $id)->find();
-		(empty($order)) && $this->error('订单参数错误1');
+		!$order && $this->error('订单不存在');
 		$merchant = Db::name('merchant')->where('id', $order['buy_id'])->find();
-		(empty($merchant)) && $this->error('订单参数错误2');
+		!$merchant && $this->error('商户不存在');
 		($merchant['appid'] != $appId) && $this->error('appid错误');
 		($order['status'] == 5) && $this->error('此订单已取消');
 		($order['status'] >= 1) && $this->error('你已经标记了已付款完成，请勿重复操作');
@@ -1902,7 +1902,7 @@ class Merchant extends Base {
 		!$this->uid && $this->error('请登录操作');
 		$id    = input('post.id');
 		$order = Db::name('order_sell')->where('id', $id)->find();
-		(empty($order)) && $this->error('订单参数错误1');
+		!$order && $this->error('订单不存在');
 		($order['buy_id'] != $this->uid) && $this->error('不是您的买单');
 		($order['status'] == 5) && $this->error('此订单已取消');
 		($order['status'] >= 1) && $this->error('你已经标记了已付款完成，请勿重复操作');
