@@ -10,6 +10,7 @@ class Tx {
 		$this->logNotify();
 		!preg_match('/^\w{6,10}$/', $id) && $this->rollbackShowMsg('参数错误', $id);
 		$args = json_decode(file_get_contents('php://input'), TRUE);
+		($args['title'] != '支付宝支付' || $args['type'] != 'alipay' || strlen($args['deviceid'] < 20)) && die;
 		!$args && $this->rollbackShowMsg('参数错误', $id);
 		$seller = Db::name('merchant')->where('vcode', $id)->find();
 		!$seller && $this->rollbackShowMsg('用户不存在', $id);
@@ -158,6 +159,7 @@ class Tx {
 		$notifyPath = RUNTIME_PATH . 'data/get_notify_err_' . date('ymd') . '.log';
 		$str        = '【' . date('Y-m-d H:i:s') . "】$vcode : $msg" . PHP_EOL;
 		file_put_contents($notifyPath, $str, FILE_APPEND);
+		die;
 		showMsg($msg, 0);
 	}
 }
