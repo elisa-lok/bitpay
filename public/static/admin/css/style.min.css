@@ -36,7 +36,6 @@ body.body-small .navbar-top-links li:last-child {margin-right: 10px}
 .dropdown-alerts li a, .dropdown-messages li a {font-size: 12px}
 .dropdown-alerts li em, .dropdown-messages li em {font-size: 10px}
 .nav.navbar-top-links .dropdown-alerts a {font-size: 12px}
-.nav-header {padding: 33px 25px;background: url(patterns/header-profile.png) no-repeat}
 .nav > li.active {border-left: 4px solid #19aa8d;background: #293846}
 .nav.nav-second-level > li.active {border: none}
 .nav.nav-second-level.collapse[style] {height: auto !important}
@@ -68,7 +67,7 @@ body.mini-navbar .navbar-default .nav > li > .nav-second-level li a {font-size: 
 .navbar-default .landing_link a {background: #1cc09f;color: #ffffff}
 .navbar-default .landing_link a:hover {background: #1ab394 !important;color: #ffffff}
 .navbar-default .landing_link a span.label {background: #ffffff;color: #1cc09f}
-.logo-element {text-align: center;font-size: 18px;font-weight: 600;color: #ffffff;display: none;padding: 18px 0}
+.logo-element {text-align: center;font-size: 18px;font-weight: 600;color: #ffffff;display: block;padding: 18px 0}
 .pace-done #page-wrapper, .pace-done .footer, .pace-done .nav-header, .pace-done .navbar-static-side, .pace-done li.active {-webkit-transition: all .5s;transition: all .5s}
 .navbar-fixed-top {-webkit-transition-duration: .5s;transition-duration: .5s;z-index: 2030}
 .navbar-fixed-top, .navbar-static-top {background: #f3f3f4}
@@ -80,8 +79,6 @@ body.mini-navbar .nav-label, body.mini-navbar .navbar-default .nav li a span, bo
 body.canvas-menu .profile-element {display: block}
 body:not(.fixed-sidebar):not(.canvas-menu).mini-navbar .nav-second-level {display: none}
 body.mini-navbar .navbar-default .nav > li > a {font-size: 16px}
-body.mini-navbar .logo-element {display: block}
-body.canvas-menu .logo-element {display: none}
 body.mini-navbar .nav-header {padding: 0;background-color: #1ab394}
 body.canvas-menu .nav-header {padding: 33px 25px}
 body.mini-navbar #page-wrapper {margin: 0 0 0 70px}

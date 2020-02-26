@@ -31,12 +31,6 @@
         
         <div class="am-g blog-article-widget blog-article-margin">
             <div class="am-u-sm-12 am-u-sm-centered blog-text-center">
-                <div class="a-write hidden-xs">
-                    <eq name="Article.a_type" value="1">本文为原创，转载请注明出处:&nbsp;&nbsp;<a>http://ilunhui.cn/deatil/index/id/{$detail.id}.html</a>
-                        <br>
-                    </eq>
-                    发表自：&nbsp;{$detail.from}&nbsp;&nbsp;地址：{$detail.ip}&nbsp;&nbsp;关键词：&nbsp;{$detail['keyword']?$detail['keyword']:'暂无标签'}&nbsp;&nbsp;
-                </div>
                 <hr>
                 <div class="bdsharebuttonbox fenxiang">
                     <a class="bds_more" href="#" data-cmd="more"></a>
@@ -47,22 +41,6 @@
                     <a title="分享到百度云收藏" class="bds_bdysc" href="#" data-cmd="bdysc"></a>
                     <a title="分享到QQ好友" class="bds_sqq" href="#" data-cmd="sqq"></a>
                 </div>
-                <script>
-                    window._bd_share_config = {
-                        "common": {
-                            "bdSnsKey": {},
-                            "bdText": "轮回博客的分享",
-                            "bdMini": "2",
-                            "bdMiniList": false,
-                            "bdPic": "http://ilunhui.cn//Public/Img/logo.png",
-                            "bdStyle": "1",
-                            "bdSize": "24"
-                        },
-                        "share": {}
-                    };
-                    with(document)
-                    0[(getElementsByTagName('head')[0] || body).appendChild(createElement('script')).src = 'http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion=' + ~(-new Date() / 36e5)];
-                </script>
             </div>
         </div>
 

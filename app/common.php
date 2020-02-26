@@ -330,20 +330,10 @@ function getConfig($field) {
  * @return string
  */
 function createOrderNo($paywhere, $uid) {
-	if ($paywhere == 1) {
-		//商家提币
-		$kait = 'M';
-	} elseif ($paywhere == 2) {
-		//用户提币
-		$kait = 'U';
-	} elseif ($paywhere == 3) {
-		$kait = 'S';
-	} elseif ($paywhere == 4) {
-		$kait = 'T';
-	} else {
-		$kait = 'O';
-	}//M22768T3085073605350PS198
-	return $kait . $uid . 'T' . strtoupper(dechex(date('m'))) . date('d') . substr(time(), -5) . substr(microtime(), 2, 5) . 'P' . 'S' . sprintf(rand(100, 999));
+	$arr = [1 => 'M', 2=> 'U',3=> 'S',4=> 'T'];
+	$pre = $arr[$paywhere] ?? 'O';
+	//M22768T3085073605350PS198
+	return $pre . $uid . 'T' . strtoupper(dechex(date('m'))) . date('d') . substr(time(), -5) . substr(microtime(), 2, 5) . 'P' . 'S' . sprintf(rand(100, 999));
 }
 
 function curl_post($url, $post_data = []) {
@@ -398,15 +388,17 @@ function apilog($uid, $duid, $api_name, $request_param, $return_param) {
 }
 
 function getUsdtPrice($ignore = FALSE, $ttl = 5) {
-	if(APP_DEBUG) return 7;
 	$price = Cache::get('usdt_price');
 	if (!$price) {
-		$url  = $ignore ? 'https://otc-api.huobi.pro/v1/data/market/detail' : 'https://otc-api.hbg.com/v1/data/market/detail';
-		$data = curl_get($url, $ttl);//获取火币价格
-		$res  = json_decode($data, TRUE);
-		//$sellPrice = $data_arr['data']['detail'][2]['sell'];
-		$price = isset($res['success']) &&  $res['success'] == TRUE ? $res['data']['detail'][2]['buy'] : ($ignore ? 7.00 : getUsdtPrice(TRUE));
-		($price != 7.00) && Cache::set('usdt_price', $price, 600);
+		$price = (Db::name('config')->where(['name' => 'usdt_price'])->value('value'));
+		if($price <= 0.1) {
+			$url  = $ignore ? 'https://otc-api.huobi.pro/v1/data/market/detail' : 'https://otc-api.hbg.com/v1/data/market/detail';
+			$data = curl_get($url, $ttl);//获取火币价格
+			$res  = json_decode($data, TRUE);
+			//$sellPrice = $data_arr['data']['detail'][2]['sell'];
+			$price = isset($res['success']) &&  $res['success'] == TRUE ? $res['data']['detail'][2]['buy'] : ($ignore ? 7.00 : getUsdtPrice(TRUE));
+		}
+		Cache::set('usdt_price', $price, 600);
 	}
 	return $price;
 }
