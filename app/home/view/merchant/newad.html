@@ -1,77 +1,50 @@
 {include file="Public:header_new"}
-<style>
-	.cards-item{ border:1px dashed #cccccc; padding:10px; margin-bottom:5px; background:#fbfbfb; }
-	.cards-item .form-group{ width:80%; margin-bottom:5px; }
-	.cards-item .btn-remove{ float:right; border:1px solid #cccccc; padding:5px; border-radius:2px;}
-</style>
+<style> .cards-item{ border:1px dashed #cccccc; padding:10px; margin-bottom:5px; background:#fbfbfb; }
+.cards-item .form-group{ width:80%; margin-bottom:5px; }
+.cards-item .btn-remove{ float:right; border:1px solid #cccccc; padding:5px; border-radius:2px;}</style>
 <div class="content-wrapper" id="pjax-container" style="min-height: 706px;">
 	<section class="content-header"><h1>发布挂单 </h1></section>
 	<section class="content">
 		<div class="row">
 			<div class="col-md-12">
 				<div class="box box-info">
-					<div class="box-header with-border">
-						<h3 class="box-title">创建一个挂单</h3>
+					<div class="box-header with-border"><h3 class="box-title">创建一个挂单</h3>
 						<div class="box-tools">
-							<div class="btn-group pull-right" style="margin-right: 10px">
-								<a href="/merchant/newadbuy" class="btn btn-sm btn-info"> <i class="fa fa-save"></i>&nbsp;&nbsp;发布挂买</a>
-							</div>
+							<div class="btn-group pull-right" style="margin-right: 10px"><a href="/merchant/newadbuy" class="btn btn-sm btn-info"> <i class="fa fa-save"></i>&nbsp;&nbsp;发布挂买</a></div>
 						</div>
-					</div>
-					<!-- /.box-header -->
-					<!-- form start -->
+					</div><!-- /.box-header --><!-- form start -->
 					<form id="newAdForm" accept-charset="UTF-8" class="form-horizontal">
 						<div class="box-body">
 							<div class="fields-group">
-								<div class="form-group">
-									<label class="col-sm-3 control-label"><em class="text-danger">*</em> 出售数量：</label>
-									<div class="col-sm-6">
-										<input type="text" class="form-control" name="amount" id="amount" placeholder="可用 {$balance}, 冻结 {$frozen}" onchange="calculate()"/>
-									</div>
+								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 出售数量：</label>
+									<div class="col-sm-6"><input type="text" class="form-control" name="amount" id="amount" placeholder="可用 {$balance}, 冻结 {$frozen}" onchange="calculate()"/></div>
 								</div>
 								{eq name="usdt_price_way" value="1"}
-								<div class="form-group">
-									<label class="col-sm-3 control-label"><em class="text-danger">*</em> 出售价格：</label>
-									<div class="col-sm-6">
-										<input type="text" class="form-control" name="price" id="price" value="{$usdt_price}" readOnly/>
-									</div>
+								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 出售价格：</label>
+									<div class="col-sm-6"><input type="text" class="form-control" name="price" id="price" value="{$usdt_price}" readOnly/></div>
 								</div>
 								{/eq} {eq name="usdt_price_way" value="0"}
-								<div class="form-group">
-									<label class="col-sm-3 control-label"><em class="text-danger">*</em> 出售价格：</label>
+								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 出售价格：</label>
 									<div class="col-sm-6">
-										<input type="text" onblur="calculate()" style="display:inline-block;width:72%;" class="form-control" name="price" id="price" value="" placeholder="价格区间{$usdt_price_min}~{$usdt_price_max}"/>
-										<span style="font-weight:bold">参考价格：{$usdt_price}</span>
-									</div>
+										<input type="text" onblur="calculate()" style="display:inline-block;width:72%;" class="form-control" name="price" id="price" value="" placeholder="价格区间{$usdt_price_min}~{$usdt_price_max}"/><span style="font-weight:bold">参考价格：{$usdt_price}</span></div>
 								</div>
 								{/eq} {eq name="usdt_price_way" value="2"}
-								<div class="form-group">
-									<label class="col-sm-3 control-label"><em class="text-danger">*</em> 出售价格：</label>
-									<div class="col-sm-6">
-										<input type="text" class="form-control" name="price" id="price" value="{$priceLimit}" readOnly/>
-									</div>
+								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 出售价格：</label>
+									<div class="col-sm-6"><input type="text" class="form-control" name="price" id="price" value="{$priceLimit}" readOnly/></div>
 								</div>
 								{/eq}
-								<div class="form-group">
-									<label class="col-sm-3 control-label"><em class="text-danger">*</em> 最小限额：</label>
-									<div class="col-sm-6">
-										<input type="text" class="form-control" name="min_limit" id="min_limit"/>
-									</div>
+								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 最小限额：</label>
+									<div class="col-sm-6"><input type="text" class="form-control" name="min_limit" id="min_limit"/></div>
 								</div>
-								<div class="form-group">
-									<label class="col-sm-3 control-label"><em class="text-danger">*</em> 最大限额：</label>
-									<div class="col-sm-6">
-										<input type="text" class="form-control" name="max_limit" id="max_limit" onblur="getMax()"/>
-									</div>
+								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 最大限额：</label>
+									<div class="col-sm-6"><input type="text" class="form-control" name="max_limit" id="max_limit" onblur="getMax()"/></div>
 								</div>
-								<div class="form-group">
-									<label class="col-sm-3 control-label"><em class="text-danger">*</em> 收款方式：</label>
-									<div class="col-sm-9">
-										<label class="checkbox-inline"> <select class="form-control" name="bank">
-											<option value="">选择银行账户</option>
-											{volist name="banks" id="v"}
-											<option value="{$v.id}">{$v.name}({$v.c_bank})</option>
-											{/volist} </select> </label> <label class="checkbox-inline"> <select class="form-control" name="zfb">
+								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 收款方式：</label>
+									<div class="col-sm-9"><label class="checkbox-inline"> <select class="form-control" name="bank">
+										<option value="">选择银行账户</option>
+										{volist name="banks" id="v"}
+										<option value="{$v.id}">{$v.name}({$v.c_bank})</option>
+										{/volist} </select> </label> <label class="checkbox-inline"> <select class="form-control" name="zfb">
 										<option value="">选择支付宝账户</option>
 										{volist name="zfb" id="v"}
 										<option value="{$v.id}">{$v.name}({$v.c_bank})</option>
@@ -83,12 +56,10 @@
 										<option value="">选择云闪付账户</option>
 										{volist name="ysf" id="v"}
 										<option value="{$v.id}">{$v.name}</option>
-										{/volist} </select> </label>
-									</div>
+										{/volist} </select> </label></div>
 								</div>
 							</div>
-						</div>
-						<!-- /.box-body -->
+						</div><!-- /.box-body -->
 						<div class="box-footer">
 							<div class="col-sm-2"></div>
 							<div class="col-sm-8">
@@ -96,9 +67,7 @@
 									<button type="button" class="btn btn-info pull-right" onclick="newAd()">提交</button>
 								</div>
 							</div>
-						</div>
-						<!-- /.box-footer -->
-					</form>
+						</div><!-- /.box-footer --></form>
 					<div class="tab-content table-responsive">
 						<div class="" id="tab_886859313">
 							<table class="table">
@@ -114,8 +83,7 @@
 									<th>操作</th>
 								</tr>
 								</thead>
-								<tbody>
-								{volist name="list" id="vo"}
+								<tbody>{volist name="list" id="vo"}
 								<tr>
 									<td>{$vo.ad_no}</td>
 									<td>¥ {$vo.price}</td>
@@ -124,8 +92,7 @@
 									<td>{$vo.remain_amount}</td>
 									<td>{$vo['add_time']|date="Y-m-d H:i:s",###}</td>
 									<td>{eq name="vo.state" value="1"}进行中{/eq} {eq name="vo.state" value="2"}暂停中{/eq} {eq name="vo.state" value="3"}已完成{/eq} {eq name="vo.state" value="4"}已冻结{/eq}</td>
-									<td>
-										{eq name="vo.state" value="1"}<a href="javascript:;" class="btn btn-sm btn-danger" onclick="changeStatus({$vo.id}, 2)">暂停</a>{/eq} {eq name="vo.state" value="2"}<a href="javascript:;" class="btn btn-sm btn-success" onclick="changeStatus({$vo.id}, 1)">开始</a>{/eq} {if $vo.state == 1 || $vo.state == 2 }<a href="javascript:;" class="btn btn-sm btn-info cancel" onclick="changeStatus({$vo.id}, 3)">撤单</a>{/if}
+									<td>{eq name="vo.state" value="1"}<a href="javascript:;" class="btn btn-sm btn-danger" onclick="changeStatus({$vo.id}, 2)">暂停</a>{/eq} {eq name="vo.state" value="2"}<a href="javascript:;" class="btn btn-sm btn-success" onclick="changeStatus({$vo.id}, 1)">开始</a>{/eq} {if $vo.state == 1 || $vo.state == 2 }<a href="javascript:;" class="btn btn-sm btn-info cancel" onclick="changeStatus({$vo.id}, 3)">撤单</a>{/if}
 									</td>
 								</tr>
 								{/volist}
@@ -140,55 +107,43 @@
 		</div>
 	</section>
 	<script src="/static/admin/js/layer/layer.js"></script>
-	<script>
-		var type = 1;
-		function calculate() {
-			var amount = $('#amount').val();
-			var price = $('#price').val();
-			$('#max_limit').val((amount * price).toFixed(2));
-		}
-		function getMax() {
-			var max_limit = $('#max_limit').val();
-			var amount = $('#amount').val();
-			var price = $('#price').val();
-			var max = (amount * price).toFixed(2);
-			if (max < max_limit) {
-				$('#max_limit').val(max);
-			}
-		}
-		function changeStatus(orderId, status) {
-			layer.load(0, {shade: [0.5, '#8f8f8f']});
-			$.post("{:url('home/merchant/setShelf')}", {id: orderId, act: status}, function (data) {
+	<script> var type = 1;
+	function calculate() {
+		var amount = $('#amount').val();
+		var price = $('#price').val();
+		$('#max_limit').val((amount * price).toFixed(2));
+	}
+	function getMax() {
+		var max_limit = $('#max_limit').val();
+		var amount = $('#amount').val();
+		var price = $('#price').val();
+		var max = (amount * price).toFixed(2);
+		if (max < max_limit) {$('#max_limit').val(max);}
+	}
+	function changeStatus(orderId, status) {
+		layer.load(0, {shade: [0.5, '#8f8f8f']});
+		$.post("{:url('home/merchant/setShelf')}", {id: orderId, act: status}, function (data) {
+			if (data.code == 1) {
+				layer.msg(data.msg, {icon: 1});
+				window.location.reload();
+			} else {layer.msg(data.msg, {icon: 2});}
+		});
+		setTimeout(function () {layer.closeAll('loading');}, 3000);
+	}
+	function newAd() {
+		layer.load(0, {shade: [0.5, '#8f8f8f']});
+		$.ajax({
+			url     : "/merchant/newad", type: "post", data: $('#newAdForm').serialize(), success: function (data) {
 				if (data.code == 1) {
 					layer.msg(data.msg, {icon: 1});
-					window.location.reload();
-				} else {
-					layer.msg(data.msg, {icon: 2});
-				}
-			});
-			setTimeout(function () {layer.closeAll('loading');}, 3000);
-		}
-
-		function newAd() {
-			layer.load(0, {shade: [0.5, '#8f8f8f']});
-			$.ajax({
-				url:"/merchant/newad",
-				type:"post",
-				data:$('#newAdForm').serialize(),
-				success:function(data){
-					if (data.code == 1) {
-						layer.msg(data.msg, {icon: 1});
-						setTimeout(function () {window.location.reload();}, 1000);
-					}else{
-						layer.msg(data.msg, {icon: 2});
-					}
-				},error: function(err){
-					console.log(err);
-					layer.msg('挂单错误, 请稍后重试')
-				}
-			});
-			setTimeout(function () {layer.closeAll('loading');}, 1200);
-			return false;
-		}
-	</script>
+					setTimeout(function () {window.location.reload();}, 1000);
+				} else {layer.msg(data.msg, {icon: 2});}
+			}, error: function (err) {
+				console.log(err);
+				layer.msg('挂单错误, 请稍后重试')
+			}
+		});
+		setTimeout(function () {layer.closeAll('loading');}, 1200);
+		return false;
+	}</script>
 </div>{include file="Public:footer_new"/}

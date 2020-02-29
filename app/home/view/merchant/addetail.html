@@ -1,272 +1,185 @@
 {include file="Public:header_new"}
-<style>
-    .cards-item{ border:1px dashed #ccc; padding:10px; margin-bottom:5px; background:#fbfbfb; }
-                            .cards-item .form-group{ width:80%; margin-bottom:5px; }
-                            .cards-item .btn-remove{ float:right; border:1px solid #ccc; padding:5px; border-radius:2px;}
-                        </style>
+<style> .cards-item{ border:1px dashed #cccccc; padding:10px; margin-bottom:5px; background:#fbfbfb; }
+.cards-item .form-group{ width:80%; margin-bottom:5px; }
+.cards-item .btn-remove{ float:right; border:1px solid #cccccc; padding:5px; border-radius:2px;}</style>
 <div class="content-wrapper" id="pjax-container" style="min-height: 706px;">
-    <section class="content-header">
-        <h1>
-            挂单详情
-            <small>查看</small>
-        </h1>
+	<section class="content-header"><h1>挂单详情<small>查看</small></h1></section>
+	<section class="content">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="box box-info">
+					<div class="box-header with-border"><h3 class="box-title">查看</h3>
+						<div class="box-tools">
+							<div class="btn-group pull-right" style="margin-right: 10px"><a href="/merchant/adindex" class="btn btn-sm btn-default"><i class="fa fa-list"></i>&nbsp;列表</a></div>
+						</div>
+					</div><!-- /.box-header --><!-- form start -->
+					<form  method="post" accept-charset="UTF-8" class="form-horizontal" id="tradeForm">
+						<div class="box-body">
+							<div class="fields-group">
+								<div class="row" style="padding:20px;">
+									<div class="col-md-4">
+										<img src="{empty name='AdOwner.headpic'}__IMG__/user2-160x160.jpg{else/}/Uploads/face/{$AdOwner.headpic}{/empty}" style="width: 100%;max-width: 45px;height: auto;border-radius:50%;"/><!-- {:msubstr($AdOwner['name'], 0, 1)} -->{$AdOwner['name']}
+									</div>
+									<div class="col-md-4">交易次数：{$AdOwner.transact_buy}</div>
+									<div class="col-md-4">平均打款时间：{:round($AdOwner['averge_buy']/60)}分钟</div>
+								</div>
+								<div class="form-group form-group-USDT" style="display:block"><label class="col-sm-3 control-label"><em class="text-danger"></em> 交易信息</label>
+									<div class="col-sm-9">
+										<div class="cards-groups cards-groups-USDT">
+											<div class="cards-item">
+												<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 报价：</label>
+													<div class="input-group" style="padding-top:7px;">{$ad.price}</div>
+												</div>
+												<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 交易限额：</label>
+													<div class="input-group" style="padding-top:7px;">{$ad.min_limit}-{$ad.max_limit} CNY</div>
+												</div>
+												<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 付款方式：</label>
+													<div class="input-group" style="padding-top:7px;">{php} if($ad['pay_method']> 0){ echo "银行转账&nbsp;"; } if($ad['pay_method2']> 0){ echo "支付宝&nbsp;"; } if($ad['pay_method3']> 0){ echo "微信支付&nbsp;"; } if($ad['pay_method4']> 0){ echo "云闪付&nbsp;"; } {/php}</div>
+												</div>
+												<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 剩余数量：</label>
+													<div class="input-group" style="padding-top:7px;">{$ad.RemainNum}</div>
+												</div>
+											</div>
+										</div>&nbsp;
+									</div>
+								</div>
+								<div class="form-group 1"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 出售数量</label>
+									<div class="col-sm-2">
+										<div class="input-group"><input type="text" name="amount" value="" id="amount0" class="form-control"><span class="input-group-addon">CNY</span></div>
+									</div>
+									<div class="col-sm-1" style="text-align:center;display:none;">=</div>
+									<div class="col-sm-2">
+										<div class="input-group"><input type="text" name="qty" value="" id="qty0" class="form-control"><span class="input-group-addon">USDT</span></div>
+									</div>
+								</div>
+								<div class="form-group 1"><label class="col-sm-3 control-label"><em class="text-danger"></em> 收款方式</label>
+									<div class="col-sm-8"><label class="checkbox-inline"><select class="form-control" name="bank">
+										<option value="">选择银行账户</option>
+										{volist name="banks" id="v"}
+										<option value="{$v.id}">{$v.name}({$v.c_bank})</option>
+										{/volist}</select></label><label class="checkbox-inline"><select class="form-control" name="zfb">
+										<option value="">选择支付宝账户</option>
+										{volist name="zfb" id="v"}
+										<option value="{$v.id}">{$v.name}({$v.c_bank})</option>
+										{/volist}</select></label><label class="checkbox-inline"><select class="form-control" name="wx">
+										<option value="">选择微信账户</option>
+										{volist name="wx" id="v"}
+										<option value="{$v.id}">{$v.name}({$v.c_bank})</option>
+										{/volist}</select></label><label class="checkbox-inline"><select class="form-control" name="ysf">
+										<option value="">选择云闪付账户</option>
+										{volist name="ysf" id="v"}
+										<option value="{$v.id}">{$v.name}</option>
+										{/volist}</select></label></div>
+									<div class="col-sm-3" style="display: none">{php} if($ad['pay_method']> 0){ echo '<label class="checkbox-inline"><input type="checkbox" name="getpaymethod[]" value="1" checked> 银行转账</label>'; } if($ad['pay_method2']> 0){ echo '<label class="checkbox-inline"><input type="checkbox" name="getpaymethod[]" value="2" checked> 支付宝</label>'; } if($ad['pay_method3']> 0){ echo '<label class="checkbox-inline"><input type="checkbox" name="getpaymethod[]" value="3" checked> 微信支付</label>'; } {/php}
+									</div>
+								</div>
+								{eq name="ga" value="1"}
+								<div class="form-group 1"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
+									<div class="col-sm-2">
+										<div class="input-group"><input type="text" name="ga" value="" class="form-control"></div>
+									</div>
+								</div>
+								{/eq}
+								<div class="text"><label class="col-sm-3 control-label">&nbsp;</label>
+									<div class="col-sm-5"><br><b> 交易须知：</b><br>1. 交易前请详细了解对方的交易信息。<br>2. 如遇到交易纠纷，可通过申诉来解决问题。<br>3. 在您发起交易请求后，币被锁定在托管中，受到平台保护。如果您是买家，发起交易请求后，请在付款周期内付款并把交易标记为付款已完成。卖家在收到付款后将会放行处于托管中的币。<br/></div>
+								</div>
+							</div>
+						</div><!-- /.box-body -->
+						<div class="box-footer"><input type="hidden" name="tid" value="{$ad.id}">
+							<div class="col-sm-2"></div>
+							<div class="col-sm-8">
+								<div class="btn-group pull-right">
+									<button type="button" class="btn btn-info pull-right" onclick="trade()">提交</button>
+								</div>
+							</div>
+						</div><!-- /.box-footer --></form>
+				</div>
 
-    </section>
-    <section class="content">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="box box-info">
-                    <div class="box-header with-border">
-                        <h3 class="box-title">查看</h3>
-                        <div class="box-tools">
-                            <div class="btn-group pull-right" style="margin-right: 10px">
-                                <a href="/merchant/adindex" class="btn btn-sm btn-default"><i class="fa fa-list"></i>&nbsp;列表</a>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- /.box-header -->
-                    <!-- form start -->
-                    <form action="/home/merchant/trade_ajax" method="post" accept-charset="UTF-8" class="form-horizontal"  onsubmit="return check()">
-                        <div class="box-body">
-                            <div class="fields-group">
-                                <div class="row" style="padding:20px;">
-                                    <div class="col-md-4"><img src="{empty name='AdOwner.headpic'}__IMG__/user2-160x160.jpg{else/}/Uploads/face/{$AdOwner.headpic}{/empty}" style="width: 100%;max-width: 45px;height: auto;border-radius:50%;" />
-                                    <!-- {:msubstr($AdOwner['name'], 0, 1)} -->
-                                    {$AdOwner['name']}
-                                </div>
-                                    <div class="col-md-4">交易次数：{$AdOwner.transact_buy}</div>
-                                    <div class="col-md-4">平均打款时间：{:round($AdOwner['averge_buy']/60)}分钟</div>
-                                </div>
-                                <div class="form-group form-group-USDT" style="display:block">
-                                    <label class="col-sm-3 control-label"><em class="text-danger"></em> 交易信息</label>
-                                    <div class="col-sm-9">
-                                        <div class="cards-groups cards-groups-USDT">
-                                            <div class="cards-item">
-                                                <div class="form-group">
-                                                    <label for="cardno" class="col-sm-3 control-label"><em class="text-danger"></em> 报价：</label>
-                                                    <div class="input-group" style="padding-top:7px;">
-                                                        {$ad.price}
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="cardno" class="col-sm-3 control-label"><em class="text-danger"></em> 交易限额：</label>
-                                                    <div class="input-group" style="padding-top:7px;">
-                                                        {$ad.min_limit}-{$ad.max_limit} CNY
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="cardno" class="col-sm-3 control-label"><em class="text-danger"></em> 付款方式：</label>
-                                                    <div class="input-group" style="padding-top:7px;">
-                                                        {php}
-                                                         if($ad['pay_method']> 0){
-                                                        echo "银行转账&nbsp;";
-                                                        }
-                                                         if($ad['pay_method2']> 0){
-                                                        echo "支付宝&nbsp;";
-                                                        }
-                                                         if($ad['pay_method3']> 0){
-                                                        echo "微信支付&nbsp;";
-                                                        }
-                                                        if($ad['pay_method4']> 0){
-                                                        echo "云闪付&nbsp;";
-                                                        }
-                                                        {/php}
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="cardno" class="col-sm-3 control-label"><em class="text-danger"></em> 剩余数量：</label>
-                                                    <div class="input-group" style="padding-top:7px;">
-                                                        {$ad.RemainNum}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>&nbsp;
-                                    </div>
-                                </div>
-                                <div class="form-group 1">
-                                    <label for="amount" class="col-sm-3 control-label"><em class="text-danger">*</em> 出售数量</label>
-                                    <div class="col-sm-2">
-                                        <div class="input-group" id="model-amount">
-                                            <input type="text" name="amount" value="" id="amount0" class="form-control"><span class="input-group-addon">CNY</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-1" style="text-align:center;display:none;">
-                                        =
-                                    </div>
-                                    <div class="col-sm-2">
-                                        <div class="input-group" id="model-amount">
-                                            <input type="text" name="qty" value="" id="qty0" class="form-control"><span class="input-group-addon">USDT</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group 1">
-                                    <label for="amount" class="col-sm-3 control-label"><em class="text-danger"></em> 收款方式</label>
-                                    <div class="col-sm-8">
-                                         <label class="checkbox-inline">
-                                            <select class="form-control" name="bank">
-                                                <option value="">选择银行账户</option>
-                                                 {volist name="banks" id="v"}
-                                                <option value="{$v.id}">{$v.name}({$v.c_bank})</option>
-                                                 {/volist}
-                                            </select>
-                                        </label>
-                                        <label class="checkbox-inline">
-                                            <select class="form-control" name="zfb">
-                                                <option value="">选择支付宝账户</option>
-                                                 {volist name="zfb" id="v"}
-                                                <option value="{$v.id}">{$v.name}({$v.c_bank})</option>
-                                                 {/volist}
-                                            </select>
-                                        </label>
-                                        <label class="checkbox-inline">
-                                            <select class="form-control" name="wx">
-                                                <option value="">选择微信账户</option>
-                                                 {volist name="wx" id="v"}
-                                                <option value="{$v.id}">{$v.name}({$v.c_bank})</option>
-                                                 {/volist}
-                                            </select>
-                                        </label>
-                                        <label class="checkbox-inline">
-                                            <select class="form-control" name="ysf">
-                                                <option value="">选择云闪付账户</option>
-                                                 {volist name="ysf" id="v"}
-                                                <option value="{$v.id}">{$v.name}</option>
-                                                 {/volist}
-                                            </select>
-                                        </label>
-                                    </div>
-                                    <div class="col-sm-3" style="display: none">
-                                        {php}
-                                        if($ad['pay_method']> 0){
-                                        echo '<label class="checkbox-inline"><input type="checkbox" name="getpaymethod[]" value="1" checked> 银行转账</label>';
-                                        }
-                                       if($ad['pay_method2']> 0){
-                                        echo '<label class="checkbox-inline"><input type="checkbox" name="getpaymethod[]" value="2" checked> 支付宝</label>';
-                                        }
-                                        if($ad['pay_method3']> 0){
-                                        echo '<label class="checkbox-inline"><input type="checkbox" name="getpaymethod[]" value="3" checked> 微信支付</label>';
-                                        }
-                                        {/php}
-                                    </div>
-                                </div>
-                                {eq name="ga" value="1"}
-                                <div class="form-group 1">
-                                    <label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
-                                    <div class="col-sm-2">
-                                        <div class="input-group">
-                                            <input type="text" name="ga" value="" class="form-control">
-                                        </div>
-                                    </div>
-                                </div>
-                                {/eq}
-
-                                <div class="text">
-                                    <label class="col-sm-3 control-label">&nbsp;</label>
-                                    <div class="col-sm-5">
-                                        <br><b> 交易须知：</b><br>
-                                        1. 交易前请详细了解对方的交易信息。<br>
-                                        2. 如遇到交易纠纷，可通过申诉来解决问题。<br>
-                                        3. 在您发起交易请求后，币被锁定在托管中，受到平台保护。如果您是买家，发起交易请求后，请在付款周期内付款并把交易标记为付款已完成。卖家在收到付款后将会放行处于托管中的币。<br />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- /.box-body -->
-                        <div class="box-footer">
-                            <input type="hidden" name="tid" value="{$ad.id}">
-                            <div class="col-sm-2">
-                            </div>
-                            <div class="col-sm-8">
-                                <div class="btn-group pull-right">
-                                    <button type="submit" class="btn btn-info pull-right" data-loading-text="&lt;i class=&#39;fa fa-spinner fa-spin &#39;&gt;&lt;/i&gt; 提交">提交</button>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- /.box-footer -->
-                    </form>
-                </div>
-                <script src="/static/admin/js/layer/layer.js"></script>
-                <script>
-                var type = 0;
-                var price = {$ad.price};
-
-                function getnum(num, ss) {
-                    if (num.indexOf(".") != "-1") {
-                        var barr = num.split(".");
-                        var org = barr[1].substr(0, ss);
-                        xin = parseFloat(barr[0] + "." + org);
-                        return xin;
-                    }
-                }
-                $('#amount' + type).css("ime-mode", "disabled").bind('keyup change', function() {
-                    var amount = $('#amount' + type).val();
-                    if (amount.indexOf(".") != "-1") {
-                        var barr = amount.split(".");
-                        var xiaoshu = barr[1].length;
-                        if (xiaoshu > 2) {
-                            var org = barr[1].substr(0, xiaoshu - 1);
-                            var xin = parseFloat(barr[0] + "." + org);
-                            $("#amount" + type).val(xin);
-                        }
-                    }
-
-
-                    btcnum = ($('#amount' + type).val() / price).toFixed(10);
-                    btcnum = getnum(btcnum, 8);
-                    $('#qty' + type).val(btcnum);
-                });
-
-                $('#qty' + type).css("ime-mode", "disabled").bind('keyup change', function() {
-                    var amount = $('#qty' + type).val();
-                    if (amount.indexOf(".") != "-1") {
-                        var barr = amount.split(".");
-                        var xiaoshu = barr[1].length;
-                        if (xiaoshu > 8) {
-                            var org = barr[1].substr(0, xiaoshu - 1);
-                            var xin = parseFloat(barr[0] + "." + org);
-                            $("#qty" + type).val(xin);
-                        }
-                    }
-
-
-                    btcnum = ($('#qty' + type).val() * price).toFixed(4);
-                    btcnum = getnum(btcnum, 2);
-                    $('#amount' + type).val(btcnum);
-                });
-
-                function check() {
-                    var amount = $('input[name="amount"]').val();
-                    var qity = $('input[name="qity"]').val();
-                    var mint = {$ad.min_limit};
-                   var maxt = {$ad.max_limit};
-                    if (amount == '') {
-                        layer.tips('请输入要出售的金额', '#qty' + type, { tips: 3 });
-                        return false;
-                    }
-                    if (qity == '') {
-                        layer.tips('请输入要出售的数量', '#qty' + type, { tips: 3 });
-                        return false;
-                    }
-                    if (amount < 0) {
-                        layer.alert('金额必须大于0');
-                        return false;
-                    }
-                    if (amount < mint) {
-                        layer.alert('金额小于最小限额');
-                        return false;
-                    }
-                    if (amount > maxt) {
-                        layer.alert('金额大于最大限额');
-                        return false;
-                    }
-                    return true;
-                }
-                </script>
-            </div>
-        </div>
-    </section>
-    <script>
-    $(function() {});
-    </script>
+			</div>
+		</div>
+	</section>
 </div>
+<script src="/static/admin/js/layer/layer.js"></script>
+<script> var type = 0;
+var price = {$ad.price};
+function getnum(num, ss) {
+	if (num.indexOf(".") != "-1") {
+		var barr = num.split(".");
+		var org = barr[1].substr(0, ss);
+		xin = parseFloat(barr[0] + "." + org);
+		return xin;
+	}
+}
+$('#amount' + type).css("ime-mode", "disabled").bind('keyup change', function () {
+	var amount = $('#amount' + type).val();
+	if (amount.indexOf(".") != "-1") {
+		var barr = amount.split(".");
+		var xiaoshu = barr[1].length;
+		if (xiaoshu > 2) {
+			var org = barr[1].substr(0, xiaoshu - 1);
+			var xin = parseFloat(barr[0] + "." + org);
+			$("#amount" + type).val(xin);
+		}
+	}
+	btcnum = ($('#amount' + type).val() / price).toFixed(10);
+	btcnum = getnum(btcnum, 8);
+	$('#qty' + type).val(btcnum);
+});
+$('#qty' + type).css("ime-mode", "disabled").bind('keyup change', function () {
+	var amount = $('#qty' + type).val();
+	if (amount.indexOf(".") != "-1") {
+		var barr = amount.split(".");
+		var xiaoshu = barr[1].length;
+		if (xiaoshu > 8) {
+			var org = barr[1].substr(0, xiaoshu - 1);
+			var xin = parseFloat(barr[0] + "." + org);
+			$("#qty" + type).val(xin);
+		}
+	}
+	btcnum = ($('#qty' + type).val() * price).toFixed(4);
+	btcnum = getnum(btcnum, 2);
+	$('#amount' + type).val(btcnum);
+});
+function trade() {
+	var amount = $('input[name="amount"]').val();
+	var qity = $('input[name="qity"]').val();
+	var mint = {$ad.min_limit};
+	var maxt = {$ad.max_limit};
+	if (amount == '') {
+		layer.tips('请输入要出售的金额', '#qty' + type, {tips: 3});
+		return false;
+	}
+	if (qity == '') {
+		layer.tips('请输入要出售的数量', '#qty' + type, {tips: 3});
+		return false;
+	}
+	if (amount < 0) {
+		layer.alert('金额必须大于0');
+		return false;
+	}
+	if (amount < mint) {
+		layer.alert('金额小于最小限额');
+		return false;
+	}
+	if (amount > maxt) {
+		layer.alert('金额大于最大限额');
+		return false;
+	}
+	layer.load(0, {shade: [0.5, '#8f8f8f']});
+	$.ajax({
+		url     : "/home/merchant/trade_ajax", type: "post", data: $('#tradeForm').serialize(), success: function (data) {
+			if (data.code == 1) {
+				layer.msg(data.msg, {icon: 1});
+				setTimeout(function () {window.location= '/merchant/ordersell';}, 1000);
+				return false
+			} else {layer.msg(data.msg, {icon: 2});}
+		}, error: function (err) {
+			console.log(err);
+			layer.msg('挂单错误, 请稍后重试')
+		}
+	});
+	setTimeout(function () {layer.closeAll('loading');}, 1200);
+	return false;
+}
+</script>
 {include file="Public:footer_new"/}
