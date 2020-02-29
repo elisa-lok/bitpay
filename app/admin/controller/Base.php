@@ -65,4 +65,9 @@ class Base extends Controller {
 		Db::rollback();
 		showMsg($msg, 0);
 	}
+
+	protected function addHistory($userId, $originData, $changeData){
+		$text = '【'.date('Y-m-d H:i:s').'】user_id: ['.$userId.'],op_user:['.session('adminuid'). session('username').'],IP:['. $_SERVER['REMOTE_ADDR'].'],【origin】'.json_encode($originData,320) . '【change】'.json_encode($changeData,320);
+		file_put_contents(RUNTIME_PATH . 'log/user_edit_' . date('ymd') . '.log', $text, FILE_APPEND);
+	}
 }

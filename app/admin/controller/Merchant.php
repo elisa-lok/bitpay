@@ -270,8 +270,9 @@ class Merchant extends Base {
 				}
 				financeLog($param['id'], $amount, '后台修改USDT冻结余额', $type, $this->username);//添加日志
 			}
-			($amt != 0 || $frozenAmt != 0) && balanceChange(FALSE, $param['id'], $amt, 0, $frozenAmt, 0, BAL_SYS, '', '管理员修改');
+			(($user['usdt'] != $param['usdt']) ||  $user['usdt'] != $param['usdt'] ) && ($amt != 0 || $frozenAmt != 0) && balanceChange(FALSE, $param['id'], $amt, 0, $frozenAmt, 0, BAL_SYS, '', '管理员修改');
 			unset($param['usdt'], $param['usdtd']);
+			$this->addHistory($param['id'], $user, $param);
 			$flag = $member->editMerchant($param);
 			showJson(['code' => $flag['code'], 'data' => $flag['data'], 'msg' => $flag['msg']]);
 		}
