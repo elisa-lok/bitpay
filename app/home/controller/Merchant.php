@@ -1404,7 +1404,7 @@ class Merchant extends Base {
 			($user['trader_check'] != 1) && showMsg('您的承兑商资格未通过');
 			$haveAdSum = Db::name('ad_buy')->where('userid', $this->uid)->where('state', 1)->count();
 			$haveAdSum = $haveAdSum ? $haveAdSum : 0;
-			($haveAdSum > 0) && showMsg('挂买最多发布1个');
+			($haveAdSum > 10) && showMsg('挂买最多发布10个');
 			(empty($_POST['bank']) && empty($_POST['zfb']) && empty($_POST['wx']) && empty($_POST['ysf'])) && showMsg('请选择收款方式');
 			$codes = ['zfb' => (int)$_POST['zfb'], 'bank' => (int)$_POST['bank'], 'wx' => (int)$_POST['wx'], 'ysf' => (int)$_POST['ysf']];
 			//查询用户的银行卡信息
