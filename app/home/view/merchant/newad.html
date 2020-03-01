@@ -8,16 +8,16 @@
 		<div class="row">
 			<div class="col-md-12">
 				<div class="box box-info">
-					<div class="box-header with-border"><h3 class="box-title">创建一个挂单</h3>
+					<div class="box-header with-border"><h3 class="box-title">委托卖出</h3>
 						<div class="box-tools">
-							<div class="btn-group pull-right" style="margin-right: 10px"><a href="/merchant/newadbuy" class="btn btn-sm btn-info"> <i class="fa fa-save"></i>&nbsp;&nbsp;发布挂买</a></div>
+							<div class="btn-group pull-right" style="margin-right: 10px"><a href="/merchant/newadbuy" class="btn btn-sm btn-danger"> <i class="fa fa-save"></i>&nbsp;&nbsp;发布买入</a></div>
 						</div>
 					</div><!-- /.box-header --><!-- form start -->
 					<form id="newAdForm" accept-charset="UTF-8" class="form-horizontal">
 						<div class="box-body">
 							<div class="fields-group">
 								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 出售数量：</label>
-									<div class="col-sm-6"><input type="text" class="form-control" name="amount" id="amount" placeholder="可用 {$balance}, 冻结 {$frozen}" onchange="calculate()"/></div>
+									<div class="col-sm-6"><input type="text" class="form-control" name="amount" id="amount" placeholder="可用 {$balance}, 冻结 {$frozen}" onchange="checkAmount()"/></div>
 								</div>
 								{eq name="usdt_price_way" value="1"}
 								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 出售价格：</label>
@@ -26,7 +26,7 @@
 								{/eq} {eq name="usdt_price_way" value="0"}
 								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 出售价格：</label>
 									<div class="col-sm-6">
-										<input type="text" onblur="calculate()" style="display:inline-block;width:72%;" class="form-control" name="price" id="price" value="" placeholder="价格区间{$usdt_price_min}~{$usdt_price_max}"/><span style="font-weight:bold">参考价格：{$usdt_price}</span></div>
+										<input type="text" onblur="checkAmount()" style="display:inline-block;width:72%;" class="form-control" name="price" id="price" value="" placeholder="价格区间{$usdt_price_min}~{$usdt_price_max}"/><span style="font-weight:bold">参考价格：{$usdt_price}</span></div>
 								</div>
 								{/eq} {eq name="usdt_price_way" value="2"}
 								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 出售价格：</label>
@@ -34,10 +34,10 @@
 								</div>
 								{/eq}
 								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 最小限额：</label>
-									<div class="col-sm-6"><input type="text" class="form-control" name="min_limit" id="min_limit"/></div>
+									<div class="col-sm-6"><input type="text" class="form-control" name="min_limit" id="min_limit" placeholder="限额100~300" onblur="checkMinLimit()"/></div>
 								</div>
 								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 最大限额：</label>
-									<div class="col-sm-6"><input type="text" class="form-control" name="max_limit" id="max_limit" onblur="getMax()"/></div>
+									<div class="col-sm-6"><input type="text" class="form-control" name="max_limit" id="max_limit" onblur="checkMaxLimit()" placeholder="限额300~10000"/></div>
 								</div>
 								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 收款方式：</label>
 									<div class="col-sm-9"><label class="checkbox-inline"> <select class="form-control" name="bank">
@@ -63,8 +63,8 @@
 						<div class="box-footer">
 							<div class="col-sm-2"></div>
 							<div class="col-sm-8">
-								<div class="btn-group pull-right">
-									<button type="button" class="btn btn-info pull-right" onclick="newAd()">提交</button>
+								<div class="btn-group">
+									<button type="button" class="btn btn-success" onclick="newAd()">卖出</button>
 								</div>
 							</div>
 						</div><!-- /.box-footer --></form>
@@ -107,18 +107,40 @@
 		</div>
 	</section>
 	<script src="/static/admin/js/layer/layer.js"></script>
-	<script> var type = 1;
-	function calculate() {
-		var amount = $('#amount').val();
-		var price = $('#price').val();
-		$('#max_limit').val((amount * price).toFixed(2));
+	<script> let type = 1, min = 100, mid = 300, max = 10000, amountLimit = parseFloat((100 / {$priceLimit}).toFixed(2)) + 0.01, amount, price;
+	function checkAmount() {
+		amount = parseFloat($('#amount').val());
+		price = parseFloat($('#price').val());
+		let limit = (amount * price).toFixed(2);
+		if (isNaN(amount) || amount < amountLimit) {
+			layer.tips('出售数量不能低于 ' + amountLimit, '#amount', {tips: 3});
+			$('#amount').val('');
+			$('#min_limit').val('');
+			$('#max_limit').val('');
+			return false
+		}
+		limit = limit < mid ? mid : limit;
+		$('#max_limit').val(limit);
 	}
-	function getMax() {
-		var max_limit = $('#max_limit').val();
-		var amount = $('#amount').val();
-		var price = $('#price').val();
-		var max = (amount * price).toFixed(2);
-		if (max < max_limit) {$('#max_limit').val(max);}
+	function checkMinLimit() {
+		let minLimit = parseFloat($('#min_limit').val())
+		if (isNaN(minLimit) || minLimit < min || minLimit > mid) {
+			layer.tips('最小限额不能超出 ' + min + '~' + mid, '#min_limit', {tips: 3});
+			$('#min_limit').val(min)
+		}
+		if (minLimit > mid) {
+			$('#min_limit').val(mid)
+		}
+	}
+	function checkMaxLimit() {
+		let maxLimit = parseFloat($('#max_limit').val());
+		if(isNaN(maxLimit)||maxLimit < mid){
+			layer.tips('最大限额不能小于 ' + mid, '#max_limit', {tips: 3});
+			$('#max_limit').val(mid);
+			return false;
+		}
+		price = parseFloat($('#price').val());
+		$('#amount').val((maxLimit / price + 0.01).toFixed(4));
 	}
 	function changeStatus(orderId, status) {
 		layer.load(0, {shade: [0.5, '#8f8f8f']});
@@ -131,6 +153,27 @@
 		setTimeout(function () {layer.closeAll('loading');}, 3000);
 	}
 	function newAd() {
+		if ($('select[name="bank"]').val() == "" && $('select[name="zfb"]').val() == "" && $('select[name="wx"]').val() == "" && $('select[name="ysf"]').val() == "") {
+			layer.msg('请选择一种支付方式', {icon: 2});
+			return false
+		}
+		let minLimit = parseFloat($('input[name="min_limit"]').val());
+		let maxLimit = parseFloat($('input[name="max_limit"]').val());
+		amount = parseFloat($('input[name="amount"]').val());
+		if (amount < amountLimit) {
+			layer.msg('最少数量不能低于' + amountLimit, {icon: 2});
+			return false
+		}
+
+		if (minLimit < min || minLimit > mid) {
+			layer.tips('最小限额不能超出 ' + min + '~' + mid, '#min_limit', {tips: 3});
+			return false;
+		}
+		if(maxLimit < mid){
+			layer.tips('最大限额不能小于' + mid, '#max_limit', {tips: 3});
+			$('#max_limit').val(mid);
+			return false;
+		}
 		layer.load(0, {shade: [0.5, '#8f8f8f']});
 		$.ajax({
 			url     : "/merchant/newad", type: "post", data: $('#newAdForm').serialize(), success: function (data) {

@@ -396,8 +396,9 @@ a:hover, a:active, a:focus{outline:0;text-decoration:none;color:#ff6c60}
 .box-body.no-padding .full-width-chart{margin:-9px}
 .box-body .box-pane{border-top-left-radius:0;border-top-right-radius:0;border-bottom-right-radius:0;border-bottom-left-radius:3px}
 .box-body .box-pane-right{border-top-left-radius:0;border-top-right-radius:0;border-bottom-right-radius:3px;border-bottom-left-radius:0}
-.box-footer{border-top-left-radius:0;border-top-right-radius:0;border-bottom-right-radius:3px;border-bottom-left-radius:3px;border-top:1px solid #f4f4f4;padding:10px;background-color:#fff}
+.box-footer{border-top-left-radius:0;border-top-right-radius:0;border-bottom-right-radius:3px;border-bottom-left-radius:3px;border-top:1px solid #f4f4f4;padding:10px;background-color:#fff;text-align: center;}
 .chart-legend{margin:10px 0}
+.checkbox-inline{padding:0!important;}
 @media (max-width:991px){
 	.chart-legend > li{float:left;margin-right:10px}
 }

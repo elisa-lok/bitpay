@@ -1274,7 +1274,7 @@ class Merchant extends Base {
 			$amount = input('post.amount');
 			($amount <= 0) && showMsg('请输入正确的出售数量', 0);
 			$minLimit = input('post.min_limit');
-			($minLimit <= 100) && showMsg('最小限额不能小于100', 0);
+			($minLimit < 100 || $minLimit > 300) && showMsg('最小限额不能超出 100 ~ 300', 0);
 			$maxLimit = input('post.max_limit');
 			($maxLimit <= 0) && showMsg('请输入正确的最大限额', 0);
 			($minLimit > $maxLimit) && showMsg('最小限额不能大于最大限额！', 0);
