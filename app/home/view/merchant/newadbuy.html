@@ -67,30 +67,32 @@
 									<button type="button" class="btn btn-danger" onclick="newAdBuy()">买入</button>
 								</div>
 							</div>
-						</div><!-- /.box-footer --></form>
+						</div>
+					</form>
+					<hr/>
 					<div class="tab-content table-responsive">
 						<div class="" id="tab_886859313">
 							<table class="table">
 								<thead>
 								<tr>
-									<th>状态</th>
 									<th>编号</th>
 									<th>价格</th>
 									<th>交易数量</th>
 									<th>剩余数量</th>
 									<th>创建时间</th>
+									<th>状态</th>
 									<th>操作</th>
 								</tr>
 								</thead>
 								<tbody>{volist name="list" id="vo"}
 								<tr>
-									<td>{eq name="vo.state" value="1"}进行中{/eq} {eq name="vo.state" value="2"}已下架{/eq} {eq name="vo.state" value="4"}已冻结{/eq}</td>
 									<td>{$vo.ad_no}</td>
-									<td>¥ {$vo.price}</td>
+									<td>¥ {$vo.price|round=###,6}</td>
 									<td>{$vo.deal}</td>
 									<td>{$vo.remain}</td>
 									<td>{$vo['add_time']|date="Y-m-d H:i:s",###}</td>
-									<td>{eq name="vo.state" value="1"}<a id="{$vo.id}" class="btn btn-sm btn-danger down">下架</a>{/eq} {eq name="vo.state" value="2"}<a id="{$vo.id}" class="btn btn-sm btn-success up">上架</a>{/eq} {eq name="vo.state" value="4"}<a id="{$vo.id}" class="btn btn-sm btn-success dong">上架</a>{/eq}
+									<td>{eq name="vo.state" value="1"}进行中{/eq} {eq name="vo.state" value="2"}已完成{/eq} {eq name="vo.state" value="4"}已冻结{/eq}</td>
+									<td>{eq name="vo.state" value="1"}<a id="{$vo.id}" class="btn btn-sm btn-info down">撤单</a>{/eq}
 									</td>
 								</tr>
 								{/volist}
