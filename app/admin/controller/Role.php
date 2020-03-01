@@ -63,9 +63,7 @@ class Role extends Base {
 			return json(['code' => $flag['code'], 'data' => $flag['data'], 'msg' => $flag['msg']]);
 		}
 		$id = input('param.id');
-		$this->assign([
-			'role' => $role->getOneRole($id)
-		]);
+		$this->assign('role', $role->getOneRole($id));
 		return $this->fetch();
 	}
 
@@ -76,6 +74,7 @@ class Role extends Base {
 	 */
 	public function del() {
 		$id   = input('param.id');
+		$id == 1 && showMsg('超管不允许删除', 400, '');
 		$role = new UserType();
 		$flag = $role->delRole($id);
 		return json(['code' => $flag['code'], 'data' => $flag['data'], 'msg' => $flag['msg']]);
@@ -114,8 +113,8 @@ class Role extends Base {
 		//分配新权限
 		if ('give' == $param['type']) {
 			$doparam = [
-				'id'    => $param['id'],
-				'rules' => $param['rule']
+					'id'    => $param['id'],
+					'rules' => $param['rule']
 			];
 			$user    = new UserType();
 			$flag    = $user->editAccess($doparam);

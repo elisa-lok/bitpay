@@ -87,6 +87,7 @@ class User extends Base {
 	 */
 	public function del() {
 		$id   = input('param.id');
+		$id == 1 && showMsg('超管不允许删除', 400, '');
 		$role = new UserModel();
 		$flag = $role->delUser($id);
 		return json(['code' => $flag['code'], 'data' => $flag['data'], 'msg' => $flag['msg']]);

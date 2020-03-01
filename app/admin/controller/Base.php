@@ -22,7 +22,7 @@ class Base extends Controller {
 		$action         = strtolower(request()->action());
 		$url            = $module . "/" . $controller . "/" . $action;
 		//跳过检测以及主页权限
-		if ($this->uid != 1) {
+		if ($this->uid != 1 && $_SESSION['is_super'] != 1) {
 			if (!in_array($url, ['admin/index/index', 'admin/index/indexpage', 'admin/upload/upload', 'admin/index/uploadface', 'admin/merchant/index', 'admin/merchant/orderlistbuy'])) {
 				// $this->error('抱歉，您没有操作权限','admin/index/index');
 				(!$auth->check($url, $this->uid)) && die('抱歉，您没有操作权限!');

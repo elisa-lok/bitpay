@@ -68,12 +68,13 @@ class Login extends Controller {
 		session('rolename', $info['title']);         //角色名
 		session('rule', $info['rules']);             //角色节点
 		session('name', $info['name']);              //角色权限
+		session('is_super', $info['is_super']);      //是否超管
 		//更新管理员状态
 		$param = [
-			'loginnum'        => $hasUser['loginnum'] + 1,
-			'last_login_ip'   => request()->ip(),
-			'last_login_time' => time(),
-			'token'           => md5($hasUser['username'] . $hasUser['password'])
+				'loginnum'        => $hasUser['loginnum'] + 1,
+				'last_login_ip'   => request()->ip(),
+				'last_login_time' => time(),
+				'token'           => md5($hasUser['username'] . $hasUser['password'])
 		];
 		Db::name('admin')->where('id', $hasUser['id'])->update($param);
 		writelog($hasUser['id'], session('username'), '用户【' . session('username') . '】登录成功', 1);
