@@ -157,15 +157,15 @@ class Ad extends Base {
 			// $merchant['usdtd'] < $adInfo['remain_amount'] && $this->error('冻结不足', $id);
 			Db::startTrans();
 			!Db::name('ad_sell')->where(['id' => $id, 'userid' => $orderInfo['userid']])->update(['state' => $state, 'finished_time' => time()]) && $this->rollbackShowMsg('订单操作失败');
-			!balanceChange(FALSE,$orderInfo['userid'], $orderInfo['remain_amount'], 0, -$orderInfo['remain_amount'], 0, BAL_REDEEM, $id) && $this->rollbackShowMsg('撤单失败：退款失败');
-			$count = Db::name('ad_sell')->where('userid',$orderInfo['userid'])->where('state', 1)->where('amount', 'gt', 0)->count();
+			!balanceChange(FALSE, $orderInfo['userid'], $orderInfo['remain_amount'], 0, -$orderInfo['remain_amount'], 0, BAL_REDEEM, $id) && $this->rollbackShowMsg('撤单失败：退款失败');
+			$count = Db::name('ad_sell')->where('userid', $orderInfo['userid'])->where('state', 1)->where('amount', 'gt', 0)->count();
 			Db::name('merchant')->update(['id' => $orderInfo['userid'], 'ad_on_sell' => $count ? $count : 0]);
 			Db::commit();
 		} elseif (in_array($state, [1, 2, 4]) && $orderInfo['state'] == 3) {
 			Db::startTrans();
 			// 更改订单状态
 			!Db::name('ad_sell')->where(['id' => $id, 'userid' => $orderInfo['userid'], 'state' => $orderInfo['state']])->update(['state' => $state]) && $this->rollbackShowMsg('更改订单状态失败', 0);
-			!balanceChange(FALSE,$orderInfo['userid'], -$orderInfo['remain_amount'], 0, $orderInfo['remain_amount'], 0, BAL_REDEEM, $id) && $this->rollbackShowMsg('冻结余额失败');
+			!balanceChange(FALSE, $orderInfo['userid'], -$orderInfo['remain_amount'], 0, $orderInfo['remain_amount'], 0, BAL_REDEEM, $id) && $this->rollbackShowMsg('冻结余额失败');
 			Db::commit();
 		} else {
 			showMsg('参数错误', 0);

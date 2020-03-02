@@ -12,9 +12,7 @@ class AdbuyModel extends Model {
 	}
 
 	public function getAdIndex($where, $order) {
-		$join = [
-			['__MERCHANT__ b', 'a.userid=b.id', 'LEFT'],
-		];
+		$join = [['__MERCHANT__ b', 'a.userid=b.id', 'LEFT'],];
 		return $this->field('a.*, b.name, b.transact_buy, b.averge_buy')->alias('a')->join($join)->where($where)->order($order)->paginate(20, FALSE, ['query' => Request::instance()->param()]);
 	}
 

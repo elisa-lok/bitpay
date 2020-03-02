@@ -35,7 +35,6 @@ class Order extends Base {
 			// 锁定操作 代码执行完成前不可继续操作 60秒后可再次点击操作
 			Cache::has($id) && $this->error('操作频繁,请稍后重试');
 			Cache::set($id, TRUE, 60);
-
 			//盘口费率
 			$pkFeeRate = $buyer['merchant_pk_fee'];
 			$pkFeeRate = $pkFeeRate ? $pkFeeRate : 0;

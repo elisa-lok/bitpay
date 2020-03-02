@@ -54,9 +54,7 @@ class MerchantModel extends Model {
 	}
 
 	public function getUsdtByWhere($map, $nowPage, $limits) {
-		$join = [
-			['__ADMIN__ b', 'b.id=a.admin_id', 'LEFT'],
-		];
+		$join = [['__ADMIN__ b', 'b.id=a.admin_id', 'LEFT'],];
 		return Db::name('coin_log')->field('a.*, b.username')->alias('a')->join($join)->where($map)->page($nowPage, $limits)->order('a.id desc')->select();
 	}
 
@@ -70,16 +68,16 @@ class MerchantModel extends Model {
 
 	public function getRewardByWhere($map, $nowPage, $limits) {
 		$join = [
-			['__MERCHANT__ b', 'b.id=a.uid', 'LEFT'],
-			['__MERCHANT__ c', 'c.id=a.duid', 'LEFT'],
+				['__MERCHANT__ b', 'b.id=a.uid', 'LEFT'],
+				['__MERCHANT__ c', 'c.id=a.duid', 'LEFT'],
 		];
 		return Db::name('agent_reward')->field('a.*, b.name, c.name as downname')->alias('a')->join($join)->where($map)->page($nowPage, $limits)->order('a.id desc')->select();
 	}
 
 	public function getTraderRewardByWhere($map, $nowPage, $limits) {
 		$join = [
-			['__MERCHANT__ b', 'b.id=a.uid', 'LEFT'],
-			['__ORDER_BUY__ c', 'c.id=a.orderid', 'LEFT'],
+				['__MERCHANT__ b', 'b.id=a.uid', 'LEFT'],
+				['__ORDER_BUY__ c', 'c.id=a.orderid', 'LEFT'],
 		];
 		return Db::name('trader_reward')->field('a.*, b.name, c.order_no, c.deal_amount')->alias('a')->join($join)->where($map)->page($nowPage, $limits)->order('a.id desc')->select();
 	}
@@ -89,9 +87,7 @@ class MerchantModel extends Model {
 	}
 
 	public function getTraderRechargeByWhere($map, $nowPage, $limits) {
-		$join = [
-			['__MERCHANT__ b', 'b.id=a.merchant_id', 'LEFT'],
-		];
+		$join = [['__MERCHANT__ b', 'b.id=a.merchant_id', 'LEFT'],];
 		return Db::name('merchant_recharge')->field('a.*, b.name')->alias('a')->join($join)->where($map)->page($nowPage, $limits)->order('a.id desc')->select();
 	}
 
@@ -100,9 +96,7 @@ class MerchantModel extends Model {
 	}
 
 	public function getAdByWhere($map, $nowPage, $limits) {
-		$join = [
-			['__MERCHANT__ b', 'b.id=a.userid', 'LEFT'],
-		];
+		$join = [['__MERCHANT__ b', 'b.id=a.userid', 'LEFT'],];
 		return Db::name('ad_sell')->field('a.*, b.name')->alias('a')->join($join)->where($map)->page($nowPage, $limits)->order('a.id desc')->select();
 	}
 
@@ -111,9 +105,7 @@ class MerchantModel extends Model {
 	}
 
 	public function getAdBuyByWhere($map, $nowPage, $limits) {
-		$join = [
-			['__MERCHANT__ b', 'b.id=a.userid', 'LEFT'],
-		];
+		$join = [['__MERCHANT__ b', 'b.id=a.userid', 'LEFT'],];
 		return Db::name('ad_buy')->field('a.*, b.name')->alias('a')->join($join)->where($map)->page($nowPage, $limits)->order('a.id desc')->select();
 	}
 
@@ -128,18 +120,18 @@ class MerchantModel extends Model {
 
 	public function getAllCountOrderBuy($map) {
 		$join = [
-			['__MERCHANT__ b', 'b.id=a.buy_id', 'LEFT'],
-			['__MERCHANT__ c', 'c.id=a.sell_id', 'LEFT'],
-			['__AD_BUY__ d', 'd.id=a.buy_bid', 'LEFT'],
+				['__MERCHANT__ b', 'b.id=a.buy_id', 'LEFT'],
+				['__MERCHANT__ c', 'c.id=a.sell_id', 'LEFT'],
+				['__AD_BUY__ d', 'd.id=a.buy_bid', 'LEFT'],
 		];
 		return Db::name('order_sell')->alias('a')->join($join)->where($map)->count();
 	}
 
 	public function getOrderBuyByWhere($map, $nowPage, $limits) {
 		$join = [
-			['__MERCHANT__ b', 'b.id=a.buy_id', 'LEFT'],
-			['__MERCHANT__ c', 'c.id=a.sell_id', 'LEFT'],
-			['__AD_BUY__ d', 'd.id=a.buy_bid', 'LEFT'],
+				['__MERCHANT__ b', 'b.id=a.buy_id', 'LEFT'],
+				['__MERCHANT__ c', 'c.id=a.sell_id', 'LEFT'],
+				['__AD_BUY__ d', 'd.id=a.buy_bid', 'LEFT'],
 		];
 		return Db::name('order_sell')->field('a.*, b.name, c.name as trader, d.ad_no')->alias('a')->join($join)->where($map)->page($nowPage, $limits)->order('a.id desc')->select();
 	}
@@ -153,8 +145,7 @@ class MerchantModel extends Model {
 	}
 
 	public function getMerchantStatistics($map, $nowPage, $limits, $order = ['id' => 'desc']) {
-		// $join = [
-		// 	// ['__MERCHANT_RECHARGE__ b', 'b.merchant_id=a.id', 'LEFT']
+		// $join = [// 	// ['__MERCHANT_RECHARGE__ b', 'b.merchant_id=a.id', 'LEFT']
 		// 	['__MERCHANT_WITHDRAW__ b', 'b.merchant_id=a.id', 'LEFT']
 		// ];
 		return $this->field('id, reg_type, name, mobile, usdt+usdtd as usdtt, order_sell_usdt_amount')->where($map)->page($nowPage, $limits)->order($order)->select();

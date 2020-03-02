@@ -26,8 +26,7 @@ class AliSms {
 			'sms_free_sign_name' => $this->sms_free_sign_name,
 			'sms_param'          => json_encode($this->sms_param),
 			'rec_num'            => $this->rec_num,
-			'sms_template_code'  => $this->sms_template_code,
-		];
+			'sms_template_code'  => $this->sms_template_code,];
 		if (!$this->sms_param) {
 			unset($param['sms_param']);
 		}

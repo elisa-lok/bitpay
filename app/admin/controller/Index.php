@@ -86,11 +86,11 @@ class Index extends Base {
 		//今日新增会员
 		$today              = strtotime(date('Y-m-d 00:00:00'));//今天开始日期
 		$map['create_time'] = ['egt', $today];
-		$info = [
-			'web_server' => $_SERVER['SERVER_SOFTWARE'],
-			'onload'     => ini_get('upload_max_filesize'),
-			'think_v'    => THINK_VERSION,
-			'phpversion' => phpversion(),
+		$info               = [
+				'web_server' => $_SERVER['SERVER_SOFTWARE'],
+				'onload'     => ini_get('upload_max_filesize'),
+				'think_v'    => THINK_VERSION,
+				'phpversion' => phpversion(),
 		];
 		//统计充值数量
 		$beginThismonth = mktime(0, 0, 0, date('m'), 1, date('Y'));

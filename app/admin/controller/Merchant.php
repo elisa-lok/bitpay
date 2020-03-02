@@ -270,7 +270,7 @@ class Merchant extends Base {
 				}
 				financeLog($param['id'], $amount, '后台修改USDT冻结余额', $type, $this->username);//添加日志
 			}
-			(($user['usdt'] != $param['usdt']) ||  $user['usdt'] != $param['usdt'] ) && ($amt != 0 || $frozenAmt != 0) && balanceChange(FALSE, $param['id'], $amt, 0, $frozenAmt, 0, BAL_SYS, '', '管理员修改');
+			(($user['usdt'] != $param['usdt']) || $user['usdt'] != $param['usdt']) && ($amt != 0 || $frozenAmt != 0) && balanceChange(FALSE, $param['id'], $amt, 0, $frozenAmt, 0, BAL_SYS, '', '管理员修改');
 			unset($param['usdt'], $param['usdtd']);
 			$this->addHistory($param['id'], $user, $param);
 			$flag = $member->editMerchant($param);
@@ -296,9 +296,9 @@ class Merchant extends Base {
 			}
 		}
 		$this->assign([
-			'merchant' => $minfo,
-			'traders'  => $traders,
-			'reg_type' => $regType,
+				'merchant' => $minfo,
+				'traders'  => $traders,
+				'reg_type' => $regType,
 		]);
 		return $this->fetch();
 	}
@@ -705,7 +705,6 @@ class Merchant extends Base {
 		return $this->fetch();
 	}
 
-
 	public function orderlist() {
 		$key                       = input('key');
 		$oid                       = trim(input('oid'));
@@ -868,7 +867,6 @@ class Merchant extends Base {
 		// 锁定操作 代码执行完成前不可继续操作 60秒后可再次点击操作
 		Cache::has($id) && $this->error('操作频繁,请稍后重试');
 		Cache::set($id, TRUE, 60);
-
 		Db::startTrans();
 		try {
 			//$rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num']);
@@ -983,7 +981,6 @@ class Merchant extends Base {
 		// 锁定操作 代码执行完成前不可继续操作 60秒后可再次点击操作
 		Cache::has($id) && $this->error('操作频繁,请稍后重试');
 		Cache::set($id, TRUE, 60);
-
 		$oldNum = $orderInfo['deal_num'];
 		($amount != $orderInfo['deal_amount']) && ($orderInfo['deal_num'] = number_format($amount / $orderInfo['deal_price'], 8, '.', ''));
 		$mchModel = Db::name('merchant');
@@ -1047,10 +1044,10 @@ class Merchant extends Base {
 			$rs1 = balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$backAmount, 0, BAL_SOLD, $orderInfo['id'], '申诉失败操作');
 			// 更新买单信息
 			$updateCondition = $amount != $orderInfo['deal_amount'] ? ['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'platform_fee' => $platformMoney, 'deal_amount' => $amount, 'deal_num' => $orderInfo['deal_num']] : [
-				'id'            => $orderInfo['id'],
-				'status'        => 4,
-				'finished_time' => time(),
-				'platform_fee'  => $platformMoney
+					'id'            => $orderInfo['id'],
+					'status'        => 4,
+					'finished_time' => time(),
+					'platform_fee'  => $platformMoney
 			];
 			// 更新订单信息
 			!Db::name('order_buy')->update($updateCondition) && $this->rollbackAndMsg('更新订单失败', $id);
@@ -1100,11 +1097,11 @@ class Merchant extends Base {
 			getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $sum, $orderInfo['deal_num']);
 			//请求回调接口
 			$data = [
-				'amount'  => $orderInfo['deal_num'],
-				'rmb'     => $amount != $orderInfo['deal_amount'] ? $amount : $orderInfo['deal_amount'],
-				'orderid' => $orderInfo['orderid'],
-				'appid'   => $buyer['appid'],
-				'status'  => $type == 1 ? 1 : 0
+					'amount'  => $orderInfo['deal_num'],
+					'rmb'     => $amount != $orderInfo['deal_amount'] ? $amount : $orderInfo['deal_amount'],
+					'orderid' => $orderInfo['orderid'],
+					'appid'   => $buyer['appid'],
+					'status'  => $type == 1 ? 1 : 0
 			];
 			//$status && askNotify($data, $orderInfo['notify_url'], $buyer['key']);
 			Cache::rm($id);

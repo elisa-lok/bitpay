@@ -147,7 +147,7 @@ class Eth {
 	 */
 	private function personal_newAccount($password = '') {
 		$params = [
-			$password,
+				$password,
 		];
 		if ($password == '') {
 			return FALSE;

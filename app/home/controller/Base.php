@@ -65,7 +65,7 @@ class Base extends Controller {
 		config($config);
 	}
 
-	protected function rollbackAndMsg($msg, $cacheKey= null) {
+	protected function rollbackAndMsg($msg, $cacheKey = NULL) {
 		$cacheKey && Cache::rm($cacheKey);
 		Db::rollback();
 		$this->error($msg);

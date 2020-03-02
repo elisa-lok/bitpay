@@ -152,8 +152,8 @@ class Member extends Base {
 		$id    = input('param.id');
 		$group = new MemberGroupModel();
 		$this->assign([
-			'member' => $member->getOneMember($id),
-			'group'  => $group->getGroup()
+				'member' => $member->getOneMember($id),
+				'group'  => $group->getGroup()
 		]);
 		return $this->fetch();
 	}

@@ -101,16 +101,16 @@ class Ad extends Base {
 			($_POST['ysf'] && !$isUnionPay) && $this->error('请先设置您的云闪付账户信息');
 			$adNo = $this->getAdvNo();
 			$flag = $model2->updateOne([
-				'id'          => $id,
-				'min_limit'   => $minLimit,
-				'max_limit'   => $maxLimit,
-				'pay_method'  => $_POST['bank'],
-				'pay_method2' => $_POST['zfb'],
-				'pay_method3' => $_POST['wx'],
-				'pay_method4' => $_POST['ysf'],
-				'amount'      => $amount,
-				'price'       => $price,
-				'state'       => 1
+					'id'          => $id,
+					'min_limit'   => $minLimit,
+					'max_limit'   => $maxLimit,
+					'pay_method'  => $_POST['bank'],
+					'pay_method2' => $_POST['zfb'],
+					'pay_method3' => $_POST['wx'],
+					'pay_method4' => $_POST['ysf'],
+					'amount'      => $amount,
+					'price'       => $price,
+					'state'       => 1
 			]);
 			if ($flag['code'] == 1) {
 				$count = $model2->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
@@ -139,7 +139,6 @@ class Ad extends Base {
 		$this->assign('banks', $banks);
 		return $this->fetch();
 	}
-
 
 	public function editadbuy() {
 		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
@@ -224,9 +223,8 @@ class Ad extends Base {
 				$count = $model2->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
 				$model->updateOne(['id' => $this->uid, 'ad_on_buy' => $count ? $count : 0]);
 				$this->success($flag['msg'], '/merchant/newadbuy/');
-			} else {
-				$this->error($flag['msg']);
 			}
+			$this->error($flag['msg']);
 		}
 		$id              = input('get.id');
 		$where['id']     = $id;
@@ -246,5 +244,4 @@ class Ad extends Base {
 		$this->assign('banks', $banks);
 		return $this->fetch();
 	}
-
 }

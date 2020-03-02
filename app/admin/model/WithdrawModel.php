@@ -8,9 +8,7 @@ class WithdrawModel extends Model {
 	protected $updateTime = 'endtime';
 
 	public function getWithdrawByWhere($map, $nowPage, $limits) {
-		$join = [
-			['__MERCHANT__ b', 'b.id=a.merchant_id', 'LEFT'],
-		];
+		$join = [['__MERCHANT__ b', 'b.id=a.merchant_id', 'LEFT'],];
 		return $this->field('a.*, b.name')->alias('a')->join($join)->where($map)->page($nowPage, $limits)->order('a.id desc')->select();
 	}
 

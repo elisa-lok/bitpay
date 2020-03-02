@@ -42,8 +42,8 @@ class User extends Base {
 			$user              = new UserModel();
 			$flag              = $user->insertUser($param);
 			$accdata           = [
-				'uid'      => $user['id'],
-				'group_id' => $param['groupid'],
+					'uid'      => $user['id'],
+					'group_id' => $param['groupid'],
 			];
 			$group_access      = Db::name('auth_group_access')->insert($accdata);
 			return json(['code' => $flag['code'], 'data' => $flag['data'], 'msg' => $flag['msg']]);
@@ -74,8 +74,8 @@ class User extends Base {
 		$id   = input('param.id');
 		$role = new UserType();
 		$this->assign([
-			'user' => $user->getOneUser($id),
-			'role' => $role->getRole()
+				'user' => $user->getOneUser($id),
+				'role' => $role->getRole()
 		]);
 		return $this->fetch();
 	}
@@ -86,7 +86,7 @@ class User extends Base {
 	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function del() {
-		$id   = input('param.id');
+		$id = input('param.id');
 		$id == 1 && showMsg('超管不允许删除', 400, '');
 		$role = new UserModel();
 		$flag = $role->delUser($id);

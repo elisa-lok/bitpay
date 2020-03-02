@@ -1,10 +1,8 @@
 <?php
 namespace app\cli\controller;
-
 use think\Db;
 
 class Ad extends Base {
-
 	public function updateAdSellPrice() {
 		$usdtPriceWay = config('usdt_price_way');
 		($usdtPriceWay == 0) && die('price way error');

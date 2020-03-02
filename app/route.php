@@ -57,6 +57,5 @@ Route::rule('auto/buyCountDown', 'home/auto/buyCountDown', 'GET');
 Route::rule('auto/updateAdSellPrice', 'home/auto/updateAdSellPrice', 'GET');
 Route::rule('auto/updateAdBuyPrice', 'home/auto/updateAdBuyPrice', 'GET');
 Route::rule('go', 'api/redirect/go', 'GET');
-
 // 接收完成通知
 Route::rule('send/:id', 'api/tx/getNotify', 'POST|GET');

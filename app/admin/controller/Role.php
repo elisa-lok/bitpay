@@ -73,7 +73,7 @@ class Role extends Base {
 	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function del() {
-		$id   = input('param.id');
+		$id = input('param.id');
 		$id == 1 && showMsg('超管不允许删除', 400, '');
 		$role = new UserType();
 		$flag = $role->delRole($id);

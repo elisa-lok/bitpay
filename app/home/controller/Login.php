@@ -129,7 +129,7 @@ class Login extends Base {
 				Db::name('merchant')->where(['id' => $return['data']['id']])->update(['device' => $device]);
 			}
 			if ($flag['code'] > 0) {
-				session_regenerate_id(true);
+				session_regenerate_id(TRUE);
 				session('logid', $flag['code']);
 				session('uid', $return['data']['id']);
 				session('user', $return['data']);

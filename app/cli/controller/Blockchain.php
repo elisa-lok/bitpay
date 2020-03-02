@@ -1,7 +1,5 @@
 <?php
 namespace app\cli\controller;
-
-
 use app\common\model\Usdt;
 use think\Db;
 use think\Exception;
@@ -300,7 +298,7 @@ class Blockchain extends Base {
 		 */
 		$time = time();
 		//$fee = config('user_recharge_fee')->value('value');//充值手续费
-		$confirms = config('usdt_confirms');//充值手续费
+		$confirms = config('usdt_confirms');  //充值手续费
 		if (empty($confirms)) {
 			exit('请设置确认数');
 		}

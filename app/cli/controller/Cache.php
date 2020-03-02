@@ -1,7 +1,5 @@
 <?php
 namespace app\cli\controller;
-
-
 class Cache extends Base {
 	public function cleanAll() {
 		$c = new \Redis();
@@ -10,7 +8,6 @@ class Cache extends Base {
 	}
 
 	public function get() {
-
 	}
 }
 

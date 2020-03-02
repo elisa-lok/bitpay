@@ -7,8 +7,7 @@ class Entrust extends Base {
 	}
 
 	// 新建订单
-	public function new(){
-
+	public function new() {
 	}
 }
 

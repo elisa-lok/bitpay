@@ -30,17 +30,17 @@ class Base extends Controller {
 		}
 		$node = new Node();
 		$this->assign([
-			'username' => $this->username,
-			'portrait' => session('portrait'),
-			'rolename' => session('rolename'),
-			'menu'     => $node->getMenu(session('rule'))
+				'username' => $this->username,
+				'portrait' => session('portrait'),
+				'rolename' => session('rolename'),
+				'menu'     => $node->getMenu(session('rule'))
 		]);
 		$this->setConfig();
 		if (config('web_site_close') == 0 && $this->uid != 1) {
 			$this->error('站点已经关闭，请稍后访问~');
 		}
 		if (config('admin_allow_ip') && $this->uid != 1) {
-				(in_array(request()->ip(), explode('#', config('admin_allow_ip'))))&&$this->error('403:禁止访问');
+			(in_array(request()->ip(), explode('#', config('admin_allow_ip')))) && $this->error('403:禁止访问');
 		}
 	}
 
@@ -60,14 +60,14 @@ class Base extends Controller {
 		die;
 	}
 
-	protected function rollbackShowMsg($msg, $cacheKey = null) {
+	protected function rollbackShowMsg($msg, $cacheKey = NULL) {
 		$cacheKey && Cache::rm($cacheKey);
 		Db::rollback();
 		showMsg($msg, 0);
 	}
 
-	protected function addHistory($userId, $originData, $changeData){
-		$text = '【'.date('Y-m-d H:i:s').'】user_id: ['.$userId.'],op_user:['.session('adminuid'). session('username').'],IP:['. $_SERVER['REMOTE_ADDR'].'],【origin】'.json_encode($originData,320) . '【change】'.json_encode($changeData,320);
+	protected function addHistory($userId, $originData, $changeData) {
+		$text = '【' . date('Y-m-d H:i:s') . '】user_id: [' . $userId . '],op_user:[' . session('adminuid') . session('username') . '],IP:[' . $_SERVER['REMOTE_ADDR'] . '],【origin】' . json_encode($originData, 320) . '【change】' . json_encode($changeData, 320);
 		file_put_contents(RUNTIME_PATH . 'log/user_edit_' . date('ymd') . '.log', $text, FILE_APPEND);
 	}
 }

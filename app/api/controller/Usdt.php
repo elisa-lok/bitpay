@@ -76,7 +76,7 @@ class Usdt {
 				$skip       = !empty($_REQUEST['skip']) && is_numeric($_REQUEST['skip']) ? intval($_REQUEST['skip']) : 0;
 				$startblock = 0;      //$_REQUEST['txid'];
 				$endblock   = 999999; //$_REQUEST['txid'];
-				$result = $this->transactionsList($addr, $count, $skip, $startblock, $endblock);
+				$result     = $this->transactionsList($addr, $count, $skip, $startblock, $endblock);
 				echo $result;
 				exit;
 			case 'blocktransactionslist':
@@ -175,8 +175,8 @@ class Usdt {
 		if ($this->vailedAddress($taddr)) {
 			$redeemaddress   = '';
 			$referenceamount = '0';
-			$bitcoin = new Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
-			$res     = $bitcoin->omni_send(ADDRESS, $taddr, PROPERTY_ID, $value . '');
+			$bitcoin         = new Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
+			$res             = $bitcoin->omni_send(ADDRESS, $taddr, PROPERTY_ID, $value . '');
 			if ($res) {
 				return $res;
 			} else {
@@ -216,16 +216,16 @@ class Usdt {
 	private function transactionsList($addr, $count, $skip, $startblock, $endblock) {
 		$bitcoin = new Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
 		$info    = $bitcoin->omni_listtransactions($addr, $count, $skip, $startblock, $endblock);
-		$json = new JSON;
-		$res  = $json->encode($info);
+		$json    = new JSON;
+		$res     = $json->encode($info);
 		return $res;
 	}
 
 	private function getAllBalance() {
 		$bitcoin = new Bitcoin(RPC_USER, RPC_PWD, RPC_URL, RPC_PORT);
 		$info    = $bitcoin->omni_getallbalancesforid(PROPERTY_ID);
-		$json = new JSON;
-		$res  = $json->encode($info);
+		$json    = new JSON;
+		$res     = $json->encode($info);
 		return $res;
 	}
 

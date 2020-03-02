@@ -50,9 +50,10 @@ class PHPExcel {
 		$setcolor->getStartColor()->setRGB($selectcolor);
 		//根据表格数据设置列名称
 		for ($i = 0; $i < $cellNum; $i++) {
-			$objPHPExcel->setActiveSheetIndex(0)->setCellValue($cellName[$i] . '2', $xlsCell[$i][1])->getStyle($cellName[$i] . '2')->applyFromArray(['font'      => ['bold' => TRUE],
-																																					 'alignment' => ['horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER]
-				]);
+			$objPHPExcel->setActiveSheetIndex(0)->setCellValue($cellName[$i] . '2', $xlsCell[$i][1])->getStyle($cellName[$i] . '2')->applyFromArray([
+					'font'      => ['bold' => TRUE],
+					'alignment' => ['horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER]
+			]);
 		}
 		//body：渲染表中数据内容部分
 		for ($i = 0; $i < $dataNum; $i++) {
@@ -89,9 +90,9 @@ class PHPExcel {
 		$PHPExcel      = $PHPReader->load($filePath);                      //读取文件
 		$currentSheet  = $PHPExcel->getSheet(0);                           //读取第一个工作簿
 		$allColumn     = $currentSheet->getHighestColumn();                // 所有列数，得出的是字母：F
-		$allColumn_num = PHPExcel_Cell::columnIndexFromString($allColumn);//F转换为6
+		$allColumn_num = PHPExcel_Cell::columnIndexFromString($allColumn); //F转换为6
 		$allRow        = $currentSheet->getHighestRow();                   // 所有行数
-		$data = [];
+		$data          = [];
 		//遍历行，遍历列，逐个读取数据：默认有标题，所以从第二行读起
 		for ($rowIndex = 2; $rowIndex <= $allRow; $rowIndex++) {
 			$sub = [];

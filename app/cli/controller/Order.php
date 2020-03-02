@@ -4,7 +4,6 @@ use think\Cache;
 use think\Db;
 
 class Order extends Base {
-
 	// 卖单倒计时
 	public function sellCountDown() {
 		$list = Db::name('order_buy')->where("" . time() . "-ctime>ltime*60 and status=0 ")->select();

@@ -3,6 +3,7 @@ namespace app\api\controller;
 use think\Db;
 
 header('Content-Type: text/html; charset=utf-8');
+
 class Pay extends Base {
 	public function index() {
 		$id    = input('get.id');

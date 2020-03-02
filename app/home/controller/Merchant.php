@@ -82,7 +82,6 @@ class Merchant extends Base {
 		return $this->fetch();
 	}
 
-
 	public function payinfo() {
 		$id    = input('post.id');
 		$order = Db::name('order_sell')->where('id', $id)->find();
@@ -92,7 +91,7 @@ class Merchant extends Base {
 		$alipay = new ZfbModel();
 		$wx     = new WxModel();
 		if ($order['buy_id'] == $this->uid) {                                        //买家显示内容,显示卖家的收款信息
-			$merchant = Db::name('merchant')->where('id', $order['sell_id'])->find();//查找卖家信息
+			$merchant = Db::name('merchant')->where('id', $order['sell_id'])->find();  //查找卖家信息
 			if ($order['pay'] > 0) {
 				$where1['merchant_id']   = $order['sell_id'];
 				$where1['id']            = $order['pay'];
@@ -117,7 +116,7 @@ class Merchant extends Base {
 			}
 		}
 		if ($order['sell_id'] == $this->uid) {                                      //卖家显示内容
-			$merchant = Db::name('merchant')->where('id', $order['buy_id'])->find();//查找买家信息
+			$merchant = Db::name('merchant')->where('id', $order['buy_id'])->find();  //查找买家信息
 		}
 		$this->assign('merchant', $merchant);
 		$this->assign('order', $order);

@@ -7,9 +7,7 @@ class AddressModel extends Model {
 	protected $createTime = 'addtime';
 
 	public function getAddressByWhere($map, $nowPage, $limits) {
-		$join = [
-			['__MERCHANT__ b', 'b.id=a.merchant_id', 'LEFT'],
-		];
+		$join = [['__MERCHANT__ b', 'b.id=a.merchant_id', 'LEFT'],];
 		return $this->field('a.*, b.mobile')->alias('a')->join($join)->where($map)->page($nowPage, $limits)->order('a.id desc')->select();
 	}
 

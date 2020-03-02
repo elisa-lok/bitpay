@@ -330,7 +330,7 @@ function getConfig($field) {
  * @return string
  */
 function createOrderNo($paywhere, $uid) {
-	$arr = [1 => 'M', 2=> 'U',3=> 'S',4=> 'T'];
+	$arr = [1 => 'M', 2 => 'U', 3 => 'S', 4 => 'T'];
 	$pre = $arr[$paywhere] ?? 'O';
 	//M22768T3085073605350PS198
 	return $pre . $uid . 'T' . strtoupper(dechex(date('m'))) . date('d') . substr(time(), -5) . substr(microtime(), 2, 5) . 'P' . 'S' . sprintf(rand(100, 999));
@@ -391,12 +391,12 @@ function getUsdtPrice($ignore = FALSE, $ttl = 5) {
 	$price = Cache::get('usdt_price');
 	if (!$price) {
 		$price = (Db::name('config')->where(['name' => 'usdt_price'])->value('value'));
-		if($price <= 0.1) {
+		if ($price <= 0.1) {
 			$url  = $ignore ? 'https://otc-api.huobi.pro/v1/data/market/detail' : 'https://otc-api.hbg.com/v1/data/market/detail';
 			$data = curl_get($url, $ttl);//获取火币价格
 			$res  = json_decode($data, TRUE);
 			//$sellPrice = $data_arr['data']['detail'][2]['sell'];
-			$price = isset($res['success']) &&  $res['success'] == TRUE ? $res['data']['detail'][2]['buy'] : ($ignore ? 7.00 : getUsdtPrice(TRUE));
+			$price = isset($res['success']) && $res['success'] == TRUE ? $res['data']['detail'][2]['buy'] : ($ignore ? 7.00 : getUsdtPrice(TRUE));
 		}
 		Cache::set('usdt_price', $price, 600);
 	}
@@ -570,20 +570,20 @@ function balanceChange($enableTrans = TRUE, $uid = 0, float $modAmt = 0, float $
 		}
 	}
 	$newLog = [
-		'last_bal_log_id'   => $lastLogId,
-		'merchant_id'       => $uid,
-		'amt_before'        => $userInfo['usdt'],
-		'amt_after'         => $userInfo['usdt'] + $modAmt,
-		'amt_change'        => $modAmt,
-		'amt_fee'           => $fee,
-		'frozen_amt_before' => $userInfo['usdtd'],
-		'frozen_amt_after'  => $userInfo['usdtd'] + $frozenModAmt,
-		'frozen_amt_change' => $frozenModAmt,
-		'frozen_amt_fee'    => $frozenFee,
-		'cur_code'          => 'usdt',
-		'action_type'       => $actType,
-		'relate_id'         => $relateId,
-		'memo'              => $memo,
+			'last_bal_log_id'   => $lastLogId,
+			'merchant_id'       => $uid,
+			'amt_before'        => $userInfo['usdt'],
+			'amt_after'         => $userInfo['usdt'] + $modAmt,
+			'amt_change'        => $modAmt,
+			'amt_fee'           => $fee,
+			'frozen_amt_before' => $userInfo['usdtd'],
+			'frozen_amt_after'  => $userInfo['usdtd'] + $frozenModAmt,
+			'frozen_amt_change' => $frozenModAmt,
+			'frozen_amt_fee'    => $frozenFee,
+			'cur_code'          => 'usdt',
+			'action_type'       => $actType,
+			'relate_id'         => $relateId,
+			'memo'              => $memo,
 	];
 	$res1   = Db::name('merchant')->where('id', $uid)->update(['usdt' => $newLog['amt_after'], 'usdtd' => $newLog['frozen_amt_after']]);
 	$res2   = Db::name('merchant_balance_log')->insert($newLog);
@@ -641,20 +641,20 @@ function balanceMod($enableTrans = TRUE, $uid = 0, float $afterAmt = 0, float $f
 		}
 	}
 	$newLog = [
-		'last_bal_log_id'   => $lastLogId,
-		'merchant_id'       => $uid,
-		'amt_before'        => $userInfo['usdt'],
-		'amt_after'         => $afterAmt,
-		'amt_change'        => $modAmt,
-		'amt_fee'           => $fee,
-		'frozen_amt_before' => $userInfo['usdtd'],
-		'frozen_amt_after'  => $afterFrozenAmt,
-		'frozen_amt_change' => $frozenModAmt,
-		'frozen_amt_fee'    => $frozenFee,
-		'cur_code'          => 'usdt',
-		'action_type'       => $actType,
-		'relate_id'         => $relateId,
-		'memo'              => $memo,
+			'last_bal_log_id'   => $lastLogId,
+			'merchant_id'       => $uid,
+			'amt_before'        => $userInfo['usdt'],
+			'amt_after'         => $afterAmt,
+			'amt_change'        => $modAmt,
+			'amt_fee'           => $fee,
+			'frozen_amt_before' => $userInfo['usdtd'],
+			'frozen_amt_after'  => $afterFrozenAmt,
+			'frozen_amt_change' => $frozenModAmt,
+			'frozen_amt_fee'    => $frozenFee,
+			'cur_code'          => 'usdt',
+			'action_type'       => $actType,
+			'relate_id'         => $relateId,
+			'memo'              => $memo,
 	];
 	$res1   = Db::name('merchant')->where('id', $uid)->update(['usdt' => $newLog['amt_after'], 'usdtd' => $newLog['frozen_amt_after']]);
 	$res2   = Db::name('merchant_balance_log')->insert($newLog);
@@ -715,15 +715,16 @@ function getTopAgentFeeRate($uid, $timeout = 900) {
 	return $pidRate;
 }
 
-function generateVCode($uid){
-	$vcode = randString(8);
+function generateVCode($uid) {
+	$vcode    = randString(8);
 	$mchModel = Db::name('merchant');
-	if(!$mchModel->where('vcode', $vcode)->find()){
-		$mchModel->where('id', $uid)->update(['vcode'=> $vcode]);
+	if (!$mchModel->where('vcode', $vcode)->find()) {
+		$mchModel->where('id', $uid)->update(['vcode' => $vcode]);
 		return $vcode;
 	}
 	return generateVCode($uid);
 }
+
 function randString(int $len = 16, string $char = '') {
 	$c       = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 	$char    = $char == '' ? $c : $char;

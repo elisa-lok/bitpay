@@ -34,10 +34,10 @@ class Data extends Base {
 			is_dir($path) || mkdir($path, 0755, TRUE);
 			//读取备份配置
 			$config = [
-				'path'     => realpath($path) . DIRECTORY_SEPARATOR,
-				'part'     => Config::get('data_backup_part_size'),
-				'compress' => Config::get('data_backup_compress'),
-				'level'    => Config::get('data_backup_compress_level'),
+					'path'     => realpath($path) . DIRECTORY_SEPARATOR,
+					'part'     => Config::get('data_backup_part_size'),
+					'compress' => Config::get('data_backup_compress'),
+					'level'    => Config::get('data_backup_compress_level'),
 			];
 			//检查是否有正在执行的任务
 			$lock = "{$config['path']}backup.lock";
@@ -50,8 +50,8 @@ class Data extends Base {
 			Session::set('backup_config', $config);
 			//生成备份文件信息
 			$file = [
-				'name' => date('Ymd-His', $Request->time()),
-				'part' => 1,
+					'name' => date('Ymd-His', $Request->time()),
+					'part' => 1,
 			];
 			Session::set('backup_file', $file);
 			//缓存要备份的表
@@ -241,7 +241,7 @@ class Data extends Base {
 			$db    = new Database($list[$part], [
 					'path'     => realpath(Config::get('data_backup_path')) . DIRECTORY_SEPARATOR,
 					'compress' => $list[$part][2]
-				]);
+			]);
 			$start = $db->import($start);
 			if (FALSE === $start) {
 				return $this->error('还原数据出错！');

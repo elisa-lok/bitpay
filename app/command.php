@@ -1,4 +1,4 @@
 <?php
 return [
-	"app\home\controller\Cron",
+		"app\home\controller\Cron",
 ];

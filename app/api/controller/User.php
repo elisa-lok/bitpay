@@ -47,12 +47,12 @@ class User {
 	public function register($account, $nickname, $password, $head_img) {
 		if ($account != '' || $password != '') {
 			$param = [
-				'account'  => $account,
-				'nickname' => $nickname,
-				'password' => md5($password),
-				'head_img' => $head_img,
-				'status'   => 1,
-				'token'    => md5($account . $password)
+					'account'  => $account,
+					'nickname' => $nickname,
+					'password' => md5($password),
+					'head_img' => $head_img,
+					'status'   => 1,
+					'token'    => md5($account . $password)
 			];
 			$user  = Db::name('user')->insert($param);
 			if ($user) {

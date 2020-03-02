@@ -6,21 +6,21 @@ class app {
 	//h5获取设备
 	public function version() {
 		die(json_encode([
-			'msg'  => '成功',
-			'code' => 200,
-			'data' => ''
+				'msg'  => '成功',
+				'code' => 200,
+				'data' => ''
 		], 320));
 		die(json_encode([
-			'msg'  => '成功',
-			'code' => 200,
-			'data' => [
-				'apkVersion'     => '2.0',//版本号
-				'apkPath'        => 'https://huobi-1253283450.file.myqcloud.com/bit/ops/app/android/533/huobi-0.apk?v=1568949568127',//下载路径
-				'apkDescription' => '更新一下, 提示一下',//更新描述
-				'lastUpdateTime' => time(),//上传更新时间
-				'apkSize'        => '410000',//apk大小
-				'isForceUpdate'  => '0',//是否强制更新 0/不强制 1/强制更新
-			]
+				'msg'  => '成功',
+				'code' => 200,
+				'data' => [
+						'apkVersion'     => '2.0',//版本号
+						'apkPath'        => 'https://huobi-1253283450.file.myqcloud.com/bit/ops/app/android/533/huobi-0.apk?v=1568949568127',//下载路径
+						'apkDescription' => '更新一下, 提示一下',//更新描述
+						'lastUpdateTime' => time(),//上传更新时间
+						'apkSize'        => '410000',//apk大小
+						'isForceUpdate'  => '0',//是否强制更新 0/不强制 1/强制更新
+				]
 		], 320));
 	}
 
