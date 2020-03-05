@@ -82,8 +82,8 @@
 									<td>{$vo['ctime']|date="y-m-d H:i:s",###}</td>
 									<td>{$vo.check_code}</td>
 									<td>{eq name="vo.status" value="0"}待付款{/eq} {eq name="vo.status" value="1"}待放行{/eq} {eq name="vo.status" value="4"}已完成{/eq} {eq name="vo.status" value="5"}已关闭{/eq} {eq name="vo.status" value="6"}申诉中{/eq} {eq name="vo.status" value="9"}订单失败{/eq}</td>
-									<td>{eq name="vo.status" value="1"} <a id="{$vo.id}" class="btn btn-sm btn-danger release">放行</a> {/eq} {eq name="vo.status" value="0"}
-										<a id="{$vo.id}" class="btn btn-sm btn-danger release2">放行</a> {/eq}<a id="{$vo.id}" class="btn btn-sm btn-success appeal">申诉</a></td>
+									<td>{eq name="vo.status" value="1"} <a id="{$vo.id}" class="btn btn-sm btn-danger" onclick="release(this, false)">放行</a> {/eq} {eq name="vo.status" value="0"}
+										<a id="{$vo.id}" class="btn btn-sm btn-danger" onclick="release(this, true)">放行</a> {/eq}<a id="{$vo.id}" class="btn btn-sm btn-success appeal">申诉</a></td>
 								</tr>
 								{/volist}
 								</tbody>
@@ -99,70 +99,56 @@
 	<script src="/static/admin/js/layer/layer.js"></script>
 	<script> let type = 1;
 	function closePopUp() {layer.closeAll('loading');}
-	$('.release').click(function () {
-		let id = $(this).attr('id');
-		layer.load(0, {shade: [0.5, '#8f8f8f']});
-		layer.prompt({title: '输入交易密码，并确认', formType: 1}, function (val) {
+	/*已经标记付款的提交*/
+	function release(val, opt){
+		if(opt === true){
+			layer.confirm('确认继续吗，卖家尚未标记付款', {icon: 3, title: '提示'}, function (index) {
+				layer.closeAll();
+				confirm(val.id, index);
+			});
+		}else{
+			confirm(val.id, index);
+		}
+	}
+
+	function confirm(id, index){
+		layer.prompt({
+			title   : '输入交易密码，并确认',
+			formType: 1
+		}, function (val) {
+			layer.load(0, {shade: [0.5, '#8f8f8f']});
 			if (val) {
-				$.post("{:url('home/merchant/checkpaypass')}", {paypassword: val}, function (respone) {
-					if (respone.code == 1) {
+				$.post("{:url('home/merchant/checkpaypass')}", {paypassword: val}, function (resp) {
+					if (resp.code == 1) {
 						layer.close(val);
 						$.post("{:url('home/order/deal')}", {id: id, type: type}, function (data) {
 							setTimeout("closePopUp()", 4000);
+							layer.close(index);
 							if (data.code == 1) {
 								layer.msg(data.msg, {icon: 1});
 								window.location.reload();
 							} else {
-								layer.close(loader);
-								layer.msg(data.msg, {icon: 2});
+								layer.closeAll('loading');
+								if(data.msg == undefined){
+									console.log(data)
+									layer.msg('系统超时, 请稍后重试', {icon: 1});
+								}else{
+									layer.msg(data.msg, {icon: 2});
+								}
 							}
 						});
 					} else {
-						layer.close(loader);
-						layer.msg(respone.msg, {icon: 2});
+						layer.closeAll('loading');
+						layer.msg(resp.msg, {icon: 2});
 					}
 				});
 			} else {
-				layer.close(loader);
+				layer.closeAll('loading');
 				layer.msg('请输入交易密码!', {icon: 2});
 			}
 		});
-	});
-	$('.release2').click(function () {
-		let id = $(this).attr('id');
-		layer.load(0, {shade: [0.5, '#8f8f8f']});
-		layer.confirm('确认继续吗，卖家尚未标记付款', {icon: 3, title: '提示'}, function (index) {
-			layer.prompt({
-				title   : '输入交易密码，并确认',
-				formType: 1
-			}, function (val) {
-				if (val) {
-					$.post("{:url('home/merchant/checkpaypass')}", {paypassword: val}, function (respone) {
-						if (respone.code == 1) {
-							layer.close(val);
-							$.post("{:url('home/order/deal')}", {id: id, type: type}, function (data) {
-								setTimeout("closePopUp()", 4000);
-								layer.close(index);
-								if (data.code == 1) {
-									layer.msg(data.msg, {icon: 1});
-									window.location.reload();
-								} else {
-									layer.close(loader);
-									layer.msg(data.msg, {icon: 2});
-								}
-							});
-						} else {
-							layer.close(loader);
-							layer.msg(respone.msg, {icon: 2});
-						}
-					});
-				} else {
-					layer.close(loader);
-					layer.msg('请输入交易密码!', {icon: 2});
-				}
-			});
-		});
-	});
+	}
+	/*申诉*/
 	$('.appeal').click(function () {
 		let id = $(this).attr('id');
 		layer.prompt({title: '输入申诉理由，并确认', formType: 2}, function (val) {

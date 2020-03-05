@@ -21,7 +21,7 @@ class Order extends Base {
 			$mchModel         = new MerchantModel();
 			$where['id']      = $id;
 			$where['sell_id'] = $this->uid;
-			$orderInfo        = $orderModel->where($where)->find();
+			$orderInfo        = $orderModel->where($where)->lock()->find();
 			empty($orderInfo) && $this->error('订单不存在');
 			($orderInfo['status'] == 5) && $this->error('订单已经被取消');
 			($orderInfo['status'] == 6) && $this->error('订单申诉中，无法释放');
@@ -185,7 +185,7 @@ class Order extends Base {
 					// 提交事务
 					Db::commit();
 					financeLog($orderInfo['buy_id'], $mum, '买入USDT_f2', 0, session('user.name'));//添加日志
-					getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $orderInfo['deal_num'] + $orderInfo['fee'], session('user.name'));
+					getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $orderInfo['deal_num'] + $orderInfo['fee']);
 					$this->success('交易成功');
 				} else {
 					// 回滚事务

@@ -255,12 +255,12 @@
 								}
 							});
 						} else {
-							layer.close(loader);
+							layer.closeAll('loading');
 							layer.msg(respone.msg, {icon: 2});
 						}
 					});
 				} else {
-					layer.close(loader);
+					layer.closeAll('loading');
 					layer.msg('请输入交易密码!', {icon: 2});
 				}
 			});

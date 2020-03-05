@@ -8,11 +8,12 @@ use think\Exception\DbException;
 class Order extends Base {
 	public function buy($edit) {
 		$orderInfoModel = Db::name('order_buy')->where('id=' . $edit);
-		$orderInfo      = $orderInfoModel->find();
+		$orderInfo      = $orderInfoModel->lock()->find();
 		!$orderInfo && $this->error('订单不存在');
 		if (request()->isPost()) {
 			$args      = input('post.');
 			$srcStatus = $orderInfo['status'];
+			($args['status'] == 4) && ($args['status'] == $srcStatus) && showMsg('状态一致, 无需修改', 0);
 			($orderInfo['status'] == $args['status']) && ($orderInfo['deal_amount'] == $args['deal_amount']) && showMsg('操作成功', 1); //状态未改变
 			$updateArr = ['status' => $args['status']];
 			if ($args['deal_amount'] != $orderInfo['deal_amount']) {
