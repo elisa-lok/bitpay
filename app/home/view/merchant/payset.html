@@ -12,7 +12,7 @@
 					</ul>
 					<div class="tab-content table-responsive">
 						<div class="tab-pane active" id="tab_1464414772">
-							<form action="{:url('home/merchant/doaccount')}" method="post" accept-charset="UTF-8" class="form-horizontal" enctype="multipart/form-data" >
+							<form action="{:url('home/merchant/doaccount')}" method="post" accept-charset="UTF-8" class="form-horizontal" enctype="multipart/form-data">
 								<div class="box-body">
 									<div class="fields-group">
 										<div class="form-group ">
@@ -35,26 +35,25 @@
 											<label for="name" class="col-sm-2  control-label">开户银行</label>
 											<div class="col-sm-8">
 												<div class="input-group">
-													<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
-													<select id="c_bank" name="c_bank" class="form-control password">
-														<option value="中国银行">中国银行</option>
-														<option value="工商银行">工商银行</option>
-														<option value="建设银行">建设银行</option>
-														<option value="农业银行">农业银行</option>
-														<option value="交通银行">交通银行</option>
-														<option value="浦发银行">浦发银行</option>
-														<option value="光大银行">光大银行</option>
-														<option value="招商银行">招商银行</option>
-														<option value="广发银行">广发银行</option>
-														<option value="中信银行">中信银行</option>
-														<option value="民生银行">民生银行</option>
-														<option value="兴业银行">兴业银行</option>
-														<option value="华夏银行">华夏银行</option>
-														<option value="上海银行">上海银行</option>
-														<option value="邮政储蓄">邮政储蓄</option>
-														<option value="北京银行">北京银行</option>
-														<option value="平安银行">平安银行</option>
-													</select>
+													<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span> <select id="c_bank" name="c_bank" class="form-control password">
+													<option value="中国银行">中国银行</option>
+													<option value="工商银行">工商银行</option>
+													<option value="建设银行">建设银行</option>
+													<option value="农业银行">农业银行</option>
+													<option value="交通银行">交通银行</option>
+													<option value="浦发银行">浦发银行</option>
+													<option value="光大银行">光大银行</option>
+													<option value="招商银行">招商银行</option>
+													<option value="广发银行">广发银行</option>
+													<option value="中信银行">中信银行</option>
+													<option value="民生银行">民生银行</option>
+													<option value="兴业银行">兴业银行</option>
+													<option value="华夏银行">华夏银行</option>
+													<option value="上海银行">上海银行</option>
+													<option value="邮政储蓄">邮政储蓄</option>
+													<option value="北京银行">北京银行</option>
+													<option value="平安银行">平安银行</option>
+												</select>
 													<!-- <input type="text" id="c_bank" name="c_bank" value="" class="form-control password" placeholder="开户银行"> -->
 												</div>
 											</div>
@@ -145,7 +144,7 @@
 							</div>
 						</div>
 						<div class="tab-pane " id="tab_886859313">
-							<form action="{:url('home/merchant/doalipaynew')}" method="post" accept-charset="UTF-8" class="form-horizontal" enctype="multipart/form-data" >
+							<form action="{:url('home/merchant/doalipaynew')}" method="post" accept-charset="UTF-8" class="form-horizontal" enctype="multipart/form-data">
 								<div class="box-body">
 									<div class="fields-group">
 										<div class="form-group ">
@@ -176,8 +175,7 @@
 											<label for="name" class="col-sm-2  control-label">支付宝ID</label>
 											<div class="col-sm-8">
 												<div class="input-group">
-													<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
-													<input type="text" id="alipay_id" name="alipay_id" class="form-control alipay_account" placeholder="输入支付宝ID">
+													<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span> <input type="text" id="alipay_id" name="alipay_id" class="form-control alipay_account" placeholder="输入支付宝ID">
 												</div>
 												<a href="javascript:;" class="text-info" id="showId">如何获取支付宝ID?</a>
 											</div>
@@ -214,16 +212,16 @@
 												</div>
 											</div>
 										</div>
-                                        {eq name="ga" value="1"}
-                                        <div class="form-group 1">
-                                            <label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
-                                            <div class="col-sm-2">
-                                                <div class="input-group">
-                                                    <input type="text" name="ga" value="" class="form-control">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        {/eq}
+										{eq name="ga" value="1"}
+										<div class="form-group 1">
+											<label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
+											<div class="col-sm-2">
+												<div class="input-group">
+													<input type="text" name="ga" value="" class="form-control">
+												</div>
+											</div>
+										</div>
+										{/eq}
 										<!-- /.box-body -->
 										<div class="box-footer">
 											<div class="col-md-2"></div>
@@ -275,7 +273,7 @@
 						</div>
 					</div>
 					<div class="tab-pane " id="tab_1558780376">
-						<form action="{:url('home/merchant/dowechatnew')}" method="post" accept-charset="UTF-8" class="form-horizontal" enctype="multipart/form-data" >
+						<form action="{:url('home/merchant/dowechatnew')}" method="post" accept-charset="UTF-8" class="form-horizontal" enctype="multipart/form-data">
 							<div class="box-body">
 								<div class="fields-group">
 									<div class="form-group ">
@@ -334,16 +332,17 @@
 										</div>
 									</div>
 								</div>
-                                {eq name="ga" value="1"}
-                                <div class="form-group 1">
-                                    <label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
-                                    <div class="col-sm-2">
-                                        <div class="input-group">
-                                            <input type="text" name="ga" value="" class="form-control">
-                                        </div>
-                                    </div>
-                                </div>
-                                {/eq}		<div class="box-footer">
+								{eq name="ga" value="1"}
+								<div class="form-group 1">
+									<label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
+									<div class="col-sm-2">
+										<div class="input-group">
+											<input type="text" name="ga" value="" class="form-control">
+										</div>
+									</div>
+								</div>
+								{/eq}
+								<div class="box-footer">
 									<div class="col-md-2"></div>
 									<div class="col-md-8">
 										<div class="btn-group pull-right">
@@ -392,7 +391,7 @@
 						</div>
 					</div>
 					<div class="tab-pane " id="tab_23892081">
-						<form action="{:url('home/merchant/doysfnew')}" method="post" accept-charset="UTF-8" class="form-horizontal" enctype="multipart/form-data" >
+						<form action="{:url('home/merchant/doysfnew')}" method="post" accept-charset="UTF-8" class="form-horizontal" enctype="multipart/form-data">
 							<div class="box-body">
 								<div class="fields-group">
 									<div class="form-group ">
@@ -443,16 +442,16 @@
 										</div>
 									</div>
 								</div>
-                                {eq name="ga" value="1"}
-                                <div class="form-group 1">
-                                    <label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
-                                    <div class="col-sm-2">
-                                        <div class="input-group">
-                                            <input type="text" name="ga" value="" class="form-control">
-                                        </div>
-                                    </div>
-                                </div>
-                                {/eq}
+								{eq name="ga" value="1"}
+								<div class="form-group 1">
+									<label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
+									<div class="col-sm-2">
+										<div class="input-group">
+											<input type="text" name="ga" value="" class="form-control">
+										</div>
+									</div>
+								</div>
+								{/eq}
 								<div class="box-footer">
 									<div class="col-md-2"></div>
 									<div class="col-md-8">
@@ -539,8 +538,6 @@
 			layer.close(index);
 		})
 	})
-
-
 	$('.delzfb').click(function () {
 		// $(this).parent().parent().remove();return;
 		var id = $(this).attr('id');
@@ -575,28 +572,38 @@
 			layer.close(index);
 		})
 	})
-    $('#showId').on('click', function(){
-        layer.open({
-            type: 1
-            ,title: false //不显示标题栏
-            ,closeBtn: false
-            ,area: '300px;'
-            ,shade: 0.8
-            ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
-            ,btn: ['查看ID', '返 回']
-            ,btnAlign: 'c'
-            ,moveType: 1 //拖拽模式，0或者1
-            ,content: '<div style="padding: 50px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;text-align:center;">你知道吗？亲！<div id="qrcode" style="background-color:#fff;height:170px;width:170px;padding:10px;margin-left:15px"></div><br>扫一扫获取您的支付宝ID<br><br>获取您的支付宝ID不会对您的资金造成损失,只是为了对方能迅速给你转账.<br><br>如果您现在正用手机操作你也可以点击左下角按钮,查看您的支付宝ID<br><br>祝您交易愉快! ^_^</div>'
-            ,success: function(layero){
-                var btn = layero.find('.layui-layer-btn');
-                btn.find('.layui-layer-btn0').attr({
-                    href: '{$generate_alipayid}'
-                    ,target: '_blank'
-                });
-                $("#qrcode").qrcode({render: "canvas", size: 150, text: "{$generate_alipayid}"});
-            }
-        });
-    });
+	$('#showId').on('click', function () {
+		layer.open({
+			type      : 1
+			,
+			title     : false //不显示标题栏
+			,
+			closeBtn  : false
+			,
+			area      : '300px;'
+			,
+			shade     : 0.8
+			,
+			id        : 'LAY_layuipro' //设定一个id，防止重复弹出
+			,
+			btn       : ['查看ID', '返 回']
+			,
+			btnAlign  : 'c'
+			,
+			moveType  : 1 //拖拽模式，0或者1
+			,
+			content   : '<div style="padding: 50px; line-height: 22px; background-color: #393d49; color: #ffffff; font-weight: 300;text-align:center;">你知道吗？亲！<div id="qrcode" style="background-color:#ffffff;height:170px;width:170px;padding:10px;margin-left:15px"></div><br>扫一扫获取您的支付宝ID<br><br>获取您的支付宝ID不会对您的资金造成损失,只是为了对方能迅速给你转账.<br><br>如果您现在正用手机操作你也可以点击左下角按钮,查看您的支付宝ID<br><br>祝您交易愉快! ^_^</div>'
+			,
+			success   : function (layero) {
+				var btn = layero.find('.layui-layer-btn');
+				btn.find('.layui-layer-btn0').attr({
+					href    : '{$generate_alipayid}'
+					, target: '_blank'
+				});
+				$("#qrcode").qrcode({render: "canvas", size: 150, text: "{$generate_alipayid}"});
+			}
+		});
+	});
 	$('.delysf').click(function () {
 		// $(this).parent().parent().remove();return;
 		var id = $(this).attr('id');
@@ -617,7 +624,6 @@
 </script>
 <script>
 	$(function () {
-
 		$("input.avatar, input.avatar2").fileinput({
 			"overwriteInitial"    : true,
 			"initialPreviewAsData": true,
@@ -628,7 +634,6 @@
 			"deleteUrl"           : "http:\/\/we.btc360.io\/admin\/386",
 			"allowedFileTypes"    : ["image"]
 		});
-
 	});
 	$('.avatar, .avatar2').change(function () {
 		var url = getObjectURL(this.files[0]); //获取本地的文件地址
@@ -640,7 +645,6 @@
 			//$('.kv-preview-data').attr('src',url);
 		}
 	});
-
 	//本地URL地址解析
 	function getObjectURL(file) {
 		//不存在选择路径补null
@@ -658,16 +662,15 @@
 		}
 		return url;
 	}
-
 	function show(url) {
 		layer.open({
 			type      : 1,
 			title     : false,
 			closeBtn  : 0,
-			area      : ['300px', '300px'],
+			area      : ['300px'],
 			skin      : 'layui-layer-nobg', //没有背景色
 			shadeClose: true,
-			content   : '<img style="width:300px;height:300px;" src="/uploads/face/' + url + '">'
+			content   : '<img style="width:300px;" src="/uploads/face/' + url + '">'
 		});
 	}
 </script></div>{include file="Public:footer_new"/}
