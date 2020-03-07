@@ -7,8 +7,6 @@ use think\Db;
 class User extends Base {
 	/**
 	 * [index 用户列表]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function index() {
 		$key = input('key');
@@ -32,8 +30,6 @@ class User extends Base {
 
 	/**
 	 * [userAdd 添加用户]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function add() {
 		if (request()->isAjax()) {
@@ -55,8 +51,6 @@ class User extends Base {
 
 	/**
 	 * [userEdit 编辑用户]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function edit() {
 		$user = new UserModel();
@@ -82,8 +76,6 @@ class User extends Base {
 
 	/**
 	 * [UserDel 删除用户]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function del() {
 		$id = input('param.id');
@@ -95,8 +87,6 @@ class User extends Base {
 
 	/**
 	 * [user_state 用户状态]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function state() {
 		$id     = input('param.id');

@@ -7,8 +7,6 @@ use think\Db;
 class Role extends Base {
 	/**
 	 * [index 角色列表]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function index() {
 		$key = input('key');
@@ -37,8 +35,6 @@ class Role extends Base {
 
 	/**
 	 * [roleAdd 添加角色]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function add() {
 		if (request()->isAjax()) {
@@ -52,8 +48,6 @@ class Role extends Base {
 
 	/**
 	 * [roleEdit 编辑角色]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function edit() {
 		$role = new UserType();
@@ -69,8 +63,6 @@ class Role extends Base {
 
 	/**
 	 * [roleDel 删除角色]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function del() {
 		$id = input('param.id');
@@ -82,8 +74,6 @@ class Role extends Base {
 
 	/**
 	 * [role_state 用户状态]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function state() {
 		$id     = input('param.id');
@@ -99,8 +89,6 @@ class Role extends Base {
 
 	/**
 	 * [giveAccess 分配权限]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function giveAccess() {
 		$param = input('param.');

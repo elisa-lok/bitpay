@@ -9,7 +9,6 @@ class ArticleCateModel extends Model {
 
 	/**
 	 * [getAllCate 获取全部分类]
-	 * @author [] [864491238@qq.com]
 	 */
 	public function getAllCate() {
 		return $this->order('id ASC')->select();
@@ -17,7 +16,6 @@ class ArticleCateModel extends Model {
 
 	/**
 	 * [insertCate 添加分类]
-	 * @author [] [864491238@qq.com]
 	 */
 	public function insertCate($param) {
 		try {
@@ -29,7 +27,6 @@ class ArticleCateModel extends Model {
 
 	/**
 	 * [editMenu 编辑分类]
-	 * @author [] [864491238@qq.com]
 	 */
 	public function editCate($param) {
 		try {
@@ -47,7 +44,6 @@ class ArticleCateModel extends Model {
 	/**
 	 * [getOneMenu 根据分类id获取一条信息]
 	 * @return [type] [description]
-	 * @author [] [864491238@qq.com]
 	 */
 	public function getOneCate($id) {
 		return $this->where('id', $id)->find();
@@ -56,7 +52,6 @@ class ArticleCateModel extends Model {
 	/**
 	 * [delMenu 删除分类]
 	 * @return [type] [description]
-	 * @author [] [864491238@qq.com]
 	 */
 	public function delCate($id) {
 		try {

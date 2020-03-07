@@ -29,19 +29,20 @@
 					<table class="table table-bordered table-hover">
 						<thead>
 						<tr class="long-tr">
-							<th width="3%">ID</th>
-							<th width="5%">客户</th>
-							<th width="5%">变动前</th>
-							<th width="5%">变动后</th>
-							<th width="5%">变动数量</th>
-							<th width="5%">手续费</th>
-							<th width="5%">冻结前</th>
-							<th width="5%">冻结后</th>
-							<th width="5%">冻结变动</th>
-							<th width="5%">类型</th>
-							<th width="8%">单号</th>
-							<th width="5%">备注</th>
-							<th width="8%">时间</th>
+							<th>ID</th>
+							<th>客户</th>
+							<th>变动前</th>
+							<th>变动后</th>
+							<th>变动数量</th>
+							<th>手续费</th>
+							<th>冻结前</th>
+							<th>冻结后</th>
+							<th>冻结变动</th>
+							<th>类型</th>
+							<th>单号</th>
+							<th>备注</th>
+							<th>地址</th>
+							<th>时间</th>
 						</tr>
 						</thead>
 						<script id="list-template" type="text/html">
@@ -59,6 +60,7 @@
 								<td>{{d[i].action_type}}</td>
 								<td>{{d[i].relate_id}}</td>
 								<td>{{d[i].memo}}</td>
+								<td>{{d[i].ip}}|{{d[i].address}}</td>
 								<td>{{d[i].create_time}}</td>
 							</tr>
 							{{# } }}

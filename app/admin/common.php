@@ -29,11 +29,6 @@ function subTree($param, $pid = 0) {
 
 /**
  * 记录日志
- * @param  [type] $uid         [用户id]
- * @param  [type] $username    [用户名]
- * @param  [type] $description [描述]
- * @param  [type] $status      [状态]
- * @return [type]              [description]
  */
 function writelog($uid, $username, $description, $status) {
 	$data['admin_id']    = $uid;

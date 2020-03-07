@@ -133,7 +133,7 @@ class Login extends Base {
 				session('logid', $flag['code']);
 				session('uid', $return['data']['id']);
 				session('user', $return['data']);
-				writeMerchantlog($return['data']['id'], $username, '用户【' . $username . '】登录成功', 1);
+				writeMerchantLog($return['data']['id'], $username, '用户【' . $username . '】登录成功', 1);
 				$this->success($return['msg']);
 			}
 			$this->error($flag['msg']);

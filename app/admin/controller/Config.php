@@ -6,7 +6,6 @@ use think\Db;
 class Config extends Base {
 	/**
 	 * 获取配置参数
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function index() {
 		$list   = Db::name('config')->select();

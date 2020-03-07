@@ -102,8 +102,6 @@
    
     /**
      * [Ajaxpage laypage分页]
-     * @param {[type]} curr [当前页]
-     * @Author[田建龙 864491238@qq.com]
      */ 
     function Ajaxpage(curr){
 
@@ -140,7 +138,6 @@
 
 /**
  * [article_list 接收异步获取的数据渲染到模板]
- * @Author[田建龙 864491238@qq.com]
  */
 function article_list(list){
 
@@ -153,7 +150,6 @@ function article_list(list){
 
 /**
  * [edit_ad 编辑挂单]
- * @Author[田建龙 864491238@qq.com]
  */ 
 function edit_ad(id){
 
@@ -163,7 +159,6 @@ function edit_ad(id){
 
 /**
  * [del_ad 删除挂单]
- * @Author[田建龙 864491238@qq.com]
  */
 function del_ad(id){
     layer.confirm('确认删除此挂单?', {icon: 3, title:'提示'}, function(index){
@@ -184,7 +179,6 @@ function del_ad(id){
 
 /**
  * [ad_state 挂单状态]
- * @Author[田建龙 864491238@qq.com]
  */
 function ad_state(val){
     $.post('{:url("ad_state")}',

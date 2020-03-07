@@ -8,7 +8,6 @@ class Member extends Base {
 	//*********************************************会员组*********************************************//
 	/**
 	 * [group 会员组]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function group() {
 		$key = input('key');
@@ -33,7 +32,6 @@ class Member extends Base {
 
 	/**
 	 * [add_group 添加会员组]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function add_group() {
 		if (request()->isAjax()) {
@@ -47,7 +45,6 @@ class Member extends Base {
 
 	/**
 	 * [edit_group 编辑会员组]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function edit_group() {
 		$group = new MemberGroupModel();
@@ -63,7 +60,6 @@ class Member extends Base {
 
 	/**
 	 * [del_group 删除会员组]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function del_group() {
 		$id    = input('param.id');
@@ -74,7 +70,6 @@ class Member extends Base {
 
 	/**
 	 * [group_status 会员组状态]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function group_status() {
 		$id     = input('param.id');
@@ -93,7 +88,6 @@ class Member extends Base {
 
 	/**
 	 * 会员列表
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function index() {
 		$key           = input('key');
@@ -118,7 +112,6 @@ class Member extends Base {
 
 	/**
 	 * 添加会员
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function add_member() {
 		if (request()->isAjax()) {
@@ -135,7 +128,6 @@ class Member extends Base {
 
 	/**
 	 * 编辑会员
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function edit_member() {
 		$member = new MemberModel();
@@ -160,7 +152,6 @@ class Member extends Base {
 
 	/**
 	 * 删除会员
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function del_member() {
 		$id     = input('param.id');
@@ -171,7 +162,6 @@ class Member extends Base {
 
 	/**
 	 * 会员状态
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function member_status() {
 		$id     = input('param.id');

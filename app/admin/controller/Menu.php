@@ -7,8 +7,6 @@ use think\Db;
 class Menu extends Base {
 	/**
 	 * [index 菜单列表]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function index() {
 		$nav        = new Leftnav;
@@ -21,8 +19,6 @@ class Menu extends Base {
 
 	/**
 	 * [add_rule 添加菜单]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function add() {
 		if (request()->isAjax()) {
@@ -36,8 +32,6 @@ class Menu extends Base {
 
 	/**
 	 * [edit_rule 编辑菜单]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function edit() {
 		$menu = new MenuModel();
@@ -53,8 +47,6 @@ class Menu extends Base {
 
 	/**
 	 * [roleDel 删除角色]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function del() {
 		$id   = input('param.id');
@@ -65,8 +57,6 @@ class Menu extends Base {
 
 	/**
 	 * [ruleorder 排序]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function ruleOrderBy() {
 		if (request()->isAjax()) {
@@ -81,8 +71,6 @@ class Menu extends Base {
 
 	/**
 	 * [rule_state 菜单状态]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function state() {
 		$id     = input('param.id');

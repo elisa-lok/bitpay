@@ -9,7 +9,6 @@ class MenuModel extends Model {
 
 	/**
 	 * [getAllMenu 获取全部菜单]
-	 * @author [Max] [864491238@qq.com]
 	 */
 	public function getAllMenu() {
 		return $this->order('id ASC')->select();
@@ -17,7 +16,6 @@ class MenuModel extends Model {
 
 	/**
 	 * [insertMenu 添加菜单]
-	 * @author [Max] [864491238@qq.com]
 	 */
 	public function insertMenu($param) {
 		try {
@@ -36,7 +34,6 @@ class MenuModel extends Model {
 
 	/**
 	 * [editMenu 编辑菜单]
-	 * @author [Max] [864491238@qq.com]
 	 */
 	public function editMenu($param) {
 		try {
@@ -55,7 +52,6 @@ class MenuModel extends Model {
 
 	/**
 	 * [getOneMenu 根据菜单id获取一条信息]
-	 * @author [Max] [864491238@qq.com]
 	 */
 	public function getOneMenu($id) {
 		return $this->where('id', $id)->find();
@@ -63,7 +59,6 @@ class MenuModel extends Model {
 
 	/**
 	 * [delMenu 删除菜单]
-	 * @author [Max] [864491238@qq.com]
 	 */
 	public function delMenu($id) {
 		try {

@@ -5,7 +5,6 @@ use app\admin\Model\DemoModel;
 class Demo extends Base {
 	/**
 	 * 发送短信
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function sms() {
 		if (request()->isAjax()) {
@@ -21,7 +20,6 @@ class Demo extends Base {
 
 	/**
 	 * 生成二维码
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function qrcode() {
 		return $this->fetch();

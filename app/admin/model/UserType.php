@@ -10,7 +10,6 @@ class UserType extends Model {
 
 	/**
 	 * [getRoleByWhere 根据条件获取角色列表信息]
-	 * @author [Max] [864491238@qq.com]
 	 */
 	public function getRoleByWhere($map, $nowPage, $limits) {
 		return $this->where($map)->page($nowPage, $limits)->order('id DESC')->select();
@@ -18,7 +17,6 @@ class UserType extends Model {
 
 	/**
 	 * [getRoleByWhere 根据条件获取所有的角色数量]
-	 * @author [Max] [864491238@qq.com]
 	 */
 	public function getAllRole($where) {
 		return $this->where($where)->count();
@@ -26,7 +24,6 @@ class UserType extends Model {
 
 	/**
 	 * [insertRole 插入角色信息]
-	 * @author [Max] [864491238@qq.com]
 	 */
 	public function insertRole($param) {
 		try {
@@ -43,7 +40,6 @@ class UserType extends Model {
 
 	/**
 	 * [editRole 编辑角色信息]
-	 * @author [Max] [864491238@qq.com]
 	 */
 	public function editRole($param) {
 		try {
@@ -60,7 +56,6 @@ class UserType extends Model {
 
 	/**
 	 * [getOneRole 根据角色id获取角色信息]
-	 * @author [Max] [864491238@qq.com]
 	 */
 	public function getOneRole($id) {
 		return $this->where('id', $id)->find();
@@ -68,7 +63,6 @@ class UserType extends Model {
 
 	/**
 	 * [delRole 删除角色]
-	 * @author [Max] [864491238@qq.com]
 	 */
 	public function delRole($id) {
 		try {
@@ -81,7 +75,6 @@ class UserType extends Model {
 
 	/**
 	 * [getRole 获取所有的角色信息]
-	 * @author [Max] [864491238@qq.com]
 	 */
 	public function getRole() {
 		return $this->where('id', '<>', 1)->select();
@@ -89,7 +82,6 @@ class UserType extends Model {
 
 	/**
 	 * [getRole 获取角色的权限节点]
-	 * @author [Max] [864491238@qq.com]
 	 */
 	public function getRuleById($id) {
 		$res = $this->field('rules')->where('id', $id)->find();
@@ -98,7 +90,6 @@ class UserType extends Model {
 
 	/**
 	 * [editAccess 分配权限]
-	 * @author [Max] [864491238@qq.com]
 	 */
 	public function editAccess($param) {
 		try {
@@ -111,7 +102,6 @@ class UserType extends Model {
 
 	/**
 	 * [getRoleInfo 获取角色信息]
-	 * @author [Max] [864491238@qq.com]
 	 */
 	public function getRoleInfo($id) {
 		$result = Db::name('auth_group')->where('id', $id)->find();

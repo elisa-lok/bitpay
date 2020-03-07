@@ -10,7 +10,6 @@ use think\Session;
 class Data extends Base {
 	/**
 	 * 数据备份首页
-	 * @author 田建龙 <864491238@qq.com>
 	 */
 	public function index() {
 		$Db            = Db::connect();
@@ -25,7 +24,6 @@ class Data extends Base {
 	 * @param String  $ids   表名
 	 * @param Integer $id    表ID
 	 * @param Integer $start 起始行数
-	 * @author 田建龙 <864491238@qq.com>
 	 */
 	public function export($ids = NULL, $id = NULL, $start = NULL) {
 		$Request = Request::instance();

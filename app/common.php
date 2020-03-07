@@ -584,6 +584,7 @@ function balanceChange($enableTrans = TRUE, $uid = 0, float $modAmt = 0, float $
 			'action_type'       => $actType,
 			'relate_id'         => $relateId,
 			'memo'              => $memo,
+			'ip'                => getIp()
 	];
 	$res1   = Db::name('merchant')->where('id', $uid)->update(['usdt' => $newLog['amt_after'], 'usdtd' => $newLog['frozen_amt_after']]);
 	$res2   = Db::name('merchant_balance_log')->insert($newLog);
@@ -655,6 +656,7 @@ function balanceMod($enableTrans = TRUE, $uid = 0, float $afterAmt = 0, float $f
 			'action_type'       => $actType,
 			'relate_id'         => $relateId,
 			'memo'              => $memo,
+			'ip'                => getIp(),
 	];
 	$res1   = Db::name('merchant')->where('id', $uid)->update(['usdt' => $newLog['amt_after'], 'usdtd' => $newLog['frozen_amt_after']]);
 	$res2   = Db::name('merchant_balance_log')->insert($newLog);
@@ -677,8 +679,16 @@ function getIp() {
 	} elseif (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] && strcasecmp($_SERVER['REMOTE_ADDR'], 'unknown')) {
 		$ip = $_SERVER['REMOTE_ADDR'];
 	}
-	$res = preg_match('/[\d\.]{7,15}/', $ip, $matches) ? $matches [0] : '';
-	return $res;
+	return preg_match('/[\d\.]{7,15}/', $ip, $matches) ? $matches [0] : '';
+}
+
+function getAddressByIp($ip) {
+	if (!$ip) {
+		return '';
+	}
+	$Ip   = new  \com\IpLocation('UTFWry.dat'); // 实例化类 参数表示IP地址库文件
+	$addr = $Ip->getlocation($ip);
+	return $addr['country'] . $addr['area'];
 }
 
 // 获取最上层所赋予的卖单利润

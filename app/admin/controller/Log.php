@@ -7,8 +7,6 @@ use think\Db;
 class Log extends Base {
 	/**
 	 * [operate_log 操作日志]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function operate_log() {
 		$key = input('key');
@@ -40,8 +38,6 @@ class Log extends Base {
 
 	/**
 	 * [del_log 删除日志]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function del_log() {
 		$id   = input('param.id');
@@ -76,7 +72,7 @@ class Log extends Base {
 		return $this->fetch();
 	}
 
-	public function Capitalflow() {
+	public function CapitalFlow() {
 		$key     = input('key');
 		$arr     = Db::name("merchant")->column("name,id"); //获取用户列表
 		$nowPage = input('get.page') ? input('get.page') : 1;
@@ -100,6 +96,7 @@ class Log extends Base {
 			$list[$k]['frozen_amt_after']  = round($v['frozen_amt_after'], 8);
 			$list[$k]['frozen_amt_change'] = round($v['frozen_amt_change'], 8);
 			$list[$k]['frozen_amt_fee']    = round($v['frozen_amt_fee'], 8);
+			$list[$k]['address']           = getAddressByIp($v['ip']);
 		}
 		$this->assign('Nowpage', $nowPage); //当前页
 		$this->assign('allpage', $allPage); //总页数

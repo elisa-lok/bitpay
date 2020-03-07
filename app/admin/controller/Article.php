@@ -7,7 +7,6 @@ use think\Db;
 class Article extends Base {
 	/**
 	 * [index 文章列表]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function index() {
 		$key = input('key');
@@ -35,8 +34,6 @@ class Article extends Base {
 
 	/**
 	 * [add_article 添加文章]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function add_article() {
 		if (request()->isAjax()) {
@@ -52,8 +49,6 @@ class Article extends Base {
 
 	/**
 	 * [edit_article 编辑文章]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function edit_article() {
 		$article = new ArticleModel();
@@ -71,8 +66,6 @@ class Article extends Base {
 
 	/**
 	 * [del_article 删除文章]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function del_article() {
 		$id   = input('param.id');
@@ -83,8 +76,6 @@ class Article extends Base {
 
 	/**
 	 * [article_state 文章状态]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function article_state() {
 		$id     = input('param.id');
@@ -104,8 +95,6 @@ class Article extends Base {
 
 	/**
 	 * [index_cate 分类列表]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function index_cate() {
 		$cate  = new ArticleCateModel();
@@ -120,8 +109,6 @@ class Article extends Base {
 
 	/**
 	 * [add_cate 添加分类]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function add_cate() {
 		if (request()->isAjax()) {
@@ -135,8 +122,6 @@ class Article extends Base {
 
 	/**
 	 * [edit_cate 编辑分类]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function edit_cate() {
 		$cate = new ArticleCateModel();
@@ -152,8 +137,6 @@ class Article extends Base {
 
 	/**
 	 * [del_cate 删除分类]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function del_cate() {
 		$id   = input('param.id');
@@ -164,8 +147,6 @@ class Article extends Base {
 
 	/**
 	 * [cate_state 分类状态]
-	 * @return [type] [description]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function cate_state() {
 		$id     = input('param.id');

@@ -9,7 +9,6 @@ class ArticleModel extends Model {
 
 	/**
 	 * 根据搜索条件获取用户列表信息
-	 * @author [Max] [864491238@qq.com]
 	 */
 	public function getArticleByWhere($map, $nowPage, $limits) {
 		return $this->field('think_article.*,name')->join('think_article_cate', 'think_article.cate_id = think_article_cate.id')->where($map)->page($nowPage, $limits)->order('id DESC')->select();
@@ -17,7 +16,6 @@ class ArticleModel extends Model {
 
 	/**
 	 * [insertArticle 添加文章]
-	 * @author [Max] [864491238@qq.com]
 	 */
 	public function insertArticle($param) {
 		try {
@@ -34,7 +32,6 @@ class ArticleModel extends Model {
 
 	/**
 	 * [updateArticle 编辑文章]
-	 * @author [Max] [864491238@qq.com]
 	 */
 	public function updateArticle($param) {
 		try {
@@ -51,7 +48,6 @@ class ArticleModel extends Model {
 
 	/**
 	 * [getOneArticle 根据文章id获取一条信息]
-	 * @author [Max] [864491238@qq.com]
 	 */
 	public function getOneArticle($id) {
 		return $this->where('id', $id)->find();
@@ -59,7 +55,6 @@ class ArticleModel extends Model {
 
 	/**
 	 * [delArticle 删除文章]
-	 * @author [Max] [864491238@qq.com]
 	 */
 	public function delArticle($id) {
 		try {

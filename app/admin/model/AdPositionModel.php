@@ -9,7 +9,6 @@ class AdPositionModel extends Model {
 
 	/**
 	 * [getAll 根据条件获取全部数据]
-	 * @author [田建龙] [864491238@qq.com]
 	 */
 	public function getAll($nowPage, $limits) {
 		return $this->page($nowPage, $limits)->order('id ASC')->select();
@@ -59,7 +58,6 @@ class AdPositionModel extends Model {
 
 	/**
 	 * [getAll 获取全部挂单位]
-	 * @author [] [864491238@qq.com]
 	 */
 	public function getAllPosition() {
 		return $this->order('id ASC')->select();
