@@ -8,24 +8,24 @@
 }
 html,
 body {
-    font-family: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, 'Microsoft JhengHei', 'Microsoft Yahei', sans-serif !important;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    font-size: 14px;
-    color: #031c23;
+    font-family:"SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, 'Microsoft Yahei', sans-serif !important;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    font-size:14px;
+    color:#031c23;
     /*background: #f4f7fb;*/
-    height: 100vh;
+    height:100vh;
 }
 [v-cloak] {display: none;}
-a {text-decoration: none;}
-button {font-size: 16px;border: none;outline: none;-webkit-appearance: none;font-family: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, 'Microsoft JhengHei', 'Microsoft Yahei', sans-serif !important;}
-input {
-    border: none;
-    outline: none;
-    resize: none;
-    -webkit-appearance: none;
-    border-radius: 0;
-    cursor: pointer;
+a{text-decoration:none;}
+button{font-size:16px;border:none;outline:none;-webkit-appearance:none;font-family:"SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, 'Microsoft Yahei', sans-serif !important;}
+input{
+    border:none;
+    outline:none;
+    resize:none;
+    -webkit-appearance:none;
+    border-radius:0;
+    cursor:pointer;
 }
 input::-ms-clear {
     display: none;
@@ -642,17 +642,17 @@ header {
     background: #ffffff;
     width: 100%;
     -webkit-appearance: none;
-    outline: none;
-    resize: none;
-    border: none;
-    font-size: 14px;
-    line-height: 18px;
-    height: 18px;
-    min-height: 18px;
-    max-height: 36px;
-    overflow: hidden;
-    line-height: 17px;
-    font-family: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, 'Microsoft JhengHei', 'Microsoft Yahei', sans-serif;
+    outline:none;
+    resize:none;
+    border:none;
+    font-size:14px;
+    line-height:18px;
+    height:18px;
+    min-height:18px;
+    max-height:36px;
+    overflow:hidden;
+    line-height:17px;
+    font-family:"SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, 'Microsoft Yahei', sans-serif;
 }
 .chat_div .chat_box .time {
     line-height: 17px;

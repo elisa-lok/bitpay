@@ -1,7 +1,7 @@
 :root{--mainColor:#4267b2;--secColor:#4d70b8}
 html, body{min-height:100%}
 .layout-boxed html, .layout-boxed body{height:100%}
-body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-family:'Helvetica Neue', Helvetica, Arial, 'Microsoft JhengHei', 'Microsoft YaHei', sans-serif;overflow-x:hidden;overflow-y:auto}
+body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-family:'Helvetica Neue', Helvetica, Arial, 'Microsoft YaHei', sans-serif;overflow-x:hidden;overflow-y:auto}
 .wrapper{min-height:100%;position:relative;overflow:hidden}
 .wrapper:before, .wrapper:after{content:" ";display:table}
 .wrapper:after{clear:both}
@@ -30,8 +30,8 @@ body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-f
 .fixed.layout-boxed .wrapper{max-width:100%}
 body.hold-transition .content-wrapper, body.hold-transition .right-side, body.hold-transition .main-footer, body.hold-transition .main-sidebar, body.hold-transition .left-side, body.hold-transition .main-header > .navbar, body.hold-transition .main-header .logo{-webkit-transition:none;-o-transition:none;transition:none}
 .content{min-height:250px;padding:15px;margin-right:auto;margin-left:auto}
-h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6{font-family:Helvetica, Arial, 'Microsoft JhengHei', 'Microsoft YaHei', sans-serif}
-a{color:#fff}
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6{font-family:Helvetica, Arial, 'Microsoft YaHei', sans-serif}
+a{color:#ffffff}
 a:hover, a:active, a:focus{outline:0;text-decoration:none;color:#ff6c60}
 .page-header{margin:10px 0 20px 0;font-size:22px}
 .page-header > small{color:#666;display:block;margin-top:5px}
