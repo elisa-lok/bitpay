@@ -77,7 +77,7 @@
             if(data==''){
                 $("#list-content").html('<td colspan="12" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>');
             }else{
-                var tpl = document.getElementById('list-template').innerHTML;
+                let tpl = document.getElementById('list-template').innerHTML;
                 laytpl(tpl).render(data, function(html){
                     document.getElementById('list-content').innerHTML = html;
                 });

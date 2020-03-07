@@ -193,7 +193,7 @@
 	</section>
 	<script src="/static/admin/js/layer/layer.js"></script>
 	<script>
-		var type = 1;
+		let type = 1;
 		function closePopUp() {
 			layer.closeAll('loading');
 		}
@@ -207,9 +207,9 @@
 					layer.load(0, {shade: [0.5, '#8f8f8f']});
 				},
 				success   : function (data) {
-					var str1 = data.replace(/\\/g, "");
-					var str2 = str1.replace(/rn/g, "");
-					var str = str2.replace(/"/g, "");
+					let str1 = data.replace(/\\/g, "");
+					let str2 = str1.replace(/rn/g, "");
+					let str = str2.replace(/"/g, "");
 					layer.open({
 						type      : 1,
 						title     : '支付信息',
@@ -225,7 +225,7 @@
 			});
 		})
 		$('.shifang').click(function () {
-			var id = $(this).attr('id');
+			let id = $(this).attr('id');
 			layer.prompt({
 				title   : '输入交易密码，并确认',
 				formType: 1
@@ -267,7 +267,7 @@
 		});
 		$('.appeal').click(function () {
 			//alert($(this).attr('id'));
-			var id = $(this).attr('id');
+			let id = $(this).attr('id');
 			layer.prompt({
 				title   : '输入申诉理由，并确认',
 				formType: 2
@@ -330,11 +330,11 @@
 			});
 			$('.export-selected').click(function (e) {
 				e.preventDefault();
-				var rows = selectedRows().join(',');
+				let rows = selectedRows().join(',');
 				if (!rows) {
 					return false;
 				}
-				var href = $(this).attr('href').replace('__rows__', rows);
+				let href = $(this).attr('href').replace('__rows__', rows);
 				location.href = href;
 			});
 			$('.grid-refresh').on('click', function () {

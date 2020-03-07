@@ -380,14 +380,14 @@
 		})
 
 		$(".header-nav li").on("click",function(){
-			var index = $(this).index();
-			var aboutHei =$(".main-wrap>div").eq(index).offset().top+ (-100);
+			let index = $(this).index();
+			let aboutHei =$(".main-wrap>div").eq(index).offset().top+ (-100);
 			$("html,body").animate({scrollTop:aboutHei},500);
 		})
 
 		$(".dropDown-nav li").on("click",function(){
-			var index = $(this).index();
-			var aboutHei =$(".main-wrap>div").eq(index).offset().top+ (-100);
+			let index = $(this).index();
+			let aboutHei =$(".main-wrap>div").eq(index).offset().top+ (-100);
 			$("html,body").animate({scrollTop:aboutHei},500);
 			$(this).addClass("active")
 			$(this).siblings().removeClass("active");
@@ -396,14 +396,14 @@
 		})
 
 
-		var winHei = $(window).height()-100;
-			var winWid = $(window).width();
+		let winHei = $(window).height()-100;
+			let winWid = $(window).width();
 			console.log(winWid)
 
 			$("#video-desktop").css("height",winHei)
 
             if(winWid <= 1605){
-            	var divLeft =(winWid-1605)/2;
+            	let divLeft =(winWid-1605)/2;
                 //动态设置教师风采样式
                 $('#video-desktop>video').css({
                 	'position':'absolute',
@@ -411,8 +411,8 @@
                     'width':'1605px'
                 });
                  if(winWid <= 1100){
-                	var winWid1 = $(window).width()*2.5
-	            	var divLeft =(1100-winWid1)/2;
+                	let winWid1 = $(window).width()*2.5
+	            	let divLeft =(1100-winWid1)/2;
 	                //动态设置教师风采样式
 	                $('#video-desktop>video').css({
 	                	'position':'absolute',
@@ -421,7 +421,7 @@
 	                });
 
 	                if(winWid <= 700){
-		            	var divLeft =(winWid-1250)/2;
+		            	let divLeft =(winWid-1250)/2;
 		                //动态设置教师风采样式
 		                $('#video-desktop>video').css({
 		                	'position':'absolute',
@@ -434,14 +434,14 @@
             }
 
 		window.onresize = function(){
-			var winHei = $(window).height()-100;
-			var winWid = $(window).width();
+			let winHei = $(window).height()-100;
+			let winWid = $(window).width();
 			console.log(winWid)
 
 			$("#video-desktop").css("height",winHei)
 
             if(winWid <= 1605){
-            	var divLeft =(winWid-1605)/2;
+            	let divLeft =(winWid-1605)/2;
                 //动态设置教师风采样式
                 $('#video-desktop>video').css({
                 	'position':'absolute',
@@ -450,8 +450,8 @@
                 });
 
                 if(winWid <= 1100){
-                	var winWid1 = $(window).width()*2.5
-	            	var divLeft =(winWid1-1100)/2;
+                	let winWid1 = $(window).width()*2.5
+	            	let divLeft =(winWid1-1100)/2;
 	                //动态设置教师风采样式
 	                $('#video-desktop>video').css({
 	                	'position':'absolute',
@@ -460,7 +460,7 @@
 	                });
 
 	                if(winWid <= 705){
-		            	var divLeft =(winWid-1250)/2;
+		            	let divLeft =(winWid-1250)/2;
 		                //动态设置教师风采样式
 		                $('#video-desktop>video').css({
 		                	'position':'absolute',
@@ -476,22 +476,22 @@
 
 
 		window.onscroll = function(){
-		    var bodyH = document.body.scrollTop || document.documentElement.scrollTop;
-		    var bodyH1=document.body.offsetHeight || document.documentElement.offsetHeight;
+		    let bodyH = document.body.scrollTop || document.documentElement.scrollTop;
+		    let bodyH1=document.body.offsetHeight || document.documentElement.offsetHeight;
 		    if(bodyH>=100){
 		      	$("#header").addClass("header-bg-active")
 		    }
 		    else{
 		    	$("#header").removeClass("header-bg-active")
 		    }
-		    var hei1=$(".main-wrap>div").eq(0).offset().top+ (-110);
-		    var hei2=$(".main-wrap>div").eq(1).offset().top+ (-110);
-		    var hei3=$(".main-wrap>div").eq(2).offset().top+ (-110);
-		    var hei4=$(".main-wrap>div").eq(3).offset().top+ (-110);
-		    var hei5=$(".main-wrap>div").eq(4).offset().top+ (-110);
-		    var hei6=$(".main-wrap>div").eq(5).offset().top+ (-110);
-		    var hei7=$(".main-wrap>div").eq(6).offset().top+ (-110);
-		    // var hei8=$(".main-wrap>div").eq(7).offset().top+ (-110);
+		    let hei1=$(".main-wrap>div").eq(0).offset().top+ (-110);
+		    let hei2=$(".main-wrap>div").eq(1).offset().top+ (-110);
+		    let hei3=$(".main-wrap>div").eq(2).offset().top+ (-110);
+		    let hei4=$(".main-wrap>div").eq(3).offset().top+ (-110);
+		    let hei5=$(".main-wrap>div").eq(4).offset().top+ (-110);
+		    let hei6=$(".main-wrap>div").eq(5).offset().top+ (-110);
+		    let hei7=$(".main-wrap>div").eq(6).offset().top+ (-110);
+		    // let hei8=$(".main-wrap>div").eq(7).offset().top+ (-110);
 
 		    if(bodyH>=hei1&&bodyH<hei2){
 		      $(".header-nav li").removeClass("active").eq(0).addClass("active");

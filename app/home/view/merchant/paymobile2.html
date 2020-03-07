@@ -260,13 +260,13 @@
     }
 
     function is_weix() {
-        var ua = navigator.userAgent.toLowerCase();
+        let ua = navigator.userAgent.toLowerCase();
         if (ua.match(/MicroMessenger/i) == "micromessenger") {
             return "wx"; //是微信
         }
         return false; //其他浏览器
     }
-    var app = {
+    let app = {
         new_info: 0,
         state: 1,
         status: 0,
@@ -327,11 +327,11 @@
     }
 
     //需要获取信息
-    var dataTimer;
+    let dataTimer;
 
     function getBasicData() {
-        var d = {};
-        var state = 0;
+        let d = {};
+        let state = 0;
         if (app.img_type != 1 && app.src == '') {
             state = 1;
         }
@@ -422,10 +422,10 @@
                     $("#orderState").html("待收款确认");
                     clearInterval(t)
                     if (json.must_img != 0) {
-                        var str = json.img_text;
+                        let str = json.img_text;
                         if (str != '') {
                             if (json.img_type == 1) {
-                                var arr = str.split(",");
+                                let arr = str.split(",");
                                 app.userName = arr[0];
                                 app.card = arr[1];
                                 app.bankName = arr[2];
@@ -452,10 +452,10 @@
                     clearInterval(t)
                     $("#js_time").text("00:00:00")
                     if (json.must_img != 0) {
-                        var str = json.img_text;
+                        let str = json.img_text;
                         if (str != '') {
                             if (json.img_type == 1) {
-                                var arr = str.split(",");
+                                let arr = str.split(",");
                                 app.userName = arr[0];
                                 app.card = arr[1];
                                 app.bankName = arr[2];
@@ -484,10 +484,10 @@
                     $("#orderState").html("已取消");
                     clearTimeout(imTime);
                     if (json.must_img != 0) {
-                        var str = json.img_text;
+                        let str = json.img_text;
                         if (str != '') {
                             if (json.img_type == 1) {
-                                var arr = str.split(",");
+                                let arr = str.split(",");
                                 app.userName = arr[0];
                                 app.card = arr[1];
                                 app.bankName = arr[2];
@@ -519,10 +519,10 @@
                         }
                     }
                     if (json.must_img != 0) {
-                        var str = json.img_text;
+                        let str = json.img_text;
                         if (str != '') {
                             if (json.img_type == 1) {
-                                var arr = str.split(",");
+                                let arr = str.split(",");
                                 app.userName = arr[0];
                                 app.card = arr[1];
                                 app.bankName = arr[2];
@@ -547,7 +547,7 @@
             if (app.state == 0) {
                 getBasicData();
             } else {
-                var day = 0,
+                let day = 0,
                     hour = 0,
                     minute = 0,
                     second = 0; //时间默认值
@@ -574,9 +574,9 @@
         }, 3000)
     }
 
-    var that = app;
-    var copy1T, copy2T, copy3T, copy4T, copy5T, copy6T, copy7T;
-    var clipboard1 = new ClipboardJS('#copy1');
+    let that = app;
+    let copy1T, copy2T, copy3T, copy4T, copy5T, copy6T, copy7T;
+    let clipboard1 = new ClipboardJS('#copy1');
     clipboard1.on('success', function(e) {
         $("#copy1").html("复制成功")
         $("#copy1").addClass("dan")
@@ -587,7 +587,7 @@
         }, 2000)
         e.clearSelection()
     });
-    var clipboard2 = new ClipboardJS('#copy2');
+    let clipboard2 = new ClipboardJS('#copy2');
     clipboard2.on('success', function(e) {
         $("#copy2").html("复制成功")
         $("#copy2").addClass("dan")
@@ -598,7 +598,7 @@
         }, 2000)
         e.clearSelection()
     });
-    var clipboard3 = new ClipboardJS('#copy3');
+    let clipboard3 = new ClipboardJS('#copy3');
     clipboard3.on('success', function(e) {
         $("#copy3").html("复制成功")
         $("#copy3").addClass("dan")
@@ -609,7 +609,7 @@
         }, 2000)
         e.clearSelection()
     });
-    var clipboard4 = new ClipboardJS('#copy4');
+    let clipboard4 = new ClipboardJS('#copy4');
     clipboard4.on('success', function(e) {
         $("#copy4").html("复制成功")
         $("#copy4").addClass("gray")
@@ -620,7 +620,7 @@
         }, 2000)
         e.clearSelection()
     });
-    var clipboard5 = new ClipboardJS('#copy5');
+    let clipboard5 = new ClipboardJS('#copy5');
     clipboard5.on('success', function(e) {
         $("#copy5").html("复制成功")
         $("#copy5").addClass("gray")
@@ -631,7 +631,7 @@
         }, 2000)
         e.clearSelection()
     });
-    var clipboard6 = new ClipboardJS('#copy6');
+    let clipboard6 = new ClipboardJS('#copy6');
     clipboard6.on('success', function(e) {
         $("#copy6").html("复制成功")
         $("#copy6").addClass("gray")
@@ -642,7 +642,7 @@
         }, 2000)
         e.clearSelection()
     });
-    var clipboard7 = new ClipboardJS('#copy7');
+    let clipboard7 = new ClipboardJS('#copy7');
     clipboard7.on('success', function(e) {
         $("#copy7").html("复制成功")
         $("#copy7").addClass("gray")
@@ -655,34 +655,34 @@
     });
 
     function formatDateTime(timeStamp) {
-        var date = new Date();
+        let date = new Date();
         date.setTime(timeStamp * 1000);
-        var y = date.getFullYear();
-        var m = date.getMonth() + 1;
+        let y = date.getFullYear();
+        let m = date.getMonth() + 1;
         m = m < 10 ? ('0' + m) : m;
-        var d = date.getDate();
+        let d = date.getDate();
         d = d < 10 ? ('0' + d) : d;
-        var h = date.getHours();
+        let h = date.getHours();
         h = h < 10 ? ('0' + h) : h;
-        var minute = date.getMinutes();
-        var second = date.getSeconds();
+        let minute = date.getMinutes();
+        let second = date.getSeconds();
         minute = minute < 10 ? ('0' + minute) : minute;
         second = second < 10 ? ('0' + second) : second;
         return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second;
     }
 
-    var t;
+    let t;
     $(document).ready(function() {
         $(".text_div").eq(0).show();
-        var timeFun = null;
+        let timeFun = null;
         timeFun = setTimeout(function() {
             if (app.state < 2) {
                 $(".text_div").find("p").eq(0).html("支付通道拥塞，请重新提交支付！")
             }
         }, 30000)
-        var url = "https://niupay.gzxkah.cn/query/3013/949771/1/1554981358/83040/8877c87edf675239701a84fe99c2595d";
+        let url = "https://niupay.gzxkah.cn/query/3013/949771/1/1554981358/83040/8877c87edf675239701a84fe99c2595d";
         $("#order,#order_id").html("");
-        var img_index = 0;
+        let img_index = 0;
         t = setInterval(function() {
             $(".img_box img").eq(img_index).show().siblings().hide();
             if (img_index < 4) {
@@ -695,10 +695,10 @@
 
         getDataWithTimer();
     })
-    var $imPc = $("#importTc");
-    var $fkTc = $("#fkTc");
-    var $cancelTc = $("#cancelTc");
-    var imTime = null;
+    let $imPc = $("#importTc");
+    let $fkTc = $("#fkTc");
+    let $cancelTc = $("#cancelTc");
+    let imTime = null;
     $('#importTc .close,#importTc .button').click(function() {
         $imPc.hide();
         // if(!$("#checkInp")[0].checked) {
@@ -721,12 +721,12 @@
     })
     $cancelTc.find('.cancel').click(function() {
         //确认取消执行请求
-        var that = $(this);
+        let that = $(this);
         if (that.attr("disabled") == true || that.attr("disabled") == "disabled") {
             return;
         }
-        var a = $(".select_div p.active .check_box");
-        var reason = '';
+        let a = $(".select_div p.active .check_box");
+        let reason = '';
         if (a.data("mode") == 4) {
             reason = $("#otherText").val();
         } else {
@@ -739,7 +739,7 @@
         }
 
         that.attr("disabled", true);
-        var d = {};
+        let d = {};
         d['order_id'] = app.order_id;
         d['send_login_id'] = app.send_login_id;
         d['recv_login_id'] = app.recv_login_id;
@@ -776,22 +776,22 @@
     })
     $fkTc.find('.button').click(function() {
         //确认已付款执行请求
-        var that = $(this);
+        let that = $(this);
         if (that.attr("disabled") == true || that.attr("disabled") == "disabled") {
             return;
         }
-        var money = parseFloat($("#money3").val());
+        let money = parseFloat($("#money3").val());
         if (isNaN(money) || money < 1) {
             alert("请输入正确的金额");
             return;
         }
-        //			var account_name = $("#account_name").val();
+        //			let account_name = $("#account_name").val();
         //			if(account_name.length<1 || account_name.length>20){
         //				alert("请输入正确的账号或名字且不超过20个字符");
         //				return;
         //			}
         that.attr("disabled", true);
-        var d = {};
+        let d = {};
         d['order_id'] = app.order_id;
         d['send_login_id'] = app.send_login_id;
         d['recv_login_id'] = app.recv_login_id;
@@ -829,13 +829,13 @@
 
     $('.press_button').click(function() {
         //确认已付款执行请求
-        var that = $(this);
+        let that = $(this);
         if (that.attr("disabled") == true || that.attr("disabled") == "disabled") {
             return;
         }
 
         that.attr("disabled", true);
-        var d = {};
+        let d = {};
         d['order_id'] = app.order_id;
         d['send_login_id'] = app.send_login_id;
         d['recv_login_id'] = app.recv_login_id;

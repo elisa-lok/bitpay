@@ -93,7 +93,7 @@
      */
     function Ajaxpage(curr){
 
-        var key=$('#key').val();
+        let key=$('#key').val();
         $.getJSON('{:url("Message/index")}', {
             page: curr || 1,key:key
         }, function(data){      //data是后台返回过来的JSON数据
@@ -129,7 +129,7 @@
  */
 function article_list(list){
 
-    var tpl = document.getElementById('arlist').innerHTML;
+    let tpl = document.getElementById('arlist').innerHTML;
     laytpl(tpl).render(list, function(html){
         document.getElementById('article_list').innerHTML = html;
     });
@@ -174,12 +174,12 @@ function ad_state(val){
     function(data){
 
         if(data.code==1){
-            var a='<span class="label label-danger">禁用</span>'
+            let a='<span class="label label-danger">禁用</span>'
             $('#zt'+val).html(a);
             layer.msg(data.msg,{icon:2,time:1500,shade: 0.1,});
             return false;
         }else{
-            var b='<span class="label label-info">开启</span>'
+            let b='<span class="label label-info">开启</span>'
             $('#zt'+val).html(b);
             layer.msg(data.msg,{icon:1,time:1500,shade: 0.1,});
             return false;

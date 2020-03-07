@@ -87,7 +87,7 @@
     <script src="/static/admin/js/layer/layer.js"></script>
     <script src="__JS__/pay/clipboard.min.js"></script>
     <script>
-        var clipboard, copyTimeout;
+        let clipboard, copyTimeout;
         function copyTarget(targetId) {
             targetId = "#" + targetId;
             targetText = $(targetId).html();
@@ -111,8 +111,8 @@
             }
             {/php}
 
-                var str = "<a href='{$url}" + txid + "' target='_blank'>查看交易详情:" + txid + "</a>";
-                // var str="<a href='https://www.omniexplorer.info/search/"+txid+"' target='_blank'>"+txid+"</a>";
+                let str = "<a href='{$url}" + txid + "' target='_blank'>查看交易详情:" + txid + "</a>";
+                // let str="<a href='https://www.omniexplorer.info/search/"+txid+"' target='_blank'>"+txid+"</a>";
                 layer.alert(str);
             }
     </script>

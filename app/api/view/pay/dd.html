@@ -490,11 +490,11 @@
 <script>$('#qrcode').qrcode({render: "canvas", size: 180, text: "{$user.alipayToCard.Short_link}"});</script>
 {/if}
 <script type="text/javascript" charset="utf-8">
-	var txId = '{$order.id}', txStatus = {$order.status}, txPayType = '{$order.pay_type}';
+	let txId = '{$order.id}', txStatus = {$order.status}, txPayType = '{$order.pay_type}';
 	/************************************ copy ************************************/
-	var clipboard, copyTimeout, imTime;
-	var payTypeArr = ['bank', 'alipay', 'wxpay', 'unionpay', 'alipayToCard'];
-	var PayIndex = '.' + payTypeArr[payTypeArr.indexOf(txPayType)];
+	let clipboard, copyTimeout, imTime;
+	let payTypeArr = ['bank', 'alipay', 'wxpay', 'unionpay', 'alipayToCard'];
+	let PayIndex = '.' + payTypeArr[payTypeArr.indexOf(txPayType)];
 	$(PayIndex).show();
 
 	function copyTarget(targetId) {
@@ -512,7 +512,7 @@
 	}
 
 	/************************************ copy end ************************************/
-	var confirmText;
+	let confirmText;
 	// 确认支付点击
 	$('#confirmTx').click(function () {
 		let payNotify = $('#payNotice');
@@ -594,7 +594,7 @@
 		window.location.href = '{$order.return_url}';
 	});
 
-	var countDownTimer, checkTimer, $fkTc = $("#fkTc"), $cancelTc = $("#cancelTc"), endTime = {$order.end_time};
+	let countDownTimer, checkTimer, $fkTc = $("#fkTc"), $cancelTc = $("#cancelTc"), endTime = {$order.end_time};
 
 	function countDown() {
 		if (endTime < parseInt(new Date().getTime() / 1000) || txStatus == 5) {
@@ -609,7 +609,7 @@
 			countDownTimer = setInterval(function () {
 				let nowTime = parseInt(new Date().getTime() / 1000);
 				restTime = endTime - nowTime;
-				var day = 0, hour = 0, minute = 0, second = 0; //时间默认值
+				let day = 0, hour = 0, minute = 0, second = 0; //时间默认值
 				if (restTime > 0) {
 					day = Math.floor(restTime / (60 * 60 * 24));
 					hour = Math.floor(restTime / (60 * 60)) - (day * 24);

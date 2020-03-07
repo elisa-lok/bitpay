@@ -106,12 +106,12 @@ function cate_state(val){
     function(data){
          
         if(data.code==1){
-            var a='<span class="label label-danger">禁用</span>'
+            let a='<span class="label label-danger">禁用</span>'
             $('#zt'+val).html(a);
             layer.msg(data.msg,{icon:2,time:1500,shade: 0.1,});
             return false;
         }else{
-            var b='<span class="label label-info">开启</span>'
+            let b='<span class="label label-info">开启</span>'
             $('#zt'+val).html(b);
             layer.msg(data.msg,{icon:1,time:1500,shade: 0.1,});
             return false;

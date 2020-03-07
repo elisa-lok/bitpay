@@ -187,13 +187,13 @@
 <script src="__JS__/ethers-v4.min.js"></script>
 <script>
 		$('.ibox-title span').click(function(){
-			var num = $(this).attr('data-show');
+			let num = $(this).attr('data-show');
 			$(this).siblings('span').removeClass('label-success');
 			$(this).addClass('label-success');
 			$(this).parent().siblings('.ibox-content').children('h1').html(num);
 		})
         function addaddress1(){
-            var load;
+            let load;
             $.ajax({
                 url:'/admin/index/addaddress',
                 type:'post',
@@ -223,9 +223,9 @@
             })
         }
         function addaddress2(){
-           var load = layer.load();
+           let load = layer.load();
             // load = layer.load();
-            var provider = ethers.getDefaultProvider();//线上默认网络
+            let provider = ethers.getDefaultProvider();//线上默认网络
             for (var i = 0; i < 10; i++) {
                 const wallet = new ethers.Wallet.createRandom();
                 // wallet.provider = provider;
@@ -251,7 +251,7 @@
                             });
         }
 		function getUsdt(){
-			var load;
+			let load;
 			$.ajax({
 				url:'/admin/index/getUsdt',
 				type:'post',
@@ -266,7 +266,7 @@
 			})
 		}
 		function getBtc(){
-			var load;
+			let load;
 			$.ajax({
 				url:'/admin/index/getBtc',
 				type:'post',

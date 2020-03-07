@@ -75,9 +75,9 @@
                 $("#list-content").html('<td colspan="20" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>');
             }else{
 
-                var content_deal = document.getElementById('list-content');
-                var tpl_deal = document.getElementById('list-template').text;
-                var tempFn_deal = doT.template(tpl_deal);
+                let content_deal = document.getElementById('list-content');
+                let tpl_deal = document.getElementById('list-template').text;
+                let tempFn_deal = doT.template(tpl_deal);
                 content_deal.innerHTML = tempFn_deal(data);
 
                 laypage({

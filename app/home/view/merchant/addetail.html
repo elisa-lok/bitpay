@@ -43,7 +43,7 @@
 										</div>&nbsp;
 									</div>
 								</div>
-								<div class="form-group 1"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 出售数量</label>
+								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 出售数量</label>
 									<div class="col-sm-2">
 										<div class="input-group"><input type="text" name="amount" value="" id="amount0" class="form-control"><span class="input-group-addon">CNY</span></div>
 									</div>
@@ -52,7 +52,7 @@
 										<div class="input-group"><input type="text" name="qty" value="" id="qty0" class="form-control"><span class="input-group-addon">USDT</span></div>
 									</div>
 								</div>
-								<div class="form-group 1"><label class="col-sm-3 control-label"><em class="text-danger"></em> 收款方式</label>
+								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 收款方式</label>
 									<div class="col-sm-8"><label class="checkbox-inline"><select class="form-control" name="bank">
 										<option value="">选择银行账户</option>
 										{volist name="banks" id="v"}
@@ -74,7 +74,7 @@
 									</div>
 								</div>
 								{eq name="ga" value="1"}
-								<div class="form-group 1"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
+								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
 									<div class="col-sm-2">
 										<div class="input-group"><input type="text" name="ga" value="" class="form-control"></div>
 									</div>
@@ -100,24 +100,24 @@
 	</section>
 </div>
 <script src="/static/admin/js/layer/layer.js"></script>
-<script> var type = 0;
+<script> let type = 0;
 var price = {$ad.price};
 function getnum(num, ss) {
 	if (num.indexOf(".") != "-1") {
-		var barr = num.split(".");
-		var org = barr[1].substr(0, ss);
+		let barr = num.split(".");
+		let org = barr[1].substr(0, ss);
 		xin = parseFloat(barr[0] + "." + org);
 		return xin;
 	}
 }
 $('#amount' + type).css("ime-mode", "disabled").bind('keyup change', function () {
-	var amount = $('#amount' + type).val();
+	let amount = $('#amount' + type).val();
 	if (amount.indexOf(".") != "-1") {
-		var barr = amount.split(".");
-		var xiaoshu = barr[1].length;
+		let barr = amount.split(".");
+		let xiaoshu = barr[1].length;
 		if (xiaoshu > 2) {
-			var org = barr[1].substr(0, xiaoshu - 1);
-			var xin = parseFloat(barr[0] + "." + org);
+			let org = barr[1].substr(0, xiaoshu - 1);
+			let xin = parseFloat(barr[0] + "." + org);
 			$("#amount" + type).val(xin);
 		}
 	}
@@ -126,13 +126,13 @@ $('#amount' + type).css("ime-mode", "disabled").bind('keyup change', function ()
 	$('#qty' + type).val(btcnum);
 });
 $('#qty' + type).css("ime-mode", "disabled").bind('keyup change', function () {
-	var amount = $('#qty' + type).val();
+	let amount = $('#qty' + type).val();
 	if (amount.indexOf(".") != "-1") {
-		var barr = amount.split(".");
-		var xiaoshu = barr[1].length;
+		let barr = amount.split(".");
+		let xiaoshu = barr[1].length;
 		if (xiaoshu > 8) {
-			var org = barr[1].substr(0, xiaoshu - 1);
-			var xin = parseFloat(barr[0] + "." + org);
+			let org = barr[1].substr(0, xiaoshu - 1);
+			let xin = parseFloat(barr[0] + "." + org);
 			$("#qty" + type).val(xin);
 		}
 	}
@@ -141,10 +141,10 @@ $('#qty' + type).css("ime-mode", "disabled").bind('keyup change', function () {
 	$('#amount' + type).val(btcnum);
 });
 function trade() {
-	var amount = $('input[name="amount"]').val();
-	var qity = $('input[name="qity"]').val();
-	var mint = {$ad.min_limit};
-	var maxt = {$ad.max_limit};
+	let amount = $('input[name="amount"]').val();
+	let qity = $('input[name="qity"]').val();
+	let mint = {$ad.min_limit};
+	let maxt = {$ad.max_limit};
 	if (amount == '') {
 		layer.tips('请输入要出售的金额', '#qty' + type, {tips: 3});
 		return false;

@@ -66,10 +66,10 @@
         });
         
         function checkForm(){
-            var mobile = $('#mobile').val();
-            var tplcode = $('#tplcode').val();
-            var code = $('#code').val();
-            var myreg = /^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/; 
+            let mobile = $('#mobile').val();
+            let tplcode = $('#tplcode').val();
+            let code = $('#code').val();
+            let myreg = /^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
             if(!mobile){
                 layer.msg('请输入要发送的手机号码',{time:1500}, function(index){
                     layer.close(index);

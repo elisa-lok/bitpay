@@ -91,13 +91,13 @@
     //laypage分页
     Ajaxpage();
     function Ajaxpage(curr){
-        var key=$('#key').val();
+        let key=$('#key').val();
         $.getJSON('{:url("Merchant/traderreward")}', {page: curr || 1,key:key}, function(data){
             $(".spiner-example").css('display','none'); //数据加载完关闭动画 
             if(data==''){
                 $("#list-content").html('<td colspan="20" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>');
             }else{
-                var tpl = document.getElementById('list-template').innerHTML;
+                let tpl = document.getElementById('list-template').innerHTML;
                 laytpl(tpl).render(data, function(html){
                     document.getElementById('list-content').innerHTML = html;
                 });
@@ -134,8 +134,8 @@ function member_status(id){
     lunhui.status(id,'{:url("merchant_status")}');
 }
 function member_check(id, check){
-	var param = {};
-	var title;
+	let param = {};
+	let title;
 	param.id = id;
 	param.check = check;
 	if(check == 1){
@@ -147,8 +147,8 @@ function member_check(id, check){
 	lunhui.tongyong(param, "{:url('merchant_check')}", title);
 }
 function member_agent_check(id, check){
-	var param = {};
-	var title;
+	let param = {};
+	let title;
 	param.id = id;
 	param.check = check;
 	if(check == 1){

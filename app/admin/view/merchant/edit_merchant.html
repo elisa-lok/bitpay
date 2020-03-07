@@ -228,9 +228,9 @@
 {include file="public/footer" /}
 <script type="text/javascript" src="/static/admin/webupload/webuploader.min.js"></script>
 <script type="text/javascript">
-	var $list = $('#fileList');
+	let $list = $('#fileList');
 	//上传图片,初始化WebUploader
-	var uploader = WebUploader.create({
+	let uploader = WebUploader.create({
 		auto     : true,// 选完文件后，是否自动上传。
 		swf      : '/static/admin/webupload/Uploader.swf',// swf文件路径
 		server   : "{:url('Upload/uploadidcard')}",// 文件接收服务端。

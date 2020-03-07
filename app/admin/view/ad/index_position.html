@@ -79,7 +79,7 @@
         skin: '#1AB5B7',//分页组件颜色
         groups: 3,//连续显示分页数
         curr: function(){
-            var page = "{$nowpage}"; // 当前页(后台获取到的)
+            let page = "{$nowpage}"; // 当前页(后台获取到的)
             return page ? page : 1; // 返回当前页码值
         }(),
         jump: function(e, first){ //触发分页后的回调(单击页码后)
@@ -120,12 +120,12 @@ function position_state(val){
     function(data){
          
         if(data.code==1){
-            var a='<span class="label label-danger">禁用</span>'
+            let a='<span class="label label-danger">禁用</span>'
             $('#zt'+val).html(a);
             layer.msg(data.msg,{icon:2,time:1500,shade: 0.1,});
             return false;
         }else{
-            var b='<span class="label label-info">开启</span>'
+            let b='<span class="label label-info">开启</span>'
             $('#zt'+val).html(b);
             layer.msg(data.msg,{icon:1,time:1500,shade: 0.1,});
             return false;

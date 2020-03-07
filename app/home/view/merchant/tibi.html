@@ -192,11 +192,11 @@
     <script>
     function cancel(obj) {
         layer.confirm('确认撤销吗？', { btn: ['确定', '取消'], title: "提示" }, function() {
-            var id = $(obj).attr('data-id');
+            let id = $(obj).attr('data-id');
             if (id == null || id == undefined || id == '') {
                 layer.msg('参数错误', { icon: 2 });
             }
-            var url = '/home/merchant/cancel';
+            let url = '/home/merchant/cancel';
             $.ajax({
                 type: "post",
                 url: url,
@@ -246,12 +246,12 @@
         $('.export-selected').click(function(e) {
             e.preventDefault();
 
-            var rows = selectedRows().join(',');
+            let rows = selectedRows().join(',');
             if (!rows) {
                 return false;
             }
 
-            var href = $(this).attr('href').replace('__rows__', rows);
+            let href = $(this).attr('href').replace('__rows__', rows);
             location.href = href;
         });
 

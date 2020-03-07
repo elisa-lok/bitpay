@@ -131,14 +131,14 @@
 	Ajaxpage();
 
 	function Ajaxpage(curr) {
-		var key = $('#key').val();
-		var reg_type = $('#reg_type').val();
+		let key = $('#key').val();
+		let reg_type = $('#reg_type').val();
 		$.getJSON('{:url("Merchant/index")}', {page: curr || 1, key: key, reg_type: reg_type}, function (data) {
 			$(".spiner-example").css('display', 'none'); //数据加载完关闭动画
 			if (data == '') {
 				$("#list-content").html('<td colspan="20" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>');
 			} else {
-				var tpl = document.getElementById('list-template').innerHTML;
+				let tpl = document.getElementById('list-template').innerHTML;
 				laytpl(tpl).render(data, function (html) {
 					document.getElementById('list-content').innerHTML = html;
 				});
@@ -176,8 +176,8 @@
 	}
 
 	function member_check(id, check) {
-		var param = {};
-		var title;
+		let param = {};
+		let title;
 		param.id = id;
 		param.check = check;
 		if (check == 1) {
@@ -190,8 +190,8 @@
 	}
 
 	function member_agent_check(id, check) {
-		var param = {};
-		var title;
+		let param = {};
+		let title;
 		param.id = id;
 		param.check = check;
 		if (check == 1) {
@@ -204,8 +204,8 @@
 	}
 
 	function member_trader_check(id, check) {
-		var param = {};
-		var title;
+		let param = {};
+		let title;
 		param.id = id;
 		param.check = check;
 		if (check == 1) {

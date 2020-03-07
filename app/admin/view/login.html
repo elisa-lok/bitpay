@@ -49,7 +49,7 @@
 <script type="text/javascript" src="__JS__/lunhui.js"></script>
 <script type="text/javascript" src="__JS__/jquery.slider.min.js"></script>
 <script type="text/javascript">
-	var check_result = false;
+	let check_result = false;
 	$("#slider").slider({
 		width       : 233, // width
 		height      : 35, // height
@@ -94,7 +94,7 @@
 				lunhui.success(data.msg, data.url);
 			} else {
 				lunhui.error(data.msg);
-                var img = document.getElementById('captcha');
+                let img = document.getElementById('captcha');
                 img.src ='{:url('checkVerify')}?tm='+Math.random();
 				$('button').removeClass('disabled').text('登　录');
 				return false;

@@ -113,14 +113,14 @@
     //laypage分页
     Ajaxpage();
     function Ajaxpage(curr){
-        var key=$('#key').val();
-        var order = $('#order option:selected').val();
+        let key=$('#key').val();
+        let order = $('#order option:selected').val();
         $.getJSON('{:url("Merchant/merchantstatistics")}', {page: curr || 1, key:key, order:order}, function(data){
             $(".spiner-example").css('display','none'); //数据加载完关闭动画
             if(data==''){
                 $("#list-content").html('<td colspan="12" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>');
             }else{
-                var tpl = document.getElementById('list-template').innerHTML;
+                let tpl = document.getElementById('list-template').innerHTML;
                 laytpl(tpl).render(data, function(html){
                     document.getElementById('list-content').innerHTML = html;
                 });
@@ -145,7 +145,7 @@
     	$("[data-toggle='tooltip']").tooltip();
     	$("[data-toggle='tooltip']").click(function(){
     		console.log(1);
-    		var title = $(this).attr('data-original-title');$('#key').val(title);
+    		let title = $(this).attr('data-original-title');$('#key').val(title);
     	})
     });
 </script>

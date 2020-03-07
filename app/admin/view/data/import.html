@@ -68,7 +68,7 @@
     $(function () {
     
         $(".db-import").click(function () {
-            var self = this, status = ".";
+            let self = this, status = ".";
             $.get(self.href, success, "json");
             window.onbeforeunload = function () { return "正在还原数据库，请不要关闭！";};
             return false;

@@ -107,16 +107,16 @@
     //laypage分页
     Ajaxpage();
     function Ajaxpage(curr){
-        var key=$('#key').val();
-        var oid=$('#oid').val();
-        var status = $('#status option:selected').val();
+        let key=$('#key').val();
+        let oid=$('#oid').val();
+        let status = $('#status option:selected').val();
         $.getJSON('{:url("Merchant/order")}', {page: curr || 1,key:key, oid:oid,status:status}, function(data){
             // console.log(data)
             $(".spiner-example").css('display','none'); //数据加载完关闭动画
             if(data==''){
                 $("#list-content").html('<td colspan="13" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>');
             }else{
-                var tpl = document.getElementById('list-template').innerHTML;
+                let tpl = document.getElementById('list-template').innerHTML;
                 laytpl(tpl).render(data, function(html){
                     document.getElementById('list-content').innerHTML = html;
                 });
@@ -138,7 +138,7 @@
         });
     }
     function showtxid(txid){
-        var str="<a href='https://www.omniexplorer.info/search/"+txid+"' target='_blank'>"+txid+"</a>";
+        let str="<a href='https://www.omniexplorer.info/search/"+txid+"' target='_blank'>"+txid+"</a>";
         layer.alert(str);
     }
 
@@ -147,10 +147,10 @@
             type: 1,
             title: false,
             closeBtn: 0,
-            area: ['300px'],
+            area: ['300px','467px'],
             skin: 'layui-layer-nobg', //没有背景色
             shadeClose: true,
-            content: '<img style="width:300px;" src="'+url+'">'
+            content: '<img style="width:300px;height:467px;" src="'+url+'">'
         });
     }
     function showbank(url){

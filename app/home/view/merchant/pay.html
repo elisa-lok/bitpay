@@ -128,7 +128,7 @@
 </div>
 </body>
 <script>
-    var flag;
+    let flag;
     $('.usdt').mouseover(function() {
         $('.descusdt').show();
     });
@@ -136,25 +136,25 @@
         $('.descusdt').hide();
     });
     $('.paymethod li').click(function() {
-        var type = $(this).attr('data-type');
-        var showclass = $(this).attr('data-class');
+        let type = $(this).attr('data-type');
+        let showclass = $(this).attr('data-class');
         $('.paymethod li').removeClass('active');
         $(this).addClass('active');
         $('input[name="paymethod"]').val(type);
         $('.erweima').hide();
         $('.' + showclass).show();
     })
-    var remaintime = { $remaintime | default = 0 };
+    let remaintime = { $remaintime | default = 0 };
     if (remaintime > 0) {
         resetTime(remaintime);
     }
     CheckOutTime();
 
     function resetTime(time) {
-        var timer = null;
-        var t = time;
-        var m = 0;
-        var s = 0;
+        let timer = null;
+        let t = time;
+        let m = 0;
+        let s = 0;
         m = Math.floor(t / 60 % 60);
         m < 10 && (m = '0' + m);
         s = Math.floor(t % 60);
@@ -179,7 +179,7 @@
     }
 
     function CheckOutTime() {
-        var id = { $id | default = 0 };
+        let id = { $id | default = 0 };
         $.post('{:url("home/merchant/CheckOutTime")}', { id: id }, function(data) {
             if (data.code === 1) {
                 clearTimeout(flag);
@@ -197,8 +197,8 @@
         if (!confirm('确认继续操作吗？')) {
             return false;
         }
-        var appid = "{$appid|default=''}";
-        var id = { $id | default = 0 };
+        let appid = "{$appid|default=''}";
+        let id = { $id | default = 0 };
         $.post('{:url("home/merchant/uptrade")}', { id: id, appid: appid }, function(data) {
             if (data.code == 1) {
                 alert('操作成功，请等待承兑商释放');

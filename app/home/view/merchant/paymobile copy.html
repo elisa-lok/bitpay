@@ -142,8 +142,8 @@ g<!DOCTYPE html>
 </div>
 </body>
 <script>
-	var copy1T;
-	var clipboard1 = new ClipboardJS('#copy1');
+	let copy1T;
+	let clipboard1 = new ClipboardJS('#copy1');
 		clipboard1.on('success', function(e) {
 			$("#fz").html("(复制成功)")
 			clearTimeout(copy1T);
@@ -160,8 +160,8 @@ $('.usdt').mouseout(function(){
 	$('.descusdt').hide();
 });
 $('.paymethod li').click(function(){
-	var type = $(this).attr('data-type');
-	var showclass = $(this).attr('data-class');
+	let type = $(this).attr('data-type');
+	let showclass = $(this).attr('data-class');
 	$('.paymethod li').removeClass('active');
 	$(this).addClass('active');
 	$('input[name="paymethod"]').val(type);
@@ -174,10 +174,10 @@ if(remaintime > 0){
 }
 CheckOutTime();
 function resetTime(time){
-  var timer=null;
-  var t=time;
-  var m=0;
-  var s=0;
+  let timer=null;
+  let t=time;
+  let m=0;
+  let s=0;
   m=Math.floor(t/60%60);
   m<10&&(m='0'+m);
   s=Math.floor(t%60);
@@ -200,7 +200,7 @@ function resetTime(time){
   timer=setInterval(countDown,1000);
 }
 function CheckOutTime(){
-	var id = {$id|default=0};
+	let id = {$id|default=0};
 	$.post('{:url("home/merchant/CheckOutTime")}', {id:id}, function(data){
 		if(data.code === 1){
 			clearTimeout(flag);
@@ -218,8 +218,8 @@ function uptrade(){
 	if(!confirm('确认继续操作吗？')){
 		return false;
 	}
-	var appid = "{$appid|default=''}";
-	var id = {$id|default=0};
+	let appid = "{$appid|default=''}";
+	let id = {$id|default=0};
 	$.post('{:url("home/merchant/uptrade")}', {id:id, appid:appid}, function(data){
 		if(data.code == 1){
 			alert('操作成功，请等待承兑商释放');window.location.href=data.msg;

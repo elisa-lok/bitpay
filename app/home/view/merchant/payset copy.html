@@ -118,12 +118,12 @@
                                         <script src="/static/admin/js/layer/layer.js"></script>
                                         <script>
                                             $('.edit').click(function(){
-    var c_bank_card = $(this).parent().prev().prev().html();
-    var c_bank_detail = $(this).parent().prev().prev().prev().html();
-    var c_bank = $(this).parent().prev().prev().prev().prev().html();
-    var name = $(this).parent().prev().prev().prev().prev().prev().html();
-    var truename = $(this).parent().prev().prev().prev().prev().prev().prev().html();
-    var id = $(this).attr('data-id');
+    let c_bank_card = $(this).parent().prev().prev().html();
+    let c_bank_detail = $(this).parent().prev().prev().prev().html();
+    let c_bank = $(this).parent().prev().prev().prev().prev().html();
+    let name = $(this).parent().prev().prev().prev().prev().prev().html();
+    let truename = $(this).parent().prev().prev().prev().prev().prev().prev().html();
+    let id = $(this).attr('data-id');
     $('#c_bank').val(c_bank);
     $('#c_bank_detail').val(c_bank_detail);
     $('#c_bank_card').val(c_bank_card);
@@ -134,8 +134,8 @@
 })
 $('.del').click(function(){
     // $(this).parent().parent().remove();return;
-    var id = $(this).attr('id');
-    var obj = $(this);
+    let id = $(this).attr('id');
+    let obj = $(this);
     layer.confirm('确认删除此条记录吗?', {icon: 3, title:'提示'}, function(index){
         $.getJSON("{:url('home/merchant/delBank')}", {'id' : id}, function(res){
             if(res.code == 1){
@@ -298,7 +298,7 @@ $(function() {
 
 });
 $('.avatar, .avatar2').change(function() {
-    var url = getObjectURL(this.files[0]); //获取本地的文件地址
+    let url = getObjectURL(this.files[0]); //获取本地的文件地址
     if (url) {
         $(this).parent().find('img').attr('src', url); //修改图片路径
         //$('.kv-preview-data').attr('src',url);
@@ -315,7 +315,7 @@ function getObjectURL(file) {
     if (file == null) {
         return null;
     }
-    var url = null;
+    let url = null;
     if (window.createObjectURL != undefined) { // basic
         url = window.createObjectURL(file);
     } else if (window.URL != undefined) { // mozilla(firefox)

@@ -125,13 +125,13 @@
     //laypage分页
     Ajaxpage();
     function Ajaxpage(curr){
-        var key=$('#key').val();
+        let key=$('#key').val();
         $.getJSON('{:url("Role/index")}', {page: curr || 1,key:key}, function(data){
             $(".spiner-example").css('display','none'); //数据加载完关闭动画
             if(data==''){
                 $("#list-content").html('<td colspan="20" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>');
             }else{
-                var tpl = document.getElementById('list-template').innerHTML;
+                let tpl = document.getElementById('list-template').innerHTML;
                 laytpl(tpl).render(data, function(html){
                     document.getElementById('list-content').innerHTML = html;
                 });
@@ -172,8 +172,8 @@
     }
 
     zNodes = '';
-    var index = '';
-    var index2 = '';
+    let index = '';
+    let index2 = '';
     //分配权限
     function giveQx(id){
         $("#nodeid").val(id);
@@ -195,7 +195,7 @@
                 });
 
                 //设置zetree
-                var setting = {
+                let setting = {
                     check:{
                         enable:true
                     },
@@ -207,7 +207,7 @@
                 };
 
                 $.fn.zTree.init($("#treeType"), setting, zNodes);
-                var zTree = $.fn.zTree.getZTreeObj("treeType");
+                let zTree = $.fn.zTree.getZTreeObj("treeType");
                 zTree.expandAll(true);
 
             }else{
@@ -219,16 +219,16 @@
 
     //确认分配权限
     $("#postform").click(function(){
-        var zTree = $.fn.zTree.getZTreeObj("treeType");
-        var nodes = zTree.getCheckedNodes(true);
-        var NodeString = '';
+        let zTree = $.fn.zTree.getZTreeObj("treeType");
+        let nodes = zTree.getCheckedNodes(true);
+        let NodeString = '';
         $.each(nodes, function (n, value) {
             if(n>0){
                 NodeString += ',';
             }
             NodeString += value.id;
         });
-        var id = $("#nodeid").val();
+        let id = $("#nodeid").val();
         //写入库
         $.post('./giveAccess', {'type' : 'give', 'id' : id, 'rule' : NodeString}, function(res){
             layer.close(index);

@@ -83,7 +83,7 @@ $('.check-all').on('ifUnchecked', function (event) {
     $(function () {
      
         (function ($) {
-            var $form = $("#export-form"), $export = $("#export"), tables, $optimize = $("#optimize"), $repair = $("#repair");
+            let $form = $("#export-form"), $export = $("#export"), tables, $optimize = $("#optimize"), $repair = $("#repair");
             $optimize.add($repair).click(function () {
                 $.post($(this).attr('url'), $form.serialize(), function (data) {
                     if (data.code) {

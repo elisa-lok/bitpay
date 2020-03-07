@@ -161,12 +161,12 @@ $(function() {
         $('.export-selected').click(function(e) {
             e.preventDefault();
 
-            var rows = selectedRows().join(',');
+            let rows = selectedRows().join(',');
             if (!rows) {
                 return false;
             }
 
-            var href = $(this).attr('href').replace('__rows__', rows);
+            let href = $(this).attr('href').replace('__rows__', rows);
             location.href = href;
         });
 

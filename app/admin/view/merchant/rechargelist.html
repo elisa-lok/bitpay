@@ -110,15 +110,15 @@
     //laypage分页
     Ajaxpage();
     function Ajaxpage(curr){
-        var key=$('#key').val();
-        var keyuser=$('#keyuser').val();
-        var status = $('#status option:selected').val();
+        let key=$('#key').val();
+        let keyuser=$('#keyuser').val();
+        let status = $('#status option:selected').val();
         $.getJSON('{:url("Merchant/rechargelist")}', {page: curr || 1,key:key, keyuser:keyuser, status:status}, function(data){
             $(".spiner-example").css('display','none'); //数据加载完关闭动画
             if(data==''){
                 $("#list-content").html('<td colspan="10" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>');
             }else{
-                var tpl = document.getElementById('list-template').innerHTML;
+                let tpl = document.getElementById('list-template').innerHTML;
                 laytpl(tpl).render(data, function(html){
                     document.getElementById('list-content').innerHTML = html;
                 });
@@ -163,7 +163,7 @@ function refuse(id){
 	lunhui.myconfirm(id, '{:url("refuseWithdraw")}', '确认拒绝？');
 }
 function showtxid(txid){
-	// var str="<a href='https://www.omniexplorer.info/search/"+txid+"' target='_blank'>"+txid+"</a>";
+	// let str="<a href='https://www.omniexplorer.info/search/"+txid+"' target='_blank'>"+txid+"</a>";
 	// layer.alert(str);
      {php}
     if(config('wallettype')=='omni'){
@@ -174,8 +174,8 @@ function showtxid(txid){
     }
     {/php}
 
-    var str="<a href='{$url}"+txid+"' target='_blank'>查看交易详情:"+txid+"</a>";
-    // var str="<a href='https://www.omniexplorer.info/search/"+txid+"' target='_blank'>"+txid+"</a>";
+    let str="<a href='{$url}"+txid+"' target='_blank'>查看交易详情:"+txid+"</a>";
+    // let str="<a href='https://www.omniexplorer.info/search/"+txid+"' target='_blank'>"+txid+"</a>";
     layer.alert(str);
 }
 </script>

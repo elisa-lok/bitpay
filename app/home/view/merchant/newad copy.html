@@ -169,19 +169,19 @@
     </section>
     <script src="/static/admin/js/layer/layer.js"></script>
     <script>
-    var type = 1;
+    let type = 1;
 
     function jisuan() {
-        var amount = $('#amount').val();
-        var price = $('#price').val();
+        let amount = $('#amount').val();
+        let price = $('#price').val();
         $('#max_limit').val((amount * price).toFixed(2));
     }
 
     function getMax() {
-        var max_limit = $('#max_limit').val();
-        var amount = $('#amount').val();
-        var price = $('#price').val();
-        var max = (amount * price).toFixed(2);
+        let max_limit = $('#max_limit').val();
+        let amount = $('#amount').val();
+        let price = $('#price').val();
+        let max = (amount * price).toFixed(2);
         if (max < max_limit) {
             $('#max_limit').val(max);
         }

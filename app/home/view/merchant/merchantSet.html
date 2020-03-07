@@ -175,17 +175,17 @@
 
 <script>
 $(function () {
-    var delay = 30;
-    var now;
+    let delay = 30;
+    let now;
     $('.x-action-sms').each(function () {
-        var $btn = $(this);
+        let $btn = $(this);
         $btn.click(function () {
             if (this.disabled) {
                 return;
             }
             this.disabled = true;
-            var url = $btn.data('url');
-            var mobile = $btn.closest('.form-group').find('input').val();
+            let url = $btn.data('url');
+            let mobile = $btn.closest('.form-group').find('input').val();
 
             $.ajax({
                 url: url,
@@ -199,7 +199,7 @@ $(function () {
                     }
 
                     now = delay;
-                    var timer = setInterval(function () {
+                    let timer = setInterval(function () {
                         now--;
                         if (now == 0) {
                             clearInterval(timer);

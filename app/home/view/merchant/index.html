@@ -242,19 +242,19 @@
 				</div>
 				<script src="__JS__/echarts.common.min.js"></script>
 				<script>
-					var chart1 = echarts.init(document.getElementById('chart-1'));
+					let chart1 = echarts.init(document.getElementById('chart-1'));
 					chart1.setOption({tooltip: {trigger: 'axis'}, xAxis: {type: 'category', data: []}, yAxis: {type: 'value'}, series: [{name: '订单数量', data: [], type: 'line'}]});
-					var chart2 = echarts.init(document.getElementById('chart-2'), 'walden');
+					let chart2 = echarts.init(document.getElementById('chart-2'), 'walden');
 					chart2.setOption({tooltip: {trigger: 'axis'}, xAxis: {type: 'category', data: []}, yAxis: {type: 'value'}, series: [{name: '入金', data: [], type: 'line'}, {name: '出金', data: [], type: 'line'}]});
 				</script>
 				<!-- <script src="__JS__/ZeroClipboard.min.js"></script> -->
 				<script src="__JS__/pay/clipboard.min.js"></script>
 				<script>
 					$(document).ready(function () {
-						var clip1 = new ClipboardJS("#copy_button1");
-						var clip2 = new ClipboardJS("#copy_button2");
-						var clip3 = new ClipboardJS("#copy_button3");
-						var clip4 = new ClipboardJS("#copy_button4");
+						let clip1 = new ClipboardJS("#copy_button1");
+						let clip2 = new ClipboardJS("#copy_button2");
+						let clip3 = new ClipboardJS("#copy_button3");
+						let clip4 = new ClipboardJS("#copy_button4");
 						clip1.on("success", function (e) {layer.msg('复制成功！', {icon: 1});});
 						clip2.on("success", function (e) {layer.msg('复制成功！', {icon: 1});});
 						clip3.on("success", function (e) {layer.msg('复制成功！', {icon: 1});});
@@ -265,7 +265,7 @@
 		</div>
 	</section>
 	<script>
-		var clipboard, copyTimeout;
+		let clipboard, copyTimeout;
 		function copyTarget(targetId) {
 			targetId = "#" + targetId;
 			targetText = $(targetId).html();

@@ -102,15 +102,15 @@
 	//laypage分页
 	Ajaxpage();
 	function Ajaxpage(curr) {
-		var key = $('#key').val();
-		var oid = $('#oid').val();
-		var status = $('#status option:selected').val();
+		let key = $('#key').val();
+		let oid = $('#oid').val();
+		let status = $('#status option:selected').val();
 		$.getJSON('{:url("ad/buyadlist")}', {page: curr || 1, key: key, oid: oid, status: status}, function (data) {
 			$(".spiner-example").css('display', 'none'); //数据加载完关闭动画
 			if (data == '') {
 				$("#list-content").html('<td colspan="10" style="padding-top:10px;padding-bottom:10px;font-size:16px;text-align:center">暂无数据</td>');
 			} else {
-				var tpl = document.getElementById('list-template').innerHTML;
+				let tpl = document.getElementById('list-template').innerHTML;
 				laytpl(tpl).render(data, function (html) {
 					document.getElementById('list-content').innerHTML = html;
 				});

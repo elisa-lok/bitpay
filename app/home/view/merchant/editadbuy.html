@@ -164,11 +164,11 @@
     </section>
     <script src="/static/admin/js/layer/layer.js"></script>
     <script>
-    var type = 2;
+    let type = 2;
 
     function jisuan() {
-        var amount = $('#amount').val();
-        var price = $('#price').val();
+        let amount = $('#amount').val();
+        let price = $('#price').val();
         $('#max_limit').val((amount * price).toFixed(2));
     }
     </script>

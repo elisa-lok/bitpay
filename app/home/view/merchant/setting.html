@@ -92,25 +92,25 @@
 		});
 	});
 	$('.avatar').change(function () {
-		var url = getObjectURL(this.files[0]); /*获取本地的文件地址*/
+		let url = getObjectURL(this.files[0]); /*获取本地的文件地址*/
 		if (url) {/*$(this).parent().find('img').attr('src',url);//修改图片路径*/
 			$('.kv-preview-data').attr('src', url);
 		} else {/*$(this).parent().find('img').attr('src',defaultimage);*/
 			$('.kv-preview-data').attr('src', url);
 		}
 	});
-	var time = 60;
+	let time = 60;
 	function getcode() {
-		var mobile = {$Think.session.user['mobile']};
+		let mobile = {$Think.session.user['mobile']};
 		if (!mobile) {
 			layer.msg('请输入手机号');
 			return false;
-		}/* $.post("{:url('Home/Login/sendPhoneCodeModify')}",{mobile:mobile},function(data){ layer.msg(data.msg); if(data.code == 0){ $("#getcode").html("获取验证码"); $("#getcode").attr("onclick",'getcode()'); return false; }else{ var timer=setInterval(function(){ if(time>0){ $("#getcode").html(time+'s　'); $("#getcode").attr("onclick", ''); time--; }else{ time=60; $("#getcode").html("获取验证码"); $("#getcode").attr("onclick",'getcode()'); clearInterval(timer) } },1000) } })*/
+		}/* $.post("{:url('Home/Login/sendPhoneCodeModify')}",{mobile:mobile},function(data){ layer.msg(data.msg); if(data.code == 0){ $("#getcode").html("获取验证码"); $("#getcode").attr("onclick",'getcode()'); return false; }else{ let timer=setInterval(function(){ if(time>0){ $("#getcode").html(time+'s　'); $("#getcode").attr("onclick", ''); time--; }else{ time=60; $("#getcode").html("获取验证码"); $("#getcode").attr("onclick",'getcode()'); clearInterval(timer) } },1000) } })*/
 	}/*本地URL地址解析*/
 	function getObjectURL(file) {/*不存在选择路径补null*/
 		file = file ? file : null;
 		if (file == null) {return null;}
-		var url = null;
+		let url = null;
 		if (window.createObjectURL != undefined) { /* basic*/
 			url = window.createObjectURL(file);
 		} else if (window.URL != undefined) { /* mozilla(firefox)*/

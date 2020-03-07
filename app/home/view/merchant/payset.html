@@ -60,7 +60,7 @@
 										</div>
 									</div>
 									<div class="form-group  ">
-										<label for="password" class="col-sm-2  control-label">开户支行</label>
+										<label class="col-sm-2  control-label">开户支行</label>
 										<div class="col-sm-8">
 											<div class="input-group">
 												<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span> <input type="text" id="c_bank_detail" name="c_bank_detail" value="" class="form-control password" placeholder="开户支行">
@@ -68,7 +68,7 @@
 										</div>
 									</div>
 									<div class="form-group  ">
-										<label for="password_confirmation" class="col-sm-2  control-label">银行卡号</label>
+										<label class="col-sm-2  control-label">银行卡号</label>
 										<div class="col-sm-8">
 											<div class="input-group">
 												<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span> <input type="text" id="c_bank_card" name="c_bank_card" value="" class="form-control c_bank_card" placeholder="银行卡号">
@@ -76,7 +76,7 @@
 										</div>
 									</div>
 									<div class="form-group  ">
-										<label for="password_confirmation" class="col-sm-2  control-label">确认卡号</label>
+										<label class="col-sm-2  control-label">确认卡号</label>
 										<div class="col-sm-8">
 											<div class="input-group">
 												<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span> <input type="text" id="c_bank_card_again" name="c_bank_card_again" value="" class="form-control c_bank_card" placeholder="确认卡号">
@@ -84,7 +84,7 @@
 										</div>
 									</div>
 									{eq name="ga" value="1"}
-									<div class="form-group 1">
+									<div class="form-group">
 										<label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
 										<div class="col-sm-2">
 											<div class="input-group">
@@ -213,7 +213,7 @@
 											</div>
 										</div>
 										{eq name="ga" value="1"}
-										<div class="form-group 1">
+										<div class="form-group">
 											<label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
 											<div class="col-sm-2">
 												<div class="input-group">
@@ -333,7 +333,7 @@
 									</div>
 								</div>
 								{eq name="ga" value="1"}
-								<div class="form-group 1">
+								<div class="form-group">
 									<label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
 									<div class="col-sm-2">
 										<div class="input-group">
@@ -443,7 +443,7 @@
 									</div>
 								</div>
 								{eq name="ga" value="1"}
-								<div class="form-group 1">
+								<div class="form-group">
 									<label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
 									<div class="col-sm-2">
 										<div class="input-group">
@@ -507,12 +507,12 @@
 <script>$("#qrcode").qrcode({render: "canvas", size: 130, text: "{$generate_alipayid}"});</script>
 <script>
 	$('.edit').click(function () {
-		var c_bank_card = $(this).parent().prev().prev().html();
-		var c_bank_detail = $(this).parent().prev().prev().prev().html();
-		var c_bank = $(this).parent().prev().prev().prev().prev().html();
-		var name = $(this).parent().prev().prev().prev().prev().prev().html();
-		var truename = $(this).parent().prev().prev().prev().prev().prev().prev().html();
-		var id = $(this).attr('data-id');
+		let c_bank_card = $(this).parent().prev().prev().html();
+		let c_bank_detail = $(this).parent().prev().prev().prev().html();
+		let c_bank = $(this).parent().prev().prev().prev().prev().html();
+		let name = $(this).parent().prev().prev().prev().prev().prev().html();
+		let truename = $(this).parent().prev().prev().prev().prev().prev().prev().html();
+		let id = $(this).attr('data-id');
 		$('#c_bank').val(c_bank);
 		$('#c_bank_detail').val(c_bank_detail);
 		$('#c_bank_card').val(c_bank_card);
@@ -523,8 +523,8 @@
 	})
 	$('.del').click(function () {
 		// $(this).parent().parent().remove();return;
-		var id = $(this).attr('id');
-		var obj = $(this);
+		let id = $(this).attr('id');
+		let obj = $(this);
 		layer.confirm('确认删除此条记录吗?', {icon: 3, title: '提示'}, function (index) {
 			$.getJSON("{:url('home/merchant/delBank')}", {'id': id}, function (res) {
 				if (res.code == 1) {
@@ -540,8 +540,8 @@
 	})
 	$('.delzfb').click(function () {
 		// $(this).parent().parent().remove();return;
-		var id = $(this).attr('id');
-		var obj = $(this);
+		let id = $(this).attr('id');
+		let obj = $(this);
 		layer.confirm('确认删除此条记录吗?', {icon: 3, title: '提示'}, function (index) {
 			$.getJSON("{:url('home/merchant/delZfb')}", {'id': id}, function (res) {
 				if (res.code == 1) {
@@ -557,8 +557,8 @@
 	})
 	$('.delwx').click(function () {
 		// $(this).parent().parent().remove();return;
-		var id = $(this).attr('id');
-		var obj = $(this);
+		let id = $(this).attr('id');
+		let obj = $(this);
 		layer.confirm('确认删除此条记录吗?', {icon: 3, title: '提示'}, function (index) {
 			$.getJSON("{:url('home/merchant/delWx')}", {'id': id}, function (res) {
 				if (res.code == 1) {
@@ -595,7 +595,7 @@
 			content   : '<div style="padding: 50px; line-height: 22px; background-color: #393d49; color: #ffffff; font-weight: 300;text-align:center;">你知道吗？亲！<div id="qrcode" style="background-color:#ffffff;height:170px;width:170px;padding:10px;margin-left:15px"></div><br>扫一扫获取您的支付宝ID<br><br>获取您的支付宝ID不会对您的资金造成损失,只是为了对方能迅速给你转账.<br><br>如果您现在正用手机操作你也可以点击左下角按钮,查看您的支付宝ID<br><br>祝您交易愉快! ^_^</div>'
 			,
 			success   : function (layero) {
-				var btn = layero.find('.layui-layer-btn');
+				let btn = layero.find('.layui-layer-btn');
 				btn.find('.layui-layer-btn0').attr({
 					href    : '{$generate_alipayid}'
 					, target: '_blank'
@@ -606,8 +606,8 @@
 	});
 	$('.delysf').click(function () {
 		// $(this).parent().parent().remove();return;
-		var id = $(this).attr('id');
-		var obj = $(this);
+		let id = $(this).attr('id');
+		let obj = $(this);
 		layer.confirm('确认删除此条记录吗?', {icon: 3, title: '提示'}, function (index) {
 			$.getJSON("{:url('home/merchant/delYsf')}", {'id': id}, function (res) {
 				if (res.code == 1) {
@@ -636,7 +636,7 @@
 		});
 	});
 	$('.avatar, .avatar2').change(function () {
-		var url = getObjectURL(this.files[0]); //获取本地的文件地址
+		let url = getObjectURL(this.files[0]); //获取本地的文件地址
 		if (url) {
 			$(this).parent().find('img').attr('src', url); //修改图片路径
 			//$('.kv-preview-data').attr('src',url);
@@ -652,7 +652,7 @@
 		if (file == null) {
 			return null;
 		}
-		var url = null;
+		let url = null;
 		if (window.createObjectURL != undefined) { // basic
 			url = window.createObjectURL(file);
 		} else if (window.URL != undefined) { // mozilla(firefox)
@@ -667,10 +667,10 @@
 			type      : 1,
 			title     : false,
 			closeBtn  : 0,
-			area      : ['300px'],
+			area      : ['300px','467px'],
 			skin      : 'layui-layer-nobg', //没有背景色
 			shadeClose: true,
-			content   : '<img style="width:300px;" src="/uploads/face/' + url + '">'
+			content   : '<img style="width:300px;height:467px" src="/uploads/face/' + url + '">'
 		});
 	}
 </script></div>{include file="Public:footer_new"/}
