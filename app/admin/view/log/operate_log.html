@@ -40,7 +40,7 @@
                                 <th width="15%">描述</th>
                                 <th width="6%">状态</th>
                                 <th width="10%">操作时间</th>
-                                <th width="8%">操作</th>
+                                <!--<th width="8%">操作</th>-->
                             </tr>
                         </thead>
                         <script id="list-template" type="text/html">
@@ -58,11 +58,11 @@
                                         {{# } }}
                                     </td> 
                                     <td>{{d[i].add_time}}</td> 
-                                    <td>
-                                        <a href="javascript:;" onclick="del_log({{d[i].log_id}})" class="btn btn-danger btn-outline btn-xs">
-                                            <i class="fa fa-trash-o"></i> 删除
-                                        </a>
-                                    </td>
+                                    <!--<td>-->
+                                    <!--    <a href="javascript:;" onclick="del_log({{d[i].log_id}})" class="btn btn-danger btn-outline btn-xs">-->
+                                    <!--        <i class="fa fa-trash-o"></i> 删除-->
+                                    <!--    </a>-->
+                                    <!--</td>-->
                                 </tr>
                             {{# } }}
                         </script>
@@ -126,9 +126,9 @@
 
 
     //删除日志
-    function del_log(log_id){
-        lunhui.confirm(log_id,'{:url('del_log')}');
-    }
+    // function del_log(log_id){
+    //     lunhui.confirm(log_id,'{:url('del_log')}');
+    // }
 
 </script>
 </body>

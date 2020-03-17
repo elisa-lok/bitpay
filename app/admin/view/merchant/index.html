@@ -12,10 +12,7 @@
 				<div class="col-sm-12">
 					<form name="admin_list_sea" class="form-search" method="post" action="{:url('index')}">
 						<div class="col-sm-3">
-							<div class="input-group">
-								<input type="text" id="key" class="form-control" name="key" value="{$val}" placeholder="会员账号/昵称/手机号"/> <input type="hidden" name="reg_type" id="reg_type" value="{$reg_type}"/> <span class="input-group-btn">
-                                        <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> 搜索</button>
-                                    </span>
+							<div class="input-group"><input type="text" id="key" class="form-control" name="key" value="{$val}" placeholder="会员账号/昵称/手机号"/> <input type="hidden" name="reg_type" id="reg_type" value="{$reg_type}"/> <span class="input-group-btn"><button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> 搜索</button></span>
 							</div>
 						</div>
 					</form>
@@ -129,7 +126,6 @@
 <script type="text/javascript">
 	//laypage分页
 	Ajaxpage();
-
 	function Ajaxpage(curr) {
 		let key = $('#key').val();
 		let reg_type = $('#reg_type').val();
@@ -159,22 +155,18 @@
 			}
 		});
 	}
-
 	//编辑会员
 	function edit_member(id) {
 		location.href = '/admin/merchant/edit_merchant/id/' + id + '/reg_type/' + $('#reg_type').val() + '.html';
 	}
-
 	//删除会员
 	function del_member(id) {
 		lunhui.confirm(id, '{:url("del_merchant")}');
 	}
-
 	//用户会员
 	function member_status(id) {
 		lunhui.status(id, '{:url("merchant_status")}');
 	}
-
 	function member_check(id, check) {
 		let param = {};
 		let title;
@@ -188,7 +180,6 @@
 		//console.log(param);
 		lunhui.tongyong(param, "{:url('merchant_check')}", title);
 	}
-
 	function member_agent_check(id, check) {
 		let param = {};
 		let title;
@@ -202,7 +193,6 @@
 		//console.log(param);
 		lunhui.tongyong(param, "{:url('merchant_agent_check')}", title);
 	}
-
 	function member_trader_check(id, check) {
 		let param = {};
 		let title;

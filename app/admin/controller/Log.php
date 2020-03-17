@@ -39,12 +39,12 @@ class Log extends Base {
 	/**
 	 * [del_log 删除日志]
 	 */
-	public function del_log() {
-		$id   = input('param.id');
-		$log  = new LogModel();
-		$flag = $log->delLog($id);
-		return json(['code' => $flag['code'], 'data' => $flag['data'], 'msg' => $flag['msg']]);
-	}
+	// public function del_log() {
+	// 	$id   = input('param.id');
+	// 	$log  = new LogModel();
+	// 	$flag = $log->delLog($id);
+	// 	return json(['code' => $flag['code'], 'data' => $flag['data'], 'msg' => $flag['msg']]);
+	// }
 
 	public function financeLog() {//资金日志
 		$key = input('key');
