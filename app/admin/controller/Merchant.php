@@ -55,7 +55,7 @@ class Merchant extends Base {
 		$regType   = input('reg_type');
 		$map['id'] = ['gt', 0];
 		if ($key && $key !== '') {
-			$map['name|mobile'] = $key;
+			$map['name|mobile|id'] = ['like', '%'.$key.'%'];
 		}
 		$map['reg_type'] = $regType;
 		$member          = new MerchantModel();
@@ -250,6 +250,7 @@ class Merchant extends Base {
 			}
 			$amt  = $frozenAmt = 0;
 			$user = Db::name('merchant')->where('id', $param['id'])->find();
+			Db::startTrans();
 			if ($user['usdt'] != $param['usdt']) {
 				$amt = $amount = $param['usdt'] - $user['usdt'];
 				if ($amount < 0) {
@@ -270,10 +271,14 @@ class Merchant extends Base {
 				}
 				financeLog($param['id'], $amount, '后台修改USDT冻结余额', $type, $this->username);//添加日志
 			}
-			(($user['usdt'] != $param['usdt']) || $user['usdt'] != $param['usdt']) && ($amt != 0 || $frozenAmt != 0) && balanceChange(FALSE, $param['id'], $amt, 0, $frozenAmt, 0, BAL_SYS, '', '管理员修改');
+			if(($user['usdt'] != $param['usdt']) || ($user['usdtd'] != $param['usdtd'])){
+				!balanceChange(FALSE, $param['id'], $amt, 0, $frozenAmt, 0, BAL_SYS, '', '管理员修改') && $this->rollbackShowMsg('修改余额失败');
+			}
+
 			unset($param['usdt'], $param['usdtd']);
 			$this->addHistory($param['id'], $user, $param);
 			$flag = $member->editMerchant($param);
+			Db::commit();
 			showJson(['code' => $flag['code'], 'data' => $flag['data'], 'msg' => $flag['msg']]);
 		}
 		$id          = input('param.id');
