@@ -20,7 +20,7 @@ class Login extends Controller {
 				return $this->fetch('/login');
 			}
 		} else {
-			return $this->fetch('/login');
+			return $this->redirect('admin/index');
 		}
 	}
 
