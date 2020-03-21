@@ -10,9 +10,11 @@
 			<!--搜索框开始-->
 			<div class="row">
 				<div class="col-sm-12">
-					<form name="admin_list_sea" class="form-search" method="post" action="{:url('index')}">
+					<form name="admin_list_sea" class="form-search" method="get">
 						<div class="col-sm-3">
-							<div class="input-group"><input type="text" id="key" class="form-control" name="key" value="{$val}" placeholder="会员账号/昵称/手机号"/> <input type="hidden" name="reg_type" id="reg_type" value="{$reg_type}"/> <span class="input-group-btn"><button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> 搜索</button></span>
+							<div class="input-group"><input type="text" id="key" class="form-control" name="key" value="{$val}" placeholder="会员账号/昵称/手机号"/>
+								<input type="hidden" name="reg_type" id="reg_type" value="{$reg_type}"/>
+								<span class="input-group-btn"><button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> 搜索</button></span>
 							</div>
 						</div>
 					</form>
@@ -25,13 +27,13 @@
 					<table class="table table-bordered table-hover">
 						<thead>
 						<tr class="long-tr">
-							<th width="4%">ID</th>
-							<th width="9%">姓名</th>
+							<th width="3%">ID</th>
+							<th width="6%">姓名</th>
 							<th width="9%">手机号</th>
 							<th width="5%">邀请人</th>
 							<th width="6%">身份证</th>
-							<th width="5%">正面</th>
-							<th width="5%">反面</th>
+							<!--<th width="5%">正面</th>-->
+							<!--<th width="5%">反面</th>-->
 							<th width="5%">总USDT</th>
 							<th width="5%">可用USDT</th>
 							<th width="5%">冻结USDT</th>
@@ -53,12 +55,12 @@
 								<td>{{d[i].mobile}}</td>
 								<td>{{d[i].parent}}</td>
 								<td>{{d[i].idcard}}</td>
-								<td>
-									<a href="/uploads/idcard/{{d[i].idcard_zheng}}" target="_blank" title="点击查看原图"><img src="/uploads/idcard/{{d[i].idcard_zheng}}" class="img-circle" style="width:35px;height:35px" onerror="this.src='/static/admin/images/head_default.gif'"/></a>
-								</td>
-								<td>
-									<a href="/uploads/idcard/{{d[i].idcard_fan}}" target="_blank" title="点击查看原图"><img src="/uploads/idcard/{{d[i].idcard_fan}}" class="img-circle" style="width:35px;height:35px" onerror="this.src='/static/admin/images/head_default.gif'"/></a>
-								</td>
+								<!--<td>-->
+								<!--	<a href="/uploads/idcard/{{d[i].idcard_zheng}}" target="_blank" title="点击查看原图"><img src="/uploads/idcard/{{d[i].idcard_zheng}}" class="img-circle" style="width:35px;height:35px" onerror="this.src='/static/admin/images/head_default.gif'"/></a>-->
+								<!--</td>-->
+								<!--<td>-->
+								<!--	<a href="/uploads/idcard/{{d[i].idcard_fan}}" target="_blank" title="点击查看原图"><img src="/uploads/idcard/{{d[i].idcard_fan}}" class="img-circle" style="width:35px;height:35px" onerror="this.src='/static/admin/images/head_default.gif'"/></a>-->
+								<!--</td>-->
 								<td>{{d[i].total_usdt}}</td>
 								<td>{{d[i].usdt}}</td>
 								<td>{{d[i].usdtd}}</td>

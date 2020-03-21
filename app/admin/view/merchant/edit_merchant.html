@@ -1,12 +1,7 @@
 {include file="public/header" /}
 <link rel="stylesheet" type="text/css" href="/static/admin/webupload/webuploader.css">
 <link rel="stylesheet" type="text/css" href="/static/admin/webupload/style.css">
-<style>
-	.file-item{float:left; position:relative; width:110px;height:110px; margin:0 20px 20px 0; padding:4px;}
-	.file-item .info{overflow:hidden;}
-	.uploader-list{width:100%; overflow:hidden;}
-	.xz_a{margin-left:317px; display:none;}
-</style>
+<style>.input-group-addon{width:15px;}</style>
 <body class="gray-bg">
 <div class="wrapper wrapper-content">
 	<div class="row">
@@ -19,57 +14,55 @@
 					</div>
 				</div>
 				<div class="ibox-content">
-					<form class="form-horizontal" name="edit_member" id="edit_member" method="post" action="{:url('edit_merchant')}">
-						<input type="hidden" name="id" value="{$merchant.id}">
+					<form class="form-horizontal" id="edit_member">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">ID：</label>
+							<div class="input-group">
+								<input name="id" type="text" class="form-control" name="name" value="{$merchant.id}" placeholder="用户ID" readonly>
+							</div>
+						</div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">姓名：</label>
 							<div class="input-group">
 								<input id="account" type="text" class="form-control" name="name" value="{$merchant.name}" placeholder="请输入姓名">
 							</div>
 						</div>
-						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">手机号：</label>
 							<div class="input-group">
 								<input id="mobile" type="text" class="form-control" name="mobile" value="{$merchant.mobile}" placeholder="请输入手机号">
 							</div>
 						</div>
-						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">密码：</label>
 							<div class="input-group">
 								<input id="password" type="text" class="form-control" name="password" placeholder="请输入密码">
 							</div>
 						</div>
-						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">邀请人ID：</label>
 							<div class="input-group">
 								<input id="pid" type="text" class="form-control" name="pid" value="{$merchant.pid}" placeholder="请输入邀请人id">
 							</div>
 						</div>
-						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">身份证号：</label>
 							<div class="input-group">
 								<input id="idcard" type="text" class="form-control" name="idcard" value="{$merchant.idcard}" placeholder="请输入身份证号">
 							</div>
 						</div>
-						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">AppId：</label>
 							<div class="input-group">
 								<input id="appid" type="text" class="form-control" name="appid" value="{$merchant.appid}" placeholder="请输入appid">
 							</div>
 						</div>
-						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">key：</label>
 							<div class="input-group">
 								<input id="key" type="text" class="form-control" name="key" value="{$merchant.key}" placeholder="请输入密钥">
 							</div>
 						</div>
-						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">角色：</label>
 							<div class="radio i-checks">
@@ -77,7 +70,6 @@
 								<input type="radio" name='reg_type' value="3" {if condition="$merchant['reg_type'] eq 3 " }checked{/if}/>代理
 							</div>
 						</div>
-						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">状态：</label>
 							<div class="input-group">
@@ -86,105 +78,88 @@
 								</div>
 							</div>
 						</div>
-						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">可用USDT：</label>
 							<div class="input-group">
 								<input id="usdt" type="text" class="form-control" name="usdt" value="{$merchant.usdt}" placeholder="请输入可用usdt">
 							</div>
 						</div>
-						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">冻结USDT：</label>
 							<div class="input-group">
 								<input id="usdtd" type="text" class="form-control" name="usdtd" value="{$merchant.usdtd}" placeholder="请输入冻结usdt">
 							</div>
 						</div>
-						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">谷歌验证：</label>
 							<div class="input-group">
 								<input id="ga" type="text" class="form-control" name="ga" value="{$merchant.ga}" placeholder="请输入谷歌验证码">
 							</div>
 						</div>
-						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">提币手续费：</label>
 							<div class="input-group">
-								<input id="merchant_tibi_fee" type="text" class="form-control" name="merchant_tibi_fee" value="{$merchant.merchant_tibi_fee}" placeholder="请输入提币手续费">个
+								<input id="merchant_tibi_fee" type="text" class="form-control" name="merchant_tibi_fee" value="{$merchant.merchant_tibi_fee}" placeholder="请输入提币手续费"><span class="input-group-addon">个</span>
 							</div>
 						</div>
-						<!-- <div class="hr-line-dashed"></div>
+						<!-- 
 						  <div class="form-group">
 						   <label class="col-sm-3 control-label">USDT地址：</label>
 						   <div class="input-group">
 							   <input id="usdtb" type="text" class="form-control" name="usdtb" value="{$merchant.usdtb}" placeholder="USDT地址：">
 						   </div>
 					   </div> -->
-						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">用户充值手续费：</label>
 							<div class="input-group">
-								<input id="user_recharge_fee" type="text" class="form-control" name="user_recharge_fee" value="{$merchant.user_recharge_fee}" placeholder="请输入用户充值手续费">%
+								<input id="user_recharge_fee" type="text" class="form-control" name="user_recharge_fee" value="{$merchant.user_recharge_fee}" placeholder="请输入用户充值手续费"><span class="input-group-addon">%</span>
 							</div>
 						</div>
-						<!--承兑商-->
-						{eq name="merchant['trader_check']" value="1"}
-						<div class="hr-line-dashed"></div>
+						<!--承兑商-->						{eq name="merchant['trader_check']" value="1"}
 						<div class="form-group">
 							<label class="col-sm-3 control-label">承兑商充值手续费：</label>
 							<div class="input-group">
-								<input id="trader_recharge_fee" type="text" class="form-control" name="trader_recharge_fee" value="{$merchant.trader_recharge_fee}" placeholder="请输入承兑商充值手续费">%
+								<input id="trader_recharge_fee" type="text" class="form-control" name="trader_recharge_fee" value="{$merchant.trader_recharge_fee}" placeholder="请输入承兑商充值手续费"><span class="input-group-addon">%</span>
 							</div>
 						</div>
-						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">承兑商卖单奖励：</label>
 							<div class="input-group">
-								<input id="trader_trader_get" type="text" class="form-control" name="trader_trader_get" value="{$merchant.trader_trader_get}" placeholder="请输入承兑商卖单奖励">%
+								<input id="trader_trader_get" type="text" class="form-control" name="trader_trader_get" value="{$merchant.trader_trader_get}" placeholder="请输入承兑商卖单奖励"><span class="input-group-addon">%</span>
 							</div>
 						</div>
 						{/eq}
-						<!--商户-->
-						{eq name="merchant['reg_type']" value="1"}
-						<div class="hr-line-dashed"></div>
+						<!--商户-->						{eq name="merchant['reg_type']" value="1"}
 						<div class="form-group">
 							<label class="col-sm-3 control-label">商户盘口费率：</label>
 							<div class="input-group">
-								<input id="merchant_pk_fee" type="text" class="form-control" name="merchant_pk_fee" value="{$merchant.merchant_pk_fee}" placeholder="请输入商户盘口费率">%
+								<input id="merchant_pk_fee" type="text" class="form-control" name="merchant_pk_fee" value="{$merchant.merchant_pk_fee}" placeholder="请输入商户盘口费率"><span class="input-group-addon">%</span>
 							</div>
 						</div>
-						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">商户盘口提币手续费：</label>
-							<div class="input-group inline">
-								<input id="user_withdraw_fee" type="text" class="form-control" name="user_withdraw_fee" value="{$merchant.user_withdraw_fee}" placeholder="请输入盘口提币手续费">
-								<div class="input-group-append">
-									<span class="input-group-text">%</span>
-								</div>
+							<div class="input-group">
+								<input id="user_withdraw_fee" type="text" class="form-control" name="user_withdraw_fee" value="{$merchant.user_withdraw_fee}" placeholder="请输入盘口提币手续费"> <span class="input-group-addon">%</span>
 							</div>
 						</div>
 						{/eq}
-						<!--代理-->
-						{eq name="merchant['reg_type']" value="3"} {eq name="merchant['agent_check']" value="1"}
-						<div class="hr-line-dashed"></div>
+						<!--代理-->						{eq name="merchant['reg_type']" value="3"} {eq name="merchant['agent_check']" value="1"}
 						<div class="form-group">
 							<label class="col-sm-3 control-label">下级承兑卖单佣金比例：</label>
 							<div class="input-group">
-								<input id="trader_parent_get" type="text" class="form-control" name="trader_parent_get" value="{$merchant.trader_parent_get}" placeholder="下级承兑卖单佣金比例">%
+								<input id="trader_parent_get" type="text" class="form-control" name="trader_parent_get" value="{$merchant.trader_parent_get}" placeholder="下级承兑卖单佣金比例"><span class="input-group-addon">%</span>
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">下级承兑卖单利润比例：</label>
 							<div class="input-group">
-								<input id="tariff" type="text" class="form-control" name="tariff" value="{$merchant.tariff}" placeholder="下级承兑商卖单利润">%
+								<input id="tariff" type="text" class="form-control" name="tariff" value="{$merchant.tariff}" placeholder="下级承兑商卖单利润"><span class="input-group-addon">%</span>
 							</div>
 						</div>
-						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">下级商户买订单利润比例：</label>
 							<div class="input-group">
-								<input id="trader_merchant_parent_get" type="text" class="form-control" name="trader_merchant_parent_get" value="{$merchant.trader_merchant_parent_get}" placeholder="">%
+								<input id="trader_merchant_parent_get" type="text" class="form-control" name="trader_merchant_parent_get" value="{$merchant.trader_merchant_parent_get}" placeholder=""><span class="input-group-addon">%</span>
 							</div>
 						</div>
 						<div class="form-group">
@@ -196,15 +171,13 @@
 							</div>
 						</div>
 						{/eq}
-						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">商户代理利润：</label>
 							<div class="input-group">
-								<input id="trader_merchant_parent_get_new" type="text" class="form-control" name="trader_merchant_parent_get_new" value="{$merchant.trader_merchant_parent_get_new}" placeholder="商户代理购买订单利润">%
+								<input id="trader_merchant_parent_get_new" type="text" class="form-control" name="trader_merchant_parent_get_new" value="{$merchant.trader_merchant_parent_get_new}" placeholder="商户代理购买订单利润"><span class="input-group-addon">%</span>
 							</div>
 						</div>
 						{/eq}
-						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">匹配用户：</label>
 							<div class="input-group col-sm-9">
@@ -213,10 +186,9 @@
 								</div>
 							</div>
 						</div>
-						<div class="hr-line-dashed"></div>
 						<div class="form-group">
 							<div class="col-sm-4 col-sm-offset-3">
-								<button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> 保存</button>&nbsp;&nbsp;&nbsp; <a class="btn btn-danger" href="javascript:history.go(-1);"><i class="fa fa-close"></i> 返回</a>
+								<button class="btn btn-primary" type="button" id="submit"><i class="fa fa-save"></i> 保存</button>&nbsp;&nbsp;&nbsp; <a class="btn btn-danger" href="javascript:history.go(-1);"><i class="fa fa-close"></i> 返回</a>
 							</div>
 						</div>
 					</form>
@@ -226,77 +198,27 @@
 	</div>
 </div>
 {include file="public/footer" /}
-<script type="text/javascript" src="/static/admin/webupload/webuploader.min.js"></script>
 <script type="text/javascript">
-	let $list = $('#fileList');
-	//上传图片,初始化WebUploader
-	let uploader = WebUploader.create({
-		auto     : true,// 选完文件后，是否自动上传。
-		swf      : '/static/admin/webupload/Uploader.swf',// swf文件路径
-		server   : "{:url('Upload/uploadidcard')}",// 文件接收服务端。
-		duplicate: true,// 重复上传图片，true为可重复false为不可重复
-		pick     : '#imgPicker',// 选择文件的按钮。可选。
-		accept: {
-			title     : 'Images',
-			extensions: 'gif,jpg,jpeg,bmp,png',
-			mimeTypes : 'image/jpg,image/jpeg,image/png'
-		},
-		'onUploadSuccess': function (file, data, response) {
-			$("#idcard_zheng").val(data._raw);
-			$("#img_data").attr('src', '/uploads/idcard/' + data._raw).show();
-		}
-	});
-	$list = $('#fileList2');
-	//上传图片,初始化WebUploader
-	uploader = WebUploader.create({
-		auto     : true,// 选完文件后，是否自动上传。
-		swf      : '/static/admin/webupload/Uploader.swf',// swf文件路径
-		server   : "{:url('Upload/uploadidcard')}",// 文件接收服务端。
-		duplicate: true,// 重复上传图片，true为可重复false为不可重复
-		pick     : '#imgPicker2',// 选择文件的按钮。可选。
-		accept: {
-			title     : 'Images',
-			extensions: 'gif,jpg,jpeg,bmp,png',
-			mimeTypes : 'image/jpg,image/jpeg,image/png'
-		},
-		'onUploadSuccess': function (file, data, response) {
-			$("#idcard_fan").val(data._raw);
-			$("#img_data2").attr('src', '/uploads/idcard/' + data._raw).show();
-		}
-	});
-	uploader.on('fileQueued', function (file) {
-		$list.html('<div id="' + file.id + '" class="item">' +
-			'<h4 class="info">' + file.name + '</h4>' +
-			'<p class="state">正在上传...</p>' +
-			'</div>');
-	});
-	// 文件上传成功
-	uploader.on('uploadSuccess', function (file) {
-		$('#' + file.id).find('p.state').text('上传成功！');
-	});
-	// 文件上传失败，显示上传出错。
-	uploader.on('uploadError', function (file) {
-		$('#' + file.id).find('p.state').text('上传出错!');
-	});
 	//提交
-	$(function () {
-		$('#edit_member').ajaxForm({
-			beforeSubmit: checkForm,
-			success     : complete,
-			dataType    : 'json'
+	$("#submit").click(function () {
+		layer.confirm("确定保存?", {btn: ['确定', '取消'], title: "提示"}, function () {
+			$.ajax({
+				type    : 'POST',
+				url     : "{:url('edit_merchant')}",
+				data    : $('#edit_member').serialize(),
+				dataType: 'json',
+				success : function (data) {
+					if (data.code == 1) {
+						layer.msg(data.msg, {icon: 6, time: 1500, shade: 0.1}, function (index) {
+							window.history.go(-1);
+						});
+					} else {
+						layer.msg(data.msg, {icon: 5, time: 1500, shade: 0.1});
+						return false;
+					}
+				}
+			});
 		});
-		function checkForm() {
-		}
-		function complete(data) {
-			if (data.code == 1) {
-				layer.msg(data.msg, {icon: 6, time: 1500, shade: 0.1}, function (index) {
-					window.location.href = "{:url('merchant/index?reg_type='.$reg_type)}";
-				});
-			} else {
-				layer.msg(data.msg, {icon: 5, time: 1500, shade: 0.1});
-				return false;
-			}
-		}
 	});
 </script>
 </body></html>

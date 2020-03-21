@@ -51,13 +51,12 @@ class Merchant extends Base {
 	}
 
 	public function index() {
-		$key       = input('key');
-		$regType   = input('reg_type');
+		$key     = input('key');
 		$map['id'] = ['gt', 0];
 		if ($key && $key !== '') {
-			$map['name|mobile|id'] = ['like', '%'.$key.'%'];
+			$map['name|mobile|id'] = ['like', '%' . $key . '%'];
 		}
-		$map['reg_type'] = $regType;
+		$map['reg_type'] = input('reg_type');
 		$member          = new MerchantModel();
 		$nowPage         = input('get.page') ? input('get.page') : 1;
 		$limits          = config('list_rows');       // 获取总条数
@@ -65,14 +64,16 @@ class Merchant extends Base {
 		$allPage         = intval(ceil($count / $limits));
 		$lists           = $member->getMerchantByWhere($map, $nowPage, $limits);
 		foreach ($lists as $k => &$v) {
-			$v['total_usdt'] = $v['usdt'] + $v['usdtd'];
+			$v['total_usdt'] = round($v['usdt'] + $v['usdtd'], 8);
+			$v['usdt']       = round($v['usdt'], 8);
+			$v['usdtd']      = round($v['usdtd'], 8);
 			$v['addtime']    = getTime($v['addtime']);
 			$v['parent']     = $member->where('id', $v['pid'])->value('name');
 		}
 		$this->assign('Nowpage', $nowPage); //当前页
 		$this->assign('allpage', $allPage); //总页数
 		$this->assign('val', $key);
-		$this->assign('reg_type', $regType);
+		$this->assign('reg_type', $map['reg_type']);
 		(input('get.page')) && showJson($lists);
 		return $this->fetch();
 	}
@@ -231,81 +232,71 @@ class Merchant extends Base {
 	}
 
 	public function edit_merchant() {
-		$member = new MerchantModel();
-		if (request()->isAjax()) {
-			$param = input('post.');
-			if (empty($param['password'])) {
-				unset($param['password']);
-			} else {
-				$param['password'] = md5($param['password']);
-			}
-			if (!empty($param['pptrader'])) {
-				$tradersId = $member->where('trader_check', 1)->order('id ASC')->column('id');
-				shuffle($tradersId);
-				$param['pptrader'] = implode(',', $tradersId);
-			} elseif (!empty($param['pptraders']) && is_array($param['pptraders'])) {
-				$param['pptrader'] = implode(',', $param['pptraders']);
-			} else {
-				$param['pptrader'] = '';
-			}
-			$amt  = $frozenAmt = 0;
-			$user = Db::name('merchant')->where('id', $param['id'])->find();
-			Db::startTrans();
-			if ($user['usdt'] != $param['usdt']) {
-				$amt = $amount = $param['usdt'] - $user['usdt'];
-				if ($amount < 0) {
-					$amount = abs($amount);
-					$type   = 1;
-				} else {
-					$type = 0;
-				}
-				financeLog($param['id'], $amount, '后台修改USDT余额', $type, $this->username);//添加日志
-			}
-			if ($user['usdtd'] != $param['usdtd']) {
-				$frozenAmt = $amount = $param['usdtd'] - $user['usdtd'];
-				if ($amount < 0) {
-					$amount = abs($amount);
-					$type   = 1;
-				} else {
-					$type = 0;
-				}
-				financeLog($param['id'], $amount, '后台修改USDT冻结余额', $type, $this->username);//添加日志
-			}
-			if(($user['usdt'] != $param['usdt']) || ($user['usdtd'] != $param['usdtd'])){
-				!balanceChange(FALSE, $param['id'], $amt, 0, $frozenAmt, 0, BAL_SYS, '', '管理员修改') && $this->rollbackShowMsg('修改余额失败');
-			}
-
-			unset($param['usdt'], $param['usdtd']);
-			$this->addHistory($param['id'], $user, $param);
-			$flag = $member->editMerchant($param);
-			Db::commit();
-			showJson(['code' => $flag['code'], 'data' => $flag['data'], 'msg' => $flag['msg']]);
+		if (request()->isAjax() && request()->isPost()) {
+			Cache::has('editMember') ? $this->rollbackShowMsg('10s只能操作一次') : Cache::set('editMember', '1', 10);
+			$this->editMember();
 		}
+		$member      = new MerchantModel();
 		$id          = input('param.id');
 		$regType     = input('param.reg_type');
 		$minfo       = $member->getOneByWhere($id, 'id');
 		$matchTrader = explode(',', $minfo['pptrader']);
 		$traders     = $member->field('id, name')->where('trader_check', 1)->order('id ASC')->select();
-		/*	foreach ($traders as $k => &$v) {
-				if (in_array($v['id'], $matchTrader)) {
-					$status = 1;
-				} else {
-					$status = 0;
-				}
-			}*/
 		foreach ($traders as $k => &$v) {
-			if (in_array($v['id'], $matchTrader)) {
-				$v['ispp'] = 1;
-			} else {
-				$v['ispp'] = 0;
-			}
+			$v['ispp'] = in_array($v['id'], $matchTrader) ? 1 : 0;
 		}
-		$this->assign([
-				'merchant' => $minfo,
-				'traders'  => $traders,
-				'reg_type' => $regType,
-		]);
+		$this->assign(['merchant' => $minfo, 'traders' => $traders, 'reg_type' => $regType]);
 		return $this->fetch();
+	}
+
+	private function editMember() {
+		$member = new MerchantModel();
+		$param  = input('post.');
+		if (empty($param['password'])) {
+			unset($param['password']);
+		} else {
+			$param['password'] = md5($param['password']);
+		}
+		if (!empty($param['pptrader'])) {
+			$tradersId = $member->where('trader_check', 1)->order('id ASC')->column('id');
+			shuffle($tradersId);
+			$param['pptrader'] = implode(',', $tradersId);
+		} elseif (!empty($param['pptraders']) && is_array($param['pptraders'])) {
+			$param['pptrader'] = implode(',', $param['pptraders']);
+		} else {
+			$param['pptrader'] = '';
+		}
+		$amt  = $frozenAmt = 0;
+		$user = Db::name('merchant')->where('id', $param['id'])->find();
+		Db::startTrans();
+		if ($user['usdt'] != $param['usdt']) {
+			$amt = $amount = $param['usdt'] - $user['usdt'];
+			if ($amount < 0) {
+				$amount = abs($amount);
+				$type   = 1;
+			} else {
+				$type = 0;
+			}
+			financeLog($param['id'], $amount, '后台修改USDT余额', $type, $this->username);//添加日志
+		}
+		if ($user['usdtd'] != $param['usdtd']) {
+			$frozenAmt = $amount = $param['usdtd'] - $user['usdtd'];
+			if ($amount < 0) {
+				$amount = abs($amount);
+				$type   = 1;
+			} else {
+				$type = 0;
+			}
+			financeLog($param['id'], $amount, '后台修改USDT冻结余额', $type, $this->username);//添加日志
+		}
+		if (($user['usdt'] != $param['usdt']) || ($user['usdtd'] != $param['usdtd'])) {
+			!balanceChange(FALSE, $param['id'], $amt, 0, $frozenAmt, 0, BAL_SYS, '', '管理员修改') && $this->rollbackShowMsg('修改余额失败');
+		}
+		unset($param['usdt'], $param['usdtd']);
+		$this->addHistory($param['id'], $user, $param);
+		$flag = $member->editMerchant($param);
+		Db::commit();
+		showJson(['code' => $flag['code'], 'data' => $flag['data'], 'msg' => $flag['msg']]);
 	}
 
 	public function del_merchant() {
