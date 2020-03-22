@@ -266,33 +266,8 @@ class Merchant extends Base {
 		} else {
 			$param['pptrader'] = '';
 		}
-		$amt  = $frozenAmt = 0;
 		$user = Db::name('merchant')->where('id', $param['id'])->find();
 		Db::startTrans();
-		if ($user['usdt'] != $param['usdt']) {
-			$amt = $amount = $param['usdt'] - $user['usdt'];
-			if ($amount < 0) {
-				$amount = abs($amount);
-				$type   = 1;
-			} else {
-				$type = 0;
-			}
-			financeLog($param['id'], $amount, '后台修改USDT余额', $type, $this->username);//添加日志
-		}
-		if ($user['usdtd'] != $param['usdtd']) {
-			$frozenAmt = $amount = $param['usdtd'] - $user['usdtd'];
-			if ($amount < 0) {
-				$amount = abs($amount);
-				$type   = 1;
-			} else {
-				$type = 0;
-			}
-			financeLog($param['id'], $amount, '后台修改USDT冻结余额', $type, $this->username);//添加日志
-		}
-		if (($user['usdt'] != $param['usdt']) || ($user['usdtd'] != $param['usdtd'])) {
-			!balanceChange(FALSE, $param['id'], $amt, 0, $frozenAmt, 0, BAL_SYS, '', '管理员修改') && $this->rollbackShowMsg('修改余额失败');
-		}
-		unset($param['usdt'], $param['usdtd']);
 		$this->addHistory($param['id'], $user, $param);
 		$flag = $member->editMerchant($param);
 		Db::commit();

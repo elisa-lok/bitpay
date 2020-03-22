@@ -597,7 +597,7 @@ function balanceChange($enableTrans = TRUE, $uid = 0, float $modAmt = 0, float $
 }
 
 /**
- * * 修改金额, 直接填入输入后的金额
+ * 修改金额, 直接填入输入后的金额
  * @param bool   $enableTrans    是否启动事务
  * @param int    $uid            用户ID
  * @param float  $afterAmt       变动后金额
@@ -607,11 +607,11 @@ function balanceChange($enableTrans = TRUE, $uid = 0, float $modAmt = 0, float $
  * @param int    $actType
  * @param string $relateId       对应订单ID
  * @param string $memo           备注
- * @return bool|string
- * @throws \think\Exception
+ * @return bool
  * @throws DataNotFoundException
- * @throws ModelNotFoundException
  * @throws DbException
+ * @throws ModelNotFoundException
+ * @throws \think\Exception
  * @throws \think\exception\PDOException
  */
 function balanceMod($enableTrans = TRUE, $uid = 0, float $afterAmt = 0, float $fee = 0, float $afterFrozenAmt = 0, float $frozenFee = 0, $actType = 0, $relateId = '', $memo = '') {
