@@ -56,7 +56,7 @@ class Base extends Controller {
 		$this->assign('url', '/' . $c . '/' . $a);
 	}
 
-	private function setConfig() {
+	protected function setConfig() {
 		$config = cache('db_config_data');
 		if (!$config) {
 			$config = api('Config/lists');
@@ -72,7 +72,13 @@ class Base extends Controller {
 		die;
 	}
 
-	protected function getAdvNo() {
+	public function getAdvNo(){
+		$txId  = (int)(microtime(true) * 1000);
+		$ad = Db::name('ad_sell')->where(['ad_no' => $txId])->find();
+		return empty($ad) ? $txId : $this->getAdvNo();
+	}
+
+/*	protected function getAdvNo() {
 		$code = '';
 		for ($i = 1; $i <= 5; $i++) {
 			$code .= chr(rand(97, 122));
@@ -80,5 +86,5 @@ class Base extends Controller {
 		$adv_no  = $code . time();
 		$advsell = Db::name('ad_sell')->where(['ad_no' => $adv_no])->find();
 		return empty($advsell) ? $adv_no : $this->getAdvNo();
-	}
+	}*/
 }

@@ -51,7 +51,7 @@ class Merchant extends Base {
 	}
 
 	public function index() {
-		$key     = input('key');
+		$key       = input('key');
 		$map['id'] = ['gt', 0];
 		if ($key && $key !== '') {
 			$map['name|mobile|id'] = ['like', '%' . $key . '%'];
@@ -1015,10 +1015,10 @@ class Merchant extends Base {
 			$rs1 = balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$backAmount, 0, BAL_SOLD, $orderInfo['id'], '申诉失败操作');
 			// 更新买单信息
 			$updateCondition = $amount != $orderInfo['deal_amount'] ? ['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'platform_fee' => $platformMoney, 'deal_amount' => $amount, 'deal_num' => $orderInfo['deal_num']] : [
-					'id'            => $orderInfo['id'],
-					'status'        => 4,
-					'finished_time' => time(),
-					'platform_fee'  => $platformMoney
+				'id'            => $orderInfo['id'],
+				'status'        => 4,
+				'finished_time' => time(),
+				'platform_fee'  => $platformMoney
 			];
 			// 更新订单信息
 			!Db::name('order_buy')->update($updateCondition) && $this->rollbackAndMsg('更新订单失败', $id);
@@ -1068,11 +1068,11 @@ class Merchant extends Base {
 			getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $sum, $orderInfo['deal_num']);
 			//请求回调接口
 			$data = [
-					'amount'  => $orderInfo['deal_num'],
-					'rmb'     => $amount != $orderInfo['deal_amount'] ? $amount : $orderInfo['deal_amount'],
-					'orderid' => $orderInfo['orderid'],
-					'appid'   => $buyer['appid'],
-					'status'  => $type == 1 ? 1 : 0
+				'amount'  => $orderInfo['deal_num'],
+				'rmb'     => $amount != $orderInfo['deal_amount'] ? $amount : $orderInfo['deal_amount'],
+				'orderid' => $orderInfo['orderid'],
+				'appid'   => $buyer['appid'],
+				'status'  => $type == 1 ? 1 : 0
 			];
 			//$status && askNotify($data, $orderInfo['notify_url'], $buyer['key']);
 			Cache::rm($id);

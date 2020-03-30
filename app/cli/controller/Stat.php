@@ -63,6 +63,7 @@ class Stat extends Base {
 		]);
 		return $rs ? '更新统计表think_statistics成功' : '更新统计表think_statistics失败';
 	}
+
 }
 
 ?>
