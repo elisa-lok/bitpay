@@ -538,14 +538,14 @@ class Merchant extends Base {
 				$orderSn = createOrderNo(1, $this->uid);
 				$rs1     = balanceChange(FALSE, $this->uid, -$num, 0, $num, 0, BAL_WITHDRAW, $orderSn);
 				$rs2     = Db::name('merchant_withdraw')->insert([
-						'merchant_id' => $this->uid,
-						'address'     => $address,
-						'num'         => $num,
-						'fee'         => $feenum,
-						'mum'         => $mum,
-						'note'        => $remark,
-						'addtime'     => time(),
-						'ordersn'     => $orderSn
+					'merchant_id' => $this->uid,
+					'address'     => $address,
+					'num'         => $num,
+					'fee'         => $feenum,
+					'mum'         => $mum,
+					'note'        => $remark,
+					'addtime'     => time(),
+					'ordersn'     => $orderSn
 				]);
 				if ($rs1 && $rs2) {
 					// 提交事务
@@ -1307,29 +1307,31 @@ class Merchant extends Base {
 			$adNo = $this->getAdvNo();
 			$res1 = balanceChange(FALSE, $this->uid, -$amount, 0, $amount, 0, BAL_ENTRUST, $adNo);
 			if ($res1) {
-				Db::commit();
 				$model2 = new AdModel();
 				$flag   = $model2->insertOne([
-						'userid'        => $this->uid,
-						'add_time'      => time(),
-						'coin'          => '0',
-						'min_limit'     => $minLimit,
-						'max_limit'     => $maxLimit,
-						'pay_method'    => $codes['bank'],
-						'pay_method2'   => $codes['zfb'],
-						'pay_method3'   => $codes['wx'],
-						'pay_method4'   => $codes['ysf'],
-						'ad_no'         => $adNo,
-						'amount'        => $amount,
-						'remain_amount' => $amount,
-						'price'         => $price,
-						'message'       => '',
-						'state'         => 1
+					'userid'        => $this->uid,
+					'add_time'      => time(),
+					'coin'          => '0',
+					'min_limit'     => $minLimit,
+					'max_limit'     => $maxLimit,
+					'pay_method'    => $codes['bank'],
+					'pay_method2'   => $codes['zfb'],
+					'pay_method3'   => $codes['wx'],
+					'pay_method4'   => $codes['ysf'],
+					'ad_no'         => $adNo,
+					'amount'        => $amount,
+					'remain_amount' => $amount,
+					'price'         => $price,
+					'message'       => '',
+					'state'         => 1
 				]);
 				//增加在售挂单数
 				$count = $model2->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
-				$model->updateOne(['id' => $this->uid, 'ad_on_sell' => $count]);
-				($flag['code'] == 1) ? showMsg($flag['msg'], 1) : showMsg($flag['msg'], 0);
+				$res   = $model->updateOne(['id' => $this->uid, 'ad_on_sell' => $count]);
+				($flag['code'] !== 1) && $this->rollbackAndShow($flag['msg'], 0);
+				($res['code'] !== 1) && $this->rollbackAndShow($res['msg'], 0);
+				Db::commit();
+				showMsg($flag['msg'], 1);
 			} else {
 				Db::rollback();
 				showMsg('挂单失败,无法冻结余额', 0);
@@ -1429,19 +1431,19 @@ class Merchant extends Base {
 			$adNo   = $this->getAdvNo();
 			$model2 = new AdbuyModel();
 			$flag   = $model2->insertOne([
-					'userid'      => $this->uid,
-					'add_time'    => time(),
-					'coin'        => 'usdt',
-					'min_limit'   => $minLimit,
-					'max_limit'   => $maxLimit,
-					'pay_method'  => $codes['bank'],
-					'pay_method2' => $codes['zfb'],
-					'pay_method3' => $codes['wx'],
-					'pay_method4' => $codes['ysf'],
-					'ad_no'       => $adNo,
-					'amount'      => $amount,
-					'price'       => $price,
-					'state'       => 1
+				'userid'      => $this->uid,
+				'add_time'    => time(),
+				'coin'        => 'usdt',
+				'min_limit'   => $minLimit,
+				'max_limit'   => $maxLimit,
+				'pay_method'  => $codes['bank'],
+				'pay_method2' => $codes['zfb'],
+				'pay_method3' => $codes['wx'],
+				'pay_method4' => $codes['ysf'],
+				'ad_no'       => $adNo,
+				'amount'      => $amount,
+				'price'       => $price,
+				'state'       => 1
 			]);
 			//增加挂买数
 			$count = $model2->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
@@ -1710,23 +1712,23 @@ class Merchant extends Base {
 
 	public function BackArr($key) {
 		$bankArr = [
-				'工商银行' => 'ICBC',
-				'农业银行' => 'ABC',
-				'中国银行' => 'BOC',
-				'建设银行' => 'CCB',
-				'招商银行' => 'CMB',
-				'浦发银行' => 'SPDB',
-				'广发银行' => 'GDB',
-				'兴业银行' => 'CIB',
-				'北京银行' => 'BCCB',
-				'交通银行' => 'COMM',
-				'平安银行' => 'SPABANK',
-				'光大银行' => 'CEB',
-				'中信银行' => 'CNCB',
-				'民生银行' => 'CMBC',
-				'华夏银行' => 'HXB',
-				'上海银行' => 'BOS',
-				'邮政储蓄' => 'PSBC',
+			'工商银行' => 'ICBC',
+			'农业银行' => 'ABC',
+			'中国银行' => 'BOC',
+			'建设银行' => 'CCB',
+			'招商银行' => 'CMB',
+			'浦发银行' => 'SPDB',
+			'广发银行' => 'GDB',
+			'兴业银行' => 'CIB',
+			'北京银行' => 'BCCB',
+			'交通银行' => 'COMM',
+			'平安银行' => 'SPABANK',
+			'光大银行' => 'CEB',
+			'中信银行' => 'CNCB',
+			'民生银行' => 'CMBC',
+			'华夏银行' => 'HXB',
+			'上海银行' => 'BOS',
+			'邮政储蓄' => 'PSBC',
 		];
 		return $bankArr[$key] ?? showMsg('暂不支持该银行');
 	}

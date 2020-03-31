@@ -72,6 +72,13 @@ class Base extends Controller {
 		die;
 	}
 
+	protected function rollbackAndShow($msg, $code){
+		Db::rollback();
+		showMsg($msg, $code);
+	}
+
+
+
 	public function getAdvNo(){
 		$txId  = (int)(microtime(true) * 1000);
 		$ad = Db::name('ad_sell')->where(['ad_no' => $txId])->find();

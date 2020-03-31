@@ -18,11 +18,7 @@ class AdModel extends Model {
 	public function insertOne($param) {
 		try {
 			$result = $this->allowField(TRUE)->save($param);
-			if (FALSE === $result) {
-				return ['code' => -1, 'data' => '', 'msg' => $this->getError()];
-			} else {
-				return ['code' => 1, 'data' => '', 'msg' => '恭喜你，发布成功'];
-			}
+			return FALSE === $result ? ['code' => -1, 'data' => '', 'msg' => $this->getError()] : ['code' => 1, 'data' => '', 'msg' => '恭喜你，发布成功'];
 		} catch (PDOException $e) {
 			return ['code' => -2, 'data' => '', 'msg' => $e->getMessage()];
 		}

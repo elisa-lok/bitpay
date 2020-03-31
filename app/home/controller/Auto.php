@@ -5,8 +5,7 @@ use think\Cache;
 use think\db;
 use think\Exception;
 
-(PHP_SAPI != 'cli') && die('error');
-
+// (PHP_SAPI != 'cli') && die('error');
 class Auto extends Base {
 	/**
 	 * 定时刷新该方法
@@ -59,17 +58,17 @@ class Auto extends Base {
 										Db::name('merchant_recharge')->update(['id' => $res['id'], 'confirmations' => $v2['confirmations'], 'addtime' => $time]);
 									} else {
 										Db::name('merchant_recharge')->insert([
-												'merchant_id'   => $userAdd['uid'],
-												'from_address'  => $v2['from'],
-												'to_address'    => $account,
-												'coinname'      => 'usdt',
-												'txid'          => $v2['hash'],
-												'num'           => $num,
-												'mum'           => $num - $sfee,
-												'addtime'       => $time,
-												'status'        => 0,
-												'fee'           => $sfee,
-												'confirmations' => $v2['confirmations']
+											'merchant_id'   => $userAdd['uid'],
+											'from_address'  => $v2['from'],
+											'to_address'    => $account,
+											'coinname'      => 'usdt',
+											'txid'          => $v2['hash'],
+											'num'           => $num,
+											'mum'           => $num - $sfee,
+											'addtime'       => $time,
+											'status'        => 0,
+											'fee'           => $sfee,
+											'confirmations' => $v2['confirmations']
 										]);
 									}
 									continue;
@@ -99,17 +98,17 @@ class Auto extends Base {
 									if ($valid) {
 										$rs1 = balanceChange(FALSE, $userAdd['uid'], $num - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充币');
 										$rs2 = Db::name('merchant_recharge')->insert([
-												'merchant_id'   => $userAdd['uid'],
-												'from_address'  => $v2['from'],
-												'to_address'    => $account,
-												'coinname'      => 'usdt',
-												'txid'          => $v2['hash'],
-												'num'           => $num,
-												'mum'           => $num - $sfee,
-												'addtime'       => $time,
-												'status'        => 1,
-												'fee'           => $sfee,
-												'confirmations' => $v2['confirmations']
+											'merchant_id'   => $userAdd['uid'],
+											'from_address'  => $v2['from'],
+											'to_address'    => $account,
+											'coinname'      => 'usdt',
+											'txid'          => $v2['hash'],
+											'num'           => $num,
+											'mum'           => $num - $sfee,
+											'addtime'       => $time,
+											'status'        => 1,
+											'fee'           => $sfee,
+											'confirmations' => $v2['confirmations']
 										]);
 										//增加充值数量统计，不算手续费
 										Db::name('merchant')->where(['id' => $userAdd['uid']])->setInc('recharge_amount', $num);
@@ -121,17 +120,17 @@ class Auto extends Base {
 									} else {
 										$rs1 = TRUE;
 										$rs2 = Db::name('merchant_recharge')->insert([
-												'merchant_id'   => $userAdd['uid'],
-												'from_address'  => $v2['from'],
-												'to_address'    => $account,
-												'coinname'      => 'usdt',
-												'txid'          => $v2['hash'],
-												'num'           => $num,
-												'mum'           => $num - $sfee,
-												'addtime'       => $time,
-												'status'        => 5,
-												'fee'           => $sfee,
-												'confirmations' => $v2['confirmations']
+											'merchant_id'   => $userAdd['uid'],
+											'from_address'  => $v2['from'],
+											'to_address'    => $account,
+											'coinname'      => 'usdt',
+											'txid'          => $v2['hash'],
+											'num'           => $num,
+											'mum'           => $num - $sfee,
+											'addtime'       => $time,
+											'status'        => 5,
+											'fee'           => $sfee,
+											'confirmations' => $v2['confirmations']
 										]);
 									}
 								}
@@ -191,17 +190,17 @@ class Auto extends Base {
 							Db::name('merchant_user_recharge')->update(['id' => $res['id'], 'confirmations' => $v2['confirmations'], 'addtime' => $time]);
 						} else {
 							Db::name('merchant_user_recharge')->insert([
-									'merchant_id'   => $v['merchant_id'],
-									'from_address'  => $v2['sendingaddress'],
-									'to_address'    => $v['address'],
-									'coinname'      => 'usdt',
-									'txid'          => $v2['txid'],
-									'num'           => $v2['amount'],
-									'mum'           => $v2['amount'] - $sfee,
-									'addtime'       => $time,
-									'status'        => 0,
-									'fee'           => $sfee,
-									'confirmations' => $v2['confirmations']
+								'merchant_id'   => $v['merchant_id'],
+								'from_address'  => $v2['sendingaddress'],
+								'to_address'    => $v['address'],
+								'coinname'      => 'usdt',
+								'txid'          => $v2['txid'],
+								'num'           => $v2['amount'],
+								'mum'           => $v2['amount'] - $sfee,
+								'addtime'       => $time,
+								'status'        => 0,
+								'fee'           => $sfee,
+								'confirmations' => $v2['confirmations']
 							]);
 						}
 						continue;
@@ -231,17 +230,17 @@ class Auto extends Base {
 						if ($valid) {
 							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
 							$rs2 = Db::name('merchant_user_recharge')->insert([
-									'merchant_id'   => $v['merchant_id'],
-									'from_address'  => $v2['sendingaddress'],
-									'to_address'    => $v['address'],
-									'coinname'      => 'usdt',
-									'txid'          => $v2['txid'],
-									'num'           => $v2['amount'],
-									'mum'           => $v2['amount'] - $sfee,
-									'addtime'       => $time,
-									'status'        => 1,
-									'fee'           => $sfee,
-									'confirmations' => $v2['confirmations']
+								'merchant_id'   => $v['merchant_id'],
+								'from_address'  => $v2['sendingaddress'],
+								'to_address'    => $v['address'],
+								'coinname'      => 'usdt',
+								'txid'          => $v2['txid'],
+								'num'           => $v2['amount'],
+								'mum'           => $v2['amount'] - $sfee,
+								'addtime'       => $time,
+								'status'        => 1,
+								'fee'           => $sfee,
+								'confirmations' => $v2['confirmations']
 							]);
 							//增加充值数量统计，不算手续费
 							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
@@ -253,17 +252,17 @@ class Auto extends Base {
 						} else {
 							$rs1 = TRUE;
 							$rs2 = Db::name('merchant_user_recharge')->insert([
-									'merchant_id'   => $v['merchant_id'],
-									'from_address'  => $v2['sendingaddress'],
-									'to_address'    => $v['address'],
-									'coinname'      => 'usdt',
-									'txid'          => $v2['txid'],
-									'num'           => $v2['amount'],
-									'mum'           => $v2['amount'] - $sfee,
-									'addtime'       => $time,
-									'status'        => 5,
-									'fee'           => $sfee,
-									'confirmations' => $v2['confirmations']
+								'merchant_id'   => $v['merchant_id'],
+								'from_address'  => $v2['sendingaddress'],
+								'to_address'    => $v['address'],
+								'coinname'      => 'usdt',
+								'txid'          => $v2['txid'],
+								'num'           => $v2['amount'],
+								'mum'           => $v2['amount'] - $sfee,
+								'addtime'       => $time,
+								'status'        => 5,
+								'fee'           => $sfee,
+								'confirmations' => $v2['confirmations']
 							]);
 						}
 					}
@@ -334,17 +333,17 @@ class Auto extends Base {
 							Db::name('merchant_recharge')->update(['id' => $res['id'], 'confirmations' => $v2['confirmations'], 'addtime' => $time]);
 						} else {
 							Db::name('merchant_recharge')->insert([
-									'merchant_id'   => $v['merchant_id'],
-									'from_address'  => $v2['sendingaddress'],
-									'to_address'    => $v['address'],
-									'coinname'      => 'usdt',
-									'txid'          => $v2['txid'],
-									'num'           => $v2['amount'],
-									'mum'           => $v2['amount'] - $sfee,
-									'addtime'       => $time,
-									'status'        => 0,
-									'fee'           => $sfee,
-									'confirmations' => $v2['confirmations']
+								'merchant_id'   => $v['merchant_id'],
+								'from_address'  => $v2['sendingaddress'],
+								'to_address'    => $v['address'],
+								'coinname'      => 'usdt',
+								'txid'          => $v2['txid'],
+								'num'           => $v2['amount'],
+								'mum'           => $v2['amount'] - $sfee,
+								'addtime'       => $time,
+								'status'        => 0,
+								'fee'           => $sfee,
+								'confirmations' => $v2['confirmations']
 							]);
 						}
 						continue;
@@ -367,17 +366,17 @@ class Auto extends Base {
 						if ($valid) {
 							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
 							$rs2 = Db::name('merchant_recharge')->insert([
-									'merchant_id'   => $v['merchant_id'],
-									'from_address'  => $v2['sendingaddress'],
-									'to_address'    => $v['address'],
-									'coinname'      => 'usdt',
-									'txid'          => $v2['txid'],
-									'num'           => $v2['amount'],
-									'mum'           => $v2['amount'] - $sfee,
-									'addtime'       => $time,
-									'status'        => 1,
-									'fee'           => $sfee,
-									'confirmations' => $v2['confirmations']
+								'merchant_id'   => $v['merchant_id'],
+								'from_address'  => $v2['sendingaddress'],
+								'to_address'    => $v['address'],
+								'coinname'      => 'usdt',
+								'txid'          => $v2['txid'],
+								'num'           => $v2['amount'],
+								'mum'           => $v2['amount'] - $sfee,
+								'addtime'       => $time,
+								'status'        => 1,
+								'fee'           => $sfee,
+								'confirmations' => $v2['confirmations']
 							]);
 							//增加充值数量统计，不算手续费
 							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
@@ -385,17 +384,17 @@ class Auto extends Base {
 						} else {
 							$rs1 = TRUE;
 							$rs2 = Db::name('merchant_recharge')->insert([
-									'merchant_id'   => $v['merchant_id'],
-									'from_address'  => $v2['sendingaddress'],
-									'to_address'    => $v['address'],
-									'coinname'      => 'usdt',
-									'txid'          => $v2['txid'],
-									'num'           => $v2['amount'],
-									'mum'           => $v2['amount'] - $sfee,
-									'addtime'       => $time,
-									'status'        => 5,
-									'fee'           => $sfee,
-									'confirmations' => $v2['confirmations']
+								'merchant_id'   => $v['merchant_id'],
+								'from_address'  => $v2['sendingaddress'],
+								'to_address'    => $v['address'],
+								'coinname'      => 'usdt',
+								'txid'          => $v2['txid'],
+								'num'           => $v2['amount'],
+								'mum'           => $v2['amount'] - $sfee,
+								'addtime'       => $time,
+								'status'        => 5,
+								'fee'           => $sfee,
+								'confirmations' => $v2['confirmations']
 							]);
 						}
 					}
@@ -539,17 +538,17 @@ class Auto extends Base {
 		//求购总数量，计算所有挂买的剩余数量
 		$orderBuySum = $adBuyTotal - $dealBuyNum;
 		$rs          = Db::name('statistics')->insert([
-				'platform_profit'      => $feePlatform,
-				'agent_reward'         => $feeAgent,
-				'trader_reward'        => $feeTrader,
-				'platform_usdt_amount' => $usdtSum,
-				'recharge_total'       => $rechargeSum,
-				'withdraw_total'       => $withdrawSum,
-				'ad_sell_on_total'     => $adSellSum,
-				'order_sell_amount'    => $orderSellSum,
-				'ad_buy_on_total'      => $adBuySum,
-				'order_buy_amount'     => $orderBuySum,
-				'create_time'          => time()
+			'platform_profit'      => $feePlatform,
+			'agent_reward'         => $feeAgent,
+			'trader_reward'        => $feeTrader,
+			'platform_usdt_amount' => $usdtSum,
+			'recharge_total'       => $rechargeSum,
+			'withdraw_total'       => $withdrawSum,
+			'ad_sell_on_total'     => $adSellSum,
+			'order_sell_amount'    => $orderSellSum,
+			'ad_buy_on_total'      => $adBuySum,
+			'order_buy_amount'     => $orderBuySum,
+			'create_time'          => time()
 		]);
 		return $rs ? '更新统计表think_statistics成功' : '更新统计表think_statistics失败';
 	}
