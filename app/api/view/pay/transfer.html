@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0">
+	<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<title>在线交易</title>
+	<link rel="stylesheet" type="text/css" href="__CSS__/pay/save.css">
+	<style type="text/css">
+		#index{max-width:768px;width:100%;display:block;min-height:100%;margin:0 auto;}
+		#box1{margin:0;}
+		.loading{ position:fixed; top:50%; left:50%; margin:-20px 0 0 -20px; width:40px; height:40px; border:2px solid; border-color:#333333 #333333 transparent; border-radius:50%; box-sizing:border-box; animation:loading 1s linear infinite; }
+		@keyframes loading{ 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+	</style>
+</head>
+<body>
+<div class="importTc" id="bankTc" style="display:none">
+	<div class="tc_container">
+		<i class="close"> <img src="__IMG__/icon_close.png"> </i>
+		<div class="yun_top">
+			<img src="__IMG__/icin_ysf_white@2x.png">
+			<p class="yun_title">推荐使用</p>
+		</div>
+		<div class="yun_bottom">
+			<p style="font-size:18px;margin-bottom:20px;text-align: center;">支持扫码交易的手机银行APP</p>
+			<img src="__IMG__/icons_ysfapp@2x.png">
+		</div>
+	</div>
+</div>
+<!-- popup confirm modal start -->
+<div class="importTc" id="fkTc" style="display:none">
+	<div class="tc_container">
+		<p class="im_title">确认转账</p>
+		<i class="close"> <img src="__IMG__/icon_close.png"> </i>
+		<div class="content">
+			<p>1. 请选择填写付款留言，注明您已经完成付款的金额、姓名或昵称，以便可以更快的确认交易到账。 </p>
+			<p>2. 若您尚未转账给对方，请不要点击 <span class="red">「确认已付款」</span>按钮，以免造成交易纠纷以及可能的信用降级。</p>
+		</div>
+		<div class="bottom">
+			<div class="text">
+				<div><span class="left text-center" style="width:40%;">实际转账金额</span><input type="text" id="confrimMoney" style="width:55%;">
+					<div class="clear"></div>
+				</div>
+				<div class="text-center" id="payNotice" style="line-height: 20px;color: #ff0000;">&nbsp;</div>
+			</div>
+		</div>
+		<div class="button_div">
+			<button class="button" id="confirmTx">确定已付款</button>
+			<button class="cancel_button">取消</button>
+		</div>
+	</div>
+</div>
+<!-- popup confirm  modal end -->
+<!-- popup cancel  modal start -->
+<div class="importTc" id="cancelTc" style="display:none">
+	<div class="tc_container">
+		<p class="im_title">取消交易</p>
+		<i class="close"> <img src="__IMG__/icon_close.png"> </i>
+		<div class="select_div">
+			<p class="active"><input type="checkbox" class="checkbox" checked id="select1" data-mode="1"><label for="select1">我不想交易了</label></p>
+			<p><input type="checkbox" class="checkbox" id="select2" data-mode="2"><label for="select2">我是新手，没搞清楚怎么交易</label></p>
+			<p><input type="checkbox" class="checkbox" id="select3" data-mode="3"><label for="select3">对方收款方式异常，我付不了款</label></p>
+			<p><input type="checkbox" class="checkbox" id="select4" data-mode="4"><label for="select4">其他</label></p>
+			<textarea name="" id="otherText" placeholder="请输入取消理由,且不超过20个字符" disabled></textarea>
+			<p class="text-center" id="cancelNotice">&nbsp;</p>
+		</div>
+		<div class="button_div">
+			<button class="back">我再想想</button>
+			<button class="cancel" id="cancelTx">确认取消</button>
+		</div>
+	</div>
+</div>
+<div class="tishi_tc" id="alert_tc2" style="display:none;">
+	<p class="info" id="tc_info2">请 <span class="red">转账</span> 付款 <span class="red money">{$order.deal_amount}</span>元 <br>付错金额的损失自己承担! </p>
+	<div class="button_div">
+		<button class="sure" onclick="hideTc2()">我知道了</button>
+	</div>
+</div>
+<!-- popup cancel  modal end -->
+<div id="index">
+	<div class="loading"></div>
+	<div class="container" style="display: none">
+		<div id="state_box" hidden style="padding: 20px; height: 100vh; background: rgb(255, 255, 255); flex-direction: column; justify-content: center;">
+			<div class="img_box text-center" style="margin-bottom:30px">
+				<img class="h28" src="__IMG__/logo_zhifubao@2x.png" hidden> <img class="h28" src="__IMG__/logo_zhifubao@2x.png" hidden> <img class="h28" src="__IMG__/logo_bank@2x.png" hidden> <img class="h28" src="__IMG__/logo_weixin@2x.png" hidden>
+				<img class="h28" src="__IMG__/logo_ysf@2x.png" hidden>
+			</div>
+			<div class="text_div">
+				<p>正在连接交易页面，15秒后自动重连，不需要关闭窗口！</p>
+				<p>……</p>
+			</div>
+		</div>
+		<div id="info_box">
+			<div id="state_box2" style="display: block;">
+				<header class="bankIcon">
+					<div class="head_box">
+						<img id="bank_logo" class="bank" src="__IMG__/logo_bank@2x.png" hidden> <img id="wxpay_log" class="wxpay" src="__IMG__/logo_weixin@2x.png" hidden> <img id="alipay_logo" class="alipay alipayToCard" src="__IMG__/logo_zhifubao@2x.png" hidden>
+						<img id="unionpay_logo" class="unionpay" src="__IMG__/logo_ysf@2x.png" hidden>
+					</div>
+				</header>
+				<div class="bottom_div">
+					<div style="display: flex;justify-content: center;" id="fkDiv">
+						<button class="fk_button">我已付款 <span id="money2">{$order.deal_amount}</span>元</button>
+						<button class="cancel_button">取消</button>
+					</div>
+					<button class="press_button" id="pressButton" hidden>催款</button>
+				</div>
+				<div id="box">
+					<p class="red_p warning-text">输错金额和多次交易 自己承担损失 <span class="red_arrow"></span></p>
+					<div class="zf_p">
+						<div class="clear"></div>
+						<div id="box1">
+							<div id="order-info">
+								<p class="money" style="color: black;">请付 <span id="money">{$order.deal_amount}</span> 元 </p>
+								<button class="copy_button2" id="copy4" data-clipboard-target="#money" style="background: #ffffff;font-size: 14px;margin:auto;display: block;height:24px;" onclick="copyTarget(this.id)">
+									复制金额
+								</button>
+								<p class="order">
+									<span>订单号：</span><span><span id="order_id">{$order.orderid}</span><button class="copy_button2" data-clipboard-target="#order_id" id="copy5" style="background: transparent;margin-left:10px" onclick="copyTarget(this.id)">复制</button></span>
+								</p>
+							</div>
+							<div class="ewm_box">
+								<div class="cancel_div" hidden>
+									<img id="icon1" src="__IMG__/icon_czcg@2x.png" hidden/> <img id="icon2" src="__IMG__/icon_ddcs@2x.png" hidden/> <img id="icon3" src="__IMG__/icon_ddqx@2x.png" hidden/> <img id="icon4" src="__IMG__/icon_ddfk@2x.png" hidden/>
+								</div>
+								{if $order.status < 1}
+								<div class="text-block ibox">
+									<span class="right countdown" style="margin:20px;">支付倒计时: <span id="js_time">00:10:00</span></span> {if $order.pay_type == 'alipay'}
+									<table class="tb">
+										<tr>
+											<td class="text-right">支付宝姓名:</td>
+											<td class="text-center" id="user_alipay_name">{$user.alipay.truename}</td>
+											<td>
+												<button class="cp-btn" id="cp_user_alipay_name" data-clipboard-target="#user_alipay_name" onclick="copyTarget(this.id)">复制</button>
+											</td>
+										</tr>
+										<tr>
+											<td class="text-right">备注码:</td>
+											<td class="text-center" id="trade_code">{$order.check_code}</td>
+											<td>
+												<button class="cp-btn" id="cp_trade_code" data-clipboard-target="#trade_code" onclick="copyTarget(this.id)">复制</button>
+											</td>
+										</tr>
+										<a href="javascript:;" id="alipay_link">
+											<div style="margin:65px auto 0 auto;max-width:60%" id="alipay_pay"></div>
+											<span id="alipay_click">请用支付宝扫一扫</span></a>
+									</table>
+									{elseif $order.pay_type == 'wxpay'}
+									<table class="tb">
+										<tr>
+											<td class="text-right">微信手机:</td>
+											<td class="text-center" id="user_account">{$user.wxpay.c_bank}</td>
+											<td>
+												<button class="cp-btn" id="cp_user_account" data-clipboard-target="#user_account" onclick="copyTarget(this.id)">复制</button>
+											</td>
+										</tr>
+										<tr>
+											<td class="text-right">微信姓名:</td>
+											<td class="text-center" id="user_name">{$user.wxpay.truename}</td>
+											<td>
+												<button class="cp-btn" id="cp_user_name" data-clipboard-target="#user_name" onclick="copyTarget(this.id)">复制</button>
+											</td>
+										</tr>
+									</table>
+									{elseif $order.pay_type == 'unionpay'}
+									<table class="tb">
+										<tr>
+											<td class="text-right">云闪付手机:</td>
+											<td class="text-center" id="user_unionpay_name">{$user.unionpay.truename}</td>
+											<td>
+												<button class="cp-btn" id="cp_user_unionpay_name" data-clipboard-target="#user_unionpay_name" onclick="copyTarget(this.id)">复制</button>
+											</td>
+										</tr>
+										<tr>
+											<td class="text-right">云闪付姓名:</td>
+											<td class="text-center" id="user_unionpay_account">{$user.unionpay.c_bank}</td>
+											<td>
+												<button class="cp-btn" id="cp_user_unionpay_account" data-clipboard-target="#user_unionpay_account" onclick="copyTarget(this.id)">复制</button>
+											</td>
+										</tr>
+									</table>
+									{elseif $order.pay_type == 'bank'}
+									<table class="tb">
+										<tr>
+											<td class="text-right">姓名:</td>
+											<td class="text-center" id="user_bank_name">{$user.bank.truename}</td>
+											<td>
+												<button class="cp-btn" id="cp_user_bank_name" data-clipboard-target="#user_name" onclick="copyTarget(this.id)">复制</button>
+											</td>
+										</tr>
+										<tr>
+											<td class="text-right">账号:</td>
+											<td class="text-center" id="user_bank_account">{$user.bank.c_bank_card}</td>
+											<td>
+												<button class="cp-btn" id="cp_user_bank_account" data-clipboard-target="#user_bank_account" onclick="copyTarget(this.id)">复制</button>
+											</td>
+										</tr>
+										<tr>
+											<td class="text-right">银行:</td>
+											<td class="text-center" id="user_bank">{$user.bank.c_bank}</td>
+											<td>
+												<button class="cp-btn" id="cp_user_bank" data-clipboard-target="#user_bank" onclick="copyTarget(this.id)">复制</button>
+											</td>
+										</tr>
+										<tr>
+											<td class="text-right">支行:</td>
+											<td class="text-center" id="user_subbranch">{$user.bank.c_bank_detail}</td>
+											<td>
+												<button class="cp-btn" id="cp_user_subbranch" data-clipboard-target="#user_subbranch" onclick="copyTarget(this.id)">复制</button>
+											</td>
+										</tr>
+									</table>
+									{elseif $order.pay_type == 'alipayToCard'}
+									<div style="margin:65px auto 0 auto;max-width:60%">
+										<a href="alipays://platformapi/startapp?appId=20000067&url={$user.alipayToCard.Short_link}">
+											<div id="qrcode"></div>
+											点我打开支付宝付款</a> {/if}
+									</div>
+									{/if}
+									<p class="check_code_txt"><small><span style="color:red">*</span>备注码可以更快识别你的订单,请勿更改</small></p>
+								</div>
+								<div>
+									<img class="h28 bankIcon wxpay" src="__IMG__/logo_weixin@2x.png" hidden> <img class="h28 bankIcon bank" src="__IMG__/logo_bank@2x.png" hidden> <img class="h28 bankIcon alipay" src="__IMG__/logo_zhifubao@2x.png" hidden>
+									<img class="h28 bankIcon unionpay" src="__IMG__/logo_ysf@2x.png" hidden> <img class="h28 bankIcon alipayToCard" src="__IMG__/logo_zhifubao@2x.png" hidden>
+									<p class="ti_p bankIcon wxpay" style="display:none"><span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon2 icon_wx"></span><span class="arrow"><span></span><span></span></span>
+										<span class="ticon icon3"></span></p>
+									<p class="ti_p bankIcon bank" style="display:none"><span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon2 icon_ysf"></span><span class="arrow"><span></span><span></span></span>
+										<span class="ticon icon3"></span></p>
+									<p class="ti_p bankIcon alipay" style="display:none"><span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon2 icon_zfb"></span><span class="arrow"><span></span><span></span></span>
+										<span class="ticon icon3"></span></p>
+									<p class="ti_p bankIcon unionpay" style="display:none"><span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon2 icon_ysf"></span><span class="arrow"><span></span><span></span></span>
+										<span class="ticon icon3"></span></p>
+									<p class="ti_p bankIcon alipayToCard" style="display:none"><span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon2 icon_zfb"></span><span class="arrow"><span></span><span></span></span>
+										<span class="ticon icon3"></span></p>
+									<div class="ti_t bankIcon wxpay" style="display:none">
+										<div><p>打开微信收付款<br></p></div>
+										<div><p>选择向银行卡或手机号转账</p></div>
+										<div><p>输入手机号<br>验证姓名和输入金额</p></div>
+									</div>
+									<div class="ti_t bankIcon bank" style="display:none">
+										<div><p>打开网银APP<br></p></div>
+										<div><p>选择转账</p></div>
+										<div><p>输入姓名,账号<br>输入金额转账</p></div>
+									</div>
+									<div class="ti_t bankIcon alipay" style="display:none">
+										<div><p>打开支付宝<br>扫一扫</p></div>
+										<div><p>输入账号<br>与金额</p></div>
+										<div><p>验证姓名<br>确认</p></div>
+									</div>
+									<div class="ti_t bankIcon unionpay" style="display:none">
+										<div><p>打开云闪付<br></p></div>
+										<div><p></p></div>
+										<div><p>输入手机号<br>验证姓名和输入金额</p></div>
+									</div>
+									<div class="ti_t bankIcon alipayToCard" style="display:none">
+										<div><p>截屏将二维码<br></p></div>
+										<div><p>打开支付宝<br>选择扫一扫</p></div>
+										<div><p>从本地相册选择<br>选取截屏二维码</p></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="state_box3" hidden>
+					<p class="title">交易成功</p>
+					<p class="text_p">系统很快为您的交易入账</p>
+					<div class="order_box">
+						<p class="order_title">您的交易单号</p>
+						<p class="order_number" id="order">{$order.orderid}</p>
+						<button class="copy_button" id="copy3" data-clipboard-target="#order" onclick="copyTarget(this.id)">复制单号</button>
+					</div>
+					<p class="tishi_p">当您的交易未在5分钟入账</p>
+					<p class="tishi_p">您可以通过此订单号联系在线客服</p>
+					<p class="tishi_p">系统将在5秒后自动跳转回页面...</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="__JS__/pay/jquery-2.2.4.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="__JS__/pay/clipboard.min.js"></script>
+<script type="text/javascript" src="__JS__/jquery.qrcode.min.js"></script>
+{if $order.pay_type == 'alipay'}
+<script>$('#alipay_pay').qrcode({render: "canvas", size: 180, text: '{$user.alipay.alipay_pay}'});</script>
+{elseif $order.pay_type == 'alipayToCard'}
+<script>$('#qrcode').qrcode({render: "canvas", size: 180, text: "{$user.alipayToCard.Short_link}"});</script>
+{/if}
+<script type="text/javascript" charset="utf-8">
+	var txId = '{$order.id}', txStatus = {$order.status}, txPayType = '{$order.pay_type}';
+	/************************************ copy ************************************/
+	var clipboard, copyTimeout, imTime;
+	var payTypeArr = ['bank', 'alipay', 'wxpay', 'unionpay', 'alipayToCard'];
+	var PayIndex = '.' + payTypeArr[payTypeArr.indexOf(txPayType)];
+	$(PayIndex).show();
+	function copyTarget(targetId) {
+		targetId = "#" + targetId;
+		targetText = $(targetId).html();
+		clipboard = new ClipboardJS(targetId);
+		clipboard.on('success', function (e) {
+			$(targetId).html("复制成功");
+			clearTimeout(copyTimeout);
+			copyTimeout = setTimeout(function () {
+				$(targetId).html(targetText);
+			}, 300);
+			e.clearSelection()
+		});
+	}
+	/************************************ copy end ************************************/
+	var confirmText;
+	// 确认支付点击
+	$('#confirmTx').click(function () {
+		let payNotify = $('#payNotice');
+		let confirmMoney = parseFloat($("#confrimMoney").val());
+		if (confirmMoney < 1) {
+			payNotify.html("支付金额不能小于1");
+			setTimeout(function () {
+				payNotify.html('&nbsp;')
+			}, 2000)
+			return;
+		}
+		$.ajax({
+			type    : "POST",
+			url     : '{:url("api/otc/confirmTx")}',
+			data    : {id: txId, appid: '{$appid}', pay_money: $("#money").text()},
+			dataType: "json",
+			success : function (data) {
+				if (data.code == 1) {
+					$('.importTc').hide();
+					$('#state_box2').remove();
+					$('#state_box3').show();
+					setTimeout(function () {
+						window.location.href = data.msg
+					}, 4000)
+				} else {
+					payNotify.html(data.msg);
+					setTimeout(function () {
+						payNotify.html('&nbsp;')
+					}, 2000)
+				}
+			}, error: function (err) {
+				console.log(err);
+				payNotify.html('未知錯誤');
+				setTimeout(function () {
+					payNotify.html('&nbsp;')
+				}, 2000)
+			}
+		});
+	});
+	// 确认失败点击
+	$('#cancelTx').click(function () {
+		let a = $(".select_div p.active input").attr('data-mode');
+		let reason = (a == 4) ? $("#otherText").val() : $(".select_div p.active label").text();
+		if (reason.length < 1 || reason.length > 20) {
+			alert(a == 4 ? "请输入取消理且不超过20个字符" : "请选择取消理由");
+			return;
+		}
+		let cancelNotice = $('#cancelNotice');
+		$.ajax({
+			type    : "POST",
+			url     : '{:url("api/otc/cancelTx")}',
+			data    : {id: txId, appid: '{$appid}', reason: reason},
+			dataType: "json",
+			success : function (data) {
+				if (data.code == 1) {
+					cancelNotice.html("取消成功,稍后将返回页面");
+					setTimeout(function () {
+						window.location.href = data.msg
+					}, 2000)
+				} else {
+					cancelNotice.html(data.msg);
+					setTimeout(function () {
+						cancelNotice.html('&nbsp;')
+					}, 2000)
+				}
+			}, error: function (err) {
+				console.log(err);
+				cancelNotice.html('未知錯誤');
+				setTimeout(function () {
+					cancelNotice.html('&nbsp;')
+				}, 2000)
+			}
+		});
+	});
+	// 确认失败点击
+	$('#pressButton').click(function () {
+		alert('操作成功');
+		window.location.href = '{$order.return_url}';
+	});
+	var countDownTimer, checkTimer, $fkTc = $("#fkTc"), $cancelTc = $("#cancelTc"), endTime = {$order.end_time};
+	function countDown() {
+		if (endTime < parseInt(new Date().getTime() / 1000) || txStatus == 5) {
+			hideElement();
+			$(".cancel_div #icon3").show();
+			$(".warning-text").text("订单已关闭");
+		} else if (txStatus == 1) {
+			hideElement();
+			$(".warning-text").text("您已付款,正等待确认");
+			$(".cancel_div #icon4").show();
+		} else {
+			countDownTimer = setInterval(function () {
+				let nowTime = parseInt(new Date().getTime() / 1000);
+				restTime = endTime - nowTime;
+				var day = 0, hour = 0, minute = 0, second = 0; //时间默认值
+				if (restTime > 0) {
+					day = Math.floor(restTime / (60 * 60 * 24));
+					hour = Math.floor(restTime / (60 * 60)) - (day * 24);
+					minute = Math.floor(restTime / 60) - (day * 24 * 60) - (hour * 60);
+					second = Math.floor(restTime) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60);
+				}
+				if (hour <= 0 && minute <= 0 && second <= 0) {
+					hideElement();
+					$(".cancel_div #icon2").show();
+					$(".cancel_div #icon1").hide();
+					$(".cancel_div #icon3").hide();
+					$(".cancel_div #icon4").hide();
+					$(".warning-text").text("订单已关闭");
+					return;
+				}
+				if (minute <= 9) minute = '0' + minute;
+				if (second <= 9) second = '0' + second;
+				$("#js_time").text(hour + ":" + minute + ":" + second)
+			}, 1000)
+		}
+	}
+	function hideElement() {
+		$(".cancel_div").show();
+		$(".bankIcon").remove();
+		$("#order-info").remove();
+		$("#fkDiv").hide();
+		$("#pressButton").show();
+		$(".check_code_txt").hide();
+		$(".ibox").remove();
+		clearInterval(countDownTimer);
+	}
+	function checkOutTime() {
+		$.post('{:url("api/otc/checkOutTime")}', {id: txId}, function (data) {
+			if (data.code === 1) {
+				hideElement();
+				clearInterval(checkTimer);
+				$(".cancel_div #icon3").show();
+				$(".cancel_div #icon1").hide();
+				$(".cancel_div #icon2").hide();
+				$(".cancel_div #icon4").hide();
+				$(".warning-text").text("订单已关闭");
+			} else {
+				checkTimer = setTimeout('checkOutTime()', 3000);
+			}
+		})
+	}
+	// ******************** 检查超时 end ********************
+	// ******************** 弹窗 ********************
+	$(".fk_button").click(function () {
+		$fkTc.show();
+		$fkTc.find("#confrimMoney").val($("#money").text());
+	});
+	// 取消按钮点击
+	$(".bottom_div .cancel_button").click(function () {
+		$fkTc.hide();
+		$cancelTc.show();
+	});
+	$("#bankTc .close").click(function () {
+		$("#bankTc").hide();
+	});
+	// 取消弹框的页面选择
+	$cancelTc.find('.select_div>p').click(function () {
+		$(this).siblings().removeClass("active").find('.checkbox')[0].checked = false;
+		$(this).addClass("active").find(".checkbox").checked = true;
+		if ($(this).index() != 3) {
+			$("#otherText").val("");
+			$("#otherText")[0].disabled = true;
+		} else {
+			$("#otherText")[0].disabled = false;
+		}
+	});
+	// 关闭取消弹框
+	$cancelTc.find('.close,.back').click(function () {
+		$cancelTc.hide();
+		$fkTc.hide();
+	});
+	$fkTc.find('.close,.cancel_button').click(function () {
+		$fkTc.hide();
+		imTime = setTimeout(function () {
+			console.log($cancelTc.is(':hidden'))
+			if ($cancelTc.is(':hidden')) {
+				$fkTc.show();
+				$fkTc.find("#confrimMoney").val($("#money").text());
+				$cancelTc.hide();
+			}
+		}, 30000)
+	});
+	// -----------------------------------------
+	$(document).ready(function () {
+		countDown();
+		checkOutTime();
+		$('.loading').hide();
+		$('.container').show();
+	});
+	// Detect whether mobile device
+	if (/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
+		{if $order.pay_type == 'alipay'}
+		$('#alipay_link').attr('href', 'alipays://platformapi/startapp?appId=20000067&url=' + window.location.protocol + '//' + window.location.host + '/go/url/{$user.alipay.alipay_pay|base64_encode}');
+		$('#alipay_click').text("点击打开支付宝");
+		{
+			/if}
+		}
+</script>
+</body>
+</html>
