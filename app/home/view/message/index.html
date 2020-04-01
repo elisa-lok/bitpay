@@ -1,154 +1,84 @@
 {include file="Public:header_new"/}
-    <div class="content-wrapper" id="pjax-container" style="min-height: 414px;">
-            <section class="content-header"><h1>
-            
-            <small></small>
-        </h1>
-
-        <!-- breadcrumb start -->
-                <!-- breadcrumb end -->
-
-    </section><section class="content"><div class="row"><div class="col-md-12"><div class="nav-tabs-custom">
-    <ul class="nav nav-tabs">
-<li class="active"><a href="/message/index#tab_1464414772" data-toggle="tab">全部反馈</a></li>
-                <li><a href="/message/index#tab_886859313" data-toggle="tab">已回复</a></li>
-                <li><a href="/message/index#tab_1558780376" data-toggle="tab">未回复</a></li>
-        
-                <li class="pull-right header">
-                <a href="/message/add" class="btn btn-sm btn-success" style="background-color: #00a65a;
-    border-color: #008d4c;color: #fff;border-radius:3px;">
-        <i class="fa fa-save"></i>&nbsp;&nbsp;新增
-    </a>
-    </li></ul>
-<div class="tab-content table-responsive">
-                <div class="tab-pane active" id="tab_1464414772">
-            <table class="table">
-<thead><tr>
-<th>类型</th><th>内容</th><th>回复</th>
-                    <th>时间</th>
-            </tr></thead>
-<tbody>
-{volist name="list" id="vo"}
-<tr>
-	<td>
-		{if condition="$vo.type eq 1"}
-		充值
-		{elseif condition="$vo.type eq 2"/}
-		提币
-		{elseif condition="$vo.type eq 3"/}
-		其它
-		{/if}
-	</td>
-	<td>
-		{$vo.content}
-	</td>
-	<td>
-		{empty name="vo.reply"}
-		---
-		{else/}
-		{$vo.reply}
-		{/empty}
-	</td>
-	<td>
-		{empty name="vo.addtime"}
-		---
-		{else/}
-		{:date("Y-m-d H:i:s", $vo['addtime'])}
-		{/empty}
-	</td>
-</tr>
-{/volist}
-</tbody>
-</table>
-</div>
-                <div class="tab-pane " id="tab_886859313">
-            <table class="table">
-<thead><tr>
-<th>类型</th><th>内容</th><th>回复</th>
-                    <th>时间</th>
-            </tr></thead>
-<tbody>
-	{volist name="replylist" id="vo"}
-<tr>
-	<td>
-		{if condition="$vo.type eq 1"}
-		充值
-		{elseif condition="$vo.type eq 2"/}
-		提币
-		{elseif condition="$vo.type eq 3"/}
-		其它
-		{/if}
-	</td>
-	<td>
-		{$vo.content}
-	</td>
-	<td>
-		{empty name="vo.reply"}
-		---
-		{else/}
-		{$vo.reply}
-		{/empty}
-	</td>
-	<td>
-		{empty name="vo.addtime"}
-		---
-		{else/}
-		{:date("Y-m-d H:i:s", $vo['addtime'])}
-		{/empty}
-	</td>
-</tr>
-{/volist}
-</tbody>
-</table>
-</div>
-                <div class="tab-pane " id="tab_1558780376">
-            <table class="table">
-<thead><tr>
-<th>类型</th><th>内容</th><th>回复</th>
-                    <th>时间</th>
-            </tr></thead>
-<tbody>
-	{volist name="notreplylist" id="vo"}
-<tr>
-	<td>
-		{if condition="$vo.type eq 1"}
-		充值
-		{elseif condition="$vo.type eq 2"/}
-		提币
-		{elseif condition="$vo.type eq 3"/}
-		其它
-		{/if}
-	</td>
-	<td>
-		{$vo.content}
-	</td>
-	<td>
-		{empty name="vo.reply"}
-		---
-		{else/}
-		{$vo.reply}
-		{/empty}
-	</td>
-	<td>
-		{empty name="vo.addtime"}
-		---
-		{else/}
-		{:date("Y-m-d H:i:s", $vo['addtime'])}
-		{/empty}
-		
-	</td>
-</tr>
-{/volist}
-</tbody>
-</table>
-</div>
-        
-    </div>
-</div></div></div>
-
-    </section><script>
-
-    $(function () {
-            });
-</script></div>
-{include file="Public:footer_new"/}
+<div class="content-wrapper" id="pjax-container" style="min-height: 414px;">
+	<section class="content-header"><h1><small></small></h1><!-- breadcrumb start --><!-- breadcrumb end --></section>
+	<section class="content">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="nav-tabs-custom">
+					<ul class="nav nav-tabs">
+						<li class="active"><a href="/message/index#tab_all" data-toggle="tab">全部反馈</a></li>
+						<li><a href="/message/index#tab_reply" data-toggle="tab">已回复</a></li>
+						<li><a href="/message/index#tab_unread" data-toggle="tab">未回复</a></li>
+						<li class="pull-right header"><a href="/message/add" class="btn btn-sm btn-success" style="background-color: #00a65a; border-color: #008d4c;color: #ffffff;border-radius:3px;"><i class="fa fa-save"></i>&nbsp;&nbsp;新增</a></li>
+					</ul>
+					<div class="tab-content table-responsive">
+						<div class="tab-pane active" id="tab_all">
+							<table class="table">
+								<thead>
+								<tr>
+									<th>类型</th>
+									<th>内容</th>
+									<th>回复</th>
+									<th>时间</th>
+								</tr>
+								</thead>
+								<tbody>{volist name="list" id="vo"}
+								<tr>
+									<td>{if condition="$vo.type eq 1"} 充值 {elseif condition="$vo.type eq 2"/} 提币 {elseif condition="$vo.type eq 3"/} 其它 {/if}</td>
+									<td>{$vo.content}</td>
+									<td>{empty name="vo.reply"} --- {else/} {$vo.reply} {/empty}</td>
+									<td>{empty name="vo.addtime"} --- {else/} {:date("Y-m-d H:i:s", $vo['addtime'])} {/empty}</td>
+								</tr>
+								{/volist}
+								</tbody>
+							</table>
+						</div>
+						<div class="tab-pane " id="tab_reply">
+							<table class="table">
+								<thead>
+								<tr>
+									<th>类型</th>
+									<th>内容</th>
+									<th>回复</th>
+									<th>时间</th>
+								</tr>
+								</thead>
+								<tbody>{volist name="replylist" id="vo"}
+								<tr>
+									<td>{if condition="$vo.type eq 1"} 充值 {elseif condition="$vo.type eq 2"/} 提币 {elseif condition="$vo.type eq 3"/} 其它 {/if}</td>
+									<td>{$vo.content}</td>
+									<td>{empty name="vo.reply"} --- {else/} {$vo.reply} {/empty}</td>
+									<td>{empty name="vo.addtime"} --- {else/} {:date("Y-m-d H:i:s", $vo['addtime'])} {/empty}</td>
+								</tr>
+								{/volist}
+								</tbody>
+							</table>
+						</div>
+						<div class="tab-pane " id="tab_unread">
+							<table class="table">
+								<thead>
+								<tr>
+									<th>类型</th>
+									<th>内容</th>
+									<th>回复</th>
+									<th>时间</th>
+								</tr>
+								</thead>
+								<tbody>{volist name="notreplylist" id="vo"}
+								<tr>
+									<td>{if condition="$vo.type eq 1"} 充值 {elseif condition="$vo.type eq 2"/} 提币 {elseif condition="$vo.type eq 3"/} 其它 {/if}</td>
+									<td>{$vo.content}</td>
+									<td>{empty name="vo.reply"} --- {else/} {$vo.reply} {/empty}</td>
+									<td>{empty name="vo.addtime"} --- {else/} {:date("Y-m-d H:i:s", $vo['addtime'])} {/empty}</td>
+								</tr>
+								{/volist}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<script> $(function () {});</script>
+</div>{include file="Public:footer_new"/}
