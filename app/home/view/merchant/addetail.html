@@ -10,40 +10,39 @@
 				<div class="box box-danger">
 					<div class="box-header with-border"><h3 class="box-title">查看</h3>
 						<div class="box-tools">
-							<div class="btn-group pull-right" style="margin-right: 10px"><a href="/merchant/adindex" class="btn btn-sm btn-default"><i class="fa fa-list"></i>&nbsp;列表</a></div>
+							<div class="btn-group pull-right" style="margin-right: 10px"><a href="/merchant/adindex" class="btn btn-sm btn-danger"><i class="fa fa-list"></i>&nbsp;返回列表</a></div>
 						</div>
 					</div><!-- /.box-header --><!-- form start -->
 					<form  method="post" accept-charset="UTF-8" class="form-horizontal" id="tradeForm">
 						<div class="box-body">
 							<div class="fields-group">
-								<div class="row" style="padding:20px;">
-									<div class="col-md-4">
-										<img src="{empty name='AdOwner.headpic'}__IMG__/user2-160x160.jpg{else/}/Uploads/face/{$AdOwner.headpic}{/empty}" style="width: 100%;max-width: 45px;height: auto;border-radius:50%;"/><!-- {:msubstr($AdOwner['name'], 0, 1)} -->{$AdOwner['name']}
-									</div>
-									<div class="col-md-4">交易次数：{$AdOwner.transact_buy}</div>
-									<div class="col-md-4">平均打款时间：{:round($AdOwner['averge_buy']/60)}分钟</div>
-								</div>
 								<div class="form-group form-group-USDT" style="display:block"><label class="col-sm-3 control-label"><em class="text-danger"></em> 交易信息</label>
 									<div class="col-sm-9">
 										<div class="cards-groups cards-groups-USDT">
 											<div class="cards-item">
-												<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 报价：</label>
-													<div class="input-group" style="padding-top:7px;">{$ad.price}</div>
+												<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 卖家 ：</label>
+													<div class="input-group" style="padding-top:7px;">{$AdOwner.name}</div>
 												</div>
-												<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 交易限额：</label>
-													<div class="input-group" style="padding-top:7px;">{$ad.min_limit}-{$ad.max_limit} CNY</div>
+												<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 交易次数 ：</label>
+													<div class="input-group" style="padding-top:7px;">{$AdOwner.transact_buy}</div>
 												</div>
-												<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 付款方式：</label>
+												<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 报价 ：</label>
+													<div class="input-group" style="padding-top:7px;">{$ad.price|round=###,4}</div>
+												</div>
+												<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 交易限额 ：</label>
+													<div class="input-group" style="padding-top:7px;">{$ad.min_limit|round=###,2}-{$ad.max_limit|round=###,2} CNY</div>
+												</div>
+												<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 付款方式 ：</label>
 													<div class="input-group" style="padding-top:7px;">{php} if($ad['pay_method']> 0){ echo "银行转账&nbsp;"; } if($ad['pay_method2']> 0){ echo "支付宝&nbsp;"; } if($ad['pay_method3']> 0){ echo "微信支付&nbsp;"; } if($ad['pay_method4']> 0){ echo "云闪付&nbsp;"; } {/php}</div>
 												</div>
-												<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 剩余数量：</label>
+												<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 剩余数量 ：</label>
 													<div class="input-group" style="padding-top:7px;">{$ad.RemainNum}</div>
 												</div>
 											</div>
 										</div>&nbsp;
 									</div>
 								</div>
-								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 出售数量</label>
+								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 交易金额</label>
 									<div class="col-sm-2">
 										<div class="input-group"><input type="text" name="amount" value="" id="amount0" class="form-control"><span class="input-group-addon">CNY</span></div>
 									</div>

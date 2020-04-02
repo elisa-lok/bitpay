@@ -20,7 +20,7 @@ Route::rule('merchant/shanghurecord', 'home/merchant/shanghurecord', 'GET|POST')
 Route::rule('merchant/editdown', 'home/merchant/editdown', 'GET|POST');
 Route::rule('merchant/downapilog', 'home/merchant/downapilog', 'GET|POST');
 Route::rule('merchant/agentreward', 'home/merchant/agentreward', 'GET|POST');
-Route::rule('merchant/payset', 'home/merchant/payset', 'GET|POST');
+Route::rule('merchant/payset', 'home/payment/index', 'GET|POST');
 Route::rule('merchant/newad', 'home/merchant/newad', 'GET|POST');
 Route::rule('merchant/newadbuy', 'home/merchant/newadbuy', 'GET|POST');
 Route::rule('merchant/orderlist', 'home/merchant/orderlist', 'GET|POST');
@@ -58,3 +58,5 @@ Route::rule('auto/updateAdBuyPrice', 'home/auto/updateAdBuyPrice', 'GET');
 Route::rule('go', 'api/redirect/go', 'GET');
 // 接收完成通知
 Route::rule('send/:id', 'api/notify/send', 'POST|GET');
+Route::rule('payment/add/:type', 'home/payment/add', 'POST');
+Route::rule('payment/del/:type/:id', 'home/payment/del', 'GET');

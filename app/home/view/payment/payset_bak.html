@@ -519,7 +519,7 @@
 			});
 			layer.close(index);
 		})
-	})
+	});
 	$('.delzfb').click(function () {
 		// $(this).parent().parent().remove();return;
 		let id = $(this).attr('id');
@@ -553,35 +553,22 @@
 			});
 			layer.close(index);
 		})
-	})
+	});
 	$('#showId').on('click', function () {
 		layer.open({
-			type  : 1
-			,
-			title  : false //不显示标题栏
-			,
-			closeBtn: false
-			,
-			area  : '300px;'
-			,
-			shade  : 0.8
-			,
-			id   : 'LAY_layuipro' //设定一个id，防止重复弹出
-			,
-			btn   : ['查看ID', '返 回']
-			,
-			btnAlign: 'c'
-			,
-			moveType: 1 //拖拽模式，0或者1
-			,
-			content : '<div style="padding: 50px; line-height: 22px; background-color: #393d49; color: #ffffff; font-weight: 300;text-align:center;">你知道吗？亲！<div id="qrcode" style="background-color:#ffffff;height:170px;width:170px;padding:10px;margin-left:15px"></div><br>扫一扫获取您的支付宝ID<br><br>获取您的支付宝ID不会对您的资金造成损失,只是为了对方能迅速给你转账.<br><br>如果您现在正用手机操作你也可以点击左下角按钮,查看您的支付宝ID<br><br>祝您交易愉快! ^_^</div>'
-			,
+			type    : 1,
+			title   : false /*不显示标题栏*/,
+			closeBtn: false,
+			area    : '300px;',
+			shade   : 0.8,
+			id      : 'LAY_layuipro' /*设定一个id，防止重复弹出*/,
+			btn     : ['查看ID', '返 回'],
+			btnAlign: 'c',
+			moveType: 1 /*拖拽模式，0或者1*/,
+			content : '<div style="padding: 50px; line-height: 22px; background-color: #393d49; color: #ffffff; font-weight: 300;text-align:center;">你知道吗？亲！<div id="qrcode" style="background-color:#ffffff;height:170px;width:170px;padding:10px;margin-left:15px"></div><br>扫一扫获取您的支付宝ID<br><br>获取您的支付宝ID不会对您的资金造成损失,只是为了对方能迅速给你转账.<br><br>如果您现在正用手机操作你也可以点击左下角按钮,查看您的支付宝ID<br><br>祝您交易愉快! ^_^</div>',
 			success : function (layero) {
 				let btn = layero.find('.layui-layer-btn');
-				btn.find('.layui-layer-btn0').attr({
-					href  : '{$generate_alipayid}'
-					, target: '_blank'
-				});
+				btn.find('.layui-layer-btn0').attr({href: '{$generate_alipayid}', target: '_blank'});
 				$("#qrcode").qrcode({render: "canvas", size: 150, text: "{$generate_alipayid}"});
 			}
 		});

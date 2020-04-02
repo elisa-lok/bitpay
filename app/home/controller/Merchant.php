@@ -923,336 +923,14 @@ class Merchant extends Base {
 			}
 		}
 		//新方法
-		// if(!$qianbao){
-		// $address=Db::name('address')->where('status',0)->find();
-		// if(!$address){
-		// $this->error('系统可用地址池错误');
-		// }
-		// $rs = $model->updateOne(['id'=>$this->uid, 'usdtb'=>$address['address']]);
-		// if($rs['code'] == 1){
-		// $mp['status']=1;
-		// $mp['uid']=$this->uid;
-		// Db::name('address')->where('address',$address['address'])->update($mp);
-		// $qianbao =$address['address'];
-		// }else{
-		// $this->error($rs['msg']);
-		// }
-		// }
-		//原方法
-		/*
- if(!$qianbao){
- $model2 = new \app\common\model\Usdt();
- $return = $model2->index('getnewaddress', $addr = null, $mum = null, $index=null, $count=null,$skip=null);
- if($return['code'] == 1 && !empty($return['data'])){
- // $rs = Db::name('merchant_user_address')->insert(['merchant_id'=>$this->merchant['id'], 'username'=>$data['username'], 'address'=>$return['data'], 'addtime'=>time()]);
- $rs = $model->updateOne(['id'=>$this->uid, 'usdtb'=>$return['data']]);
- if($rs['code'] == 1){
- $qianbao = $return['data'];
- }else{
- $this->error($rs['msg']);
- }
- }else{
- $this->error('生成钱包地址失败');
- }
- }
- */ // $this->assign('qianbao', $qianbao);
+		/*if(!$qianbao){$address=Db::name('address')->where('status',0)->find();if(!$address){$this->error('系统可用地址池错误');}$rs = $model->updateOne(['id'=>$this->uid, 'usdtb'=>$address['address']]);if($rs['code'] == 1){$mp['status']=1;$mp['uid']=$this->uid;Db::name('address')->where('address',$address['address'])->update($mp);$qianbao =$address['address'];}else{$this->error($rs['msg']);}}*/ //原方法
+		/*if (!$qianbao) {$model2 = new \app\common\model\Usdt();$return = $model2->index('getnewaddress', $addr = NULL, $mum = NULL, $index = NULL, $count = NULL, $skip = NULL);if ($return['code'] == 1 && !empty($return['data'])) {// $rs = Db::name('merchant_user_address')->insert(['merchant_id'=>$this->merchant['id'], 'username'=>$data['username'], 'address'=>$return['data'], 'addtime'=>time()]); $rs = $model->updateOne(['id' => $this->uid, 'usdtb' => $return['data']]); if ($rs['code'] == 1) { $qianbao = $return['data']; } else { $this->error($rs['msg']); } } else { $this->error('生成钱包地址失败'); } } */// $this->assign('qianbao', $qianbao);
 		// $this->assign('qianbao2', $qianbao2);
 		$confirms = config('usdt_confirms');
 		$this->assign('confirms', $confirms);
 		$list = Db::name('merchant_recharge')->where(['merchant_id' => $this->uid])->order('id DESC')->paginate(20);
 		$this->assign('list', $list);
 		return $this->fetch();
-	}
-
-	public function payset() {
-		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
-		$user = Db::name('merchant')->where(['id' => $this->uid])->find();
-		$this->assign('user', $user);
-		$bankModel = new BankModel();
-		$alipay    = new ZfbModel();
-		$wx        = new WxModel();
-		$unionpay  = new YsfModel();
-		$this->assign('generate_alipayid', 'https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id=2016110502555511&redirect_uri=https%3A%2F%2Fwww.dedemao.com%2Falipay%2Fauthorize.php%3Fscope%3Dauth_base&scope=auth_base&state=STATE');
-		$this->assign('list', $bankModel->getBank(['merchant_id' => $this->uid], 'id DESC'));
-		$this->assign('list2', $alipay->getBank(['merchant_id' => $this->uid], 'id DESC'));
-		$this->assign('list3', $wx->getBank(['merchant_id' => $this->uid], 'id DESC'));
-		$this->assign('list4', $unionpay->getBank(['merchant_id' => $this->uid], 'id DESC'));
-		$ga = explode('|', $user['ga']);
-		$this->assign('ga', ($ga['4'] ?? 0));
-		return $this->fetch();
-	}
-
-	public function delBank() {
-		$id = input('param.id');
-		$m  = new BankModel();
-		$rs = $m->delOne(['id' => $id, 'merchant_id' => $this->uid]);
-		return json($rs);
-	}
-
-	public function delZfb() {
-		$id = input('param.id');
-		$m  = new ZfbModel();
-		$rs = $m->delOne(['id' => $id, 'merchant_id' => $this->uid]);
-		return json($rs);
-	}
-
-	public function delWx() {
-		$id = input('param.id');
-		$m  = new WxModel();
-		$rs = $m->delOne(['id' => $id, 'merchant_id' => $this->uid]);
-		return json($rs);
-	}
-
-	public function delYsf() {
-		$id = input('param.id');
-		$m  = new YsfModel();
-		$rs = $m->delOne(['id' => $id, 'merchant_id' => $this->uid]);
-		return json($rs);
-	}
-
-	public function doaccount() {
-		if (request()->isPost()) {
-			!$this->uid && $this->error('请登陆操作', url('home/login/login'));
-			$c_bank                     = input('post.c_bank');
-			$c_bank_detail              = input('post.c_bank_detail');
-			$c_bank_card                = input('post.c_bank_card');
-			$c_bank_card_again          = input('post.c_bank_card_again');
-			$id                         = input('post.id');
-			$m                          = new BankModel();
-			$param['c_bank']            = $c_bank;
-			$param['c_bank_detail']     = $c_bank_detail;
-			$param['c_bank_card']       = $c_bank_card;
-			$param['c_bank_card_again'] = $c_bank_card_again;
-			$param['merchant_id']       = $this->uid;
-			$param['name']              = input('post.name');
-			$param['truename']          = input('post.truename');
-			$user                       = Db::name('merchant')->where('id', $this->uid)->find();
-			$ga                         = explode('|', $user['ga']);
-			if (isset($ga[4]) && $ga[4]) {
-				$code = input('post.ga');
-				!$code && $this->error('请输入谷歌验证码');
-				$google = new GoogleAuthenticator();
-				!$google->verifyCode($ga['0'], $code, 1) && $this->error('谷歌验证码错误！');
-			}
-			if ($id) {
-				$param['id'] = $id;
-				$rs          = $m->updateOne($param);
-			} else {
-				$rs = $m->insertOne($param);
-			}
-			($rs['code'] == 1) ? $this->success($rs['msg']) : $this->error($rs['msg']);
-			// TODO ?????????? 为什么没往下写?
-			$param['id']            = $this->uid;
-			$param['c_bank']        = $c_bank;
-			$param['c_bank_detail'] = $c_bank_detail;
-			$param['c_bank_card']   = $c_bank_card;
-			$param['name']          = $name = input('post.name');
-			(empty($name) || !checkName($name)) && $this->error('请填写真实姓名');
-			($c_bank_card_again != $c_bank_card && !empty($c_bank_card)) && $this->error('确认银行卡卡号错误！');
-			(strlen($c_bank_card) < 16 || strlen($c_bank_card) > 22) && $this->error('请输入正确的银行卡号');
-			(!$c_bank) && $this->error('请输入开户银行');
-			(!$c_bank_detail) && $this->error('请输入开户支行');
-			$param['id']            = $this->uid;
-			$param['c_bank']        = $c_bank;
-			$param['c_bank_detail'] = $c_bank_detail;
-			$param['c_bank_card']   = $c_bank_card;
-			$param['name']          = $name;
-			$model                  = new MerchantModel();
-			$return                 = $model->updateOne($param);
-			($return['code'] == 1) ? $this->success($return['msg']) : $this->error($return['msg']);
-		}
-	}
-
-	public function doalipay() {
-		if (request()->isPost()) {
-			!$this->uid && $this->error('请登陆操作', url('home/login/login'));
-			$user = Db::name('merchant')->where('id', $this->uid)->find();
-			$ga   = explode('|', $user['ga']);
-			if (isset($ga[4]) && $ga[4]) {
-				$code = input('post.ga');
-				!$code && $this->error('请输入谷歌验证码');
-				$google = new GoogleAuthenticator();
-				!$google->verifyCode($ga['0'], $code, 1) && $this->error('谷歌验证码错误！');
-			}
-			$name = input('post.name');
-			(empty($name) || !checkName($name)) && $this->error('请填写真实姓名');
-			$alipay_account = input('post.alipay_account');
-			(!$alipay_account) && $this->error('请输入支付宝账户');
-			$file = request()->file('avatar');
-			if ($file) {
-				$info = $file->validate(['size' => 3145728, 'ext' => 'jpg,png'])->move(ROOT_PATH . 'public' . DS . 'uploads/face');
-				if ($info) {
-					$param['c_alipay_img'] = $info->getSaveName();
-				} else {
-					$param['c_alipay_img'] = '';
-					// $this->error('请上传支付宝收款码：' . $file->getError());
-				}
-			} else {
-				$lastImg = input('post.last_alipay_img');
-				if (empty($lastImg)) {
-					$param['c_alipay_img'] = '';
-					//$this->error('请上传支付宝收款码');
-				} else {
-					$param['c_alipay_img'] = $lastImg;
-				}
-			}
-			$param['id']               = $this->uid;
-			$param['c_alipay_account'] = $alipay_account;
-			$param['name']             = $name;
-			$model                     = new MerchantModel();
-			$return                    = $model->updateOne($param);
-			($return['code'] == 1) ? $this->success($return['msg']) : $this->error($return['msg']);
-		}
-	}
-
-	public function dowechat() {
-		if (request()->isPost()) {
-			!$this->uid && $this->error('请登陆操作', url('home/login/login'));
-			$user = Db::name('merchant')->where('id', $this->uid)->find();
-			$ga   = explode('|', $user['ga']);
-			if (isset($ga[4]) && $ga[4]) {
-				$code = input('post.ga');
-				!$code && $this->error('请输入谷歌验证码');
-				$google = new GoogleAuthenticator();
-				!$google->verifyCode($ga['0'], $code, 1) && $this->error('谷歌验证码错误！');
-			}
-			$name = input('post.name');
-			(empty($name) || !checkName($name)) && $this->error('请填写真实姓名');
-			$file = request()->file('avatar2');
-			if ($file) {
-				$info = $file->validate(['size' => 3145728, 'ext' => 'jpg,png'])->move(ROOT_PATH . 'public' . DS . 'uploads/face');
-				if ($info) {
-					$param['c_wechat_img'] = $info->getSaveName();
-				} else {
-					$param['c_wechat_img'] = '';
-					// $this->error('请上传微信收款码：' . $file->getError());
-				}
-			} else {
-				$lastImg = input('post.last_wechat_img');
-				if (empty($lastImg)) {
-					$param['c_wechat_img'] = '';
-					// $this->error('请上传微信收款码');
-				} else {
-					$param['c_wechat_img'] = $lastImg;
-				}
-			}
-			$wxAccount = input('post.wechat_account');
-			(!$wxAccount) && $this->error('请输入微信账户');
-			$param['id']               = $this->uid;
-			$param['c_wechat_account'] = $wxAccount;
-			$param['name']             = $name;
-			$model                     = new MerchantModel();
-			$return                    = $model->updateOne($param);
-			($return['code'] == 1) ? $this->success($return['msg']) : $this->error($return['msg']);
-		}
-	}
-
-	public function doalipaynew() {
-		if (request()->isPost()) {
-			!$this->uid && $this->error('请登陆操作', url('home/login/login'));
-			$user = Db::name('merchant')->where('id', $this->uid)->find();
-			$ga   = explode('|', $user['ga']);
-			if (isset($ga[4]) && $ga[4]) {
-				$code = input('post.ga');
-				!$code && $this->error('请输入谷歌验证码');
-				$google = new GoogleAuthenticator();
-				!$google->verifyCode($ga['0'], $code, 1) && $this->error('谷歌验证码错误！');
-			}
-			$trueName       = input('post.zfbtruename');
-			$name           = input('post.zfbname');
-			$alipay_account = input('post.alipay_account');
-			$alipay_id      = input('post.alipay_id');
-			empty($trueName) && $this->error('请填写真实姓名');
-			empty($name) && $this->error('请填写标识名称');
-			empty($alipay_id) && $this->error('请输入支付宝ID');
-			// if(!$alipay_account){
-			// $this->error('请输入支付宝账户');
-			// }
-			$file = request()->file('avatar');
-			if ($file) {
-				$info = $file->validate(['size' => 3145728, 'ext' => 'jpg,png'])->move(ROOT_PATH . 'public' . DS . 'uploads/face');
-				if ($info) {
-					$param['c_bank_detail'] = $info->getSaveName();
-				} else {
-					$param['c_bank_detail'] = '';
-					// $this->error('请上传支付宝收款码：' . $file->getError());
-				}
-			} else {
-				$lastImg = input('post.last_alipay_img');
-				if (empty($lastImg)) {
-					$param['c_bank_detail'] = '';
-					// $this->error('请上传支付宝收款码');
-				} else {
-					$param['c_bank_detail'] = $lastImg;
-				}
-			}
-			$param['merchant_id'] = $this->uid;
-			$param['c_bank']      = $alipay_account;
-			$param['truename']    = $trueName;
-			$param['name']        = $name;
-			$param['alipay_id']   = trim($alipay_id);
-			$model                = new ZfbModel();
-			$return               = $model->insertOne($param);
-			($return['code'] == 1) ? $this->success($return['msg']) : $this->error($return['msg']);
-		}
-	}
-
-	public function dowechatnew() {
-		if (request()->isPost()) {
-			!$this->uid && $this->error('请登陆操作', url('home/login/login'));
-			$trueName  = input('post.wxtruename');
-			$name      = input('post.wxname');
-			$wxAccount = input('post.wechat_account');
-			(empty($trueName)) && $this->error('请填写真实姓名');
-			(empty($name)) && $this->error('请填写标识名称');
-			(!$wxAccount) && $this->error('请输入微信账户');
-			$file = request()->file('avatar2');
-			if ($file) {
-				$info                   = $file->validate(['size' => 3145728, 'ext' => 'jpg,png'])->move(ROOT_PATH . 'public' . DS . 'uploads/face');
-				$param['c_bank_detail'] = $info ? $info->getSaveName() : '';
-			} else {
-				$lastImg = input('post.last_wechat_img');
-				// $this->error('请上传微信收款码');
-				$param['c_bank_detail'] = empty($lastImg) ? '' : $lastImg;
-			}
-			$param['merchant_id'] = $this->uid;
-			$param['c_bank']      = $wxAccount;
-			$param['truename']    = $trueName;
-			$param['name']        = $name;
-			$model                = new WxModel();
-			$return               = $model->insertOne($param);
-			($return['code'] == 1) ? $this->success($return['msg']) : $this->error($return['msg']);
-		}
-	}
-
-	public function doysfnew() {
-		if (request()->isPost()) {
-			!$this->uid && $this->error('请登陆操作', url('home/login/login'));
-			$trueName = input('post.ysftruename');
-			$name     = input('post.ysfname');
-			(empty($trueName)) && $this->error('请填写真实姓名');
-			(empty($name)) && $this->error('请填写标识名称');
-			$file = request()->file('avatar2');
-			if ($file) {
-				$info = $file->validate(['size' => 3145728, 'ext' => 'jpg,png'])->move(ROOT_PATH . 'public' . DS . 'uploads/face');
-				if ($info) {
-					$param['c_bank_detail'] = $info->getSaveName();
-				} else {
-					$this->error('请上传已释放收款码：' . $file->getError());
-				}
-			} else {
-				$lastImg = input('post.ysfimg');
-				(empty($lastImg)) && $this->error('请上传微信收款码');
-				$param['c_bank_detail'] = $lastImg;
-			}
-			$param['merchant_id'] = $this->uid;
-			// $param['c_bank'] = $wxAccount;
-			$param['truename'] = $trueName;
-			$param['name']     = $name;
-			$model             = new YsfModel();
-			$return            = $model->insertOne($param);
-			($return['code'] == 1) ? $this->success($return['msg']) : $this->error($return['msg']);
-		}
 	}
 
 	public function newad() {
@@ -1527,9 +1205,8 @@ class Merchant extends Base {
 			$count = $model->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
 			$model2->updateOne(['id' => $this->uid, 'ad_on_buy' => $count ? $count : 0]);
 			$this->success("操作成功");
-		} else {
-			$this->error("操作失败");
 		}
+		$this->error("操作失败");
 	}
 
 	public function adindex() {
@@ -1710,29 +1387,6 @@ class Merchant extends Base {
 		}
 	}
 
-	public function BackArr($key) {
-		$bankArr = [
-			'工商银行' => 'ICBC',
-			'农业银行' => 'ABC',
-			'中国银行' => 'BOC',
-			'建设银行' => 'CCB',
-			'招商银行' => 'CMB',
-			'浦发银行' => 'SPDB',
-			'广发银行' => 'GDB',
-			'兴业银行' => 'CIB',
-			'北京银行' => 'BCCB',
-			'交通银行' => 'COMM',
-			'平安银行' => 'SPABANK',
-			'光大银行' => 'CEB',
-			'中信银行' => 'CNCB',
-			'民生银行' => 'CMBC',
-			'华夏银行' => 'HXB',
-			'上海银行' => 'BOS',
-			'邮政储蓄' => 'PSBC',
-		];
-		return $bankArr[$key] ?? showMsg('暂不支持该银行');
-	}
-
 	public function ordersell() {
 		!$this->uid && $this->error('请登陆操作', url('home/login/login'));
 		$where['sell_id'] = $this->uid;
@@ -1806,23 +1460,6 @@ class Merchant extends Base {
 		PHPExcel::excelPut($Excel, $data);
 	}
 
-	public function Scurl($url, $data = []) {
-		//使用crul模拟
-		$ch = curl_init();
-		//禁用https
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		//允许请求以文件流的形式返回
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
-		curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 30);
-		curl_setopt($ch, CURLOPT_URL, $url);
-		$result = curl_exec($ch); //执行发送
-		curl_close($ch);
-		return $result;
-	}
-
 	public function CheckOutTime() {
 		$id    = input('post.id');
 		$order = Db::name('order_buy')->where('id', $id)->find();
@@ -1857,9 +1494,8 @@ class Merchant extends Base {
 				sendSms($mobile, $content);
 			}*/
 			$this->success($order['return_url']);
-		} else {
-			$this->error('确认失败，请稍后再试');
 		}
+		$this->error('确认失败，请稍后再试');
 	}
 
 	/**
@@ -1882,9 +1518,8 @@ class Merchant extends Base {
 			// sendSms($mobile, $content);
 			//}
 			$this->success('标记成功');
-		} else {
-			$this->error('确认失败，请稍后再试');
 		}
+		$this->error('确认失败，请稍后再试');
 	}
 
 	public function pkorder() {
@@ -2052,9 +1687,7 @@ class Merchant extends Base {
 		return $this->fetch();
 	}
 
-	/**
-	 * 承兑商买单申诉
-	 */
+	//承兑商买单申诉
 	public function appeal_ajax_trader() {
 		if (request()->isPost()) {
 			$content = input('post.content');
@@ -2073,9 +1706,7 @@ class Merchant extends Base {
 		}
 	}
 
-	/**
-	 * 商户申诉
-	 */
+	//商户申诉
 	public function appeal_ajax_merchant() {
 		if (request()->isPost()) {
 			$content = input('post.content');

@@ -1,0 +1,449 @@
+{include file="Public:header_new"/}
+<style>input, select, .col-sm-10{max-width:700px;text-align:center;text-align-last:center;}
+.upload_file{position:absolute;width:100%;height:220px;opacity:0;top:0;left:0;overflow:hidden;z-index:10;}
+.qrcodeImg{width:220px;height:220px;border-radius:10px}
+.nav > li > a{padding-left:5px;padding-right:5px}</style>
+<div class="content-wrapper" id="pjax-container" style="min-height: 414px;">
+	<section class="content">
+		<div class="col-md-12">
+			<div class="nav-tabs-custom">
+				<ul class="nav nav-tabs">
+					<li class="active"><a href="/message/index#tab_bank" data-toggle="tab"><i class="fa fa-credit-card fa-fw" style="color:orange"></i> 银行卡</a></li>
+					<li><a href="/message/index#tab_alipay" data-toggle="tab"><svg class="icon" style="width: 1em; height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1134"><path d="M1023.795 853.64v6.348a163.807 163.807 0 0 1-163.807 163.807h-696.18A163.807 163.807 0 0 1 0 859.988v-696.18A163.807 163.807 0 0 1 163.807 0h696.181a163.807 163.807 0 0 1 163.807 163.807V853.64z" fill="#009FE9" p-id="1135" data-spm-anchor-id="a313x.7781069.1998910419.i2"></path><path d="M844.836 648.267c-40.952-14.333-95.623-34.809-156.846-57.128a949.058 949.058 0 0 0 90.094-222.573H573.325V307.14h245.711v-43.41l-245.71 2.458V143.33H472.173c-18.223 0-21.704 20.476-21.704 20.476v102.38H204.759v40.952h245.71v61.427H245.712v40.952h409.518a805.522 805.522 0 0 1-64.909 148.246c-128.384-42.795-266.186-77.604-354.233-55.08a213.564 213.564 0 0 0-112.003 63.27c-95.418 116.917-26.21 294.034 175.274 294.034 119.989 0 236.087-67.366 325.771-177.73 134.322 65.932 398.666 176.297 398.666 176.297V701.3s-32.352-4.095-178.96-53.033z m-563.702 144.97c-158.893 0-204.759-124.699-126.336-194.112a191.86 191.86 0 0 1 90.913-46.276c93.575-10.238 189.811 35.629 293.624 86.614-74.941 94.598-166.674 153.774-258.2 153.774z" fill="#FFFFFF" p-id="1136"></path></svg> 支付宝</a></li>
+					<li><a href="/message/index#tab_wxpay" data-toggle="tab"><i class="fa fa-wechat fa-fw" style="color:limegreen"> </i> 微信</a></li>
+					<li><a href="/message/index#tab_union" data-toggle="tab"><span><img src="__IMG__/unionpay_logo.png" width="14"></span> 云闪付</a></li>
+				</ul>
+				<div class="tab-content table-responsive">
+					<div class="tab-pane active" id="tab_bank">
+						<form action="{:url('home/merchant/doaccount')}" id="formBank" method="post" accept-charset="UTF-8" class="form-horizontal" enctype="multipart/form-data" autocomplete="off">
+							<div class="box-body">
+								<div class="form-group">
+									<label class="col-sm-3 control-label">姓名</label>
+									<div class="col-sm-10">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span><input type="text" name="truename" value="" class="form-control" placeholder="您的真实姓名">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-3 control-label">账户标识</label>
+									<div class="col-sm-10">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-tag fa-fw"></i></span><input type="text" name="tag" value="" class="form-control" placeholder="如:卡号1234">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-3 control-label">开户银行</label>
+									<div class="col-sm-10">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-home fa-fw"></i></span> <select name="bank_name" class="form-control">
+											<option value="中国银行">中国银行</option>
+											<option value="工商银行">工商银行</option>
+											<option value="建设银行">建设银行</option>
+											<option value="农业银行">农业银行</option>
+											<option value="交通银行">交通银行</option>
+											<option value="浦发银行">浦发银行</option>
+											<option value="光大银行">光大银行</option>
+											<option value="招商银行">招商银行</option>
+											<option value="广发银行">广发银行</option>
+											<option value="中信银行">中信银行</option>
+											<option value="民生银行">民生银行</option>
+											<option value="兴业银行">兴业银行</option>
+											<option value="华夏银行">华夏银行</option>
+											<option value="上海银行">上海银行</option>
+											<option value="邮政储蓄">邮政储蓄</option>
+											<option value="北京银行">北京银行</option>
+											<option value="平安银行">平安银行</option>
+										</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-3 control-label">开户支行</label>
+									<div class="col-sm-10">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-code-fork fa-fw"></i></span> <input type="text" name="bank_branch" value="" class="form-control" placeholder="开户支行">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-3 control-label">银行卡号</label>
+									<div class="col-sm-10">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-credit-card fa-fw"></i></span> <input type="text" name="bank_card" value="" class="form-control" placeholder="银行卡号">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-3 control-label">确认卡号</label>
+									<div class="col-sm-10">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-repeat fa-fw"></i></span> <input type="text" name="bank_card_repeat" value="" class="form-control" placeholder="确认卡号">
+										</div>
+									</div>
+								</div>
+								{eq name="ga" value="1"}
+								<div class="form-group">
+									<label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
+									<div class="col-sm-3">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span><input type="text" name="ga" value="" class="form-control">
+										</div>
+									</div>
+								</div>
+								{/eq}
+								<div class="box-footer" style="text-align:left">
+									<div class="form-group">
+										<div class="col-sm-offset-3 col-sm-10">
+											<button type="reset" class="btn btn-default">重置</button>
+											<button type="button" class="btn btn-success" onclick="subForm('#formBank')">提交</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+						<div class="tab-content table-responsive">
+							<table class="table">
+								<thead>
+								<tr>
+									<th>姓名</th>
+									<th>标识</th>
+									<th>银行</th>
+									<th>支行</th>
+									<th>卡号</th>
+									<th>创建</th>
+									<th>操作</th>
+								</tr>
+								</thead>
+								<tbody>
+								{volist name="list" id="vo"}
+								<tr>
+									<td>{$vo.truename}</td>
+									<td>{$vo.name}</td>
+									<td>{$vo.c_bank}</td>
+									<td>{$vo.c_bank_detail}</td>
+									<td>{$vo.c_bank_card}</td>
+									<td>{:date('Y-m-d H:i', $vo['create_time'])}</td>
+									<td><a id="{$vo.id}" class="btn btn-sm btn-danger" onclick="delPayment('bank',this, '{$vo.id}')">删除</a></td>
+								</tr>
+								{/volist}
+								</tbody>
+							</table>
+							<div class="box-footer clearfix">
+								{$list->render()}
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane" id="tab_alipay">
+						<form action="{:url('home/merchant/doalipaynew')}" id="formAlipay" method="post" accept-charset="UTF-8" class="form-horizontal" enctype="multipart/form-data" autocomplete="off">
+							<div class="box-body">
+								<div class="form-group">
+									<label class="col-sm-3 control-label">姓名</label>
+									<div class="col-sm-10">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span> <input type="text" name="truename" class="form-control" placeholder="您的真实姓名">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-3 control-label">标识</label>
+									<div class="col-sm-10">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-tag fa-fw"></i></span> <input type="text" name="tag" class="form-control" placeholder="用于区别的标识,如账户1,账户2">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-3 control-label">支付宝账号</label>
+									<div class="col-sm-10">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-credit-card fa-fw"></i></span> <input type="text" name="account" value="" class="form-control" placeholder="输入支付宝账号">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-3 control-label">支付宝ID</label>
+									<div class="col-sm-10">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span> <input type="text" name="alipay_id" class="form-control" placeholder="输入支付宝ID">
+										</div>
+										<a href="javascript:;" class="text-info" id="showAlipayId" style="float:left">如何获取支付宝ID?</a>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-3 control-label">收款码</label>
+									<div class="col-sm-10">
+										<div class="input-group" style="display:block;">
+											<div style="position: relative;">
+												<img class="qrcodeImg" id="alipay_bg" src="__IMG__/img_bg.png"/> <input class="upload_file" type="file" onChange="readQr(this,'#alipay')" value=""/>
+											</div>
+										</div>
+										<input type="text" name="qrcode" id="alipay_txt"  value="" readonly hidden/>
+										<p id="alipay_msg">&nbsp;</p>
+									</div>
+								</div>
+								{eq name="ga" value="1"}
+								<div class="form-group">
+									<label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
+									<div class="col-sm-3">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span><input type="text" name="ga" value="" class="form-control">
+										</div>
+									</div>
+								</div>
+								{/eq}
+							</div>
+							<div class="box-footer">
+								<div class="form-group">
+									<div class="col-sm-offset-3 col-sm-10">
+										<button type="reset" class="btn btn-default">重置</button>
+										<button type="button" onclick="subForm('#formAlipay')" class="btn btn-success">提交</button>
+									</div>
+								</div>
+							</div>
+						</form>
+						<div class="tab-content table-responsive">
+							<table class="table">
+								<thead>
+								<tr>
+									<th>姓名</th>
+									<th>标识</th>
+									<th>支付宝账号</th>
+									<th>收款码(点击查看)</th>
+									<th>创建时间</th>
+									<th>操作</th>
+								</tr>
+								</thead>
+								<tbody>
+								{volist name="list2" id="vo"}
+								<tr>
+									<td>{$vo.truename}</td>
+									<td>{$vo.name}</td>
+									<td>{$vo.c_bank}</td>
+									<td><a onclick="showQr('{$vo.qrcode}')"><img src="__IMG__/q.jpg" style="width: 30px;"></a></td>
+									<td>{:date('Y-m-d H:i', $vo['create_time'])}</td>
+									<td>
+										<a id="{$vo.id}" class="btn btn-sm btn-danger" onclick="delPayment('alipay',this, '{$vo.id}')">删除</a>
+									</td>
+								</tr>
+								{/volist}
+								</tbody>
+							</table>
+							<div class="box-footer clearfix">
+								{$list->render()}
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane" id="tab_wxpay">
+						<form action="{:url('home/merchant/dowechatnew')}" id="formWx" method="post" accept-charset="UTF-8" class="form-horizontal" enctype="multipart/form-data" autocomplete="off">
+							<div class="box-body">
+								<div class="form-group">
+									<label class="col-sm-3 control-label">姓名</label>
+									<div class="col-sm-10">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span> <input type="text" name="truename" class="form-control" placeholder="您的真实姓名">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-3 control-label">标识</label>
+									<div class="col-sm-10">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-tag fa-fw"></i></span> <input type="text" name="tag" class="form-control" placeholder="用于区别的标识,如微信1,微信2">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-3 control-label">绑定手机号</label>
+									<div class="col-sm-10">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-mobile fa-fw"></i></span> <input type="text" name="account" value="" class="form-control" placeholder="微信绑定手机号">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-3 control-label">收款码</label>
+									<div class="col-sm-10">
+										<div class="input-group" style="display:block;">
+											<div style="position: relative;">
+												<img class="qrcodeImg" id="wx_bg" src="__IMG__/img_bg.png"/> <input class="upload_file" type="file" onChange="readQr(this,'#wx')" value=""/>
+											</div>
+										</div>
+										<input type="text" name="qrcode" id="wx_txt" value="" readonly hidden/>
+										<p id="wx_msg">&nbsp;</p>
+									</div>
+								</div>
+								{eq name="ga" value="1"}
+								<div class="form-group">
+									<label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
+									<div class="col-sm-3">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span><input type="text" name="ga" value="" class="form-control">
+										</div>
+									</div>
+								</div>
+								{/eq}
+								<div class="box-footer" style="text-align:left">
+									<div class="form-group">
+										<div class="col-sm-offset-3 col-sm-10">
+											<button type="reset" class="btn btn-default">重置</button>
+											<button type="button" onclick="subForm('#formWx')" class="btn btn-success">提交</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+						<div class="tab-content table-responsive">
+							<table class="table">
+								<thead>
+								<tr>
+									<th>姓名</th>
+									<th>标识</th>
+									<th>微信账号</th>
+									<th>收款码(点击查看)</th>
+									<th>创建时间</th>
+									<th>操作</th>
+								</tr>
+								</thead>
+								<tbody>
+								{volist name="list3" id="vo"}
+								<tr>
+									<td>{$vo.truename}</td>
+									<td>{$vo.name}</td>
+									<td>{$vo.c_bank}</td>
+									<td><a onclick="showQr('{$vo.qrcode}')"><img src="__IMG__/q.jpg" style="width: 30px;"></a></td>
+									<td>{:date('Y-m-d H:i', $vo['create_time'])}</td>
+									<td>
+										<a id="{$vo.id}" class="btn btn-sm btn-danger" onclick="delPayment('wx',this, '{$vo.id}')">删除</a>
+									</td>
+								</tr>
+								{/volist}
+								</tbody>
+							</table>
+							<div class="box-footer clearfix">
+								{$list->render()}
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane" id="tab_union">
+						<form action="{:url('home/merchant/doysfnew')}" id="formUnion" method="post" accept-charset="UTF-8" class="form-horizontal" enctype="multipart/form-data" autocomplete="off">
+							<div class="box-body">
+								<div class="form-group">
+									<label class="col-sm-3 control-label">姓名</label>
+									<div class="col-sm-10">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span> <input type="text" name="truename" class="form-control" placeholder="您的真实姓名">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-3 control-label">账户标识</label>
+									<div class="col-sm-10">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-tag fa-fw"></i></span> <input type="text" name="tag" class="form-control" placeholder="用于区别的标识,如账户1,账户2">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-3 control-label">收款码</label>
+									<div class="col-sm-10">
+										<div class="input-group" style="display:block;">
+											<div style="position: relative;">
+												<img class="qrcodeImg" id="union_bg" src="__IMG__/img_bg.png"/> <input class="upload_file" type="file" onChange="readQr(this,'#union')" value=""/>
+											</div>
+										</div>
+										<input type="text" name="qrcode" id="union_txt" value="" readonly hidden/>
+										<p id="union_msg">&nbsp;</p>
+									</div>
+								</div>
+								{eq name="ga" value="1"}
+								<div class="form-group">
+									<label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
+									<div class="col-sm-3">
+										<div class="input-group">
+											<span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span><input type="text" name="ga" value="" class="form-control">
+										</div>
+									</div>
+								</div>
+								{/eq}
+								<div class="box-footer" style="text-align:left">
+									<div class="form-group">
+										<div class="col-sm-offset-3 col-sm-10">
+											<button type="reset" class="btn btn-default">重置</button>
+											<button type="button" onclick="subForm('#formUnion')" class="btn btn-success">提交</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+						<div class="tab-content table-responsive">
+							<table class="table">
+								<thead>
+								<tr>
+									<th>姓名</th>
+									<th>标识</th>
+									<th>收款码(点击查看)</th>
+									<th>创建时间</th>
+									<th>操作</th>
+								</tr>
+								</thead>
+								<tbody>
+								{volist name="list4" id="vo"}
+								<tr>
+									<td>{$vo.truename}</td>
+									<td>{$vo.name}</td>
+									<td><a onclick="show('{$vo.qrcode}')"><img src="__IMG__/q.jpg" style="width: 30px;"></a></td>
+									<td>{:date('Y-m-d H:i', $vo['create_time'])}</td>
+									<td>
+										<a class="btn btn-sm btn-danger" onclick="delPayment('union',this, '{$vo.id}')">删除</a>
+									</td>
+								</tr>
+								{/volist}
+								</tbody>
+							</table>
+							<div class="box-footer clearfix">
+								{$list->render()}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</div>
+<script src="/static/admin/js/layer/layer.js"></script>
+<script type="text/javascript" src="__JS__/jquery.qrcode.min.js"></script>
+<script type="text/javascript" src="__JS__/llqrcode.js"></script>
+<script>
+	function showQr(url) {
+		layer.open({
+			type: 1,
+			title: false,
+			closeBtn: 0,
+			area: ['300px', '300px'],
+			skin: 'layui-layer-nobg',
+			shadeClose: true,
+			content: '<div id="showQ" style="background-color:#ffffff;height:300px;width:300px;padding:10px"></div>'
+		});
+		$("#showQ").qrcode({render: "canvas", size: 280, text: url });
+	}
+
+	/*删除id*/
+function delPayment(type, t, id){layer.confirm('确认删除此条记录吗?', {icon: 3, title: '提示'}, function (index) {$.getJSON("/payment/del/"+ type + '/' + id, {}, function (res) {if (res.code === 1) {layer.msg(res.msg, {icon: 1, time: 1500, shade: 0.1});$(t).parent().parent().remove();} else {layer.msg(res.msg, {icon: 0, time: 1500, shade: 0.1});}});layer.close(index);})}
+/*读取alipayId生成二维码*/
+let alipayIdUrl = 'https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id=2016110502555511&redirect_uri=https%3A%2F%2Fwww.dedemao.com%2Falipay%2Fauthorize.php%3Fscope%3Dauth_base&scope=auth_base&state=STATE';
+$("#qrcode").qrcode({render: "canvas", size: 130, text: alipayIdUrl });
+/*读取二维码*/
+function readQr(t,type){let suffixBg=type+"_bg",suffixMsg=type+"_msg",suffixTxt=type+"_txt";let f=getObjectURL(t.files[0]);qrcode.decode(f);qrcode.callback=function(imgMsg){console.log(imgMsg);if((type==='#alipay'&&/alipays:\/\/|qr\.alipay\.com/i.test(imgMsg.toLowerCase()))||(type==='#wx'&&/wxp:\/\/|wx\.tenpay\.com|payapp\.weixin\.qq.com|w\.url\.cn/i.test(imgMsg.toLowerCase()))||(type==='#union'&&/qr\.96616\.com/i.test(imgMsg.toLowerCase()))){$(suffixMsg).css("color","#78cd51").text('二维码正确');$(suffixBg).attr('src',f);$(suffixTxt).val(imgMsg)}else{console.log(imgMsg);$(suffixTxt).val('');$(suffixMsg).css("color","red").text('二维码无法识别');$(suffixBg).attr('src','__IMG__/img_bg.png');setTimeout(function(){$(suffixMsg).html('&nbsp;')},3000)}}}
+/*提交表单*/
+function subForm(formId){let tmp=$(formId).serializeArray(),args={};$.each(tmp,function(index,item){args[item.name]=item.value});console.log(args);if(args.truename.length<2||args.truename.length>6)return layer.msg('真实姓名不正确',{icon:0,time:1000,shade:0.1});if(args.tag.length<1||args.tag.length>20)return layer.msg('账户标识不能为空或者大于20字符',{icon:0,time:1000,shade:0.1});if(formId==='#formBank'){if(args.bank_name.length!==4)return layer.msg('开户银行不正确',{icon:0,time:1000,shade:0.1});if(args.bank_branch.length<4)return layer.msg('开户支行不正确',{icon:0,time:1000,shade:0.1});if(args.bank_card.length<15||args.bank_card.length>23||!(/^\d*$/.test(args.bank_card)))return layer.msg('银行卡号不正确',{icon:0,time:1000,shade:0.1});if(args.bank_card.length!==args.bank_card_repeat.length)return layer.msg('两次输入卡号不一致',{icon:0,time:1000,shade:0.1})}else{if(args.qrcode.length<8)return layer.msg('二维码不正确,请重新上传',{icon:0,time:1000,shade:0.1});if(formId==='#formAlipay'&&args.account.length<8)return layer.msg('支付宝账户不能为空',{icon:0,time:1000,shade:0.1});if(formId==='#formAlipay'&&args.alipay_id.length>0&&!(/^\d{16}$/.test(args.alipay_id)))return layer.msg('支付宝ID不正确',{icon:0,time:1000,shade:0.1});if(formId==='#formWx'&&!(/^1\d{10}$/.test(args.account)))return layer.msg('微信绑定手机不正确',{icon:0,time:1000,shade:0.1})}let T=formId==='#formBank'?'bank':(formId==='#formAlipay'?'alipay':(formId==='#formWx'?'wx':'union'));$.ajax({type:'POST',url:"/payment/add/"+T,data:JSON.stringify(args),contentType:"application/json;charset=utf-8",dataType:'json',success:function(data){return data.code===1?layer.msg(data.msg,{icon:6,time:1500,shade:0.1},function(){window.location.reload()}):layer.msg(data.msg,{icon:5,time:1500,shade:0.1})},error:function(err){return layer.msg('服务器错误, 请稍后重试',{icon:5,time:1000,shade:0.1},function(){console.log(err)})}})}
+/*显示支付宝ID*/
+$('#showAlipayId').on('click',function(){layer.open({type:1,title:false,closeBtn:false,area:'300px;',shade:0.8,id:'LAY_layuipro',btn:['查看ID','返 回'],btnAlign:'c',moveType:0,content:'<div style="padding: 50px; line-height: 22px; background-color: #393d49; color: #ffffff; font-weight: 300;text-align:center;">你知道吗？亲！<div id="qrcode" style="background-color:#ffffff;height:170px;width:170px;padding:10px;margin-left:15px"></div><br>扫一扫获取您的支付宝ID<br><br>获取您的支付宝ID不会对您的资金造成损失,只是为了对方能迅速给你转账.<br><br>如果您现在正用手机操作你也可以点击左下角按钮,查看您的支付宝ID<br><br>祝您交易愉快! ^_^</div>',success:function(layero){let btn=layero.find('.layui-layer-btn');btn.find('.layui-layer-btn0').attr({href:alipayIdUrl,target:'_blank'});$("#qrcode").qrcode({render:"canvas",size:150,text:alipayIdUrl})}})});
+/*本地URL地址解析*/
+function getObjectURL(file) {file = file ? file : null;if (file == null) return '__IMG__/img_bg.png';let url = '__IMG__/img_bg.png';if (window.createObjectURL != undefined) { /*basic*/url = window.createObjectURL(file);} else if (window.webkitURL != undefined) { /*webkit or chrome*/url = window.webkitURL.createObjectURL(file);} else if (window.URL != undefined) { /*mozilla(firefox)*/url = window.URL.createObjectURL(file);}return url;}
+/*展示图片*/
+function show(url) {layer.open({type: 1, title: false, closeBtn: 0, area: ['300px', '467px'], skin: 'layui-layer-nobg', shadeClose: true, content: '<img style="width:300px;height:467px" src="/uploads/face/' + url + '">'});}
+/*记住当前tab*/
+$(function() {let getTabIndex = sessionStorage.getItem('tabIndex');$(".nav-tabs li").eq(getTabIndex).addClass('active').siblings().removeClass('active');$(".tab-pane").eq(getTabIndex).show().siblings(".tab-pane").hide();$(".nav-tabs li").on('click', function () {let i = $(this).index();$(this).addClass('active').siblings().removeClass('active');$(".tab-pane").eq(i).show().siblings(".tab-pane").hide();sessionStorage.setItem('tabIndex', i);});});
+</script>{include file="Public:footer_new"/}

@@ -102,22 +102,22 @@ class Order extends Base {
 			//$rs6       = Db::name('ad_sell')->where('id', $onlineAd['id'])-> setDec('remain_amount', $data['amount']);
 			//$rs7       = Db::name('ad_sell')->where('id', $onlineAd['id'])-> setInc('trading_volume', $data['amount']);
 			$rs2 = Db::name('order_buy')->insertGetId([
-					'buy_id'       => $this->merchant['id'],//接口请求时,返回商户的id,放行时增加商户的USDT,有疑问?!
-					'sell_id'      => $onlineAd['traderid'],
-					'sell_sid'     => $onlineAd['id'],
-					'deal_amount'  => $actualAmt,
-					'deal_num'     => $data['amount'],
-					'deal_price'   => $onlineAd['price'],
-					'ctime'        => time(),
-					'ltime'        => config('order_expire'),
-					'order_no'     => $data['orderid'],
-					'buy_username' => $data['username'],
-					'buy_address'  => $data['address'],
-					'return_url'   => $data['return_url'],
-					'notify_url'   => $data['notify_url'],
-					'orderid'      => $data['orderid'],
-					'check_code'   => $checkCode,
-					'status'       => 1
+				'buy_id'       => $this->merchant['id'],//接口请求时,返回商户的id,放行时增加商户的USDT,有疑问?!
+				'sell_id'      => $onlineAd['traderid'],
+				'sell_sid'     => $onlineAd['id'],
+				'deal_amount'  => $actualAmt,
+				'deal_num'     => $data['amount'],
+				'deal_price'   => $onlineAd['price'],
+				'ctime'        => time(),
+				'ltime'        => config('order_expire'),
+				'order_no'     => $data['orderid'],
+				'buy_username' => $data['username'],
+				'buy_address'  => $data['address'],
+				'return_url'   => $data['return_url'],
+				'notify_url'   => $data['notify_url'],
+				'orderid'      => $data['orderid'],
+				'check_code'   => $checkCode,
+				'status'       => 1
 			]);
 			if ($rs1 && $rs2 && $rs4) {
 				// 提交事务
@@ -242,24 +242,24 @@ class Order extends Base {
 			$sellOrderRes = Db::name('ad_sell')->where('id', $onlineAd['id'])->update(['remain_amount' => Db::raw('remain_amount - ' . $actualAmt), 'trading_volume' => Db::raw('trading_volume + ' . $actualAmt),]);
 			// 创建的交易订单信息
 			$orderAddRes = Db::name('order_buy')->insertGetId([
-					'buy_id'       => $this->merchant['id'],//接口请求时,返回商户的id,放行时增加商户的USDT,有疑问?!
-					'sell_id'      => $onlineAd['traderid'],
-					'sell_sid'     => $onlineAd['id'],
-					'raw_amount'   => $data['amount'],
-					'raw_num'      => $actualAmt,
-					'deal_amount'  => $data['amount'],
-					'deal_num'     => $actualAmt,
-					'deal_price'   => $onlineAd['price'],
-					'ctime'        => time(),
-					'ltime'        => config('order_expire'),
-					'order_no'     => $data['orderid'],
-					'buy_username' => $data['username'],
-					'buy_address'  => $data['address'],
-					'return_url'   => $data['return_url'],
-					'notify_url'   => $data['notify_url'],
-					'orderid'      => $data['orderid'],
-					'check_code'   => $checkCode,
-					'status'       => 0,
+				'buy_id'       => $this->merchant['id'],//接口请求时,返回商户的id,放行时增加商户的USDT,有疑问?!
+				'sell_id'      => $onlineAd['traderid'],
+				'sell_sid'     => $onlineAd['id'],
+				'raw_amount'   => $data['amount'],
+				'raw_num'      => $actualAmt,
+				'deal_amount'  => $data['amount'],
+				'deal_num'     => $actualAmt,
+				'deal_price'   => $onlineAd['price'],
+				'ctime'        => time(),
+				'ltime'        => config('order_expire'),
+				'order_no'     => $data['orderid'],
+				'buy_username' => $data['username'],
+				'buy_address'  => $data['address'],
+				'return_url'   => $data['return_url'],
+				'notify_url'   => $data['notify_url'],
+				'orderid'      => $data['orderid'],
+				'check_code'   => $checkCode,
+				'status'       => 0,
 			]);
 			if ($sellerRes && $sellOrderRes && $orderAddRes) {
 				// 提交事务
@@ -276,15 +276,14 @@ class Order extends Base {
 					sendNotice($onlineAd['id'], '你有订单已匹配, 请及时处理', $content);
 				}
 				$http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
-				$url       = $http_type . $_SERVER['HTTP_HOST'] . '/api/pay?id=' . $orderAddRes . '&appid=' . $data['appid'] . '&type=' . $data['type'];
+				$url       = $http_type . $_SERVER['HTTP_HOST'] . '/pay/' . $data['type'] . '/' . $orderAddRes . '/' . $data['appid'];
 				Cache::rm('sell_order_lock_' . $onlineAd['id']);
 				$this->suc($url);
-			} else {
-				// 回滚事务
-				Db::rollback();
-				Cache::rm('sell_order_lock_' . $onlineAd['id']);
-				$this->err('提交失败');
 			}
+			// 回滚事务
+			Db::rollback();
+			Cache::rm('sell_order_lock_' . $onlineAd['id']);
+			$this->err('提交失败');
 		} catch (DbException $e) {
 			// 回滚事务
 			Db::rollback();
