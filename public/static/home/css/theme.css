@@ -642,7 +642,7 @@ table.text-center, table.text-center td, table.text-center th{text-align:center}
 @media (max-width:768px){
 	.login-box, .register-box{width:90%;margin-top:20px}
 }
-.login-box-body, .register-box-body{background:rgba(20, 20, 20, 0.6);padding:20px;border-top:0;color:#666;border-radius:5px}
+.login-box-body, .register-box-body{background:rgba(20, 20, 20, 0.6);padding:20px;border-top:0;color:#666;border-radius:15px}
 .login-box-body .form-control-feedback, .register-box-body .form-control-feedback{color:#777}
 .login-box-msg, .register-box-msg{margin:0;text-align:center;padding:0 20px 20px 20px}
 .social-auth-links{margin:10px 0}
@@ -922,4 +922,4 @@ ul{padding-left:0}
 .btn-group.open .dropdown-toggle,.btn-white.active,.btn.active,.btn:active{box-shadow:none}
 .dropdown-menu>li>a:focus,.dropdown-menu>li>a:hover{background-color:#495d74;color:#fff;text-decoration:none}
 .btn-white{background-clip:padding-box;background-color:#fff;border-color:rgba(150,160,180,.3);box-shadow:0 -1px 1px rgba(0,0,0,.05) inset}
-input{max-width:600px;text-align:center;text-align-last:center;}
+input,select{text-align:center;text-align-last:center;}

@@ -1,19 +1,115 @@
 {include file="Public:header_new"}
 <style> .cards-item{ border:1px dashed #cccccc; padding:10px; margin-bottom:5px; background:#fbfbfb; }
 .cards-item .form-group{ width:80%; margin-bottom:5px; }
-.cards-item .btn-remove{ float:right; border:1px solid #cccccc; padding:5px; border-radius:2px;}</style>
+.cards-item .btn-remove{ float:right; border:1px solid #cccccc; padding:5px; border-radius:2px;}
+.row-centered{text-align:center;margin-top:10px;}
+.col-centered{display:inline-block;float:none;text-align:left;border:1px solid #ddd;padding:0;}</style>
 <div class="content-wrapper" id="pjax-container" style="min-height: 706px;">
-	<section class="content-header"><h1>发布挂单 </h1></section>
 	<section class="content">
 		<div class="row">
 			<div class="col-md-12">
 				<div class="box box-danger">
-					<div class="box-header with-border"><h3 class="box-title">委托卖出</h3>
+					<div class="box-header with-border"><h3 class="box-title">委托</h3>
 						<div class="box-tools">
 							<div class="btn-group pull-right" style="margin-right: 10px"><a href="/merchant/newadbuy" class="btn btn-sm btn-danger"> <i class="fa fa-save"></i>&nbsp;&nbsp;发布买入</a></div>
 						</div>
-					</div><!-- /.box-header --><!-- form start -->
-					<form id="newAdForm" accept-charset="UTF-8" class="form-horizontal">
+					</div>
+					<!--<div class="row row-centered">
+						<div class="col-md-4 col-centered">
+							<ul class="nav nav-tabs nav-justified">
+								<li class="active"><a data-toggle="tab" href="#sell-tab">卖出</a></li>
+								<li><a data-toggle="tab" href="#buy-tab">买入</a></li>
+							</ul>
+							<div class="tab-content">
+								<div id="sell-tab" class="tab-pane in active">
+									<section class="">
+										<header class="panel-heading">
+											可用资产
+										</header>
+										<div class="panel-body">
+											<form role="form" autocomplete="off">
+												<div class="form-group">
+													<div class="input-group">
+														<div class="input-group-addon">数量</div>
+														<input type="text" class="form-control text-center" value="" onchange="calcTotal()">
+														<div class="input-group-addon">USDT</div>
+													</div>
+												</div>
+												<div class="form-group">
+													<div class="input-group">
+														<div class="input-group-addon">总价</div>
+														<input type="text" class="form-control text-center" placeholder="最低100" value="" onchange="calcAmt()">
+														<div class="input-group-addon">CNY</div>
+													</div>
+												</div>
+												<div class="form-group">
+													<div class="input-group">
+														<div class="input-group-addon">单价</div>
+														<input type="text" value="{$usdt_price}" class="form-control text-center" placeholder="" readonly>
+														<div class="input-group-addon">CNY</div>
+													</div>
+												</div>
+												<div class="form-group">
+													<div class="input-group">
+														<div class="input-group-addon">最小金额</div>
+														<input type="text" class="form-control text-center" placeholder="单笔最小交易金额">
+														<div class="input-group-addon">CNY</div>
+													</div>
+												</div>
+												<div class="form-group">
+													<div class="input-group">
+														<div class="input-group-addon">最大金额</div>
+														<input type="text" class="form-control text-center" placeholder="单笔最大交易金额">
+														<div class="input-group-addon">CNY</div>
+													</div>
+												</div>
+												<p><label class="control-label"><em class="text-danger">*</em> 收款方式：</label></p>
+												<div class="form-group text-center">
+													<div class="input-group form-group-sm col-sm-12" style="display:inline-block">
+														<div class="col-sm-3 p0">
+															<select class="form-control text-center" name="bank">
+																<option value="">银行</option>
+																{volist name="banks" id="v"}
+																<option value="{$v.id}">{$v.name}({$v.c_bank})</option>
+																{/volist} </select>
+														</div>
+														<div class="col-sm-3 p0">
+															<select class="form-control text-center" name="zfb">
+																<option value="">支付宝</option>
+																{volist name="zfb" id="v"}
+																<option value="{$v.id}">{$v.name}({$v.c_bank})</option>
+																{/volist} </select>
+														</div>
+														<div class="col-sm-3 p0">
+															<select class="form-control text-center" name="wx">
+																<option value="">微信</option>
+																{volist name="wx" id="v"}
+																<option value="{$v.id}">{$v.name}({$v.c_bank})</option>
+																{/volist} </select></div>
+														<div class="col-sm-3 p0">
+															<select class="form-control text-center" name="ysf">
+																<option value="">云闪付</option>
+																{volist name="ysf" id="v"}
+																<option value="{$v.id}">{$v.name}</option>
+																{/volist} </select></div>
+													</div>
+												</div>
+												<button type="button" class="btn btn-success btn-lg btn-block">
+													卖出
+												</button>
+											</form>
+										</div>
+									</section>
+								</div>
+								<div id="buy-tab" class="tab-pane">
+									<h3>Menu 1</h3>
+									<p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+								</div>
+							</div>
+						</div>
+					</div>-->
+
+					<form id="newAdForm" accept-charset="UTF-8" class="form-horizontal" autocomplete="off">
 						<div class="box-body">
 							<div class="fields-group">
 								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 出售数量：</label>
@@ -135,7 +231,7 @@
 	}
 	function checkMaxLimit() {
 		let maxLimit = parseFloat($('#max_limit').val());
-		if(isNaN(maxLimit)||maxLimit < mid){
+		if (isNaN(maxLimit) || maxLimit < mid) {
 			layer.tips('最大限额不能小于 ' + mid, '#max_limit', {tips: 3});
 			$('#max_limit').val(mid);
 			return false;
@@ -165,12 +261,11 @@
 			layer.msg('最少数量不能低于' + amountLimit, {icon: 2});
 			return false
 		}
-
 		if (minLimit < min || minLimit > mid) {
 			layer.tips('最小限额不能超出 ' + min + '~' + mid, '#min_limit', {tips: 3});
 			return false;
 		}
-		if(maxLimit < mid){
+		if (maxLimit < mid) {
 			layer.tips('最大限额不能小于' + mid, '#max_limit', {tips: 3});
 			$('#max_limit').val(mid);
 			return false;
