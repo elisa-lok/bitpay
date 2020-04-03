@@ -2,6 +2,7 @@
 html, body{min-height:100%}
 .layout-boxed html, .layout-boxed body{height:100%}
 body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-family:'Helvetica Neue', Helvetica, Arial, 'Microsoft YaHei', sans-serif;overflow-x:hidden;overflow-y:auto}
+td,th{text-align:center;}
 .wrapper{min-height:100%;position:relative;overflow:hidden}
 .wrapper:before, .wrapper:after{content:" ";display:table}
 .wrapper:after{clear:both}
@@ -921,3 +922,4 @@ ul{padding-left:0}
 .btn-group.open .dropdown-toggle,.btn-white.active,.btn.active,.btn:active{box-shadow:none}
 .dropdown-menu>li>a:focus,.dropdown-menu>li>a:hover{background-color:#495d74;color:#fff;text-decoration:none}
 .btn-white{background-clip:padding-box;background-color:#fff;border-color:rgba(150,160,180,.3);box-shadow:0 -1px 1px rgba(0,0,0,.05) inset}
+input{max-width:600px;text-align:center;text-align-last:center;}

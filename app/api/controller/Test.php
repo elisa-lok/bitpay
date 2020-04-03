@@ -8,4 +8,12 @@ class Test extends Base {
 		var_dump($a);
 		die;
 	}
+
+	public function t(){
+		var_dump(date('Y-m-d H:i:s',strtotime('2020-06-01T23:40:28.381Z')));
+	}
+
+	public function phpinfo(){
+		phpinfo();
+	}
 }

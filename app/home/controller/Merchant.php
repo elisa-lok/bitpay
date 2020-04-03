@@ -86,53 +86,46 @@ class Merchant extends Base {
 		$id    = input('post.id');
 		$order = Db::name('order_sell')->where('id', $id)->find();
 		empty($order) && die('订单信息错误');
-		$ad     = Db::name('ad_buy')->where('id', $order['buy_bid'])->find();
-		$bank   = new BankModel();
-		$alipay = new ZfbModel();
-		$wx     = new WxModel();
-		if ($order['buy_id'] == $this->uid) {                                        //买家显示内容,显示卖家的收款信息
-			$merchant = Db::name('merchant')->where('id', $order['sell_id'])->find();  //查找卖家信息
-			if ($order['pay'] > 0) {
-				$where1['merchant_id']   = $order['sell_id'];
-				$where1['id']            = $order['pay'];
-				$isBank                  = $bank->getOne($where1);
-				$merchant['c_bank']      = $isBank['c_bank'] . $isBank['c_bank_detail'];
-				$merchant['c_bank_card'] = $isBank['c_bank_card'];
-				$merchant['name']        = $isBank['truename'];
-			}
-			if ($order['pay2'] > 0) {
-				$where2['merchant_id']     = $order['sell_id'];
-				$where2['id']              = $order['pay2'];
-				$isAlipay                  = $alipay->getOne($where2);
-				$merchant['c_alipay_acc']  = $isAlipay['c_bank'];
-				$merchant['c_alipay_name'] = $isAlipay['truename'];
-				$merchant['c_alipay_img']  = str_replace("\\", "/", $isAlipay['c_bank_detail']);
-			}
-			if ($order['pay3'] > 0) {
-				$where3['merchant_id']    = $order['sell_id'];
-				$where3['id']             = $order['pay3'];
-				$isWxpay                  = $wx->getOne($where3);
-				$merchant['c_wechat_img'] = str_replace("\\", "/", $isWxpay['c_bank_detail']);
-			}
-		}
+		($this->uid != $order['sell_id']) && ($this->uid != $order['buy_id']) && die('无权限查看');
 		if ($order['sell_id'] == $this->uid) {                                      //卖家显示内容
-			$merchant = Db::name('merchant')->where('id', $order['buy_id'])->find();  //查找买家信息
+			$user = Db::name('merchant')->where('id', $order['buy_id'])->find();      //查找买家信息
+		} else {
+			//买家显示内容,显示卖家的收款信息
+			$user = Db::name('merchant')->where('id', $order['sell_id'])->find();  //查找卖家信息
+			// 银行卡
+			if ($order['pay'] > 0) {
+				$user['bank'] = (new BankModel())->getOne(['merchant_id' => $order['sell_id'], 'id' => $order['pay']])->toArray();
+			}
+			// 支付宝
+			if ($order['pay2'] > 0) {
+				$alipay         = (new ZfbModel())->getOne(['merchant_id' => $order['sell_id'], 'id' => $order['pay2']]);
+				$user['alipay'] = ['c_bank' => $alipay['c_bank'], 'c_bank_card' => $alipay['c_bank_card'], 'truename' => $alipay['truename'], 'qrcode' => StrToMicroTime($alipay['qrcode'])];
+			}
+			// 微信
+			if ($order['pay3'] > 0) {
+				$wx         = (new WxModel())->getOne(['merchant_id' => $order['sell_id'], 'id' => $order['pay3']]);
+				$user['wx'] = ['c_bank' => $wx['c_bank'], 'c_bank_card' => $wx['c_bank_card'], 'truename' => $wx['truename'], 'qrcode' => StrToMicroTime($wx['qrcode'])];
+			}
+			// 云闪付
+			if ($order['pay4'] > 0) {
+				$user['union'] = (new YsfModel())->getOne(['merchant_id' => $order['sell_id'], 'id' => $order['pay4']])->toArray();
+			}
 		}
-		$this->assign('merchant', $merchant);
+		$this->assign('uid', $this->uid);
+		$this->assign('user', $user);
 		$this->assign('order', $order);
-		$this->assign('ad', $ad);
 		return $this->fetch();
 	}
 
 	public function dosetting() {
 		if (request()->isPost()) {
 			!$this->uid && $this->error('请登陆操作', url('home/login/login'));
-			$file = request()->file('avatar');
+			/*$file = request()->file('avatar');
 			if ($file) {
 				$info = $file->validate(['size' => 3145728, 'ext' => 'jpg,png'])->move(ROOT_PATH . 'public' . DS . 'uploads/face');
 				$info && $this->error('请上传正确的图片：' . $file->getError());
 				$param['headpic'] = $info->getSaveName();
-			}
+			}*/
 			$name       = input('post.name');
 			$password   = trim(input('post.password'));
 			$payPsw     = trim(input('post.paypassword'));
@@ -923,7 +916,7 @@ class Merchant extends Base {
 			}
 		}
 		//新方法
-		/*if(!$qianbao){$address=Db::name('address')->where('status',0)->find();if(!$address){$this->error('系统可用地址池错误');}$rs = $model->updateOne(['id'=>$this->uid, 'usdtb'=>$address['address']]);if($rs['code'] == 1){$mp['status']=1;$mp['uid']=$this->uid;Db::name('address')->where('address',$address['address'])->update($mp);$qianbao =$address['address'];}else{$this->error($rs['msg']);}}*/ //原方法
+		/*if(!$qianbao){$address=Db::name('address')->where('status',0)->find();if(!$address){$this->error('系统可用地址池错误');}$rs = $model->updateOne(['id'=>$this->uid, 'usdtb'=>$address['address']]);if($rs['code'] == 1){$mp['status']=1;$mp['uid']=$this->uid;Db::name('address')->where('address',$address['address'])->update($mp);$qianbao =$address['address'];}else{$this->error($rs['msg']);}}*/                                                                                                                                                                                                                         //原方法
 		/*if (!$qianbao) {$model2 = new \app\common\model\Usdt();$return = $model2->index('getnewaddress', $addr = NULL, $mum = NULL, $index = NULL, $count = NULL, $skip = NULL);if ($return['code'] == 1 && !empty($return['data'])) {// $rs = Db::name('merchant_user_address')->insert(['merchant_id'=>$this->merchant['id'], 'username'=>$data['username'], 'address'=>$return['data'], 'addtime'=>time()]); $rs = $model->updateOne(['id' => $this->uid, 'usdtb' => $return['data']]); if ($rs['code'] == 1) { $qianbao = $return['data']; } else { $this->error($rs['msg']); } } else { $this->error('生成钱包地址失败'); } } */// $this->assign('qianbao', $qianbao);
 		// $this->assign('qianbao2', $qianbao2);
 		$confirms = config('usdt_confirms');
@@ -965,7 +958,7 @@ class Merchant extends Base {
 			//查询用户的银行卡信息
 			$where1['merchant_id'] = $this->uid;
 			$where1['id']          = $codes['bank'];
-			$isBank                = $m->getOne($where1);
+			$bank                  = $m->getOne($where1);
 			//查询用户的支付宝信息
 			$where2['merchant_id'] = $this->uid;
 			$where2['id']          = (int)$codes['zfb'];
@@ -976,7 +969,7 @@ class Merchant extends Base {
 			$where4['merchant_id'] = $this->uid;
 			$where4['id']          = $codes['ysf'];
 			$isUnionPay            = $unionpay->getOne($where4);
-			($codes['bank'] && !$isBank) && showMsg('请先设置您的银行卡账户信息', 0);
+			($codes['bank'] && !$bank) && showMsg('请先设置您的银行卡账户信息', 0);
 			($codes['zfb'] && !$isAlipay) && showMsg('请先设置您的支付宝账户信息', 0);
 			($codes['wx'] && !$isWxpay) && showMsg('请先设置您的微信账户信息', 0);
 			($codes['ysf'] && !$isUnionPay) && showMsg('请先设置您的云闪付账户信息', 0);
@@ -1089,7 +1082,7 @@ class Merchant extends Base {
 			//查询用户的银行卡信息
 			$where1['merchant_id'] = $this->uid;
 			$where1['id']          = $codes['bank'];
-			$isBank                = $m->getOne($where1);
+			$bank                  = $m->getOne($where1);
 			//查询用户的支付宝信息
 			$where2['merchant_id'] = $this->uid;
 			$where2['id']          = $codes['zfb'];
@@ -1102,7 +1095,7 @@ class Merchant extends Base {
 			$where4['merchant_id'] = $this->uid;
 			$where4['id']          = $codes['ysf'];
 			$isUnionPay            = $unionpay->getOne($where4);
-			($codes['bank'] && !$isBank) && showMsg('请先设置您的银行卡账户信息');
+			($codes['bank'] && !$bank) && showMsg('请先设置您的银行卡账户信息');
 			($codes['zfb'] && !$isAlipay) && showMsg('请先设置您的支付宝账户信息');
 			($codes['wx'] && !$isWxpay) && showMsg('请先设置您的微信账户信息');
 			($codes['ysf'] && !$isUnionPay) && showMsg('请先设置您的云闪付账户信息');
@@ -1286,7 +1279,7 @@ class Merchant extends Base {
 		//查询用户的银行卡信息
 		$where1['merchant_id'] = $this->uid;
 		$where1['id']          = $_POST['bank'];
-		$isBank                = $m->getOne($where1);
+		$bank                  = $m->getOne($where1);
 		//查询用户的支付宝信息
 		$where2['merchant_id'] = $this->uid;
 		$where2['id']          = $_POST['zfb'];
@@ -1299,7 +1292,7 @@ class Merchant extends Base {
 		$where4['merchant_id'] = $this->uid;
 		$where4['id']          = $_POST['ysf'];
 		$isUnionPay            = $unionpay->getOne($where4);
-		($_POST['bank'] && !$isBank) && $this->error('请先设置您的银行卡账户信息');
+		($_POST['bank'] && !$bank) && $this->error('请先设置您的银行卡账户信息');
 		($_POST['zfb'] && !$isAlipay) && $this->error('请先设置您的支付宝账户信息');
 		($_POST['wx'] && !$isWxpay) && $this->error('请先设置您的微信账户信息');
 		($_POST['ysf'] && !$isUnionPay) && $this->error('请先设置您的云闪付账户信息');

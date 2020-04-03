@@ -745,3 +745,11 @@ function randString(int $len = 16, string $char = '') {
 	}
 	return $str;
 }
+
+function MicroTimeToStr($s){
+	return preg_replace('/t=\d{13}/', 't={MICROTIME}', $s);
+}
+
+function StrToMicroTime($s){
+	return str_replace('{MICROTIME}', (int)(microtime(TRUE) * 1000), $s);
+}

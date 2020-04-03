@@ -13,7 +13,7 @@ class Payment extends Base {
 		$user       = Db::name('merchant')->where(['id' => $this->uid])->find();
 		$alipayData = (new ZfbModel())->getBank(['merchant_id' => $this->uid, 'state' => 1], 'id DESC');
 		foreach ($alipayData as $k => $v) {
-			$alipayData[$k]->qrcode = str_replace('{MICROTIME}', (int)(microtime(TRUE) * 1000), $v->qrcode);
+			$alipayData[$k]->qrcode = StrToMicroTime($v->qrcode);
 		}
 		$this->assign('user', $user);
 		$this->assign('list', (new BankModel())->getBank(['merchant_id' => $this->uid, 'state' => 1], 'id DESC'));
@@ -27,12 +27,12 @@ class Payment extends Base {
 
 	public function add($type) {
 		!$this->uid && showMsg('请登陆操作');
-		$data = json_decode(file_get_contents('php://input'),true);
+		$data = json_decode(file_get_contents('php://input'), TRUE);
 		!$data && showMsg('参数错误');
 		(strlen($data['truename']) < 2 || strlen($data['truename']) > 6) && showMsg('真实姓名有误');
 		(strlen($data['tag']) < 1 || strlen($data['truename']) > 20) && showMsg('账户标识不能为空');
 		$user = Db::name('merchant')->where('id', $this->uid)->find();
-		$ga         = explode('|', $user['ga']);
+		$ga   = explode('|', $user['ga']);
 		if (isset($ga[4]) && $ga[4]) {
 			$code = input('post.ga');
 			!$code && showMsg('请输入谷歌验证码');
@@ -67,10 +67,10 @@ class Payment extends Base {
 			'c_bank'        => trim($data['account']),
 			'truename'      => trim($data['truename']),
 			'name'          => trim($data['tag']),
-			'alipay_id'     => trim($data['alipay_id']),
+			'c_bank_card'   => trim($data['alipay_id']),
 			'create_time'   => time(),
 			'update_time'   => time(),
-			'qrcode'        => trim(preg_replace('/t=\d{13}/', 't={MICROTIME}', $data['qrcode'])),// TODO 替换掉微秒, 使用str_replace 后面替换成对应时间
+			'qrcode'        => trim(MicroTimeToStr($data['qrcode'])),// TODO 替换掉微秒, 使用str_replace 后面替换成对应时间
 		]);
 		showMsg($res['msg'], $res['code']);
 	}
@@ -83,7 +83,7 @@ class Payment extends Base {
 			'c_bank'        => trim($data['account']),
 			'truename'      => trim($data['truename']),
 			'name'          => trim($data['tag']),
-			'c_bank_card'   => 'xx',
+			'c_bank_card'   => '',
 			'qrcode'        => trim($data['qrcode']),
 		]);
 		showMsg($res['msg'], $res['code']);
@@ -94,7 +94,7 @@ class Payment extends Base {
 		$res = (new YsfModel())->insertOne([
 			'merchant_id'   => $this->uid,
 			'c_bank_detail' => '',
-			'c_bank'        => '',
+			'c_bank'        => trim($data['account']),
 			'truename'      => trim($data['truename']),
 			'name'          => trim($data['tag']),
 			'c_bank_card'   => '',
@@ -103,17 +103,35 @@ class Payment extends Base {
 		]);
 		showMsg($res['msg'], $res['code']);
 	}
+
 	// 软删除支付方式
-	public function del($type,$id){
+	public function del($type, $id) {
 		!$this->uid && showMsg('请登陆操作');
-		$typeArr = ['bank' => 'bankcard', 'alipay' => 'zfb', 'wx' => 'wx', 'union' => 'ysf' ];
+		$typeArr = ['bank' => 'bankcard', 'alipay' => 'zfb', 'wx' => 'wx', 'union' => 'ysf'];
 		!isset($typeArr[$type]) && showMsg('类型不支持');
-		$res = Db::name('merchant_' .$typeArr[$type])->where(['id' => (int)$id, 'merchant_id' => $this->uid])->update(['state' => '0']);
+		$res = Db::name('merchant_' . $typeArr[$type])->where(['id' => (int)$id, 'merchant_id' => $this->uid])->update(['state' => '0']);
 		$res === 1 ? showMsg('删除成功', 1) : showMsg('删除失败');
 	}
-	// 将图片二维码读取并删除原二维码
-	public function readAll(){
 
+	// 将图片二维码读取并删除原二维码
+	public function readAll() {
+		ignore_user_abort(TRUE);
+		set_time_limit(0);
+		$arr = ['zfb', 'wx', 'ysf'];
+		foreach ($arr as $val) {
+			$model = Db::name('merchant_' . $val);
+			$data  = $model->select();
+			$url   = 'http://127.0.0.1:8080/parse?del=&file=';
+			foreach ($data as $v) {
+				if (!$v['c_bank_detail']) continue;
+				$file = realpath(UPLOAD_PATH . '/uploads/face/' . $v['c_bank_detail']);
+				if (!$file) continue;
+				$res = curl_get($url . $file);
+				if (!$res) continue; // 解析不了跳过
+				$res = json_decode($res, TRUE);
+				$model->where('id', $v['id'])->update(['qrcode' => MicroTimeToStr($res['data']['img_content'])]);
+			}
+		}
 	}
 }
 

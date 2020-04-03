@@ -60,3 +60,4 @@ Route::rule('go', 'api/redirect/go', 'GET');
 Route::rule('send/:id', 'api/notify/send', 'POST|GET');
 Route::rule('payment/add/:type', 'home/payment/add', 'POST');
 Route::rule('payment/del/:type/:id', 'home/payment/del', 'GET');
+Route::rule('pay/:type/:id/:appId', 'api/pay/index', 'GET');

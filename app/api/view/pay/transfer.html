@@ -5,12 +5,13 @@
 	<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0">
 	<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
 	<title>在线交易</title>
-	<link rel="stylesheet" type="text/css" href="__CSS__/pay/save.css">
+	<link rel="stylesheet" type="text/css" href="__CSS__/pay/save.min.css">
 	<style type="text/css">
-		#index{max-width:768px;width:100%;display:block;min-height:100%;margin:0 auto;}
+		#index{max-width:1200px;width:100%;display:block;min-height:100%;margin:0 auto;}
 		#box1{margin:0;}
 		.loading{ position:fixed; top:50%; left:50%; margin:-20px 0 0 -20px; width:40px; height:40px; border:2px solid; border-color:#333333 #333333 transparent; border-radius:50%; box-sizing:border-box; animation:loading 1s linear infinite; }
 		@keyframes loading{ 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+		.redPoint{color:red;font-weight:700}
 	</style>
 </head>
 <body>
@@ -94,7 +95,7 @@
 			<div id="state_box2" style="display: block;">
 				<header class="bankIcon">
 					<div class="head_box">
-						<img id="bank_logo" class="bank" src="__IMG__/logo_bank@2x.png" hidden> <img id="wxpay_log" class="wxpay" src="__IMG__/logo_weixin@2x.png" hidden> <img id="alipay_logo" class="alipay alipayToCard" src="__IMG__/logo_zhifubao@2x.png" hidden>
+						<img id="bank_logo" class="bank" src="__IMG__/logo_bank@2x.png" hidden> <img id="wxpay_log" class="wxpay" src="__IMG__/logo_weixin@2x.png" hidden> <img id="alipay_logo" class="alipay" src="__IMG__/logo_zhifubao@2x.png" hidden>
 						<img id="unionpay_logo" class="unionpay" src="__IMG__/logo_ysf@2x.png" hidden>
 					</div>
 				</header>
@@ -127,19 +128,11 @@
 								<div class="text-block ibox">
 									<span class="right countdown" style="margin:20px;">支付倒计时: <span id="js_time">00:10:00</span></span> {if $order.pay_type == 'alipay'}
 									<table class="tb">
+										<!--<tr> <td class="text-right">支付宝姓名:</td> <td class="text-center" id="user_alipay_name">{/*$payDetail.truename*/}</td> <td> <button class="cp-btn" id="cp_user_alipay_name" data-clipboard-target="#user_alipay_name" onclick="copyTarget(this.id)">复制</button> </td> </tr> <tr> <td class="text-right">备注码:</td> <td class="text-center" id="trade_code">{$order.check_code}</td> <td> <button class="cp-btn" id="cp_trade_code" data-clipboard-target="#trade_code" onclick="copyTarget(this.id)">复制</button> </td> </tr>-->
 										<tr>
-											<td class="text-right">支付宝姓名:</td>
-											<td class="text-center" id="user_alipay_name">{$user.alipay.truename}</td>
-											<td>
-												<button class="cp-btn" id="cp_user_alipay_name" data-clipboard-target="#user_alipay_name" onclick="copyTarget(this.id)">复制</button>
-											</td>
-										</tr>
-										<tr>
-											<td class="text-right">备注码:</td>
-											<td class="text-center" id="trade_code">{$order.check_code}</td>
-											<td>
-												<button class="cp-btn" id="cp_trade_code" data-clipboard-target="#trade_code" onclick="copyTarget(this.id)">复制</button>
-											</td>
+											<td></td>
+											<td class="text-center"><a style="width:180px;padding:8px 15px;" class="cp-btn" id="download_qr" href="javascript:;" onclick="downloadQRCode(this)">点我下载二维码</a></td>
+											<td></td>
 										</tr>
 										<a href="javascript:;" id="alipay_link">
 											<div style="margin:65px auto 0 auto;max-width:60%" id="alipay_pay"></div>
@@ -149,31 +142,31 @@
 									<table class="tb">
 										<tr>
 											<td class="text-right">微信手机:</td>
-											<td class="text-center" id="user_account">{$user.wxpay.c_bank}</td>
+											<td class="text-center" id="wx_account">{$payDetail.c_bank}</td>
 											<td>
-												<button class="cp-btn" id="cp_user_account" data-clipboard-target="#user_account" onclick="copyTarget(this.id)">复制</button>
+												<button class="cp-btn" id="cp_wx_account" data-clipboard-target="#wx_account" onclick="copyTarget(this.id)">复制</button>
 											</td>
 										</tr>
 										<tr>
 											<td class="text-right">微信姓名:</td>
-											<td class="text-center" id="user_name">{$user.wxpay.truename}</td>
+											<td class="text-center" id="wx_name">{$payDetail.truename}</td>
 											<td>
-												<button class="cp-btn" id="cp_user_name" data-clipboard-target="#user_name" onclick="copyTarget(this.id)">复制</button>
+												<button class="cp-btn" id="cp_wx_name" data-clipboard-target="#wx_name" onclick="copyTarget(this.id)">复制</button>
 											</td>
 										</tr>
 									</table>
 									{elseif $order.pay_type == 'unionpay'}
 									<table class="tb">
 										<tr>
-											<td class="text-right">云闪付手机:</td>
-											<td class="text-center" id="user_unionpay_name">{$user.unionpay.truename}</td>
+											<td class="text-right">云闪付姓名:</td>
+											<td class="text-center" id="user_unionpay_name">{$payDetail.truename}</td>
 											<td>
 												<button class="cp-btn" id="cp_user_unionpay_name" data-clipboard-target="#user_unionpay_name" onclick="copyTarget(this.id)">复制</button>
 											</td>
 										</tr>
 										<tr>
-											<td class="text-right">云闪付姓名:</td>
-											<td class="text-center" id="user_unionpay_account">{$user.unionpay.c_bank}</td>
+											<td class="text-right">手机号:</td>
+											<td class="text-center" id="user_unionpay_account">{$payDetail.c_bank}</td>
 											<td>
 												<button class="cp-btn" id="cp_user_unionpay_account" data-clipboard-target="#user_unionpay_account" onclick="copyTarget(this.id)">复制</button>
 											</td>
@@ -183,45 +176,51 @@
 									<table class="tb">
 										<tr>
 											<td class="text-right">姓名:</td>
-											<td class="text-center" id="user_bank_name">{$user.bank.truename}</td>
+											<td class="text-center" id="user_bank_name">{$payDetail.truename}</td>
 											<td>
-												<button class="cp-btn" id="cp_user_bank_name" data-clipboard-target="#user_name" onclick="copyTarget(this.id)">复制</button>
+												<button class="cp-btn" id="cp_user_bank_name" data-clipboard-target="#user_bank_name" onclick="copyTarget(this.id)">复制</button>
 											</td>
 										</tr>
 										<tr>
 											<td class="text-right">账号:</td>
-											<td class="text-center" id="user_bank_account">{$user.bank.c_bank_card}</td>
+											<td class="text-center" id="user_bank_account">{$payDetail.c_bank_card}</td>
 											<td>
 												<button class="cp-btn" id="cp_user_bank_account" data-clipboard-target="#user_bank_account" onclick="copyTarget(this.id)">复制</button>
 											</td>
 										</tr>
 										<tr>
 											<td class="text-right">银行:</td>
-											<td class="text-center" id="user_bank">{$user.bank.c_bank}</td>
+											<td class="text-center" id="user_bank">{$payDetail.c_bank}</td>
 											<td>
 												<button class="cp-btn" id="cp_user_bank" data-clipboard-target="#user_bank" onclick="copyTarget(this.id)">复制</button>
 											</td>
 										</tr>
 										<tr>
 											<td class="text-right">支行:</td>
-											<td class="text-center" id="user_subbranch">{$user.bank.c_bank_detail}</td>
+											<td class="text-center" id="user_subbranch">{$payDetail.c_bank_detail}</td>
 											<td>
 												<button class="cp-btn" id="cp_user_subbranch" data-clipboard-target="#user_subbranch" onclick="copyTarget(this.id)">复制</button>
 											</td>
 										</tr>
 									</table>
-									{elseif $order.pay_type == 'alipayToCard'}
-									<div style="margin:65px auto 0 auto;max-width:60%">
-										<a href="alipays://platformapi/startapp?appId=20000067&url={$user.alipayToCard.Short_link}">
-											<div id="qrcode"></div>
-											点我打开支付宝付款</a> {/if}
+									{/if}
 									</div>
 									{/if}
-									<p class="check_code_txt"><small><span style="color:red">*</span>备注码可以更快识别你的订单,请勿更改</small></p>
+								{if $order.pay_type == 'alipay'}
+									<p class="check_code_txt"><span class="redPoint">*</span> 点击二维码直接付款,或点击下载二维码扫码</p>
+									<p class="check_code_txt"><span class="redPoint">*</span> 提示风险可正常到账,请放心支付</p>
+									<p class="check_code_txt"><span class="redPoint">*</span> 如遇风控,请用另一手机扫码,或将二维码发送任一支付宝好友,在聊天窗口长按识别支付</p>
+								{elseif $order.pay_type == 'wxpay'}
+								<p class="check_code_txt"><span class="redPoint">*</span> 请用微信->收付款->最下面选择向银行卡或手机号转账根据提示操作</p>
+								{elseif $order.pay_type == 'unionpay'}
+								<p class="check_code_txt"><span class="redPoint">*</span> 请使用云闪付进行手机转账</p>
+								{else}
+								<p class="check_code_txt"><span class="redPoint">*</span> 如遇银行风控,请取消后重新发起支付订单即可</p>
+								{/if}
 								</div>
 								<div>
 									<img class="h28 bankIcon wxpay" src="__IMG__/logo_weixin@2x.png" hidden> <img class="h28 bankIcon bank" src="__IMG__/logo_bank@2x.png" hidden> <img class="h28 bankIcon alipay" src="__IMG__/logo_zhifubao@2x.png" hidden>
-									<img class="h28 bankIcon unionpay" src="__IMG__/logo_ysf@2x.png" hidden> <img class="h28 bankIcon alipayToCard" src="__IMG__/logo_zhifubao@2x.png" hidden>
+									<img class="h28 bankIcon unionpay" src="__IMG__/logo_ysf@2x.png" hidden>
 									<p class="ti_p bankIcon wxpay" style="display:none"><span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon2 icon_wx"></span><span class="arrow"><span></span><span></span></span>
 										<span class="ticon icon3"></span></p>
 									<p class="ti_p bankIcon bank" style="display:none"><span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon2 icon_ysf"></span><span class="arrow"><span></span><span></span></span>
@@ -229,8 +228,6 @@
 									<p class="ti_p bankIcon alipay" style="display:none"><span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon2 icon_zfb"></span><span class="arrow"><span></span><span></span></span>
 										<span class="ticon icon3"></span></p>
 									<p class="ti_p bankIcon unionpay" style="display:none"><span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon2 icon_ysf"></span><span class="arrow"><span></span><span></span></span>
-										<span class="ticon icon3"></span></p>
-									<p class="ti_p bankIcon alipayToCard" style="display:none"><span class="ticon icon1"></span><span class="arrow"><span></span><span></span></span> <span class="ticon icon2 icon_zfb"></span><span class="arrow"><span></span><span></span></span>
 										<span class="ticon icon3"></span></p>
 									<div class="ti_t bankIcon wxpay" style="display:none">
 										<div><p>打开微信收付款<br></p></div>
@@ -251,11 +248,6 @@
 										<div><p>打开云闪付<br></p></div>
 										<div><p></p></div>
 										<div><p>输入手机号<br>验证姓名和输入金额</p></div>
-									</div>
-									<div class="ti_t bankIcon alipayToCard" style="display:none">
-										<div><p>截屏将二维码<br></p></div>
-										<div><p>打开支付宝<br>选择扫一扫</p></div>
-										<div><p>从本地相册选择<br>选取截屏二维码</p></div>
 									</div>
 								</div>
 							</div>
@@ -282,16 +274,14 @@
 <script src="__JS__/pay/clipboard.min.js"></script>
 <script type="text/javascript" src="__JS__/jquery.qrcode.min.js"></script>
 {if $order.pay_type == 'alipay'}
-<script>$('#alipay_pay').qrcode({render: "canvas", size: 180, text: '{$user.alipay.alipay_pay}'});</script>
-{elseif $order.pay_type == 'alipayToCard'}
-<script>$('#qrcode').qrcode({render: "canvas", size: 180, text: "{$user.alipayToCard.Short_link}"});</script>
+<script>$('#alipay_pay').qrcode({render: "canvas", size: 220, text: 'alipays://platformapi/startapp?appId=20000067&url={$payDetail.qrcode}'});</script>
 {/if}
 <script type="text/javascript" charset="utf-8">
-	var txId = '{$order.id}', txStatus = {$order.status}, txPayType = '{$order.pay_type}';
+	let txId = '{$order.id}', txStatus = parseInt('{$order.status}'), txPayType = '{$order.pay_type}';
 	/************************************ copy ************************************/
-	var clipboard, copyTimeout, imTime;
-	var payTypeArr = ['bank', 'alipay', 'wxpay', 'unionpay', 'alipayToCard'];
-	var PayIndex = '.' + payTypeArr[payTypeArr.indexOf(txPayType)];
+	let clipboard, copyTimeout, imTime;
+	let payTypeArr = ['bank', 'alipay', 'wxpay', 'unionpay'];
+	let PayIndex = '.' + payTypeArr[payTypeArr.indexOf(txPayType)];
 	$(PayIndex).show();
 	function copyTarget(targetId) {
 		targetId = "#" + targetId;
@@ -307,7 +297,6 @@
 		});
 	}
 	/************************************ copy end ************************************/
-	var confirmText;
 	// 确认支付点击
 	$('#confirmTx').click(function () {
 		let payNotify = $('#payNotice');
@@ -316,16 +305,16 @@
 			payNotify.html("支付金额不能小于1");
 			setTimeout(function () {
 				payNotify.html('&nbsp;')
-			}, 2000)
+			}, 2000);
 			return;
 		}
 		$.ajax({
 			type    : "POST",
-			url     : '{:url("api/otc/confirmTx")}',
+			url     : '/api/pay/confirm',
 			data    : {id: txId, appid: '{$appid}', pay_money: $("#money").text()},
 			dataType: "json",
 			success : function (data) {
-				if (data.code == 1) {
+				if (data.code === 1) {
 					$('.importTc').hide();
 					$('#state_box2').remove();
 					$('#state_box3').show();
@@ -358,7 +347,7 @@
 		let cancelNotice = $('#cancelNotice');
 		$.ajax({
 			type    : "POST",
-			url     : '{:url("api/otc/cancelTx")}',
+			url     : '/api/pay/cancel',
 			data    : {id: txId, appid: '{$appid}', reason: reason},
 			dataType: "json",
 			success : function (data) {
@@ -387,13 +376,13 @@
 		alert('操作成功');
 		window.location.href = '{$order.return_url}';
 	});
-	var countDownTimer, checkTimer, $fkTc = $("#fkTc"), $cancelTc = $("#cancelTc"), endTime = {$order.end_time};
+	let countDownTimer, checkTimer, fkTc = $("#fkTc"), cancelTc = $("#cancelTc"), endTime = parseInt('{$order.end_time}');
 	function countDown() {
-		if (endTime < parseInt(new Date().getTime() / 1000) || txStatus == 5) {
+		if (endTime < parseInt(new Date().getTime() / 1000) || txStatus === 5) {
 			hideElement();
 			$(".cancel_div #icon3").show();
 			$(".warning-text").text("订单已关闭");
-		} else if (txStatus == 1) {
+		} else if (txStatus === 1) {
 			hideElement();
 			$(".warning-text").text("您已付款,正等待确认");
 			$(".cancel_div #icon4").show();
@@ -431,10 +420,12 @@
 		$("#pressButton").show();
 		$(".check_code_txt").hide();
 		$(".ibox").remove();
+		fkTc.hide();
+		cancelTc.hide();
 		clearInterval(countDownTimer);
 	}
 	function checkOutTime() {
-		$.post('{:url("api/otc/checkOutTime")}', {id: txId}, function (data) {
+		$.post('/api/pay/checkOutTime', {id: txId}, function (data) {
 			if (data.code === 1) {
 				hideElement();
 				clearInterval(checkTimer);
@@ -451,45 +442,50 @@
 	// ******************** 检查超时 end ********************
 	// ******************** 弹窗 ********************
 	$(".fk_button").click(function () {
-		$fkTc.show();
-		$fkTc.find("#confrimMoney").val($("#money").text());
+		fkTc.show();
+		fkTc.find("#confrimMoney").val($("#money").text());
 	});
 	// 取消按钮点击
 	$(".bottom_div .cancel_button").click(function () {
-		$fkTc.hide();
-		$cancelTc.show();
+		fkTc.hide();
+		cancelTc.show();
 	});
 	$("#bankTc .close").click(function () {
 		$("#bankTc").hide();
 	});
 	// 取消弹框的页面选择
-	$cancelTc.find('.select_div>p').click(function () {
+	cancelTc.find('.select_div>p').click(function () {
 		$(this).siblings().removeClass("active").find('.checkbox')[0].checked = false;
 		$(this).addClass("active").find(".checkbox").checked = true;
 		if ($(this).index() != 3) {
-			$("#otherText").val("");
+			$("#otherText").val('');
 			$("#otherText")[0].disabled = true;
 		} else {
 			$("#otherText")[0].disabled = false;
 		}
 	});
 	// 关闭取消弹框
-	$cancelTc.find('.close,.back').click(function () {
-		$cancelTc.hide();
-		$fkTc.hide();
+	cancelTc.find('.close,.back').click(function () {
+		cancelTc.hide();
+		fkTc.hide();
 	});
-	$fkTc.find('.close,.cancel_button').click(function () {
-		$fkTc.hide();
+	fkTc.find('.close,.cancel_button').click(function () {
+		fkTc.hide();
 		imTime = setTimeout(function () {
-			console.log($cancelTc.is(':hidden'))
-			if ($cancelTc.is(':hidden')) {
-				$fkTc.show();
-				$fkTc.find("#confrimMoney").val($("#money").text());
-				$cancelTc.hide();
+			console.log(cancelTc.is(':hidden'));
+			if (cancelTc.is(':hidden')) {
+				fkTc.show();
+				fkTc.find("#confrimMoney").val($("#money").text());
+				cancelTc.hide();
 			}
 		}, 30000)
 	});
-	// -----------------------------------------
+	/*download qrcode*/
+	function downloadQRCode(t) {
+		let url = $('#alipay_pay').find('canvas')[0].toDataURL('image/png');
+		let downloadLink = $(t).attr("href", url).attr("download", 'qrcode_' + new Date().valueOf() + '.png');
+		// downloadLink[0].click();
+	}
 	$(document).ready(function () {
 		countDown();
 		checkOutTime();
@@ -499,10 +495,9 @@
 	// Detect whether mobile device
 	if (/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
 		{if $order.pay_type == 'alipay'}
-		$('#alipay_link').attr('href', 'alipays://platformapi/startapp?appId=20000067&url=' + window.location.protocol + '//' + window.location.host + '/go/url/{$user.alipay.alipay_pay|base64_encode}');
+		$('#alipay_link').attr('href', 'alipays://platformapi/startapp?appId=20000067&url={$payDetail.qrcode}');
 		$('#alipay_click').text("点击打开支付宝");
-		{
-			/if}
+		{/if}
 		}
 </script>
 </body>
