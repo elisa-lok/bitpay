@@ -570,21 +570,21 @@ function balanceChange($enableTrans = TRUE, $uid = 0, float $modAmt = 0, float $
 		}
 	}
 	$newLog = [
-			'last_bal_log_id'   => $lastLogId,
-			'merchant_id'       => $uid,
-			'amt_before'        => $userInfo['usdt'],
-			'amt_after'         => $userInfo['usdt'] + $modAmt,
-			'amt_change'        => $modAmt,
-			'amt_fee'           => $fee,
-			'frozen_amt_before' => $userInfo['usdtd'],
-			'frozen_amt_after'  => $userInfo['usdtd'] + $frozenModAmt,
-			'frozen_amt_change' => $frozenModAmt,
-			'frozen_amt_fee'    => $frozenFee,
-			'cur_code'          => 'usdt',
-			'action_type'       => $actType,
-			'relate_id'         => $relateId,
-			'memo'              => $memo,
-			'ip'                => getIp()
+		'last_bal_log_id'   => $lastLogId,
+		'merchant_id'       => $uid,
+		'amt_before'        => $userInfo['usdt'],
+		'amt_after'         => $userInfo['usdt'] + $modAmt,
+		'amt_change'        => $modAmt,
+		'amt_fee'           => $fee,
+		'frozen_amt_before' => $userInfo['usdtd'],
+		'frozen_amt_after'  => $userInfo['usdtd'] + $frozenModAmt,
+		'frozen_amt_change' => $frozenModAmt,
+		'frozen_amt_fee'    => $frozenFee,
+		'cur_code'          => 'usdt',
+		'action_type'       => $actType,
+		'relate_id'         => $relateId,
+		'memo'              => $memo,
+		'ip'                => getIp()
 	];
 	$res1   = Db::name('merchant')->where('id', $uid)->update(['usdt' => $newLog['amt_after'], 'usdtd' => $newLog['frozen_amt_after']]);
 	$res2   = Db::name('merchant_balance_log')->insert($newLog);
@@ -642,21 +642,21 @@ function balanceMod($enableTrans = TRUE, $uid = 0, float $afterAmt = 0, float $f
 		}
 	}
 	$newLog = [
-			'last_bal_log_id'   => $lastLogId,
-			'merchant_id'       => $uid,
-			'amt_before'        => $userInfo['usdt'],
-			'amt_after'         => $afterAmt,
-			'amt_change'        => $modAmt,
-			'amt_fee'           => $fee,
-			'frozen_amt_before' => $userInfo['usdtd'],
-			'frozen_amt_after'  => $afterFrozenAmt,
-			'frozen_amt_change' => $frozenModAmt,
-			'frozen_amt_fee'    => $frozenFee,
-			'cur_code'          => 'usdt',
-			'action_type'       => $actType,
-			'relate_id'         => $relateId,
-			'memo'              => $memo,
-			'ip'                => getIp(),
+		'last_bal_log_id'   => $lastLogId,
+		'merchant_id'       => $uid,
+		'amt_before'        => $userInfo['usdt'],
+		'amt_after'         => $afterAmt,
+		'amt_change'        => $modAmt,
+		'amt_fee'           => $fee,
+		'frozen_amt_before' => $userInfo['usdtd'],
+		'frozen_amt_after'  => $afterFrozenAmt,
+		'frozen_amt_change' => $frozenModAmt,
+		'frozen_amt_fee'    => $frozenFee,
+		'cur_code'          => 'usdt',
+		'action_type'       => $actType,
+		'relate_id'         => $relateId,
+		'memo'              => $memo,
+		'ip'                => getIp(),
 	];
 	$res1   = Db::name('merchant')->where('id', $uid)->update(['usdt' => $newLog['amt_after'], 'usdtd' => $newLog['frozen_amt_after']]);
 	$res2   = Db::name('merchant_balance_log')->insert($newLog);
@@ -746,10 +746,14 @@ function randString(int $len = 16, string $char = '') {
 	return $str;
 }
 
-function MicroTimeToStr($s){
+function MicroTimeToStr($s) {
 	return preg_replace('/t=\d{13}/', 't={MICROTIME}', $s);
 }
 
-function StrToMicroTime($s){
+function StrToMicroTime($s, $addTime = FALSE) {
+	if ($addTime && stristr($s, '?t=') === FALSE) {
+		// 寻找是否存在 "?=t", 没有则添加
+		return $s . '?t=' . (int)(microtime(TRUE) * 1000);
+	}
 	return str_replace('{MICROTIME}', (int)(microtime(TRUE) * 1000), $s);
 }

@@ -99,12 +99,12 @@ class Merchant extends Base {
 			// 支付宝
 			if ($order['pay2'] > 0) {
 				$alipay         = (new ZfbModel())->getOne(['merchant_id' => $order['sell_id'], 'id' => $order['pay2']]);
-				$user['alipay'] = ['c_bank' => $alipay['c_bank'], 'c_bank_card' => $alipay['c_bank_card'], 'truename' => $alipay['truename'], 'qrcode' => StrToMicroTime($alipay['qrcode'])];
+				$user['alipay'] = ['c_bank' => $alipay['c_bank'], 'c_bank_card' => $alipay['c_bank_card'], 'truename' => $alipay['truename'], 'qrcode' => StrToMicroTime($alipay['qrcode'], true)];
 			}
 			// 微信
 			if ($order['pay3'] > 0) {
 				$wx         = (new WxModel())->getOne(['merchant_id' => $order['sell_id'], 'id' => $order['pay3']]);
-				$user['wx'] = ['c_bank' => $wx['c_bank'], 'c_bank_card' => $wx['c_bank_card'], 'truename' => $wx['truename'], 'qrcode' => StrToMicroTime($wx['qrcode'])];
+				$user['wx'] = ['c_bank' => $wx['c_bank'], 'c_bank_card' => $wx['c_bank_card'], 'truename' => $wx['truename'], 'qrcode' => $wx['qrcode']];
 			}
 			// 云闪付
 			if ($order['pay4'] > 0) {

@@ -24,7 +24,7 @@ class Pay extends Base {
 		$this->assign('order', $order);
 		$this->assign('appid', $appId);
 		$payDetail = Db::name('merchant_' . $payType[$type])->where('id', $payId)->find();
-		$payDetail['qrcode'] = StrToMicroTime($payDetail['qrcode']);
+		$payDetail['qrcode'] = StrToMicroTime($payDetail['qrcode'], true);
 		/*固定码*/ //$longUrl = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s": "money","u":"' . $alipay['alipay_id'] . '","a":"' . $order['deal_amount'] . '","m":"' . $order['check_code'] . '"}';
 		/*转账码*/ //$longUrl ='https://ds.alipay.com/?from=mobilecodec&scheme='.urlencode('alipays://platformapi/startapp?appId=20000200&actionType=toAccount&account=&amount=&userId=' . $alipay['alipay_id'] . '&memo=' . $order['check_code'] .'');
 		$this->assign('payDetail', $payDetail);

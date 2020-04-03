@@ -13,7 +13,7 @@ class Payment extends Base {
 		$user       = Db::name('merchant')->where(['id' => $this->uid])->find();
 		$alipayData = (new ZfbModel())->getBank(['merchant_id' => $this->uid, 'state' => 1], 'id DESC');
 		foreach ($alipayData as $k => $v) {
-			$alipayData[$k]->qrcode = StrToMicroTime($v->qrcode);
+			$alipayData[$k]->qrcode = StrToMicroTime($v->qrcode, true);
 		}
 		$this->assign('user', $user);
 		$this->assign('list', (new BankModel())->getBank(['merchant_id' => $this->uid, 'state' => 1], 'id DESC'));
