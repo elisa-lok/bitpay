@@ -455,7 +455,7 @@ class Auto extends Base {
 			$rs3      = $rs4 = 1;
 			if ($sellInfo['state'] == 3) {
 				// 如果挂单已下架 回滚余额
-				$rs3 = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $orderInfo['id'], "支付超时->自动下架");
+				$rs3 = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $orderInfo['id'], "支付超时");
 			}
 			if ($rs1 && $rs2 && $rs3) {
 				Db::commit();
@@ -483,7 +483,7 @@ class Auto extends Base {
 			$orderInfo = Db::name('order_sell')->where(['id' => $vv['id']])->find();
 			$rs1       = Db::name('order_sell')->update(['status' => 5, 'id' => $vv['id']]);
 			$realAmt   = $orderInfo['deal_num'] + $orderInfo['fee'];
-			$rs2       = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $orderInfo['id'], "支付超时->自动下架->buy");
+			$rs2       = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $orderInfo['id'], "支付超时");
 			if ($rs1 && $rs2) {
 				Db::commit();
 			} else {

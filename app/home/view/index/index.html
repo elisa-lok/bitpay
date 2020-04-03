@@ -12,19 +12,7 @@
 	<meta name="format-detection" content="telephone=no">
 	<link rel="stylesheet" href="__CSS__/layui.css" media="all">
 	<link rel="stylesheet" href="__CSS__/global.css" media="all">
-	<!--<link rel="stylesheet" href="__CSS__/common-combin.css" media="all">-->
-	<style type="text/css">
-		.layui-field-title{
-			border:none;
-		}
-		.bClass{
-			font-weight:500;
-			font-size:20px;
-			padding:5px 5px 10px 5px;
-			border-bottom:1px solid #56aab7;
-		}
-		.pt10{padding-top:10px;}
-	</style>
+	<style type="text/css"> .layui-field-title{border:none;}  .bClass{font-weight:500;font-size:20px;padding:5px 5px 10px 5px;border-bottom:1px solid #56aab7;}  .pt10{padding-top:10px;}</style>
 	<link id="layuicss-layer" rel="stylesheet" href="__CSS__/layer.css" media="all">
 </head>
 <body class="site-home">
@@ -37,7 +25,11 @@
 			<div class="layui-form component"></div>
 			<ul class="layui-nav" style="font-size:18px!important;">
 				<li class="layui-nav-item1">
+					{if $uid != null }
+					<a href="/merchant/index">进入后台</a>
+					{else}
 					<a href="/login"> 登 录 </a>
+					{/if}
 				</li>
 				<span class="layui-nav-bar" style="width: 0; left: 0; opacity: 0;"></span>
 			</ul>
