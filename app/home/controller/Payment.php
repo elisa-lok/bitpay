@@ -29,8 +29,8 @@ class Payment extends Base {
 		!$this->uid && showMsg('请登陆操作');
 		$data = json_decode(file_get_contents('php://input'), TRUE);
 		!$data && showMsg('参数错误');
-		(strlen($data['truename']) < 2 || strlen($data['truename']) > 6) && showMsg('真实姓名有误');
-		(strlen($data['tag']) < 1 || strlen($data['truename']) > 20) && showMsg('账户标识不能为空');
+		(mb_strlen($data['truename'], 'UTF-8') < 2 || mb_strlen($data['truename'],'UTF-8') > 6) && showMsg('真实姓名有误');
+		(mb_strlen($data['tag'], 'UTF-8') < 1 || mb_strlen($data['truename'], 'UTF-8') > 20) && showMsg('账户标识不能为空');
 		$user = Db::name('merchant')->where('id', $this->uid)->find();
 		$ga   = explode('|', $user['ga']);
 		if (isset($ga[4]) && $ga[4]) {

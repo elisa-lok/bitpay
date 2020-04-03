@@ -19,9 +19,8 @@ class Login extends Controller {
 				session('loginkeys', $urlkey);
 				return $this->fetch('/login');
 			}
-		} else {
-			return $this->redirect('admin/index');
 		}
+		return $this->redirect('admin/index');
 	}
 
 	/**
@@ -31,22 +30,21 @@ class Login extends Controller {
 	public function doLogin() {
 		$username = input("param.username");
 		$password = input("param.password");
-		if (config('verify_type') == 1) {
-			$code = input("param.code");
-		}
-		$result = $this->validate(compact('username', 'password'), 'AdminValidate');
+		$result   = $this->validate(compact('username', 'password'), 'AdminValidate');
 		if (TRUE !== $result) {
 			return json(['code' => -5, 'url' => '', 'msg' => $result]);
 		}
-		$verify = new Verify();
-		if (config('verify_type') == 1) {
-			if (!$code) {
-				return json(['code' => -4, 'url' => '', 'msg' => '请输入验证码']);
-			}
-			if (!$verify->check($code)) {
-				return json(['code' => -4, 'url' => '', 'msg' => '验证码错误']);
-			}
-		}
+		/*	$verify = new Verify();
+				if (config('verify_type') == 1) {
+					$code = input("param.code");
+					if (!$code) {
+						return json(['code' => -4, 'url' => '', 'msg' => '请输入验证码']);
+					}
+					if (!$verify->check($code)) {
+						return json(['code' => -4, 'url' => '', 'msg' => '验证码错误']);
+					}
+				}
+		*/
 		$hasUser = Db::name('admin')->where('username', $username)->find();
 		if (empty($hasUser)) {
 			return json(['code' => -1, 'url' => '', 'msg' => '管理员不存在']);
@@ -71,10 +69,10 @@ class Login extends Controller {
 		session('is_super', $info['is_super']);      //是否超管
 		//更新管理员状态
 		$param = [
-				'loginnum'        => $hasUser['loginnum'] + 1,
-				'last_login_ip'   => request()->ip(),
-				'last_login_time' => time(),
-				'token'           => md5($hasUser['username'] . $hasUser['password'])
+			'loginnum'        => $hasUser['loginnum'] + 1,
+			'last_login_ip'   => request()->ip(),
+			'last_login_time' => time(),
+			'token'           => md5($hasUser['username'] . $hasUser['password'])
 		];
 		Db::name('admin')->where('id', $hasUser['id'])->update($param);
 		writelog($hasUser['id'], session('username'), '用户【' . session('username') . '】登录成功', 1);
@@ -109,6 +107,6 @@ class Login extends Controller {
 		session('rule', NULL);             //角色节点
 		session('name', NULL);             //角色权限
 		//cache('db_config_data',null);//清除缓存中网站配置信息
-		$this->redirect('login/index');
+		$this->redirect('login/index?urlkey='.ADMIN_KEY);
 	}
 }
