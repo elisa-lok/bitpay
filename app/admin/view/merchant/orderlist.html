@@ -21,8 +21,7 @@
 									<option value="7" {eq name="status" value="7" }selected{/eq}>申诉中</option>
 									<option value="10" {eq name="status" value="10" }selected{/eq}>订单失败</option>
 								</select> <span class="input-group-btn">
-                                    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> 搜索</button>
-                                </span>
+								<button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> 搜索</button></span>
 							</div>
 						</div>
 					</form>
@@ -39,15 +38,16 @@
 							<th>推荐人</th>
 							<th>买家</th>
 							<th>订单号</th>
-							<th>订单金额</th>
-							<th>订单数量</th>
+							<th>订单额</th>
+							<th>订单量</th>
 							<th>单价</th>
-							<th>交易数量</th>
-							<th>交易金额</th>
+							<th>交易量</th>
+							<th>交易额</th>
 							<th>时间</th>
 							<th>完成时间</th>
 							<th>校验码</th>
-							<th>申诉内容</th>
+							<th>申诉</th>
+							<th>取消原因</th>
 							<th>状态</th>
 							<th>收款方式</th>
 							<th>操作</th>
@@ -70,16 +70,17 @@
 								<td>{{d[i].finished_time}}</td>
 								<td>{{d[i].check_code}}</td>
 								<td>{{d[i].su_reason}}</td>
+								<td>{{d[i].desc}}</td>
 								<td>
-									{{# if(d[i].status == 0){ }} 待付款 {{# }else if(d[i].status == 1){ }} 已付款 {{# }else if(d[i].status == 4){ }} 已完成 {{# }else if(d[i].status == 5){ }} 已关闭 {{# }else if(d[i].status == 6){ }} 申诉中 {{# }else if(d[i].status == 9){ }} 订单失败 {{# } }}
+									{{# if(d[i].status == 0){ }} 待付 {{# }else if(d[i].status == 1){ }} 付款 {{# }else if(d[i].status == 4){ }} 完成 {{# }else if(d[i].status == 5){ }} 关闭 {{# }else if(d[i].status == 6){ }} 申诉中 {{# }else if(d[i].status == 9){ }} 失败 {{# } }}
 								</td>
 								<td>
 									{{# if(d[i].bankinfo !=undefined){ }}
 									<a onclick="showbank('{{d[i].bankinfo}}')">银行卡</a> {{# }if(d[i].zfbinfo !=undefined){ }} |<a onclick="showqr('{{d[i].zfbinfo}}')">支付宝</a> {{# }if(d[i].wxinfo !=undefined){ }} |<a onclick="showqr('{{d[i].wxinfo}}')">微信</a> {{# }if(d[i].ysfinfo !=undefined){ }} |<a onclick="showqr('{{d[i].ysfinfo}}')">云闪付</a> {{# } }}
 								</td>
 								<td>
-									<a href="javascript:;" onclick="success('{{d[i].id}}')" class="btn btn-primary btn-outline btn-xs">申诉成功</a> <a href="javascript:;" onclick="fail('{{d[i].id}}')" class="btn btn-primary btn-outline btn-xs">申诉失败</a>
-									<a href="javascript:;" onclick="huitiao('{{d[i].id}}')" class="btn btn-success btn-outline btn-xs">发送回调</a><a href="/admin/order/buy/edit/{{d[i].id}}"class="btn btn-success btn-outline btn-xs">编辑</a>
+									<a href="javascript:;" onclick="success('{{d[i].id}}')" class="btn btn-primary btn-outline btn-xs">成功</a> <a href="javascript:;" onclick="fail('{{d[i].id}}')" class="btn btn-primary btn-outline btn-xs">失败</a>
+									<a href="javascript:;" onclick="huitiao('{{d[i].id}}')" class="btn btn-success btn-outline btn-xs">回调</a><a href="/admin/order/buy/edit/{{d[i].id}}"class="btn btn-success btn-outline btn-xs">编辑</a>
 								</td>
 							</tr>{{# } }}
 						</script>

@@ -857,27 +857,16 @@ table.text-center, table.text-center td, table.text-center th{text-align:center}
 .full-opacity-hover:hover{opacity:1;filter:alpha(opacity=100)}
 .chart{position:relative;overflow:hidden;width:100%}
 .chart svg, .chart canvas{width:100% !important}
-@media print{
-	.no-print, .main-sidebar, .left-side, .main-header, .content-header{display:none !important}
-	.content-wrapper, .right-side, .main-footer{margin-left:0 !important;min-height:0 !important;-webkit-transform:translate(0, 0) !important;-ms-transform:translate(0, 0) !important;-o-transform:translate(0, 0) !important;transform:translate(0, 0) !important}
-	.fixed .content-wrapper, .fixed .right-side{padding-top:0 !important}
-	.invoice{width:100%;border:0;margin:0;padding:0}
-	.invoice-col{float:left;width:33.3333333%}
-	.table-responsive{overflow:auto}
-	.table-responsive > .table tr th, .table-responsive > .table tr td{white-space:normal !important}
-}
 .nav .open > a, .nav .open > a:focus, .nav .open > a:hover{background-color:var(--red)}
 .sidebar, .slimScrollDiv{height:656px;overflow:hidden;width:auto}
-.slimScrollDiv{position:relative;box-shadow:3px 1px 5px rgba(0, 0, 0, .2)}
+.slimScrollDiv{position:relative;}
 .text-center{text-align: center; text-align-last: center;}
 .p0{padding: 0;}
 .m0{margin: 0;}
 .text-shadow{text-shadow:0 1px 2px rgba(0,0,0,.2)}
 .border-none{border:none;}
 .navbar-nav>li>a {line-height:30px;padding-top:10px;padding-bottom:10px;}
-
-
-.label{padding:.5em .8em}
+/*重置样式*/
 .label-default{background-color:#a1a1a1}
 .label-primary{background-color:#59ace2}
 .label-success{background-color:#a9d86e}
@@ -891,7 +880,6 @@ table.text-center, table.text-center td, table.text-center th{text-align:center}
 .text-warning{color:#fcb322}
 .text-success{color:#a9d86e}
 .text-info{color:#8175c7}
-.form-control{color:#777!important;font-size:.8rem;height:calc(1.5em + .75rem + 7px)}
 .modal-content{box-shadow:none;border:none}
 .modal-header{background:#00a8b3;color:#fff;border-radius:5px 5px 0 0;-webkit-border-radius:5px 5px 0 0;border-bottom:none}
 .form-control{box-shadow:none;color:#c2c2c2}
@@ -923,3 +911,4 @@ ul{padding-left:0}
 .dropdown-menu>li>a:focus,.dropdown-menu>li>a:hover{background-color:#495d74;color:#fff;text-decoration:none}
 .btn-white{background-clip:padding-box;background-color:#fff;border-color:rgba(150,160,180,.3);box-shadow:0 -1px 1px rgba(0,0,0,.05) inset}
 input,select{text-align:center;text-align-last:center;}
+

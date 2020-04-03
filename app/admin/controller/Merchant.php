@@ -733,7 +733,11 @@ class Merchant extends Base {
 				$wx                   = Db::name('merchant_ysf')->where(['id' => $sorder['pay_method4']])->find();
 				$lists[$k]['ysfinfo'] = '/uploads/face/' . $wx['c_bank_detail'];
 			}
-			// $lists[$k]['payway'] = $str;
+			$lists[$k]['deal_amount'] = round($v['deal_amount'],2);
+			$lists[$k]['deal_num'] = round($v['deal_num'],6);
+			$lists[$k]['deal_price'] = round($v['deal_price'],4);
+			$lists[$k]['deal_num'] = round($v['deal_num'],6);
+			$lists[$k]['deal_amount'] = round($v['deal_amount'],6);
 		}
 		$this->assign('Nowpage', $nowPage);        //当前页
 		$this->assign('allpage', $allPage);        //总页数
