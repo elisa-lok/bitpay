@@ -39,12 +39,19 @@ class Stat extends Base {
 		// TODO 商户当天下发币量
 		$profit['mch_sell_vol'] = $sellModel->where($sqlMap)->whereIn('sell_id', $mchIds)->sum('deal_num');
 		// TODO 承兑当天购买币量
-		$profit['user_buy_vol'] = $sellModel->where($sqlMap)->whereNotIn('sell_id', array_merge($specialId, $mchIds))->sum('deal_num');
+		$profit['user_buy_vol'] = $sellModel->where($sqlMap)->whereNotIn('sell_id', array_merge($specialId, $userIds))->sum('deal_num');
 		// 系统卖出币量
-		$profit['sys_sell_vol'] = $sellModel->where($sqlMap)->whereNotIn('sell_id', $specialId)->sum('deal_num');
+		$profit['sys_sell_vol'] = $sellModel->where($sqlMap)->whereIn('sell_id', $specialId)->sum('deal_num');
 		//代理商奖励总和
 		$profit['agent_reward'] = getTotalInfo(['create_time' => $time], 'agent_reward', 'amount');
 		//承兑商奖励总和
 		$profit['user_reward'] = getTotalInfo(['create_time' => $time], 'trader_reward', 'amount');
+		// 成功率统计
+		$statusArr = Db::name('order_buy')->where(['ctime' =>$time])->field('status,COUNT(1) AS `num`')->group('status')->select();
+		// 0,1,4,5,6,9
+		$statusArr = array_column($statusArr,'num', 'status');
+		$profit['rate'] = $rate = (float)((float)$statusArr[4] / (float)array_sum($statusArr));
+		$profit['appeal'] = $rate = (float)((float)$statusArr[4] / (float)array_sum($statusArr));
+		$profit['rate'] = $rate = (float)((float)$statusArr[4] / (float)array_sum($statusArr));
 	}
 }

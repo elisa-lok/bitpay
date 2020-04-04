@@ -453,5 +453,5 @@ function getObjectURL(file) {file = file ? file : null;if (file == null) return 
 /*展示图片*/
 function showPhoto(url) {layer.open({type: 1, title: false, closeBtn: 0, area: ['300px', '467px'], skin: 'layui-layer-nobg', shadeClose: true, content: '<img style="width:300px;height:467px" src="/uploads/face/' + url + '">'});}
 /*记住当前tab*/
-$(function() {let getTabIndex = sessionStorage.getItem('tabIndex');$(".nav-tabs li").eq(getTabIndex).addClass('active').siblings().removeClass('active');$(".tab-pane").eq(getTabIndex).show().siblings(".tab-pane").hide();$(".nav-tabs li").on('click', function () {let i = $(this).index();$(this).addClass('active').siblings().removeClass('active');$(".tab-pane").eq(i).show().siblings(".tab-pane").hide();sessionStorage.setItem('tabIndex', i);});});
+$(function() {let getTabIndex = localStorage.getItem('tabIndex');$(".nav-tabs li").eq(getTabIndex).addClass('active').siblings().removeClass('active');$(".tab-pane").eq(getTabIndex).show().siblings(".tab-pane").hide();$(".nav-tabs li").on('click', function () {let i = $(this).index();$(this).addClass('active').siblings().removeClass('active');$(".tab-pane").eq(i).show().siblings(".tab-pane").hide();localStorage.setItem('tabIndex', i);});});
 </script>{include file="Public:footer_new"/}

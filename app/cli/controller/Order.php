@@ -6,19 +6,17 @@ use think\Db;
 class Order extends Base {
 	// 卖单倒计时
 	public function sellCountDown() {
-		$list = Db::name('order_buy')->where("" . time() . "-ctime>ltime*60 and status=0 ")->select();
-		if (!$list) {
-			return;
-		}
+		$list = Db::name('order_buy')->where( time() . "-ctime > ltime*60 AND status=0 ")->whereOr( 'status=1 AND dktime < '. (time() - 3600))->select();
+		!$list &&  die('无数据');
 		foreach ($list as $key => $vv) {
 			// 锁定操作 代码执行完成前不可继续操作
 			if (Cache::has($vv['id'])) continue;
 			Cache::set($vv['id'], TRUE, 60);
 			Db::startTrans();
+			$memo = $vv['status'] == 1 ? '恶意点付款' : '支付超时';
 			$orderInfo = Db::name('order_buy')->where(['id' => $vv['id']])->find();
 			//$seller = Db::name('merchant')->where(array('id'=>$vv['sell_id']))->find();
 			$buyer = Db::name('merchant')->where(['id' => $vv['buy_id']])->find();
-			//$table = "movesay_".'usdt'."_log";
 			$rs1     = Db::name('order_buy')->update(['status' => 5, 'id' => $vv['id']]);
 			$realAmt = $orderInfo['deal_num'] + $orderInfo['fee'];
 			// 回滚挂单,  增加剩余量, 减少交易量
@@ -28,7 +26,7 @@ class Order extends Base {
 			$rs3      = $rs4 = 1;
 			if ($sellInfo['state'] == 3) {
 				// 如果挂单已下架 回滚余额
-				$rs3 = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $orderInfo['id'], "支付超时->自动下架");
+				$rs3 = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $orderInfo['id'], $memo);
 			}
 			if ($rs1 && $rs2 && $rs3) {
 				Db::commit();
@@ -38,6 +36,7 @@ class Order extends Base {
 				$data['appid']   = $buyer['appid'];
 				$data['status']  = 0;
 				askNotify($data, $orderInfo['notify_url'], $buyer['key']);
+
 			} else {
 				Db::rollback();
 				$msg = '【' . date('Y-m-d H:i:s') . '】 订单' . $vv['id'] . '回滚失败, 买家ID: ' . $vv['buy_id'] . ' , 卖家ID: ' . $vv['sell_id'] . ", 失败步骤: $rs1,$rs2,$rs3";
@@ -46,17 +45,16 @@ class Order extends Base {
 		}
 	}
 
+
 	public function buyCountDown() {
-		$list = Db::name('order_sell')->where("" . time() . "-ctime>ltime*60 and status=0 ")->select();
-		if (!$list) {
-			return;
-		}
+		$list = Db::name('order_sell')->where( time() . "-ctime>ltime*60 AND status=0 ")->select();
+		!$list &&  die('无数据');
 		foreach ($list as $key => $vv) {
 			Db::startTrans();
 			$orderInfo = Db::name('order_sell')->where(['id' => $vv['id']])->find();
 			$rs1       = Db::name('order_sell')->update(['status' => 5, 'id' => $vv['id']]);
 			$realAmt   = $orderInfo['deal_num'] + $orderInfo['fee'];
-			$rs2       = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $orderInfo['id'], "支付超时->自动下架->buy");
+			$rs2       = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $orderInfo['id'], "支付超时");
 			if ($rs1 && $rs2) {
 				Db::commit();
 			} else {

@@ -56,17 +56,17 @@ class Blockchain extends Base {
 										Db::name('merchant_recharge')->update(['id' => $res['id'], 'confirmations' => $v2['confirmations'], 'addtime' => $time]);
 									} else {
 										Db::name('merchant_recharge')->insert([
-												'merchant_id'   => $userAdd['uid'],
-												'from_address'  => $v2['from'],
-												'to_address'    => $account,
-												'coinname'      => 'usdt',
-												'txid'          => $v2['hash'],
-												'num'           => $num,
-												'mum'           => $num - $sfee,
-												'addtime'       => $time,
-												'status'        => 0,
-												'fee'           => $sfee,
-												'confirmations' => $v2['confirmations']
+											'merchant_id'   => $userAdd['uid'],
+											'from_address'  => $v2['from'],
+											'to_address'    => $account,
+											'coinname'      => 'usdt',
+											'txid'          => $v2['hash'],
+											'num'           => $num,
+											'mum'           => $num - $sfee,
+											'addtime'       => $time,
+											'status'        => 0,
+											'fee'           => $sfee,
+											'confirmations' => $v2['confirmations']
 										]);
 									}
 									continue;
@@ -96,17 +96,17 @@ class Blockchain extends Base {
 									if ($valid) {
 										$rs1 = balanceChange(FALSE, $userAdd['uid'], $num - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充币');
 										$rs2 = Db::name('merchant_recharge')->insert([
-												'merchant_id'   => $userAdd['uid'],
-												'from_address'  => $v2['from'],
-												'to_address'    => $account,
-												'coinname'      => 'usdt',
-												'txid'          => $v2['hash'],
-												'num'           => $num,
-												'mum'           => $num - $sfee,
-												'addtime'       => $time,
-												'status'        => 1,
-												'fee'           => $sfee,
-												'confirmations' => $v2['confirmations']
+											'merchant_id'   => $userAdd['uid'],
+											'from_address'  => $v2['from'],
+											'to_address'    => $account,
+											'coinname'      => 'usdt',
+											'txid'          => $v2['hash'],
+											'num'           => $num,
+											'mum'           => $num - $sfee,
+											'addtime'       => $time,
+											'status'        => 1,
+											'fee'           => $sfee,
+											'confirmations' => $v2['confirmations']
 										]);
 										//增加充值数量统计，不算手续费
 										Db::name('merchant')->where(['id' => $userAdd['uid']])->setInc('recharge_amount', $num);
@@ -118,17 +118,17 @@ class Blockchain extends Base {
 									} else {
 										$rs1 = TRUE;
 										$rs2 = Db::name('merchant_recharge')->insert([
-												'merchant_id'   => $userAdd['uid'],
-												'from_address'  => $v2['from'],
-												'to_address'    => $account,
-												'coinname'      => 'usdt',
-												'txid'          => $v2['hash'],
-												'num'           => $num,
-												'mum'           => $num - $sfee,
-												'addtime'       => $time,
-												'status'        => 5,
-												'fee'           => $sfee,
-												'confirmations' => $v2['confirmations']
+											'merchant_id'   => $userAdd['uid'],
+											'from_address'  => $v2['from'],
+											'to_address'    => $account,
+											'coinname'      => 'usdt',
+											'txid'          => $v2['hash'],
+											'num'           => $num,
+											'mum'           => $num - $sfee,
+											'addtime'       => $time,
+											'status'        => 5,
+											'fee'           => $sfee,
+											'confirmations' => $v2['confirmations']
 										]);
 									}
 								}
@@ -188,17 +188,17 @@ class Blockchain extends Base {
 							Db::name('merchant_user_recharge')->update(['id' => $res['id'], 'confirmations' => $v2['confirmations'], 'addtime' => $time]);
 						} else {
 							Db::name('merchant_user_recharge')->insert([
-									'merchant_id'   => $v['merchant_id'],
-									'from_address'  => $v2['sendingaddress'],
-									'to_address'    => $v['address'],
-									'coinname'      => 'usdt',
-									'txid'          => $v2['txid'],
-									'num'           => $v2['amount'],
-									'mum'           => $v2['amount'] - $sfee,
-									'addtime'       => $time,
-									'status'        => 0,
-									'fee'           => $sfee,
-									'confirmations' => $v2['confirmations']
+								'merchant_id'   => $v['merchant_id'],
+								'from_address'  => $v2['sendingaddress'],
+								'to_address'    => $v['address'],
+								'coinname'      => 'usdt',
+								'txid'          => $v2['txid'],
+								'num'           => $v2['amount'],
+								'mum'           => $v2['amount'] - $sfee,
+								'addtime'       => $time,
+								'status'        => 0,
+								'fee'           => $sfee,
+								'confirmations' => $v2['confirmations']
 							]);
 						}
 						continue;
@@ -228,17 +228,17 @@ class Blockchain extends Base {
 						if ($valid) {
 							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
 							$rs2 = Db::name('merchant_user_recharge')->insert([
-									'merchant_id'   => $v['merchant_id'],
-									'from_address'  => $v2['sendingaddress'],
-									'to_address'    => $v['address'],
-									'coinname'      => 'usdt',
-									'txid'          => $v2['txid'],
-									'num'           => $v2['amount'],
-									'mum'           => $v2['amount'] - $sfee,
-									'addtime'       => $time,
-									'status'        => 1,
-									'fee'           => $sfee,
-									'confirmations' => $v2['confirmations']
+								'merchant_id'   => $v['merchant_id'],
+								'from_address'  => $v2['sendingaddress'],
+								'to_address'    => $v['address'],
+								'coinname'      => 'usdt',
+								'txid'          => $v2['txid'],
+								'num'           => $v2['amount'],
+								'mum'           => $v2['amount'] - $sfee,
+								'addtime'       => $time,
+								'status'        => 1,
+								'fee'           => $sfee,
+								'confirmations' => $v2['confirmations']
 							]);
 							//增加充值数量统计，不算手续费
 							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
@@ -250,17 +250,17 @@ class Blockchain extends Base {
 						} else {
 							$rs1 = TRUE;
 							$rs2 = Db::name('merchant_user_recharge')->insert([
-									'merchant_id'   => $v['merchant_id'],
-									'from_address'  => $v2['sendingaddress'],
-									'to_address'    => $v['address'],
-									'coinname'      => 'usdt',
-									'txid'          => $v2['txid'],
-									'num'           => $v2['amount'],
-									'mum'           => $v2['amount'] - $sfee,
-									'addtime'       => $time,
-									'status'        => 5,
-									'fee'           => $sfee,
-									'confirmations' => $v2['confirmations']
+								'merchant_id'   => $v['merchant_id'],
+								'from_address'  => $v2['sendingaddress'],
+								'to_address'    => $v['address'],
+								'coinname'      => 'usdt',
+								'txid'          => $v2['txid'],
+								'num'           => $v2['amount'],
+								'mum'           => $v2['amount'] - $sfee,
+								'addtime'       => $time,
+								'status'        => 5,
+								'fee'           => $sfee,
+								'confirmations' => $v2['confirmations']
 							]);
 						}
 					}
@@ -331,17 +331,17 @@ class Blockchain extends Base {
 							Db::name('merchant_recharge')->update(['id' => $res['id'], 'confirmations' => $v2['confirmations'], 'addtime' => $time]);
 						} else {
 							Db::name('merchant_recharge')->insert([
-									'merchant_id'   => $v['merchant_id'],
-									'from_address'  => $v2['sendingaddress'],
-									'to_address'    => $v['address'],
-									'coinname'      => 'usdt',
-									'txid'          => $v2['txid'],
-									'num'           => $v2['amount'],
-									'mum'           => $v2['amount'] - $sfee,
-									'addtime'       => $time,
-									'status'        => 0,
-									'fee'           => $sfee,
-									'confirmations' => $v2['confirmations']
+								'merchant_id'   => $v['merchant_id'],
+								'from_address'  => $v2['sendingaddress'],
+								'to_address'    => $v['address'],
+								'coinname'      => 'usdt',
+								'txid'          => $v2['txid'],
+								'num'           => $v2['amount'],
+								'mum'           => $v2['amount'] - $sfee,
+								'addtime'       => $time,
+								'status'        => 0,
+								'fee'           => $sfee,
+								'confirmations' => $v2['confirmations']
 							]);
 						}
 						continue;
@@ -364,17 +364,17 @@ class Blockchain extends Base {
 						if ($valid) {
 							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
 							$rs2 = Db::name('merchant_recharge')->insert([
-									'merchant_id'   => $v['merchant_id'],
-									'from_address'  => $v2['sendingaddress'],
-									'to_address'    => $v['address'],
-									'coinname'      => 'usdt',
-									'txid'          => $v2['txid'],
-									'num'           => $v2['amount'],
-									'mum'           => $v2['amount'] - $sfee,
-									'addtime'       => $time,
-									'status'        => 1,
-									'fee'           => $sfee,
-									'confirmations' => $v2['confirmations']
+								'merchant_id'   => $v['merchant_id'],
+								'from_address'  => $v2['sendingaddress'],
+								'to_address'    => $v['address'],
+								'coinname'      => 'usdt',
+								'txid'          => $v2['txid'],
+								'num'           => $v2['amount'],
+								'mum'           => $v2['amount'] - $sfee,
+								'addtime'       => $time,
+								'status'        => 1,
+								'fee'           => $sfee,
+								'confirmations' => $v2['confirmations']
 							]);
 							//增加充值数量统计，不算手续费
 							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
@@ -382,17 +382,17 @@ class Blockchain extends Base {
 						} else {
 							$rs1 = TRUE;
 							$rs2 = Db::name('merchant_recharge')->insert([
-									'merchant_id'   => $v['merchant_id'],
-									'from_address'  => $v2['sendingaddress'],
-									'to_address'    => $v['address'],
-									'coinname'      => 'usdt',
-									'txid'          => $v2['txid'],
-									'num'           => $v2['amount'],
-									'mum'           => $v2['amount'] - $sfee,
-									'addtime'       => $time,
-									'status'        => 5,
-									'fee'           => $sfee,
-									'confirmations' => $v2['confirmations']
+								'merchant_id'   => $v['merchant_id'],
+								'from_address'  => $v2['sendingaddress'],
+								'to_address'    => $v['address'],
+								'coinname'      => 'usdt',
+								'txid'          => $v2['txid'],
+								'num'           => $v2['amount'],
+								'mum'           => $v2['amount'] - $sfee,
+								'addtime'       => $time,
+								'status'        => 5,
+								'fee'           => $sfee,
+								'confirmations' => $v2['confirmations']
 							]);
 						}
 					}
@@ -418,13 +418,9 @@ class Blockchain extends Base {
 				$usdt = $model->index('getbalance', $v['usdtb'], $money = NULL, $index = NULL, $count = NULL, $skip = NULL);
 				if ($usdt['code'] == 1 && $usdt['data'] >= 50) {//只有大于50才做汇总
 					$return = $model->index('cover', $v['usdtb'], $usdt['data'], $index = NULL, $count = NULL, $skip = NULL);
-					if ($return['code'] == 0) {
-						$msg = '汇总失败(用户:' . $v['mobile'] . ',地址:' . $v['usdtb'] . '):' . $return['msg'];
-					} else {
-						$msg = '汇总成功(用户:' . $v['mobile'] . ',地址:' . $v['usdtb'] . ',数量:' . $usdt['data'] . '):' . $return['data'];
-					}
-					file_put_contents(RUNTIME_PATH . "data/usdtcover.txt", " - " . $msg . "|" . date('Y-m-d H:i:s') . " + " . PHP_EOL, FILE_APPEND);
+					$msg    = $return['code'] == 0 ? '汇总失败(用户:' . $v['mobile'] . ',地址:' . $v['usdtb'] . '):' . $return['msg'] : '汇总成功(用户:' . $v['mobile'] . ',地址:' . $v['usdtb'] . ',数量:' . $usdt['data'] . '):' . $return['data'];
 				}
+				file_put_contents(RUNTIME_PATH . "data/usdtcover.txt", " - " . $msg . "|" . date('Y-m-d H:i:s') . " + " . PHP_EOL, FILE_APPEND);
 			}
 		}
 	}

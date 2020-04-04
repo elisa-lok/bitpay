@@ -35,14 +35,6 @@ Route::rule('merchant/orderlistbuy', 'home/merchant/orderlistbuy', 'GET');
 Route::rule('merchant/log', 'home/merchant/log', 'GET');
 Route::rule('message/index', 'home/message/index', 'GET');
 Route::rule('message/add', 'home/message/add', 'GET|POST');
-Route::rule('auto/autoErc', 'home/auto/autoErc', 'GET');
-Route::rule('auto/autoEth', 'home/auto/autoEth', 'GET');
-Route::rule('auto/autoEthTrader', 'home/auto/autoEthTrader', 'GET');
-Route::rule('auto/selldaojishi', 'home/auto/selldaojishi', 'GET');
-Route::rule('auto/buydaojishi', 'home/auto/buydaojishi', 'GET');
-Route::rule('auto/statistics', 'home/auto/statistics', 'GET');
-Route::rule('auto/downad', 'home/auto/downad', 'GET');
-Route::rule('auto/coverusdt', 'home/auto/coverusdt', 'GET');
 Route::rule('merchant/detail', 'home/merchant/detail', 'GET|POST');
 Route::rule('logout', 'home/login/logout', 'GET');
 Route::rule('merchant/traderreward', 'home/merchant/traderreward', 'GET|POST');
@@ -50,14 +42,21 @@ Route::rule('merchant/pkorder', 'home/merchant/pkorder', 'GET');
 // 交易接口
 Route::rule('api/merchant/requestTraderRecharge', 'api/order/tradeCrypto', 'POST');
 Route::rule('api/merchant/requestTraderRechargeRmb', 'api/order/tradeFiat', 'POST');
+// 支付
+Route::rule('payment/add/:type', 'home/payment/add', 'POST');
+Route::rule('payment/del/:type/:id', 'home/payment/del', 'GET');
+Route::rule('pay/:type/:id/:appId', 'api/pay/index', 'GET');
 // CLI
 Route::rule('auto/sellCountDown', 'home/auto/sellCountDown', 'GET');
 Route::rule('auto/buyCountDown', 'home/auto/buyCountDown', 'GET');
 Route::rule('auto/updateAdSellPrice', 'home/auto/updateAdSellPrice', 'GET');
 Route::rule('auto/updateAdBuyPrice', 'home/auto/updateAdBuyPrice', 'GET');
-Route::rule('go', 'api/redirect/go', 'GET');
+Route::rule('auto/autoErc', 'home/auto/autoErc', 'GET');
+Route::rule('auto/autoEth', 'home/auto/autoEth', 'GET');
+Route::rule('auto/autoEthTrader', 'home/auto/autoEthTrader', 'GET');
+Route::rule('auto/statistics', 'home/auto/statistics', 'GET');
+Route::rule('auto/downad', 'home/auto/downad', 'GET');
+Route::rule('auto/coverusdt', 'home/auto/coverusdt', 'GET');
 // 接收完成通知
 Route::rule('send/:id', 'api/notify/send', 'POST|GET');
-Route::rule('payment/add/:type', 'home/payment/add', 'POST');
-Route::rule('payment/del/:type/:id', 'home/payment/del', 'GET');
-Route::rule('pay/:type/:id/:appId', 'api/pay/index', 'GET');
+

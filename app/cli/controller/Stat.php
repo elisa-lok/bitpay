@@ -49,21 +49,25 @@ class Stat extends Base {
 		//求购总数量，计算所有挂买的剩余数量
 		$orderBuySum = $adBuyTotal - $dealBuyNum;
 		$rs          = Db::name('statistics')->insert([
-				'platform_profit'      => $feePlatform,
-				'agent_reward'         => $feeAgent,
-				'trader_reward'        => $feeTrader,
-				'platform_usdt_amount' => $usdtSum,
-				'recharge_total'       => $rechargeSum,
-				'withdraw_total'       => $withdrawSum,
-				'ad_sell_on_total'     => $adSellSum,
-				'order_sell_amount'    => $orderSellSum,
-				'ad_buy_on_total'      => $adBuySum,
-				'order_buy_amount'     => $orderBuySum,
-				'create_time'          => time()
+			'platform_profit'      => $feePlatform,
+			'agent_reward'         => $feeAgent,
+			'trader_reward'        => $feeTrader,
+			'platform_usdt_amount' => $usdtSum,
+			'recharge_total'       => $rechargeSum,
+			'withdraw_total'       => $withdrawSum,
+			'ad_sell_on_total'     => $adSellSum,
+			'order_sell_amount'    => $orderSellSum,
+			'ad_buy_on_total'      => $adBuySum,
+			'order_buy_amount'     => $orderBuySum,
+			'create_time'          => time()
 		]);
-		return $rs ? '更新统计表think_statistics成功' : '更新统计表think_statistics失败';
+		return $rs ? '更新统计表成功' : '更新统计表失败';
 	}
 
+	// 每日数据统计
+	public function report(){
+		//平台当天的利润，商户当天的交易量，代理的当天利润，承兑商当天购买的币量，商户当天下发的币量
+	}
 }
 
 ?>

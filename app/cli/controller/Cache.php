@@ -1,7 +1,7 @@
 <?php
 namespace app\cli\controller;
 class Cache extends Base {
-	public function cleanAll() {
+	public function clean() {
 		$c = new \Redis();
 		$c->flushAll();
 		$c->flushDB();

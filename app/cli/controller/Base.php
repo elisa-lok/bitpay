@@ -19,4 +19,8 @@ class Base extends Controller {
 		}
 		config($config);
 	}
+
+	public function test(){
+		die('this is a test');
+	}
 }
