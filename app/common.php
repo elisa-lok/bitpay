@@ -378,7 +378,7 @@ function tradenoa() {
 
 function agentReward($uid, $duid, $amount, $type, $relateOrderId = '') {
 	$rs    = [];
-	$rs[0] = balanceChange(FALSE, $uid, $amount, 0, 0, 0, BAL_COMMISSION, $relateOrderId);
+	$rs[0] = balanceChange(FALSE, $uid, $amount, 0, 0, 0, BAL_COMMISSION, $relateOrderId,'代理佣金0');
 	$rs[1] = Db::name('agent_reward')->insert(['uid' => $uid, 'duid' => $duid, 'amount' => $amount, 'type' => $type, 'create_time' => time()]);
 	return $rs;
 }

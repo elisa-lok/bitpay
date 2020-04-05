@@ -25,9 +25,8 @@ class WithdrawModel extends Model {
 			$result = $this->save($param, ['id' => $param['id']]);
 			if (FALSE === $result) {
 				return ['code' => 0, 'data' => '', 'msg' => $this->getError()];
-			} else {
-				return ['code' => 1, 'data' => '', 'msg' => '操作成功'];
 			}
+			return ['code' => 1, 'data' => '', 'msg' => '操作成功'];
 		} catch (PDOException $e) {
 			return ['code' => 0, 'data' => '', 'msg' => $e->getMessage()];
 		}

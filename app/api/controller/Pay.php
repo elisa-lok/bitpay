@@ -101,7 +101,7 @@ class Pay extends Base {
 		$realAmt   = $order['deal_num'] + $order['fee'];
 		$sellOrder = Db::name('ad_sell')->where('id', $order['sell_sid'])->lock()->find();
 		if ($sellOrder['state'] == 3) { // 1进行中,2暂停
-			return balanceChange(FALSE, $order['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $order['id'], '支付超时');
+			return balanceChange(FALSE, $order['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $order['id'], '页面支付超时');
 			// return Db::name('merchant')->where('id', $order['sell_sid'])->update(['usdt' => Db::raw('`usdt` + ' . $realAmt), 'usdtd' => Db::raw('`usdtd` - ' . $realAmt)]);
 		}
 		return Db::name('ad_sell')->where('id', $order['sell_sid'])->setInc('remain_amount', $realAmt);

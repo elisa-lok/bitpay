@@ -733,11 +733,11 @@ class Merchant extends Base {
 				$wx                   = Db::name('merchant_ysf')->where(['id' => $sorder['pay_method4']])->find();
 				$lists[$k]['ysfinfo'] = '/uploads/face/' . $wx['c_bank_detail'];
 			}
-			$lists[$k]['deal_amount'] = round($v['deal_amount'],2);
-			$lists[$k]['deal_num'] = round($v['deal_num'],6);
-			$lists[$k]['deal_price'] = round($v['deal_price'],4);
-			$lists[$k]['deal_num'] = round($v['deal_num'],6);
-			$lists[$k]['deal_amount'] = round($v['deal_amount'],6);
+			$lists[$k]['deal_amount'] = round($v['deal_amount'], 2);
+			$lists[$k]['deal_num']    = round($v['deal_num'], 6);
+			$lists[$k]['deal_price']  = round($v['deal_price'], 4);
+			$lists[$k]['deal_num']    = round($v['deal_num'], 6);
+			$lists[$k]['deal_amount'] = round($v['deal_amount'], 6);
 		}
 		$this->assign('Nowpage', $nowPage);        //当前页
 		$this->assign('allpage', $allPage);        //总页数
@@ -855,7 +855,7 @@ class Merchant extends Base {
 			$rs4      = $rs5 = 1;
 			if ($sellInfo) {
 				// 如果挂单已下架 回滚余额
-				$rs4 = balanceChange(FALSE, $orderInfo['sell_id'], $orderInfo['deal_num'], 0, -$orderInfo['deal_num'], 0, BAL_CANCEL, $orderInfo['orderid'], "申诉成功");
+				$rs4 = balanceChange(FALSE, $orderInfo['sell_id'], $orderInfo['deal_num'], 0, -$orderInfo['deal_num'], 0, BAL_CANCEL, $orderInfo['orderid'], "申诉成功00");
 				// $rs4 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num']);
 				// $rs5 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $orderInfo['deal_num']);
 			}
@@ -915,11 +915,11 @@ class Merchant extends Base {
 		$mum  = $orderInfo['deal_num'] - $sfee;
 		Db::startTrans();
 		try {
-			$rs1 = balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$orderInfo['deal_num'], 0, BAL_SOLD, $orderInfo['id'], "申诉成功->buy");
+			$rs1 = balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$orderInfo['deal_num'], 0, BAL_SOLD, $orderInfo['id'], "申诉成功01");
 			// $rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num'] + $orderInfo['fee']);
 			$rs2 = Db::name('order_sell')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'buyer_fee' => $sfee]);
 			// $rs3      = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('usdt', $mum);
-			$rs3      = balanceChange(FALSE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], "申诉成功->buy");
+			$rs3      = balanceChange(FALSE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], "申诉成功02");
 			$rs4      = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('transact_buy', 1);
 			$total    = Db::name('order_sell')->field('sum(dktime-ctime) as total')->where('buy_id', $orderInfo['buy_id'])->where('status', 4)->select();
 			$tt       = $total[0]['total'];
@@ -1016,7 +1016,7 @@ class Merchant extends Base {
 			// 把多余的币回归到原来订单里面去
 			$backAmount = $amount / $orderInfo['deal_price'];  // 返回的数量
 			($backAmount > 0) && Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->update(['remain_amount' => Db::raw('remain_amount + ' . $backAmount), 'trading_volume' => Db::raw('trading_volume - ' . $backAmount)]);
-			$rs1 = balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$backAmount, 0, BAL_SOLD, $orderInfo['id'], '申诉失败操作');
+			$rs1 = balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$backAmount, 0, BAL_SOLD, $orderInfo['id'], '申诉失败操作01');
 			// 更新买单信息
 			$updateCondition = $amount != $orderInfo['deal_amount'] ? ['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'platform_fee' => $platformMoney, 'deal_amount' => $amount, 'deal_num' => $orderInfo['deal_num']] : [
 				'id'            => $orderInfo['id'],
@@ -1031,7 +1031,7 @@ class Merchant extends Base {
 			$rs6 = $rs7 = $rs8 = $rs9 = $rs10 = $rs11 = $res3 = TRUE;
 			// 卖家卖单奖励
 			if ($sellerAwardMoney > 0) {
-				!balanceChange(FALSE, $orderInfo['sell_id'], $sellerAwardMoney, 0, 0, 0, BAL_COMMISSION, $orderInfo['orderid'], '申诉订单失败') && $this->rollbackAndMsg('订单操作失败,,错误码:10003', $id);
+				!balanceChange(FALSE, $orderInfo['sell_id'], $sellerAwardMoney, 0, 0, 0, BAL_COMMISSION, $orderInfo['orderid'], '申诉订单失败02') && $this->rollbackAndMsg('订单操作失败,,错误码:10003', $id);
 				!(Db::name('trader_reward')->insert(['uid' => $orderInfo['sell_id'], 'orderid' => $orderInfo['id'], 'amount' => $sellerAwardMoney, 'type' => 0, 'create_time' => time()])) && $this->rollbackAndMsg('订单操作失败,错误码:10004', $id);
 			}
 			//卖家代理利润
@@ -1054,7 +1054,7 @@ class Merchant extends Base {
 				}
 			}
 			// 买家获取币并更新信息
-			!balanceChange(FALSE, $orderInfo['buy_id'], $sum, 0, 0, 0, BAL_BOUGHT, $orderInfo['orderid'], '申诉订单失败') && $this->rollbackAndMsg('订单操作失败,错误码:10011', $id);
+			!balanceChange(FALSE, $orderInfo['buy_id'], $sum, 0, 0, 0, BAL_BOUGHT, $orderInfo['orderid'], '申诉订单失败03') && $this->rollbackAndMsg('订单操作失败,错误码:10011', $id);
 			!$mchModel->where('id', $orderInfo['buy_id'])->update(['transact' => Db::raw('transact+1')]) && $this->rollbackAndMsg('订单操作失败,错误码:10012', $id);
 			// 买家代理
 			if ($buyerParentMoney > 0 && $buyerAgentExist) {
@@ -1104,7 +1104,7 @@ class Merchant extends Base {
 			//$rs1 = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setDec('usdtd', $orderInfo['deal_num'] + $orderInfo['fee']);
 			$rs2 = Db::name('order_sell')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time()]);
 			//$rs3 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $orderInfo['deal_num'] + $orderInfo['fee']);
-			$rs3 = balanceChange(FALSE, $orderInfo['sell_id'], $orderInfo['deal_num'] + $orderInfo['fee'], 0, -$orderInfo['deal_num'], $orderInfo['fee'], BAL_BOUGHT, $orderInfo['id'], "申诉失败操作->buy");
+			$rs3 = balanceChange(FALSE, $orderInfo['sell_id'], $orderInfo['deal_num'] + $orderInfo['fee'], 0, -$orderInfo['deal_num'], $orderInfo['fee'], BAL_BOUGHT, $orderInfo['id'], "申诉失败操作04");
 			if ($rs1 && $rs2 && $rs3) {
 				financeLog($orderInfo['sell_id'], ($orderInfo['deal_num'] + $orderInfo['fee']), '卖出USDT_取消', 1, $this->username);//添加日志
 				// 提交事务

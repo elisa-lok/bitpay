@@ -83,12 +83,12 @@ class Notify {
 			$updateCondition = $unpay == 1 ? ['status' => 4, 'finished_time' => time(), 'dktime' => time(), 'platform_fee' => $platformMoney] : ['status' => 4, 'finished_time' => time(), 'platform_fee' => $platformMoney];
 			!(Db::name('order_buy')->where('id', $orderInfo['id'])->update($updateCondition)) && $this->rollbackShowMsg('订单更新失败', $id, TRUE);
 			// 卖家减去冻结
-			!balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$orderInfo['deal_num'], 0, BAL_SOLD, $orderInfo['id']) && $this->rollbackShowMsg('冻结余额不足,错误码:10001', $id, TRUE);
+			!balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$orderInfo['deal_num'], 0, BAL_SOLD, $orderInfo['id'],'自动完成1') && $this->rollbackShowMsg('冻结余额不足,错误码:10001', $id, TRUE);
 			// 卖家增加数据, 增加平均交易时间:秒average , 以及交易单数transact
 			!$mchModel->where('id', $orderInfo['sell_id'])->update(['transact' => Db::raw('transact+1')]) && $this->rollbackShowMsg('卖家信息操作失败,错误码:10002', $id, TRUE);
 			// 卖家卖单奖励
 			if ($sellerAwardMoney > 0) {
-				!balanceChange(FALSE, $orderInfo['sell_id'], $sellerAwardMoney, 0, 0, 0, BAL_COMMISSION, $orderInfo['id']) && $this->rollbackShowMsg('订单操作失败,,错误码:10003', $id, TRUE);
+				!balanceChange(FALSE, $orderInfo['sell_id'], $sellerAwardMoney, 0, 0, 0, BAL_COMMISSION, $orderInfo['id'],'自动完成2') && $this->rollbackShowMsg('订单操作失败,,错误码:10003', $id, TRUE);
 				!(Db::name('trader_reward')->insert(['uid' => $orderInfo['sell_id'], 'orderid' => $orderInfo['id'], 'amount' => $sellerAwardMoney, 'type' => 0, 'create_time' => time()])) && $this->rollbackShowMsg('订单操作失败,错误码:10004', $id, TRUE);
 			}
 			//卖家代理利润
@@ -111,7 +111,7 @@ class Notify {
 				}
 			}
 			// 买家加币
-			!balanceChange(FALSE, $orderInfo['buy_id'], $sum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id']) && $this->rollbackShowMsg('订单操作失败,错误码:10011', $id, TRUE);
+			!balanceChange(FALSE, $orderInfo['buy_id'], $sum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id'],'自动完成3') && $this->rollbackShowMsg('订单操作失败,错误码:10011', $id, TRUE);
 			!$mchModel->where('id', $orderInfo['buy_id'])->update(['transact' => Db::raw('transact+1')]) && $this->rollbackShowMsg('订单操作失败,错误码:10012', $id, TRUE);
 			// 买家代理
 			if ($buyerParentMoney > 0 && $buyerAgentExist) {

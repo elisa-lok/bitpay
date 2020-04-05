@@ -10,7 +10,8 @@ class Test extends Base {
 	}
 
 	public function t(){
-		var_dump(date('Y-m-d H:i:s',strtotime('2020-06-01T23:40:28.381Z')));
+		$s = 'sdfsdhfishdifu?=Ttsdf';
+		var_dump(stristr($s, '?=t'));
 	}
 
 	public function phpinfo(){

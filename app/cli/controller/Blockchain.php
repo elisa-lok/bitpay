@@ -78,7 +78,7 @@ class Blockchain extends Base {
 								$valid    = $v2['confirmations'];
 								if ($res = Db::name('merchant_recharge')->where(['txid' => $v2['hash']])->find()) {
 									if ($res['status'] != 1 && $valid) {
-										$rs1 = balanceChange(FALSE, $userAdd['uid'], $num - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
+										$rs1 = balanceChange(FALSE, $userAdd['uid'], $num - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值1');
 										$rs2 = Db::name('merchant_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 1, 'confirmations' => $v2['confirmations']]);
 										//增加充值数量统计，不算手续费
 										Db::name('merchant')->where(['id' => $userAdd['uid']])->setInc('recharge_amount', $num);
@@ -94,7 +94,7 @@ class Blockchain extends Base {
 									}
 								} else {
 									if ($valid) {
-										$rs1 = balanceChange(FALSE, $userAdd['uid'], $num - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充币');
+										$rs1 = balanceChange(FALSE, $userAdd['uid'], $num - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充币2');
 										$rs2 = Db::name('merchant_recharge')->insert([
 											'merchant_id'   => $userAdd['uid'],
 											'from_address'  => $v2['from'],
@@ -210,7 +210,7 @@ class Blockchain extends Base {
 					$valid    = $v2['valid'];
 					if ($res = Db::name('merchant_user_recharge')->where(['txid' => $v2['txid']])->find()) {
 						if ($res['status'] != 1 && $valid) {
-							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
+							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值3');
 							$rs2 = Db::name('merchant_user_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 1, 'confirmations' => $v2['confirmations']]);
 							//增加充值数量统计，不算手续费
 							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
@@ -226,7 +226,7 @@ class Blockchain extends Base {
 						}
 					} else {
 						if ($valid) {
-							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
+							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值4');
 							$rs2 = Db::name('merchant_user_recharge')->insert([
 								'merchant_id'   => $v['merchant_id'],
 								'from_address'  => $v2['sendingaddress'],
@@ -350,7 +350,7 @@ class Blockchain extends Base {
 					$valid = $v2['valid'];
 					if ($res = Db::name('merchant_recharge')->where(['txid' => $v2['txid']])->find()) {
 						if ($res['status'] != 1 && $valid) {
-							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
+							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值5');
 							$rs2 = Db::name('merchant_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 1, 'confirmations' => $v2['confirmations']]);
 							//增加充值数量统计，不算手续费
 							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
@@ -362,7 +362,7 @@ class Blockchain extends Base {
 						}
 					} else {
 						if ($valid) {
-							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
+							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值6');
 							$rs2 = Db::name('merchant_recharge')->insert([
 								'merchant_id'   => $v['merchant_id'],
 								'from_address'  => $v2['sendingaddress'],

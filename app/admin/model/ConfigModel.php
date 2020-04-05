@@ -9,7 +9,6 @@ class ConfigModel extends Model {
 	public function SaveConfig($map, $value) {
 		try {
 			$result = $this->allowField(TRUE)->where($map)->setField('value', $value);
-			var_dump($result, $map, $value);
 			return !$result ? ['code' => -1, 'msg' => $this->getError()] : ['code' => 1, 'msg' => '保存成功'];
 		} catch (PDOException $e) {
 			return ['code' => -2, 'data' => '', 'msg' => $e->getMessage()];

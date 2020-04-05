@@ -89,12 +89,12 @@ class Order extends Base {
 				$updateCondition = $unpay == 1 ? ['status' => 4, 'finished_time' => time(), 'dktime' => time(), 'platform_fee' => $platformMoney] : ['status' => 4, 'finished_time' => time(), 'platform_fee' => $platformMoney];
 				!(Db::name('order_buy')->where('id', $id)->update($updateCondition)) && $this->rollbackAndMsg('订单更新失败', $id);
 				// 卖家减去冻结
-				!balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$orderInfo['deal_num'], 0, BAL_SOLD, $orderInfo['id']) && $this->rollbackAndMsg('冻结余额不足,错误码:10001', $id);
+				!balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$orderInfo['deal_num'], 0, BAL_SOLD, $orderInfo['id'],'卖家主动完成1') && $this->rollbackAndMsg('冻结余额不足,错误码:10001', $id);
 				// 卖家增加数据, 增加平均交易时间:秒average , 以及交易单数transact
 				!$mchModel->where('id', $orderInfo['sell_id'])->update(['transact' => Db::raw('transact+1')]) && $this->rollbackAndMsg('卖家信息操作失败,错误码:10002', $id);
 				// 卖家卖单奖励
 				if ($sellerAwardMoney > 0) {
-					!balanceChange(FALSE, $orderInfo['sell_id'], $sellerAwardMoney, 0, 0, 0, BAL_COMMISSION, $orderInfo['id']) && $this->rollbackAndMsg('订单操作失败,,错误码:10003', $id);
+					!balanceChange(FALSE, $orderInfo['sell_id'], $sellerAwardMoney, 0, 0, 0, BAL_COMMISSION, $orderInfo['id'],'卖家主动完成2') && $this->rollbackAndMsg('订单操作失败,,错误码:10003', $id);
 					!(Db::name('trader_reward')->insert(['uid' => $orderInfo['sell_id'], 'orderid' => $orderInfo['id'], 'amount' => $sellerAwardMoney, 'type' => 0, 'create_time' => time()])) && $this->rollbackAndMsg('订单操作失败,错误码:10004', $id);
 				}
 				//卖家代理利润
@@ -117,7 +117,7 @@ class Order extends Base {
 					}
 				}
 				// 买家加币
-				!balanceChange(FALSE, $orderInfo['buy_id'], $sum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id']) && $this->rollbackAndMsg('订单操作失败,错误码:10011', $id);
+				!balanceChange(FALSE, $orderInfo['buy_id'], $sum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id'],'卖家主动完成3') && $this->rollbackAndMsg('订单操作失败,错误码:10011', $id);
 				!$mchModel->where('id', $orderInfo['buy_id'])->update(['transact' => Db::raw('transact+1')]) && $this->rollbackAndMsg('订单操作失败,错误码:10012', $id);
 				// 买家代理
 				if ($buyerParentMoney > 0 && $buyerAgentExist) {
@@ -173,9 +173,9 @@ class Order extends Base {
 			$mum  = $orderInfo['deal_num'] - $sfee;
 			Db::startTrans();
 			try {
-				$rs1      = balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$orderInfo['deal_num'], $orderInfo['fee'], BAL_SOLD, $orderInfo['id']);
+				$rs1      = balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$orderInfo['deal_num'], $orderInfo['fee'], BAL_SOLD, $orderInfo['id'],'商家放币1');
 				$rs2      = Db::name('order_sell')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'buyer_fee' => $sfee]);
-				$rs3      = balanceChange(FALSE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id']);
+				$rs3      = balanceChange(FALSE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], '商家放币2');
 				$rs4      = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('transact_buy', 1);
 				$total    = Db::name('order_sell')->field('sum(dktime-ctime) as total')->where('buy_id', $orderInfo['buy_id'])->where('status', 4)->select();
 				$tt       = $total[0]['total'];

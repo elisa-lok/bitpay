@@ -80,7 +80,7 @@ class Auto extends Base {
 								$valid    = $v2['confirmations'];
 								if ($res = Db::name('merchant_recharge')->where(['txid' => $v2['hash']])->find()) {
 									if ($res['status'] != 1 && $valid) {
-										$rs1 = balanceChange(FALSE, $userAdd['uid'], $num - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
+										$rs1 = balanceChange(FALSE, $userAdd['uid'], $num - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值1');
 										$rs2 = Db::name('merchant_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 1, 'confirmations' => $v2['confirmations']]);
 										//增加充值数量统计，不算手续费
 										Db::name('merchant')->where(['id' => $userAdd['uid']])->setInc('recharge_amount', $num);
@@ -96,7 +96,7 @@ class Auto extends Base {
 									}
 								} else {
 									if ($valid) {
-										$rs1 = balanceChange(FALSE, $userAdd['uid'], $num - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充币');
+										$rs1 = balanceChange(FALSE, $userAdd['uid'], $num - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充币2');
 										$rs2 = Db::name('merchant_recharge')->insert([
 											'merchant_id'   => $userAdd['uid'],
 											'from_address'  => $v2['from'],
@@ -212,7 +212,7 @@ class Auto extends Base {
 					$valid    = $v2['valid'];
 					if ($res = Db::name('merchant_user_recharge')->where(['txid' => $v2['txid']])->find()) {
 						if ($res['status'] != 1 && $valid) {
-							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
+							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值3');
 							$rs2 = Db::name('merchant_user_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 1, 'confirmations' => $v2['confirmations']]);
 							//增加充值数量统计，不算手续费
 							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
@@ -228,7 +228,7 @@ class Auto extends Base {
 						}
 					} else {
 						if ($valid) {
-							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
+							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值4');
 							$rs2 = Db::name('merchant_user_recharge')->insert([
 								'merchant_id'   => $v['merchant_id'],
 								'from_address'  => $v2['sendingaddress'],
@@ -352,7 +352,7 @@ class Auto extends Base {
 					$valid = $v2['valid'];
 					if ($res = Db::name('merchant_recharge')->where(['txid' => $v2['txid']])->find()) {
 						if ($res['status'] != 1 && $valid) {
-							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
+							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值5');
 							$rs2 = Db::name('merchant_recharge')->update(['id' => $res['id'], 'addtime' => $time, 'status' => 1, 'confirmations' => $v2['confirmations']]);
 							//增加充值数量统计，不算手续费
 							Db::name('merchant')->where(['id' => $v['merchant_id']])->setInc('recharge_amount', $v2['amount']);
@@ -364,7 +364,7 @@ class Auto extends Base {
 						}
 					} else {
 						if ($valid) {
-							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值');
+							$rs1 = balanceChange(FALSE, $v['merchant_id'], $v2['amount'] - $sfee, 0, 0, 0, BAL_RECHARGE, '', '钱包充值6');
 							$rs2 = Db::name('merchant_recharge')->insert([
 								'merchant_id'   => $v['merchant_id'],
 								'from_address'  => $v2['sendingaddress'],
@@ -440,7 +440,7 @@ class Auto extends Base {
 			if (Cache::has($vv['id'])) continue;
 			Cache::set($vv['id'], TRUE, 60);
 			Db::startTrans();
-			$memo = $vv['status'] == 1 ? '恶意点付款' : '支付超时';
+			$memo = $vv['status'] == 1 ? '恶意点付款' : '自动支付超时';
 			$orderInfo = Db::name('order_buy')->where(['id' => $vv['id']])->find();
 			//$seller = Db::name('merchant')->where(array('id'=>$vv['sell_id']))->find();
 			$buyer = Db::name('merchant')->where(['id' => $vv['buy_id']])->find();
@@ -482,7 +482,7 @@ class Auto extends Base {
 			$orderInfo = Db::name('order_sell')->where(['id' => $vv['id']])->find();
 			$rs1       = Db::name('order_sell')->update(['status' => 5, 'id' => $vv['id']]);
 			$realAmt   = $orderInfo['deal_num'] + $orderInfo['fee'];
-			$rs2       = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $orderInfo['id'], "支付超时");
+			$rs2       = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $orderInfo['id'], "支付超时,自动下架");
 			if ($rs1 && $rs2) {
 				Db::commit();
 			} else {
@@ -613,7 +613,7 @@ class Auto extends Base {
 			if ($v['remain_amount'] * $v['price'] < $v['min_limit']) {
 				Db::startTrans();
 				if (!Db::name('ad_sell')->where(['id' => $v['id'], 'userid' => $this->uid])->update(['state' => 3, 'finished_time' => time()])) continue;
-				if (!balanceChange(FALSE, $this->uid, $v['remain_amount'], 0, -$v['remain_amount'], 0, BAL_REDEEM, $orders['orderid'])) continue;
+				if (!balanceChange(FALSE, $this->uid, $v['remain_amount'], 0, -$v['remain_amount'], 0, BAL_REDEEM, $orders['orderid'], '余额不足,自动下架')) continue;
 				$count = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
 				Db::name('merchant')->update(['id' => $this->uid, 'ad_on_sell' => $count ? $count : 0]);
 				Db::commit();

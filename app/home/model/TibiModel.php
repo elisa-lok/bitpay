@@ -23,7 +23,7 @@ class TibiModel extends Model {
 		}
 		Db::startTrans();
 		try {
-			$rs1 = balanceChange(FALSE, $find['merchant_id'], $find['num'], 0, -$find['num'], 0, BAL_CANCEL, $id, '订单取消');
+			$rs1 = balanceChange(FALSE, $find['merchant_id'], $find['num'], 0, -$find['num'], 0, BAL_CANCEL, $id, '提币订单取消');
 			$rs2 = $this->where('id', $id)->update(['status' => 3]);
 			if ($rs1 && $rs2) {
 				// 提交事务

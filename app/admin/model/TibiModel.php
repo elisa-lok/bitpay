@@ -27,9 +27,8 @@ class TibiModel extends Model {
 			$result = $this->save($param, ['id' => $param['id']]);
 			if (FALSE === $result) {
 				return ['code' => 0, 'data' => '', 'msg' => $this->getError()];
-			} else {
-				return ['code' => 1, 'data' => '', 'msg' => '操作成功'];
 			}
+			return ['code' => 1, 'data' => '', 'msg' => '操作成功'];
 		} catch (PDOException $e) {
 			return ['code' => 0, 'data' => '', 'msg' => $e->getMessage()];
 		}
@@ -48,11 +47,10 @@ class TibiModel extends Model {
 				// 提交事务
 				Db::commit();
 				return ['code' => 1, 'data' => '', 'msg' => '操作成功'];
-			} else {
-				// 回滚事务
-				Db::rollback();
-				return ['code' => 0, 'data' => '', 'msg' => '操作失败'];
 			}
+			// 回滚事务
+			Db::rollback();
+			return ['code' => 0, 'data' => '', 'msg' => '操作失败'];
 		} catch (DbException $e) {
 			// 回滚事务
 			Db::rollback();

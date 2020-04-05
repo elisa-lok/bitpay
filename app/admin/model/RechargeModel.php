@@ -7,10 +7,7 @@ class RechargeModel extends Model {
 	protected $createTime = 'addtime';
 
 	public function getRechargeByWhere($map, $nowPage, $limits) {
-		$join = [
-				['__MERCHANT__ b', 'b.id=a.merchant_id', 'LEFT'],
-				['__MERCHANT_USER_ADDRESS__ c', 'a.to_address=c.address', 'LEFT']
-		];
+		$join = [['__MERCHANT__ b', 'b.id=a.merchant_id', 'LEFT'], ['__MERCHANT_USER_ADDRESS__ c', 'a.to_address=c.address', 'LEFT']];
 		return $this->field('a.*, b.name, c.username')->alias('a')->join($join)->where($map)->page($nowPage, $limits)->order('a.id desc')->select();
 	}
 
@@ -27,9 +24,8 @@ class RechargeModel extends Model {
 			$result = $this->save($param, ['id' => $param['id']]);
 			if (FALSE === $result) {
 				return ['code' => 0, 'data' => '', 'msg' => $this->getError()];
-			} else {
-				return ['code' => 1, 'data' => '', 'msg' => '操作成功'];
 			}
+			return ['code' => 1, 'data' => '', 'msg' => '操作成功'];
 		} catch (PDOException $e) {
 			return ['code' => 0, 'data' => '', 'msg' => $e->getMessage()];
 		}

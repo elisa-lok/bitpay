@@ -100,12 +100,12 @@ class Order extends Base {
 					$updateCondition = $unpay == 1 ? ['status' => 4, 'finished_time' => time(), 'dktime' => time(), 'platform_fee' => $platformMoney] : ['status' => 4, 'finished_time' => time(), 'platform_fee' => $platformMoney];
 					!(Db::name('order_buy')->where('id', $edit)->update($updateCondition)) && $this->rollbackShowMsg('订单更新失败', $edit);
 					// 卖家减去冻结
-					!balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$orderInfo['deal_num'], 0, BAL_SOLD, $orderInfo['id']) && $this->rollbackShowMsg('冻结余额不足,错误码:10001', $edit);
+					!balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$orderInfo['deal_num'], 0, BAL_SOLD, $orderInfo['id'], '管理员买单编辑01') && $this->rollbackShowMsg('冻结余额不足,错误码:10001', $edit);
 					// 卖家增加数据, 增加平均交易时间:秒average , 以及交易单数transact
 					!$mchModel->where('id', $orderInfo['sell_id'])->update(['transact' => Db::raw('transact+1')]) && $this->rollbackShowMsg('卖家信息操作失败,错误码:10002', $edit);
 					// 卖家卖单奖励
 					if ($sellerAwardMoney > 0) {
-						!balanceChange(FALSE, $orderInfo['sell_id'], $sellerAwardMoney, 0, 0, 0, BAL_COMMISSION, $orderInfo['id']) && $this->rollbackShowMsg('订单操作失败,,错误码:10003', $edit);
+						!balanceChange(FALSE, $orderInfo['sell_id'], $sellerAwardMoney, 0, 0, 0, BAL_COMMISSION, $orderInfo['id'], '管理员买单编辑02') && $this->rollbackShowMsg('订单操作失败,,错误码:10003', $edit);
 						!(Db::name('trader_reward')->insert(['uid' => $orderInfo['sell_id'], 'orderid' => $orderInfo['id'], 'amount' => $sellerAwardMoney, 'type' => 0, 'create_time' => time()])) && $this->rollbackShowMsg('订单操作失败,错误码:10004', $edit);
 					}
 					//卖家代理利润
@@ -128,7 +128,7 @@ class Order extends Base {
 						}
 					}
 					// 买家加币
-					!balanceChange(FALSE, $orderInfo['buy_id'], $sum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id']) && $this->rollbackShowMsg('订单操作失败,错误码:10011', $edit);
+					!balanceChange(FALSE, $orderInfo['buy_id'], $sum, 0, 0, 0, BAL_BOUGHT, $orderInfo['id'], '管理员买单编辑03') && $this->rollbackShowMsg('订单操作失败,错误码:10011', $edit);
 					!$mchModel->where('id', $orderInfo['buy_id'])->update(['transact' => Db::raw('transact+1')]) && $this->rollbackShowMsg('订单操作失败,错误码:10012', $edit);
 					// 买家代理
 					if ($buyerParentMoney > 0 && $buyerAgentExist) {
@@ -162,7 +162,7 @@ class Order extends Base {
 				$sell = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->find();
 				if ($sell['state'] == 2) {
 					// 如果挂单已下架 回滚余额
-					$res6 = balanceChange(TRUE, $orderInfo['sell_id'], $orderInfo['deal_num'], $orderInfo['fee'], -$orderInfo['deal_num'], $orderInfo['fee'], BAL_CANCEL, $orderInfo['id'], "编辑修改状态->取消订单");
+					$res6 = balanceChange(TRUE, $orderInfo['sell_id'], $orderInfo['deal_num'], $orderInfo['fee'], -$orderInfo['deal_num'], $orderInfo['fee'], BAL_CANCEL, $orderInfo['id'], "编辑状态-取消订单");
 					//$res6 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $realAmt);
 					//$res7 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $realAmt);
 				}

@@ -13,7 +13,7 @@ class Order extends Base {
 			if (Cache::has($vv['id'])) continue;
 			Cache::set($vv['id'], TRUE, 60);
 			Db::startTrans();
-			$memo = $vv['status'] == 1 ? '恶意点付款' : '支付超时';
+			$memo = $vv['status'] == 1 ? '恶意点付款' : '自动支付超时';
 			$orderInfo = Db::name('order_buy')->where(['id' => $vv['id']])->find();
 			//$seller = Db::name('merchant')->where(array('id'=>$vv['sell_id']))->find();
 			$buyer = Db::name('merchant')->where(['id' => $vv['buy_id']])->find();
@@ -54,7 +54,7 @@ class Order extends Base {
 			$orderInfo = Db::name('order_sell')->where(['id' => $vv['id']])->find();
 			$rs1       = Db::name('order_sell')->update(['status' => 5, 'id' => $vv['id']]);
 			$realAmt   = $orderInfo['deal_num'] + $orderInfo['fee'];
-			$rs2       = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $orderInfo['id'], "支付超时");
+			$rs2       = balanceChange(FALSE, $orderInfo['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $orderInfo['id'], "买单自动支付超时");
 			if ($rs1 && $rs2) {
 				Db::commit();
 			} else {

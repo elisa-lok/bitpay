@@ -64,7 +64,7 @@ class Ad extends Base {
 			if ($v['remain_amount'] * $v['price'] < $v['min_limit']) {
 				Db::startTrans();
 				if (!Db::name('ad_sell')->where(['id' => $v['id'], 'userid' => $this->uid])->update(['state' => 3, 'finished_time' => time()])) continue;
-				if (!balanceChange(FALSE, $this->uid, $v['remain_amount'], 0, -$v['remain_amount'], 0, BAL_REDEEM, $orders['orderid'])) continue;
+				if (!balanceChange(FALSE, $this->uid, $v['remain_amount'], 0, -$v['remain_amount'], 0, BAL_REDEEM, $orders['orderid'], '余额不足自动关闭')) continue;
 				$count = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
 				Db::name('merchant')->update(['id' => $this->uid, 'ad_on_sell' => $count ? $count : 0]);
 				Db::commit();

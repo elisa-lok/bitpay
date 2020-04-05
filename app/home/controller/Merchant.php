@@ -529,7 +529,7 @@ class Merchant extends Base {
 			Db::startTrans();
 			try {
 				$orderSn = createOrderNo(1, $this->uid);
-				$rs1     = balanceChange(FALSE, $this->uid, -$num, 0, $num, 0, BAL_WITHDRAW, $orderSn);
+				$rs1     = balanceChange(FALSE, $this->uid, -$num, 0, $num, 0, BAL_WITHDRAW, $orderSn,'用户提币');
 				$rs2     = Db::name('merchant_withdraw')->insert([
 					'merchant_id' => $this->uid,
 					'address'     => $address,
@@ -976,7 +976,7 @@ class Merchant extends Base {
 			Db::startTrans();
 			// 减少余额 增加冻结余额
 			$adNo = $this->getAdvNo();
-			$res1 = balanceChange(FALSE, $this->uid, -$amount, 0, $amount, 0, BAL_ENTRUST, $adNo);
+			$res1 = balanceChange(FALSE, $this->uid, -$amount, 0, $amount, 0, BAL_ENTRUST, $adNo,'用户挂卖单');
 			if ($res1) {
 				$model2 = new AdModel();
 				$flag   = $model2->insertOne([
@@ -1163,7 +1163,7 @@ class Merchant extends Base {
 			// $merchant['usdtd'] < $adInfo['remain_amount'] && $this->error('冻结不足', $id);
 			Db::startTrans();
 			!Db::name('ad_sell')->where(['id' => $id, 'userid' => $this->uid])->update(['state' => $act, 'finished_time' => time()]) && $this->rollbackAndMsg('订单操作失败', $id);
-			!balanceChange(FALSE, $this->uid, $adInfo['remain_amount'], 0, -$adInfo['remain_amount'], 0, BAL_REDEEM, $id) && $this->rollbackAndMsg('撤单失败：退款失败', $id);
+			!balanceChange(FALSE, $this->uid, $adInfo['remain_amount'], 0, -$adInfo['remain_amount'], 0, BAL_REDEEM, $id, '用户撤单') && $this->rollbackAndMsg('撤单失败：退款失败', $id);
 			Cache::rm($id);
 			$count = Db::name('ad_sell')->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
 			Db::name('merchant')->update(['id' => $this->uid, 'ad_on_sell' => $count ? $count : 0]);

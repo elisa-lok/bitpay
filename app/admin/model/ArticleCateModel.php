@@ -33,9 +33,8 @@ class ArticleCateModel extends Model {
 			$result = $this->save($param, ['id' => $param['id']]);
 			if (FALSE === $result) {
 				return ['code' => 0, 'data' => '', 'msg' => $this->getError()];
-			} else {
-				return ['code' => 1, 'data' => '', 'msg' => '分类编辑成功'];
 			}
+			return ['code' => 1, 'data' => '', 'msg' => '分类编辑成功'];
 		} catch (PDOException $e) {
 			return ['code' => 0, 'data' => '', 'msg' => $e->getMessage()];
 		}

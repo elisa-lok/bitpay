@@ -30,9 +30,8 @@ class MemberModel extends Model {
 			$result = $this->validate('MemberValidate')->allowField(TRUE)->save($param);
 			if (FALSE === $result) {
 				return ['code' => -1, 'data' => '', 'msg' => $this->getError()];
-			} else {
-				return ['code' => 1, 'data' => '', 'msg' => '添加成功'];
 			}
+			return ['code' => 1, 'data' => '', 'msg' => '添加成功'];
 		} catch (PDOException $e) {
 			return ['code' => -2, 'data' => '', 'msg' => $e->getMessage()];
 		}
@@ -47,9 +46,8 @@ class MemberModel extends Model {
 			$result = $this->validate('MemberValidate')->allowField(TRUE)->save($param, ['id' => $param['id']]);
 			if (FALSE === $result) {
 				return ['code' => 0, 'data' => '', 'msg' => $this->getError()];
-			} else {
-				return ['code' => 1, 'data' => '', 'msg' => '编辑成功'];
 			}
+			return ['code' => 1, 'data' => '', 'msg' => '编辑成功'];
 		} catch (PDOException $e) {
 			return ['code' => 0, 'data' => '', 'msg' => $e->getMessage()];
 		}

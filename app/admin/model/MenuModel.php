@@ -23,10 +23,9 @@ class MenuModel extends Model {
 			if (FALSE === $result) {
 				writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】添加菜单失败', 2);
 				return ['code' => -1, 'data' => '', 'msg' => $this->getError()];
-			} else {
-				writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】添加菜单成功', 1);
-				return ['code' => 1, 'data' => '', 'msg' => '添加菜单成功'];
 			}
+			writelog(session('adminuid'), session('username'), '用户【' . session('username') . '】添加菜单成功', 1);
+			return ['code' => 1, 'data' => '', 'msg' => '添加菜单成功'];
 		} catch (PDOException $e) {
 			return ['code' => -2, 'data' => '', 'msg' => $e->getMessage()];
 		}
@@ -41,10 +40,9 @@ class MenuModel extends Model {
 			if (FALSE === $result) {
 				writelog(session('uid'), session('username'), '用户【' . session('username') . '】编辑菜单失败', 2);
 				return ['code' => 0, 'data' => '', 'msg' => $this->getError()];
-			} else {
-				writelog(session('uid'), session('username'), '用户【' . session('username') . '】编辑菜单成功', 1);
-				return ['code' => 1, 'data' => '', 'msg' => '编辑菜单成功'];
 			}
+			writelog(session('uid'), session('username'), '用户【' . session('username') . '】编辑菜单成功', 1);
+			return ['code' => 1, 'data' => '', 'msg' => '编辑菜单成功'];
 		} catch (PDOException $e) {
 			return ['code' => 0, 'data' => '', 'msg' => $e->getMessage()];
 		}
