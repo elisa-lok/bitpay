@@ -57,7 +57,7 @@ class Pay extends Base {
 		($merchant['appid'] != $appid) && $this->error('appid错误');
 		($order['status'] == 5) && $this->error('此订单已取消');
 		($order['status'] >= 1) && $this->success($order['return_url']);
-		$rs = Db::name('order_buy')->where('id', $id)->update(['status' => 1, 'dktime' => time()]);
+		$rs = Db::name('order_buy')->where('id', $id)->update(['status' => 1, 'dktime' => time(),'desc'=> '付款方点付款']);
 		if ($rs) {
 			// $mobile = Db::name('merchant')->where('id', $order['sell_id'])->value('mobile');
 			// if (!empty($mobile)) {

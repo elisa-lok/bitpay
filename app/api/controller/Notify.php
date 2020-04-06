@@ -81,6 +81,7 @@ class Notify {
 		try {
 			// 订单更新
 			$updateCondition = $unpay == 1 ? ['status' => 4, 'finished_time' => time(), 'dktime' => time(), 'platform_fee' => $platformMoney] : ['status' => 4, 'finished_time' => time(), 'platform_fee' => $platformMoney];
+			$updateCondition['desc'] = 'app自动完成订单';
 			!(Db::name('order_buy')->where('id', $orderInfo['id'])->update($updateCondition)) && $this->rollbackShowMsg('订单更新失败', $id, TRUE);
 			// 卖家减去冻结
 			!balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$orderInfo['deal_num'], 0, BAL_SOLD, $orderInfo['id'],'自动完成1') && $this->rollbackShowMsg('冻结余额不足,错误码:10001', $id, TRUE);

@@ -21,7 +21,7 @@ class Confirm extends Base {
 		$data = input('get.');
 		$data['tx'] == '' && exit("404");
 		$where['order_no'] = $data['tx'];
-		$order_info        = Db::name("order_buy")->where($where)->find();
+		$order_info        = Db::name('order_buy')->where($where)->find();
 		$sellWhere['id']   = $order_info['sell_id'];
 		$sell_info         = Db::name("ad_sell")->where($sellWhere)->find();
 		$this->assign('order_info', $order_info);
@@ -41,8 +41,9 @@ class Confirm extends Base {
 			$param             = input('post.');
 			$where['order_no'] = $param['no'];
 			$order             = Db::name('order_buy')->where($where)->find();
-			$sellWhere         = $order['sell_id'];
-			$sell_user         = Db::name('merchant')->where($sellWhere)->find();
+			($order['sell_id'] != $this->uid) && $this->error('无权操作订单');
+			$sellWhere = $order['sell_id'];
+			$sell_user = Db::name('merchant')->where($sellWhere)->find();
 			empty($param['trade_code']) && $this->error("请输入备注码");
 			empty($param['secure_psw']) && $this->error("请输入交易密码");
 			if ($order['check_code'] != $param['trade_code']) {
@@ -114,9 +115,9 @@ class Confirm extends Base {
 					$rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num']);
 					//20190830修改
 					if ($nopay == 1) {
-						$rs2 = Db::name('order_buy')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'dktime' => time(), 'platform_fee' => $moneyArr[0]]);
+						$rs2 = Db::name('order_buy')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'dktime' => time(), 'platform_fee' => $moneyArr[0], 'desc' => '用户操作1']);
 					} else {
-						$rs2 = Db::name('order_buy')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'platform_fee' => $moneyArr[0]]);
+						$rs2 = Db::name('order_buy')->update(['id' => $orderInfo['id'], 'status' => 4, 'finished_time' => time(), 'platform_fee' => $moneyArr[0], 'desc' => '用户操作2']);
 					}
 					// $rs2 = Db::name('order_buy')->update(['id'=>$orderInfo['id'], 'status'=>4, 'finished_time'=>time(), 'platform_fee'=>$moneyArr[0]]);
 					$rs3      = Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('usdt', $mum);
@@ -185,21 +186,17 @@ class Confirm extends Base {
 		$param             = input('post.');
 		$where['order_no'] = $param['no'];
 		$order             = Db::name('order_buy')->where($where)->find();
-		$sellWhere         = $order['sell_id'];
-		$sell_user         = Db::name('merchant')->where($sellWhere)->find();
+		$sell_user         = Db::name('merchant')->where('id', $order['sell_id'])->find();
 		empty($param['amt']) && $this->error("请输入你的实际收到的金额");
 		empty($param['trade_code']) && $this->error("请输入备注码");
 		empty($param['secure_psw']) && $this->error("请输入交易密码");
 		$data['actual_amount'] = $param['amt'];
-		if ($order['check_code'] != $param['trade_code']) {
-			$this->error('你的备注码不正确！！！ 请核对...');
-		}
-		if ($sell_user['paypassword'] != md5($param['secure_psw'])) {
-			$this->error('你的交易密码不正确！！！ 请核对...');
-		}
+		$data['desc']          = '用户申诉';
+		if ($order['check_code'] != $param['trade_code']) $this->error('你的备注码不正确！！！ 请核对...');
+		if ($sell_user['paypassword'] != md5($param['secure_psw'])) $this->error('你的交易密码不正确！！！ 请核对...');
 		if ($order['check_code'] == $param['trade_code'] && $sell_user['paypassword'] == md5($param['secure_psw'])) {
 			Db::name('order_buy')->where('order_no', $param['no'])->update($data);
-			$this->success("已提交");
+			$this->success('已提交');
 		}
 	}
 }

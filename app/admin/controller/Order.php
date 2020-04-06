@@ -25,6 +25,7 @@ class Order extends Base {
 				$updateArr['ltime']         = ((time() - $orderInfo['ctime']) / 60) + 61;//延长60分钟, 预留多一分钟
 				$updateArr['finished_time'] = 0;
 			}
+			$updateArr['desc'] = '管理员操作订单1';
 			// Cache::has($orderInfo['id']) && showMsg('操作频繁', 0);
 			Cache::set($orderInfo['id'], TRUE, 30);
 			Db::startTrans();
@@ -98,6 +99,7 @@ class Order extends Base {
 				try {
 					// 订单更新
 					$updateCondition = $unpay == 1 ? ['status' => 4, 'finished_time' => time(), 'dktime' => time(), 'platform_fee' => $platformMoney] : ['status' => 4, 'finished_time' => time(), 'platform_fee' => $platformMoney];
+					$updateCondition['desc'] = '管理员更新订单2';
 					!(Db::name('order_buy')->where('id', $edit)->update($updateCondition)) && $this->rollbackShowMsg('订单更新失败', $edit);
 					// 卖家减去冻结
 					!balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$orderInfo['deal_num'], 0, BAL_SOLD, $orderInfo['id'], '管理员买单编辑01') && $this->rollbackShowMsg('冻结余额不足,错误码:10001', $edit);

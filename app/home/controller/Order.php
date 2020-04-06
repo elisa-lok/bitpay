@@ -87,6 +87,7 @@ class Order extends Base {
 			try {
 				// 订单更新
 				$updateCondition = $unpay == 1 ? ['status' => 4, 'finished_time' => time(), 'dktime' => time(), 'platform_fee' => $platformMoney] : ['status' => 4, 'finished_time' => time(), 'platform_fee' => $platformMoney];
+				$updateCondition['desc'] = '承兑商完成订单';
 				!(Db::name('order_buy')->where('id', $id)->update($updateCondition)) && $this->rollbackAndMsg('订单更新失败', $id);
 				// 卖家减去冻结
 				!balanceChange(FALSE, $orderInfo['sell_id'], 0, 0, -$orderInfo['deal_num'], 0, BAL_SOLD, $orderInfo['id'],'卖家主动完成1') && $this->rollbackAndMsg('冻结余额不足,错误码:10001', $id);

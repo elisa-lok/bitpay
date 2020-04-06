@@ -1475,7 +1475,7 @@ class Merchant extends Base {
 		($merchant['appid'] != $appId) && $this->error('appid错误');
 		($order['status'] == 5) && $this->error('此订单已取消');
 		($order['status'] >= 1) && $this->error('你已经标记了已付款完成，请勿重复操作');
-		$rs = Db::name('order_buy')->where('id', $id)->update(['status' => 1, 'dktime' => time()]);
+		$rs = Db::name('order_buy')->where('id', $id)->update(['status' => 1, 'dktime' => time(),'desc'=>'用户确认交易完成']);
 		if ($rs) {
 			/*$mobile = Db::name('merchant')->where('id', $order['sell_id'])->value('mobile');
 			if (!empty($mobile)) {

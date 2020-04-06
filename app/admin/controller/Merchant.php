@@ -846,13 +846,13 @@ class Merchant extends Base {
 		try {
 			//$rs1 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $orderInfo['deal_num']);
 			//$rs3 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $orderInfo['deal_num']);
-			$rs1 = Db::name('order_buy')->update(['id' => $orderInfo['id'], 'status' => 9, 'finished_time' => time()]);
+			$rs1 = Db::name('order_buy')->update(['id' => $orderInfo['id'], 'status' => 9, 'finished_time' => time(), 'desc' => '申诉成功']);
 			// 回滚挂单
-			$rs2 = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->setInc('remain_amount', $orderInfo['deal_num']);
-			$rs3 = Db::name('ad_sell')->where('id', $orderInfo['sell_sid'])->setDec('trading_volume', $orderInfo['deal_num']);
+			$adSellModel = Db::name('ad_sell');
+			$rs2 = $adSellModel->where('id', $orderInfo['sell_sid'])->update(['remain_amount' => Db::raw('remain_amount + ' . $orderInfo['deal_num']), 'trading_volume' => Db::raw('trading_volume -' . $orderInfo['deal_num'])]);
 			// 判断挂单是否已经下架
-			$sellInfo = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid'], 'state' => 2])->find();
-			$rs4      = $rs5 = 1;
+			$sellInfo = $adSellModel->where(['id' => $orderInfo['sell_sid'], 'state' => 2])->find();
+			$rs4      = 1;
 			if ($sellInfo) {
 				// 如果挂单已下架 回滚余额
 				$rs4 = balanceChange(FALSE, $orderInfo['sell_id'], $orderInfo['deal_num'], 0, -$orderInfo['deal_num'], 0, BAL_CANCEL, $orderInfo['orderid'], "申诉成功00");
@@ -864,7 +864,7 @@ class Merchant extends Base {
 			//$tt = $total[0]['total'];
 			//$transact = Db::name('merchant')->where('id', $orderInfo['sell_id'])->value('transact');
 			//$rs5 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->update(['averge'=>intval($tt/$transact)]);
-			if ($rs1 && $rs2 && $rs3 && $rs4 && $rs5) {
+			if ($rs1 && $rs2 && $rs4) {
 				// 提交事务
 				Db::commit();
 				//请求回调接口
@@ -1024,6 +1024,7 @@ class Merchant extends Base {
 				'finished_time' => time(),
 				'platform_fee'  => $platformMoney
 			];
+			$updateCondition['desc'] = '申诉失败';
 			// 更新订单信息
 			!Db::name('order_buy')->update($updateCondition) && $this->rollbackAndMsg('更新订单失败', $id);
 			!Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('transact', 1) && $this->rollbackAndMsg('更新次数失败', $id);
