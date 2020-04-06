@@ -6,7 +6,7 @@
 	<h4><label>昵称</label>：{$user.name}</h4>
 </div>
 {else}
-{if $order.pay > 0}
+{if $order.pay > 0 && isset($user.bank)}
 <div style="margin-top:10px;">
 	<h4>【 银行转账 】</h4>
 </div>
@@ -16,7 +16,7 @@
 	<p><label style="text-align:left;">银行卡号</label>：{$user.bank.c_bank_card}</p>
 </div>
 {/if}
-{/if}  {if $order.pay2 > 0}
+{/if}  {if $order.pay2 > 0 && isset($user.alipay)}
 <div style="margin-top:10px;">
 <h4>【 支付宝 】</h4>
 </div>
@@ -25,10 +25,9 @@
 	<p style="text-align:left;"><label>账户</label>：{$user.alipay.c_bank}</p>
 	<div id="alipay_qrcode"></div>
 </div>
-
 <script>var canvas = document.createElement('canvas');$('#alipay_qrcode').qrcode({render: "canvas", size: 180, text: '{$user.alipay.qrcode}'});</script>
 {/if}
-{if $order.pay2 > 0}
+{if $order.pay3 > 0 && isset($user.wx)}
 <div style="margin-top:10px;">
 	<h4>【 微信 】</h4>
 </div>
@@ -38,7 +37,7 @@
 <div id="wx_qrcode"></div>
 </div>
 <script>var canvas = document.createElement('canvas');$('#wx_qrcode').qrcode({render: "canvas", size: 180, text: '{$user.wx.qrcode}'});</script>
-{if $order.pay3 > 0}
+{if $order.pay3 > 0 && isset($user.union)}
 <div style="margin-top:10px;"></div>
 <div style="display:inline-block;">
 	<h4>【 云闪付 】</h4>

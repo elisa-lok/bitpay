@@ -962,9 +962,7 @@ class Merchant extends Base {
 			//查询用户的微信信息
 			$isWxpay = $wx->getOne(['merchant_id' => $this->uid, 'id' => $codes['wx'], 'state' => 1]);
 			//查询用户的云闪付信息
-			$where4['merchant_id'] = $this->uid;
-			$where4['id']          = $codes['ysf'];
-			$isUnionPay            = $unionpay->getOne($where4);
+			$isUnionPay            = $unionpay->getOne(['merchant_id' => $this->uid, 'id' => $codes['ysf']]);
 			($codes['bank'] && !$bank) && showMsg('请先设置您的银行卡账户信息', 0);
 			($codes['zfb'] && !$isAlipay) && showMsg('请先设置您的支付宝账户信息', 0);
 			($codes['wx'] && !$isWxpay) && showMsg('请先设置您的微信账户信息', 0);
@@ -1011,8 +1009,7 @@ class Merchant extends Base {
 		$this->assign('usdt_price_max', $usdtPriceMax);
 		$this->assign('usdt_price_way', $usdtPriceWay);
 		$model2          = new AdModel();
-		$where['userid'] = $this->uid;
-		$list            = $model2->getAd($where, 'id DESC');
+		$list            = $model2->getAd(['userid'=>$this->uid], 'id DESC');
 		foreach ($list as $k => $v) {
 			//$dealNum = Db::name('order_buy')->where(['sell_sid' => $v['id'], 'status' => ['neq', 5], 'status' => ['neq', 9]])->sum('deal_num');
 			$dealNum                    = Db::name('order_buy')->where('sell_sid', $v['id'])->where('status', 'neq', 5)->where('status', 'neq', 7)->sum('deal_num');
@@ -1026,9 +1023,9 @@ class Merchant extends Base {
 		$this->assign('list', $list);
 		$this->assign('priceLimit', $priceLimit);
 		$banks = $m->where(['merchant_id' => $this->uid, 'state' => 1])->order('id DESC')->select();
-		$this->assign('zfb', $alipay->getBank(['merchant_id' => $this->uid], 'id DESC'));
-		$this->assign('wx', $wx->getBank(['merchant_id' => $this->uid], 'id DESC'));
-		$this->assign('ysf', $unionpay->getBank(['merchant_id' => $this->uid], 'id DESC'));
+		$this->assign('zfb', $alipay->getBank(['merchant_id' => $this->uid, 'state' => 1], 'id DESC'));
+		$this->assign('wx', $wx->getBank(['merchant_id' => $this->uid, 'state' => 1], 'id DESC'));
+		$this->assign('ysf', $unionpay->getBank(['merchant_id' => $this->uid, 'state' => 1], 'id DESC'));
 		$this->assign('banks', $banks);
 		return $this->fetch();
 	}
@@ -1076,17 +1073,11 @@ class Merchant extends Base {
 			(empty($_POST['bank']) && empty($_POST['zfb']) && empty($_POST['wx']) && empty($_POST['ysf'])) && showMsg('请选择收款方式');
 			$codes = ['zfb' => (int)$_POST['zfb'], 'bank' => (int)$_POST['bank'], 'wx' => (int)$_POST['wx'], 'ysf' => (int)$_POST['ysf']];
 			//查询用户的银行卡信息
-			$where1['merchant_id'] = $this->uid;
-			$where1['id']          = $codes['bank'];
-			$bank                  = $m->getOne($where1);
+			$bank                  = $m->getOne(['merchant_id' => $this->uid, 'id' => (int)$codes['bank'], 'state' => 1]);
 			//查询用户的支付宝信息
-			$where2['merchant_id'] = $this->uid;
-			$where2['id']          = $codes['zfb'];
-			$isAlipay              = $alipay->getOne($where2);
+			$isAlipay              = $alipay->getOne(['merchant_id' => $this->uid, 'id' => (int)$codes['zfb'], 'state' => 1]);
 			//查询用户的微信信息
-			$where3['merchant_id'] = $this->uid;
-			$where3['id']          = $codes['wx'];
-			$isWxpay               = $wx->getOne($where3);
+			$isWxpay               = $wx->getOne(['merchant_id' => $this->uid, 'id' => (int)$codes['wx'], 'state' => 1]);
 			//查询用户的云闪付信息
 			$where4['merchant_id'] = $this->uid;
 			$where4['id']          = $codes['ysf'];
@@ -1133,9 +1124,9 @@ class Merchant extends Base {
 			$this->assign('priceLimit', $priceLimit);
 			// $m = new \app\home\model\BankModel();
 			$banks = $m->where(['merchant_id' => $this->uid, 'state' => 1])->order('id DESC')->select();
-			$this->assign('zfb', $alipay->getBank(['merchant_id' => $this->uid], 'id DESC'));
-			$this->assign('wx', $wx->getBank(['merchant_id' => $this->uid], 'id DESC'));
-			$this->assign('ysf', $unionpay->getBank(['merchant_id' => $this->uid], 'id DESC'));
+			$this->assign('zfb', $alipay->getBank(['merchant_id' => $this->uid,'state' => 1], 'id DESC'));
+			$this->assign('wx', $wx->getBank(['merchant_id' => $this->uid,'state' => 1], 'id DESC'));
+			$this->assign('ysf', $unionpay->getBank(['merchant_id' => $this->uid,'state' => 1], 'id DESC'));
 			$this->assign('banks', $banks);
 			return $this->fetch();
 		}
@@ -1240,9 +1231,9 @@ class Merchant extends Base {
 		$this->assign('ad', $ad);
 		$this->assign('AdOwner', $AdOwner);
 		$banks = $m->where(['merchant_id' => $this->uid, 'state' => 1])->order('id DESC')->select();
-		$this->assign('zfb', $alipay->getBank(['merchant_id' => $this->uid], 'id DESC'));
-		$this->assign('wx', $wx->getBank(['merchant_id' => $this->uid], 'id DESC'));
-		$this->assign('ysf', $unionpay->getBank(['merchant_id' => $this->uid], 'id DESC'));
+		$this->assign('zfb', $alipay->getBank(['merchant_id' => $this->uid,'state' => 1], 'id DESC'));
+		$this->assign('wx', $wx->getBank(['merchant_id' => $this->uid,'state' => 1], 'id DESC'));
+		$this->assign('ysf', $unionpay->getBank(['merchant_id' => $this->uid,'state' => 1], 'id DESC'));
 		$this->assign('banks', $banks);
 		$user = $userModel->getUserByParam($this->uid, 'id');
 		$ga   = explode('|', $user['ga']);
