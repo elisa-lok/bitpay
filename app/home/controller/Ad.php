@@ -80,17 +80,11 @@ class Ad extends Base {
 			($user['usdt'] < $amount + $haveAdSum) && $this->error('账户余额不足');
 			(empty($_POST['bank']) && empty($_POST['zfb']) && empty($_POST['wx']) && empty($_POST['ysf'])) && $this->error('请选择收款方式');
 			//查询用户的银行卡信息
-			$where1['merchant_id'] = $this->uid;
-			$where1['id']          = $_POST['bank'];
-			$isBank                = $m->getOne($where1);
+			$isBank = $m->getOne(['merchant_id' => $this->uid, 'state' => 1, 'id' => (int)$_POST['bank']]);
 			//查询用户的支付宝信息
-			$where2['merchant_id'] = $this->uid;
-			$where2['id']          = $_POST['zfb'];
-			$isAlipay              = $alipay->getOne($where2);
+			$isAlipay = $alipay->getOne(['merchant_id' => $this->uid, 'state' => 1, 'id' => (int)$_POST['zfb']]);
 			//查询用户的微信信息
-			$where3['merchant_id'] = $this->uid;
-			$where3['id']          = $_POST['wx'];
-			$isWxpay               = $wx->getOne($where3);
+			$isWxpay = $wx->getOne(['merchant_id' => $this->uid, 'state' => 1, 'id' => (int)$_POST['wx']]);
 			//查询用户的云闪付信息
 			$where4['merchant_id'] = $this->uid;
 			$where4['id']          = $_POST['ysf'];
@@ -101,16 +95,16 @@ class Ad extends Base {
 			($_POST['ysf'] && !$isUnionPay) && $this->error('请先设置您的云闪付账户信息');
 			$adNo = $this->getAdvNo();
 			$flag = $model2->updateOne([
-					'id'          => $id,
-					'min_limit'   => $minLimit,
-					'max_limit'   => $maxLimit,
-					'pay_method'  => $_POST['bank'],
-					'pay_method2' => $_POST['zfb'],
-					'pay_method3' => $_POST['wx'],
-					'pay_method4' => $_POST['ysf'],
-					'amount'      => $amount,
-					'price'       => $price,
-					'state'       => 1
+				'id'          => $id,
+				'min_limit'   => $minLimit,
+				'max_limit'   => $maxLimit,
+				'pay_method'  => $_POST['bank'],
+				'pay_method2' => $_POST['zfb'],
+				'pay_method3' => $_POST['wx'],
+				'pay_method4' => $_POST['ysf'],
+				'amount'      => $amount,
+				'price'       => $price,
+				'state'       => 1
 			]);
 			if ($flag['code'] == 1) {
 				$count = $model2->where('userid', $this->uid)->where('state', 1)->where('amount', 'gt', 0)->count();
@@ -132,7 +126,7 @@ class Ad extends Base {
 		$this->assign('usdt_price_max', $usdtPriceMax);
 		$this->assign('usdt_price_way', $usdtPriceWay);
 		// $m = new \app\home\model\BankModel();
-		$banks = $m->where('merchant_id', $this->uid)->order('id DESC')->select();
+		$banks = $m->where(['merchant_id' => $this->uid, 'state' => 1])->order('id DESC')->select();
 		$this->assign('zfb', $alipay->getBank(['merchant_id' => $this->uid], 'id DESC'));
 		$this->assign('wx', $wx->getBank(['merchant_id' => $this->uid], 'id DESC'));
 		$this->assign('ysf', $unionpay->getBank(['merchant_id' => $this->uid], 'id DESC'));
@@ -198,17 +192,11 @@ class Ad extends Base {
 			($haveAdSum > 20) && $this->error('购买挂单最多发布20个');
 			(empty($_POST['bank']) && empty($_POST['zfb']) && empty($_POST['wx'])) && $this->error('请选择收款方式');
 			//查询用户的银行卡信息
-			$where1['merchant_id'] = $this->uid;
-			$where1['id']          = $_POST['bank'];
-			$isBank                = $m->getOne($where1);
+			$isBank = $m->getOne(['merchant_id' => $this->uid, 'state' => 1, 'id' => (int)$_POST['bank']]);
 			//查询用户的支付宝信息
-			$where2['merchant_id'] = $this->uid;
-			$where2['id']          = $_POST['zfb'];
-			$isAlipay              = $alipay->getOne($where2);
+			$isAlipay = $alipay->getOne(['merchant_id' => $this->uid, 'state' => 1, 'id' => (int)$_POST['zfb']]);
 			//查询用户的微信信息
-			$where3['merchant_id'] = $this->uid;
-			$where3['id']          = $_POST['wx'];
-			$isWxpay               = $wx->getOne($where3);
+			$isWxpay = $wx->getOne(['merchant_id' => $this->uid, 'state' => 1, 'id' => (int)$_POST['wx']]);
 			//查询用户的云闪付信息
 			$where4['merchant_id'] = $this->uid;
 			$where4['id']          = $_POST['ysf'];
@@ -237,7 +225,7 @@ class Ad extends Base {
 		$this->assign('usdt_price_max', $usdtPriceMax);
 		$this->assign('usdt_price_way', $usdtPriceWay);
 		$this->assign('priceLimit', $priceLimit);
-		$banks = $m->where('merchant_id', $this->uid)->order('id DESC')->select();
+		$banks = $m->where(['merchant_id' => $this->uid, 'state' => 1])->order('id DESC')->select();
 		$this->assign('zfb', $alipay->getBank(['merchant_id' => $this->uid], 'id DESC'));
 		$this->assign('wx', $wx->getBank(['merchant_id' => $this->uid], 'id DESC'));
 		$this->assign('ysf', $unionpay->getBank(['merchant_id' => $this->uid], 'id DESC'));

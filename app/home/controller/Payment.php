@@ -13,7 +13,7 @@ class Payment extends Base {
 		$user       = Db::name('merchant')->where(['id' => $this->uid])->find();
 		$alipayData = (new ZfbModel())->getBank(['merchant_id' => $this->uid, 'state' => 1], 'id DESC');
 		foreach ($alipayData as $k => $v) {
-			$alipayData[$k]->qrcode = StrToMicroTime($v->qrcode, true);
+			$alipayData[$k]->qrcode = StrToMicroTime($v->qrcode, TRUE);
 		}
 		$this->assign('user', $user);
 		$this->assign('list', (new BankModel())->getBank(['merchant_id' => $this->uid, 'state' => 1], 'id DESC'));
@@ -29,7 +29,7 @@ class Payment extends Base {
 		!$this->uid && showMsg('请登陆操作');
 		$data = json_decode(file_get_contents('php://input'), TRUE);
 		!$data && showMsg('参数错误');
-		(mb_strlen($data['truename'], 'UTF-8') < 2 || mb_strlen($data['truename'],'UTF-8') > 6) && showMsg('真实姓名有误');
+		(mb_strlen($data['truename'], 'UTF-8') < 2 || mb_strlen($data['truename'], 'UTF-8') > 6) && showMsg('真实姓名有误');
 		(mb_strlen($data['tag'], 'UTF-8') < 1 || mb_strlen($data['truename'], 'UTF-8') > 20) && showMsg('账户标识不能为空');
 		$user = Db::name('merchant')->where('id', $this->uid)->find();
 		$ga   = explode('|', $user['ga']);
