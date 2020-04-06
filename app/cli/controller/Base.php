@@ -11,7 +11,7 @@ class Base extends Controller {
 		$this->setConfig();
 	}
 
-	private function setConfig() {
+	protected function setConfig() {
 		$config = cache('db_config_data');
 		if (!$config) {
 			$config = api('Config/lists');

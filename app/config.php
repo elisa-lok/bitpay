@@ -12,12 +12,12 @@ const BAL_REC = [BAL_SYS => '系统修改', BAL_ENTRUST => '挂单上架', BAL_R
 return [
 	// | auth配置
 	'auth_config'                => [
-			'auth_on'           => 1, // 权限开关
-			'auth_type'         => 1, // 认证方式，1为实时认证；2为登录认证。
-			'auth_group'        => 'think_auth_group', // 用户组数据不带前缀表名
-			'auth_group_access' => 'think_auth_group_access', // 用户-用户组关系不带前缀表
-			'auth_rule'         => 'think_auth_rule', // 权限规则不带前缀表
-			'auth_user'         => 'think_admin', // 用户信息不带前缀表
+		'auth_on'           => 1, // 权限开关
+		'auth_type'         => 1, // 认证方式，1为实时认证；2为登录认证。
+		'auth_group'        => 'think_auth_group', // 用户组数据不带前缀表名
+		'auth_group_access' => 'think_auth_group_access', // 用户-用户组关系不带前缀表
+		'auth_rule'         => 'think_auth_rule', // 权限规则不带前缀表
+		'auth_user'         => 'think_admin', // 用户信息不带前缀表
 	],
 	// | 应用设置
 	'url_route_on'               => TRUE,     //开启路由功能
@@ -37,35 +37,35 @@ return [
 	//'exception_tmpl'             => APP_PATH . 'admin/view/public/error.tpl',
 	// | 日志设置
 	'log'                        => [
-			'type'  => 'File',// 日志记录方式，内置 file socket 支持扩展
-			'path'  => LOG_PATH,// 日志保存目录
-			'level' => ['error', 'critical', 'alert', 'emergency'],// 日志记录级别 debug, info, notice, warning, error, critical, alert, emergency,sql
-			//'level' => ['error', 'critical', 'alert', 'emergency', 'sql'],
+		'type'  => 'File',// 日志记录方式，内置 file socket 支持扩展
+		'path'  => LOG_PATH,// 日志保存目录
+		'level' => ['error', 'critical', 'alert', 'emergency'],// 日志记录级别 debug, info, notice, warning, error, critical, alert, emergency,sql
+		// 'level' => ['error', 'critical', 'alert', 'emergency', 'sql'],
 	],
 	// | 缓存设置
 	// 'cache'                      => ['type' => 'file', 'path' => CACHE_PATH, 'prefix' => '', 'expire' => 0,],
 	'cache'                      => ['type' => 'redis', 'host' => '127.0.0.1', 'prefix' => 'cache_', 'expire' => 0],
 	// | 会话设置
 	'session'                    => [
-			'type'       => 'redis',// 驱动方式 支持redis memcache memcached
-			'auto_start' => TRUE,// 是否自动开启 SESSION
-			'expire'     => 5184000,
+		'type'       => 'redis',// 驱动方式 支持redis memcache memcached
+		'auto_start' => TRUE,// 是否自动开启 SESSION
+		'expire'     => 5184000,
 	],
 	// | Cookie设置
 	'cookie'                     => [
-			'prefix'    => '',        // cookie 名称前缀
-			'expire'    => 5184000,    // cookie 保存时间
-			'path'      => '/',        // cookie 保存路径
-			'domain'    => '',        // cookie 有效域名
-			'secure'    => FALSE,    // cookie 启用安全传输
-			'httponly'  => '',        // httponly设置
-			'setcookie' => TRUE,    // 是否使用 setcookie
+		'prefix'    => '',        // cookie 名称前缀
+		'expire'    => 5184000,    // cookie 保存时间
+		'path'      => '/',        // cookie 保存路径
+		'domain'    => '',        // cookie 有效域名
+		'secure'    => FALSE,    // cookie 启用安全传输
+		'httponly'  => '',        // httponly设置
+		'setcookie' => TRUE,    // 是否使用 setcookie
 	],
 	//分页配置
 	'paginate'                   => [
-			'type'      => 'bootstrap',
-			'var_page'  => 'page',
-			'list_rows' => 15,
+		'type'      => 'bootstrap',
+		'var_page'  => 'page',
+		'list_rows' => 15,
 	],
 	// | 数据库设置
 	'data_backup_path'           => '../data/',   //数据库备份路径必须以 / 结尾；
@@ -78,6 +78,7 @@ return [
 	'pages'                      => '10',//分页数
 	'salt'                       => 'wZPb~yxvA!ir38&Z!!@',//加密串
 	//订单超时时间
-	'order_expire'               => 8,
+	'order_expire'               => 1,
+	'paid_expire'                => 900,
 	'is_send_sms'                => TRUE,
 ];
