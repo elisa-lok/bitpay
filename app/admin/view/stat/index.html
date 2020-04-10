@@ -1,0 +1,52 @@
+{include file="public/header" /}
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+	<!-- Panel Other -->
+	<div class="ibox float-e-margins">
+		<div class="ibox-title">
+			<h5>每日统计</h5>
+		</div>
+		<div class="ibox-content">
+			<div class="hr-line-dashed"></div>
+			<div class="example-wrap">
+				<div class="example">
+					<table class="table table-bordered table-hover">
+						<thead>
+						<tr class="long-tr">
+							<th>日期</th>
+							<th>平台利润</th>
+							<th>商户购买</th>
+							<th>商户下发</th>
+							<th>承兑购买</th>
+							<th>系统卖出</th>
+							<th>代理商奖励</th>
+							<th>承兑商奖励</th>
+							<th>成功率</th>
+							<th>统计时间</th>
+						</tr>
+						</thead>
+						<tbody id="article_list">
+							{foreach name="data" item="val"}
+							<tr class="long-td">
+								<td>{$val.id}</td>
+								<td>{$val.platform_profit|round=###,8}</td>
+								<td>{$val.mch_buy_vol|round=###,8}</td>
+								<td>{$val.mch_sell_vol|round=###,8}</td>
+								<td>{$val.user_buy_vol|round=###,8}</td>
+								<td>{$val.sys_sell_vol|round=###,8}</td>
+								<td>{$val.agent_reward|round=###,8}</td>
+								<td>{$val.user_reward|round=###,8}</td>
+								<td>{$val.succ_rate|round=###,2}%</td>
+								<td>{$val.ctime|date='Y-m-d-H:i:s',###}</td>
+							</tr>{/foreach}
+						<tbody id="list-content"></tbody>
+					</table>
+					<div id="AjaxPage" style=" text-align: right;"></div>
+					<div id="allpage" style=" text-align: right;"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{include file="public/footer" /}
+</body>

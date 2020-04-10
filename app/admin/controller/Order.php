@@ -165,12 +165,7 @@ class Order extends Base {
 				if ($sell['state'] == 2) {
 					// 如果挂单已下架 回滚余额
 					$res6 = balanceChange(TRUE, $orderInfo['sell_id'], $orderInfo['deal_num'], $orderInfo['fee'], -$orderInfo['deal_num'], $orderInfo['fee'], BAL_CANCEL, $orderInfo['id'], "编辑状态-取消订单");
-					//$res6 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setInc('usdt', $realAmt);
-					//$res7 = Db::name('merchant')->where('id', $orderInfo['sell_id'])->setDec('usdtd', $realAmt);
 				}
-				// 减少用户冻结余额和增加用户余额
-				//$res2    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdt', $orderInfo['deal_num']);
-				//$res3    = Db::name('merchant')->where(['id' => $orderInfo['sell_id']])->setInc('usdtd', $orderInfo['deal_num']);
 			}
 			// 判断付款&放行
 			if ($srcStatus == 5 && ($args['status'] == 0 || $args['status'] == 1)) {
@@ -181,15 +176,6 @@ class Order extends Base {
 				($sellInfo['state'] == 2) && showMsg('原挂单已下架，不允许修改订单状态。', 0);
 				// 剩余数量不足
 				$sellInfo['remain_amount'] < $realAmt && showMsg('挂单剩余数量不足，无法修改。', 0);
-				/*
-				if ($sellinfo['remain_amount'] < $realAmt) {
-					// 如果账户余额不足则不操作
-					$sellUser = Db::name('merchant')->where('id', $orderInfo['sell_id'])->find();
-					$sellUser['usdt'] < $realAmt && showMsg('账户可用余额不足，无法修改。', 0);
-					// 如果余额足够 则直接扣余额
-					!balanceChange(TRUE, $orderInfo['sell_id'], -$realAmt, 0, $realAmt, 0, BAL_SYS, $orderInfo['id'], "挂单剩余数量不足") && showMsg('扣除余额失败', 0);
-				}
-				*/
 				// 需重新扣除剩余数量
 				$res5 = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid']])->setDec('remain_amount', $realAmt);
 				$res4 = Db::name('ad_sell')->where(['id' => $orderInfo['sell_sid']])->setInc('trading_volume', $realAmt);
@@ -246,11 +232,6 @@ class Order extends Base {
 					!balanceChange(FALSE, $orderInfo['buy_id'], $mum, 0, 0, 0, BAL_BOUGHT, $edit, '买入') && $this->rollbackShowMsg('修改买家余额失败');;
 					// 增加买家求购成功次数
 					!Db::name('merchant')->where('id', $orderInfo['buy_id'])->setInc('transact_buy', 1) && $this->rollbackShowMsg('更新买家求购次数失败');
-					// 查询平均打款时间
-					// $total    = Db::name('order_sell')->field('sum(dktime-ctime) as total')->where('buy_id', $orderInfo['buy_id'])->where('status', 4)->select();
-					// $tt       = $total[0]['total'];
-					// $transact = Db::name('merchant')->where('id', $orderInfo['buy_id'])->value('transact_buy');
-					// !Db::name('merchant')->where('id', $orderInfo['buy_id'])->update(['averge_buy' => intval($tt / $transact)]) && $this->rollbackShowMsg('更新买家平均订单失败');
 					// 提交事务
 					Db::commit();
 					getStatisticsOfOrder($orderInfo['buy_id'], $orderInfo['sell_id'], $mum, $realAmt, $this->username);
