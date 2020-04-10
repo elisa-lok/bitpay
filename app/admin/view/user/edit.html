@@ -25,8 +25,7 @@
 						<select class="form-control m-b chosen-select" name="groupid" id="groupid">
 							<option value="">==请选择角色==</option>
 							{if !empty($role)} {foreach name="role" item="vo"}
-							<option value="{$vo.id}" {if condition="$user['groupid'] eq $vo['id']" }selected{
-							/if}>{$vo.title}</option>{/foreach} {/if} </select>
+							<option value="{$vo.id}" {if condition="$user['groupid'] eq $vo['id']" }selected{/if}>{$vo.title}</option>{/foreach} {/if} </select>
 					</div>
 				</div>
 				<div class="hr-line-dashed"></div>
