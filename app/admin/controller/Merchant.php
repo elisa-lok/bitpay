@@ -722,16 +722,15 @@ class Merchant extends Base {
 			}
 			if ($sorder['pay_method2'] > 0) {
 				$alipay               = Db::name('merchant_zfb')->where(['id' => $sorder['pay_method2']])->find();
-				$alipay && ($lists[$k]['zfbinfo'] = '/uploads/face/' . $alipay['c_bank_detail']);
-				// $str.='|<a onclick="showzfb({{d[i].zfbinfo}})">支付宝</a>';
+				$alipay && ($lists[$k]['alipay_qr'] = $alipay['qrcode']);
 			}
 			if ($sorder['pay_method3'] > 0) {
 				$wx                  = Db::name('merchant_wx')->where(['id' => $sorder['pay_method3']])->find();
-				$wx && ($lists[$k]['wxinfo'] = '/uploads/face/' . $wx['c_bank_detail']);
+				$wx && ($lists[$k]['wx_qr'] = $wx['qrcode']);
 			}
 			if ($sorder['pay_method4'] > 0) {
 				$union                   = Db::name('merchant_ysf')->where(['id' => $sorder['pay_method4']])->find();
-				$union && ($lists[$k]['ysfinfo'] = '/uploads/face/' . $wx['c_bank_detail']);
+				$union && ($lists[$k]['union_qr'] =  $union['qrcode']);
 			}
 			$lists[$k]['deal_amount'] = round($v['deal_amount'], 2);
 			$lists[$k]['deal_num']    = round($v['deal_num'], 6);
