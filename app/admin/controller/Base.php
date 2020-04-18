@@ -30,10 +30,10 @@ class Base extends Controller {
 		}
 		$node = new Node();
 		$this->assign([
-				'username' => $this->username,
-				'portrait' => session('portrait'),
-				'rolename' => session('rolename'),
-				'menu'     => $node->getMenu(session('rule'))
+			'username' => $this->username,
+			'portrait' => session('portrait'),
+			'rolename' => session('rolename'),
+			'menu'     => $node->getMenu(session('rule'))
 		]);
 		$this->setConfig();
 		if (config('web_site_close') == 0 && $this->uid != 1) {
@@ -53,7 +53,7 @@ class Base extends Controller {
 		config($config);
 	}
 
-	protected function rollbackAndMsg($msg, $cacheKey) {
+	protected function rollbackAndMsg($msg, $cacheKey = NULL) {
 		$cacheKey && Cache::rm($cacheKey);
 		Db::rollback();
 		$this->error($msg);
@@ -67,7 +67,7 @@ class Base extends Controller {
 	}
 
 	protected function addHistory($userId, $originData, $changeData) {
-		$text = '【' . date('Y-m-d H:i:s') . '】user_id: [' . $userId . '],op_user:[' . session('adminuid') . session('username') . '],IP:[' . $_SERVER['REMOTE_ADDR'] . '],【origin】' . json_encode($originData, 320) . '【change】' . json_encode($changeData, 320);
-		file_put_contents(RUNTIME_PATH . 'log/' . date('Ym/d') . '_user_edit.log', $text, FILE_APPEND);
+		$text = '【' . date('Y-m-d H:i:s') . '】user_id: [' . $userId . '],op_user:[' . session('adminuid') . session('username') . '],IP:[' . $_SERVER['REMOTE_ADDR'] . '],【origin】' . json_encode($originData, 320) . '【change】' . json_encode($changeData, 320) . PHP_EOL;
+		file_put_contents(LOG_PATH . date('Ym/d') . '_user_edit.log', $text, FILE_APPEND);
 	}
 }

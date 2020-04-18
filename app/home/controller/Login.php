@@ -123,7 +123,7 @@ class Login extends Base {
 				}
 			}
 			$model = new LogModel();
-			$flag  = $model->insertOne(['merchant_id' => $return['data']['id'], 'login_time' => time(), 'update_time' => time(), 'online' => 1]);
+			$flag  = $model->insertOne(['merchant_id' => $return['data']['id'], 'login_time' => time(), 'update_time' => time(), 'online' => 1, 'ip' => getIp()]);
 			if ($device) {
 				session('device', $device);
 				Db::name('merchant')->where(['id' => $return['data']['id']])->update(['device' => $device]);
@@ -131,8 +131,9 @@ class Login extends Base {
 			if ($flag['code'] > 0) {
 				session_regenerate_id(TRUE);
 				session('logid', $flag['code']);
+				session('ip', getIp());
 				session('uid', $return['data']['id']);
-				session('user', $return['data']);
+				session('user', ($return['data'])->toArray());
 				writeMerchantLog($return['data']['id'], $username, '用户【' . $username . '】登录成功', 1);
 				$this->success($return['msg']);
 			}

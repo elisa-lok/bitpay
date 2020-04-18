@@ -45,9 +45,11 @@ class Order extends Base {
 			}
 		}
 		//设置承兑商在线状态
+/*
 		$ids = Db::name('login_log')->where('online=1 and unix_timestamp(now())-update_time<1800')->column('merchant_id');
 		Db::query('Update think_merchant set online=0');
 		Db::name('merchant')->where('id', 'in', $ids)->update(['online' => 1]);
+*/
 		//系统自动选择在线的承兑商和能够交易这个金额的承兑商
 		$where['state']  = 1;
 		$where['amount'] = ['egt', $data['amount']];
@@ -181,9 +183,11 @@ class Order extends Base {
 		// 	($count >= $pkNum) && $this->err('您有未完成的订单');
 		// }
 		//设置承兑商在线状态
+/*
 		$ids = Db::name('login_log')->where('online=1 and unix_timestamp(now())-update_time<1800')->column('merchant_id');
 		Db::query('UPDATE think_merchant SET online=0');
 		Db::name('merchant')->where('id', 'in', $ids)->update(['online' => 1]);
+*/
 		//系统自动选择在线的承兑商和能够交易这个金额的承兑商
 		$where                         = ['state' => 1, 'min_limit' => ['elt', $data['amount']], 'max_limit' => ['egt', $data['amount']]];
 		$method                        = ['bank' => 'pay_method', 'alipay' => 'pay_method2', 'wxpay' => 'pay_method3', 'unionpay' => 'pay_method4'];

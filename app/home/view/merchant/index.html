@@ -6,78 +6,35 @@
 			<div class="col-md-12">
 				<div class="row">
 					<div class="col-md-4">
-						<div class="info-box">
-							<span class="info-box-icon bg-green"><i class="fa fa-usd"></i></span>
-							<div class="info-box-content">
-                                <span class="info-box-text">
-                                    <h5>总余额(1 USDT=¥{$price})</h5>
-                                </span> <span class="info-box-number">{$merchant['usdt']+$merchant['usdtd']}</span> <span class="info-box-number">≈¥{:round($merchant['usdt']*$price, 4)}</span>
-							</div>
+						<div class="info-box"><span class="info-box-icon bg-green"><i class="fa fa-usd"></i></span>
+							<div class="info-box-content"><span class="info-box-text"><h5>总余额(1 USDT=¥{$price})</h5></span> <span class="info-box-number">{$merchant.usdt+$merchant.usdtd|round=###,8}</span> <span class="info-box-number">≈¥{$merchant.usdt*$price|round=###,8}</span></div>
 						</div>
 					</div>
 					<div class="col-md-4">
-						<div class="info-box">
-							<span class="info-box-icon bg-red"><i class="fa fa-usd"></i></span>
-							<div class="info-box-content">
-                                <span class="info-box-text">
-                                    <h5>冻结余额(1 USDT=¥{$price})</h5>
-                                </span> <span class="info-box-number">{$merchant['usdtd']}</span> <span class="info-box-number">≈¥{:round(($merchant['usdtd'])*$price, 4)}</span>
-							</div>
+						<div class="info-box"><span class="info-box-icon bg-red"><i class="fa fa-usd"></i></span>
+							<div class="info-box-content"><span class="info-box-text"><h5>冻结余额(1 USDT=¥{$price})</h5></span> <span class="info-box-number">{$merchant.usdtd|round=###,8}</span> <span class="info-box-number">≈¥{$merchant.usdtd*$price|round=###,8}</span></div>
 						</div>
 					</div>
 					<div class="col-md-4">
-						<div class="info-box">
-							<span class="info-box-icon bg-yellow"><i class="fa fa-user-plus"></i></span>
-							<div class="info-box-content">
-                                <span class="info-box-text">
-                                    <h5>可用余额</h5>
-                                </span> <span class="info-box-number">{$merchant['usdt']}</span> <span class="info-box-number">≈¥{:round(($merchant['usdt'])*$price, 4)}</span>
-							</div>
+						<div class="info-box"><span class="info-box-icon bg-yellow"><i class="fa fa-user-plus"></i></span>
+							<div class="info-box-content"><span class="info-box-text"><h5>可用余额</h5></span> <span class="info-box-number">{$merchant.usdt|round=###,8}</span> <span class="info-box-number">≈¥{$merchant.usdt*$price|round=###,8}</span></div>
 						</div>
 					</div>
 				</div>
 				<div class="row">
+					<div class="col-md-4"><a href="/merchant/withdraw?status=1">
+						<div class="info-box"><span class="info-box-icon bg-aqua"><i class="fa fa-credit-card"></i></span>
+							<div class="info-box-content"><span class="info-box-text text-black"><h5>待审核提币记录</h5></span> <span class="info-box-number text-red">0</span></div>
+						</div>
+					</a></div>
+					<div class="col-md-4"><a href="/merchant/tibi?status=1">
+						<div class="info-box"><span class="info-box-icon bg-orange"><i class="fa fa-credit-card"></i></span>
+							<div class="info-box-content"><span class="info-box-text text-black"><h5>待审核提币卖币</h5></span> <span class="info-box-number text-red">0</span></div>
+						</div>
+					</a></div>
 					<div class="col-md-4">
-						<a href="/merchant/withdraw?status=1">
-							<div class="info-box">
-								<span class="info-box-icon bg-aqua"><i class="fa fa-credit-card"></i></span>
-								<div class="info-box-content">
-                                    <span class="info-box-text text-black">
-                                        <h5>待审核提币记录</h5>
-                                    </span> <span class="info-box-number text-red">0</span>
-								</div>
-							</div>
-						</a>
-					</div>
-					<div class="col-md-4">
-						<a href="/merchant/tibi?status=1">
-							<div class="info-box">
-								<span class="info-box-icon bg-orange"><i class="fa fa-credit-card"></i></span>
-								<div class="info-box-content">
-                                    <span class="info-box-text text-black">
-                                        <h5>待审核提币卖币</h5>
-                                    </span> <span class="info-box-number text-red">0</span>
-								</div>
-							</div>
-						</a>
-					</div>
-					<div class="col-md-4">
-						<div class="info-box">
-							<span class="info-box-icon bg-aqua"><i class="fa fa-buysellads"></i></span>
-							<div class="info-box-content">
-                                <span class="info-box-text">
-                                    <h5>承兑商</h5>
-                                </span> <span class="info-box-number">
-                                    {if condition="$merchant.trader_check eq 0 and $merchant.reg_type eq 2"}
-                                    <a href="/merchant/applyTrader">申请</a>
-                                    {elseif condition="$merchant.trader_check eq 1"/}
-                                    通过
-                                    {elseif condition="$merchant.trader_check eq 2"/}
-                                    拒绝
-                                    {elseif condition="$merchant.trader_check eq 3"/}
-                                    待审核
-                                    {/if}
-                                </span>
+						<div class="info-box"><span class="info-box-icon bg-aqua"><i class="fa fa-buysellads"></i></span>
+							<div class="info-box-content"><span class="info-box-text"><h5>承兑商</h5></span> <span class="info-box-number">{if condition="$merchant.trader_check eq 0 and $merchant.reg_type eq 2"}<a href="/merchant/applyTrader">申请</a>{elseif condition="$merchant.trader_check eq 1"/}通过{elseif condition="$merchant.trader_check eq 2"/}拒绝{elseif condition="$merchant.trader_check eq 3"/}待审核{/if}</span>
 							</div>
 						</div>
 					</div>

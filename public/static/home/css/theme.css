@@ -880,12 +880,7 @@ table.text-center, table.text-center td, table.text-center th{text-align:center}
 .text-warning{color:#fcb322}
 .text-success{color:#a9d86e}
 .text-info{color:#8175c7}
-.modal-content{box-shadow:none;border:none}
 .modal-header{background:#00a8b3;color:#fff;border-radius:5px 5px 0 0;-webkit-border-radius:5px 5px 0 0;border-bottom:none}
-.form-control{box-shadow:none;color:#c2c2c2}
-#focusedInput,.form-control:focus{border:1px solid #517397;box-shadow:none}
-button,input,select,textarea{outline:0!important}
-ul{padding-left:0}
 .btn-default{background-color:#bec3c7;border-color:#bec3c7;color:#fff}
 .btn-default.active,.btn-default:active,.btn-default:focus,.btn-default:hover,.open .dropdown-toggle.btn-default{background-color:#b0b5b9;border-color:#b0b5b9;color:#fff}
 .btn-default:disabled:active,.btn-default:disabled:focus,.btn-default:disabled:hover{color:#333}

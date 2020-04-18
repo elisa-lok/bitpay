@@ -14,7 +14,7 @@ class Pay extends Base {
 		(empty($buyer)) && $this->error('订单参数错误2');
 		($buyer['appid'] != $appId) && $this->error('订单参数错误3');
 		$methodType = ['wxpay' => 'pay_method3', 'alipay' => 'pay_method2', 'unionpay' => 'pay_method4', 'bank' => 'pay_method'];
-		$payId      = Db::name('ad_sell')->where(['id'=> $order['sell_sid'], 'state' => 1])->value($methodType[$type]);
+		$payId      = Db::name('ad_sell')->where(['id'=> $order['sell_sid']])->value($methodType[$type]);
 		!$payId && $this->error('支付方式不存在, 请重新生成的订单');
 		$order['pay_type']    = $type;
 		$order['deal_amount'] = round($order['deal_amount'], 2);

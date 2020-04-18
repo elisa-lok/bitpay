@@ -8,30 +8,21 @@ class UserType extends Model {
 	// 开启自动写入时间戳字段
 	protected $autoWriteTimestamp = TRUE;
 
-	/**
-	 * [getRoleByWhere 根据条件获取角色列表信息]
-	 */
+	//根据条件获取角色列表信息
 	public function getRoleByWhere($map, $nowPage, $limits) {
 		return $this->where($map)->page($nowPage, $limits)->order('id DESC')->select();
 	}
 
-	/**
-	 * [getRoleByWhere 根据条件获取所有的角色数量]
-	 */
+	// 根据条件获取所有的角色数量
 	public function getAllRole($where) {
 		return $this->where($where)->count();
 	}
 
-	/**
-	 * [insertRole 插入角色信息]
-	 */
+	// 插入角色信息
 	public function insertRole($param) {
 		try {
 			$result = $this->validate('RoleValidate')->save($param);
-			if (FALSE === $result) {
-				return ['code' => -1, 'data' => '', 'msg' => $this->getError()];
-			}
-			return ['code' => 1, 'data' => '', 'msg' => '添加角色成功'];
+			return FALSE === $result ? ['code' => -1, 'data' => '', 'msg' => $this->getError()] : ['code' => 1, 'data' => '', 'msg' => '添加角色成功'];
 		} catch (PDOException $e) {
 			return ['code' => -2, 'data' => '', 'msg' => $e->getMessage()];
 		}
@@ -43,10 +34,7 @@ class UserType extends Model {
 	public function editRole($param) {
 		try {
 			$result = $this->validate('RoleValidate')->save($param, ['id' => $param['id']]);
-			if (FALSE === $result) {
-				return ['code' => 0, 'data' => '', 'msg' => $this->getError()];
-			}
-			return ['code' => 1, 'data' => '', 'msg' => '编辑角色成功'];
+			return FALSE === $result ? ['code' => 0, 'data' => '', 'msg' => $this->getError()] : ['code' => 1, 'data' => '', 'msg' => '编辑角色成功'];
 		} catch (PDOException $e) {
 			return ['code' => 0, 'data' => '', 'msg' => $e->getMessage()];
 		}
@@ -71,24 +59,18 @@ class UserType extends Model {
 		}
 	}
 
-	/**
-	 * [getRole 获取所有的角色信息]
-	 */
+	//获取所有的角色信息
 	public function getRole() {
 		return $this->where('id', '<>', 1)->select();
 	}
 
-	/**
-	 * [getRole 获取角色的权限节点]
-	 */
+	//获取角色的权限节点
 	public function getRuleById($id) {
 		$res = $this->field('rules')->where('id', $id)->find();
 		return $res['rules'];
 	}
 
-	/**
-	 * [editAccess 分配权限]
-	 */
+	//分配权限
 	public function editAccess($param) {
 		try {
 			$this->save($param, ['id' => $param['id']]);
@@ -103,12 +85,8 @@ class UserType extends Model {
 	 */
 	public function getRoleInfo($id) {
 		$result = Db::name('auth_group')->where('id', $id)->find();
-		if (empty($result['rules'])) {
-			$where = '';
-		} else {
-			$where = 'id in(' . $result['rules'] . ')';
-		}
-		$res = Db::name('auth_rule')->field('name')->where($where)->select();
+		$where  = empty($result['rules']) ? '' : 'id in(' . $result['rules'] . ')';
+		$res    = Db::name('auth_rule')->field('name')->where($where)->select();
 		foreach ($res as $key => $vo) {
 			if ('#' != $vo['name']) {
 				$result['name'][] = $vo['name'];

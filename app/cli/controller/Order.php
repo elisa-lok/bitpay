@@ -4,9 +4,10 @@ use think\Cache;
 use think\Db;
 
 class Order extends Base {
-	public function _initialize(){
+	public function _initialize() {
 		parent::_initialize();
 	}
+
 	// 卖单倒计时
 	public function sellCountDown() {
 		$orderBuyModel = Db::name('order_buy');
@@ -39,22 +40,21 @@ class Order extends Base {
 				// askNotify(['amount' => $orderInfo['deal_num'], 'orderid' =>$orderInfo['orderid'],'appid' => $buyer['appid'], 'status'=> 0], $orderInfo['notify_url'], $buyer['key']);
 			} else {
 				Db::rollback();
-				$msg = '【' . date('Y-m-d H:i:s') . '】 订单' . $vv['id'] . '回滚失败, 买家ID: ' . $vv['buy_id'] . ' , 卖家ID: ' . $vv['sell_id'] . ", 失败步骤: $rs1,$rs2,$rs3";
+				$msg = '【' . date('Y-m-d H:i:s') . '】 订单' . $vv['id'] . '回滚失败, 买家ID: ' . $vv['buy_id'] . ' , 卖家ID: ' . $vv['sell_id'] . ", 失败步骤: $rs1,$rs2,$rs3\r\n";
 				file_put_contents(RUNTIME_PATH . 'data/cli_sellCountDown_' . date('ymd') . '.log', $msg, FILE_APPEND);
 			}
 		}
 	}
 
-
 	public function buyCountDown() {
 		$orderSellModel = Db::name('order_sell');
-		$list = $orderSellModel->where( time() . "-ctime>ltime*60 AND status=0 ")->select();
-		!$list &&  die('无数据');
+		$list           = $orderSellModel->where(time() . "-ctime>ltime*60 AND status=0 ")->select();
+		!$list && die('无数据');
 		foreach ($list as $key => $vv) {
 			Db::startTrans();
-			$rs1       = $orderSellModel->update(['status' => 5, 'id' => $vv['id']]);
-			$realAmt   = $vv['deal_num'] + $vv['fee'];
-			$rs2       = balanceChange(FALSE, $vv['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $vv['id'], "买单自动支付超时");
+			$rs1     = $orderSellModel->update(['status' => 5, 'id' => $vv['id']]);
+			$realAmt = $vv['deal_num'] + $vv['fee'];
+			$rs2     = balanceChange(FALSE, $vv['sell_id'], $realAmt, 0, -$realAmt, 0, BAL_REDEEM, $vv['id'], "买单自动支付超时");
 			if ($rs1 && $rs2) {
 				Db::commit();
 			} else {

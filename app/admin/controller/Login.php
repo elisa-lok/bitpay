@@ -96,7 +96,6 @@ class Login extends Controller {
 
 	/**
 	 * 退出登录
-	 * @return
 	 */
 	public function loginOut() {
 		//session(null);

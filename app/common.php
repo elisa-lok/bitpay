@@ -258,7 +258,7 @@ function sql_check() {
  * SQL注入日志
  */
 function writeslog($log) {
-	$log_path = RUNTIME_PATH . 'sql_log.txt';
+	$log_path = LOG_PATH . date('Ym/d') . '_sql.txt';
 	$ts       = fopen($log_path, "a+");
 	fputs($ts, $log . "\r\n");
 	fclose($ts);
@@ -378,7 +378,7 @@ function tradenoa() {
 
 function agentReward($uid, $duid, $amount, $type, $relateOrderId = '') {
 	$rs    = [];
-	$rs[0] = balanceChange(FALSE, $uid, $amount, 0, 0, 0, BAL_COMMISSION, $relateOrderId,'代理佣金0');
+	$rs[0] = balanceChange(FALSE, $uid, $amount, 0, 0, 0, BAL_COMMISSION, $relateOrderId, '代理佣金0');
 	$rs[1] = Db::name('agent_reward')->insert(['uid' => $uid, 'duid' => $duid, 'amount' => $amount, 'type' => $type, 'create_time' => time()]);
 	return $rs;
 }
@@ -565,7 +565,7 @@ function balanceChange($enableTrans = TRUE, $uid = 0, float $modAmt = 0, float $
 	if ($lastLog) {
 		$lastLogId = $lastLog['bal_log_id'];
 		if ($lastLog['amt_after'] != $userInfo['usdt'] || $lastLog['frozen_amt_after'] != $userInfo['usdtd']) {
-			$log = $msg = '【' . date('Y-m-d H:i:s') . "】 资金记录异常: 用户ID: 【 $uid 】, 前记录ID: $lastLogId , 余额" . $lastLog['amt_after'] . ', 冻结:  ' . $lastLog['frozen_amt_after'] . ', 账户现有: 余额: ' . $userInfo['usdt'] . ', 冻结:' . $userInfo['usdt'] . " \r\n";
+			$log = $msg = '【' . date('Y-m-d H:i:s') . "】 资金记录异常: 用户ID: 【 $uid 】, 前记录ID: $lastLogId , 余额" . $lastLog['amt_after'] . ', 冻结:  ' . $lastLog['frozen_amt_after'] . ', 账户现有: 余额: ' . $userInfo['usdt'] . ', 冻结:' . $userInfo['usdt'] . PHP_EOL;
 			file_put_contents(RUNTIME_PATH . 'data/abnormal_flow.log', $log, FILE_APPEND);
 		}
 	}
@@ -670,6 +670,7 @@ function balanceMod($enableTrans = TRUE, $uid = 0, float $afterAmt = 0, float $f
 
 function getIp() {
 	//strcasecmp 比较两个字符，不区分大小写。返回0，>0，<0。
+	$ip = '127.0.0.1';
 	if (getenv('HTTP_CLIENT_IP') && strcasecmp(getenv('HTTP_CLIENT_IP'), 'unknown')) {
 		$ip = getenv('HTTP_CLIENT_IP');
 	} elseif (getenv('HTTP_X_FORWARDED_FOR') && strcasecmp(getenv('HTTP_X_FORWARDED_FOR'), 'unknown')) {

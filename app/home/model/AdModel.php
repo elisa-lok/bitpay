@@ -17,10 +17,10 @@ class AdModel extends Model {
 
 	public function insertOne($param) {
 		try {
-			$result = $this->allowField(TRUE)->save($param);
-			return FALSE === $result ? ['code' => -1, 'data' => '', 'msg' => $this->getError()] : ['code' => 1, 'data' => '', 'msg' => '恭喜你，发布成功'];
+			$result = $this->allowField(TRUE)->insertGetId($param);
+			return $result < 1 ? ['code' => -1, 'data' => '', 'msg' => $this->getError(), 'id' => 0] : ['code' => 1, 'data' => '', 'msg' => '恭喜你，发布成功', 'id' => $result];
 		} catch (PDOException $e) {
-			return ['code' => -2, 'data' => '', 'msg' => $e->getMessage()];
+			return ['code' => -2, 'data' => '', 'msg' => $e->getMessage(), 'id' => 0];
 		}
 	}
 
