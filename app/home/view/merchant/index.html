@@ -7,17 +7,17 @@
 				<div class="row">
 					<div class="col-md-4">
 						<div class="info-box"><span class="info-box-icon bg-green"><i class="fa fa-usd"></i></span>
-							<div class="info-box-content"><span class="info-box-text"><h5>总余额(1 USDT=¥{$price})</h5></span> <span class="info-box-number">{$merchant.usdt+$merchant.usdtd|round=###,8}</span> <span class="info-box-number">≈¥{$merchant.usdt*$price|round=###,8}</span></div>
+							<div class="info-box-content"><span class="info-box-text"><h5>总余额(1 USDT=¥{$price})</h5></span> <span class="info-box-number">{$merchant.usdt+$merchant.usdtd|round=###,6}</span> <span class="info-box-number">≈¥{$merchant.usdt*$price|round=###,6}</span></div>
 						</div>
 					</div>
 					<div class="col-md-4">
 						<div class="info-box"><span class="info-box-icon bg-red"><i class="fa fa-usd"></i></span>
-							<div class="info-box-content"><span class="info-box-text"><h5>冻结余额(1 USDT=¥{$price})</h5></span> <span class="info-box-number">{$merchant.usdtd|round=###,8}</span> <span class="info-box-number">≈¥{$merchant.usdtd*$price|round=###,8}</span></div>
+							<div class="info-box-content"><span class="info-box-text"><h5>冻结余额(1 USDT=¥{$price})</h5></span> <span class="info-box-number">{$merchant.usdtd|round=###,6}</span> <span class="info-box-number">≈¥{$merchant.usdtd*$price|round=###,6}</span></div>
 						</div>
 					</div>
 					<div class="col-md-4">
 						<div class="info-box"><span class="info-box-icon bg-yellow"><i class="fa fa-user-plus"></i></span>
-							<div class="info-box-content"><span class="info-box-text"><h5>可用余额</h5></span> <span class="info-box-number">{$merchant.usdt|round=###,8}</span> <span class="info-box-number">≈¥{$merchant.usdt*$price|round=###,8}</span></div>
+							<div class="info-box-content"><span class="info-box-text"><h5>可用余额</h5></span> <span class="info-box-number">{$merchant.usdt|round=###,6}</span> <span class="info-box-number">≈¥{$merchant.usdt*$price|round=###,6}</span></div>
 						</div>
 					</div>
 				</div>

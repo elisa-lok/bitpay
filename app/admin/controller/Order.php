@@ -54,7 +54,7 @@ class Order extends Base {
 					$adSellInfo = $adSellModel->where(['userid' => $orderInfo['sell_id'], 'state' => ['lt', 3]])->lock(TRUE)->find();
 					// 如果新订单存在, 并且金额大于订单
 					if ($adSellInfo && $adSellInfo['remain_amount'] >= $realAmt) {
-						!$orderInfoModel->update(['sell_sid' => $adSellInfo['id']]) && $this->rollbackAndMsg('修改成新原始挂单失败', $edit);
+						!Db::name('order_buy')->where('id=' . $edit)->update(['sell_sid' => $adSellInfo['id']]) && $this->rollbackAndMsg('修改成新原始挂单失败', $edit);
 						!$adSellModel->where('id', $adSellInfo['id'])->update(['remain_amount' => Db::raw('remain_amount - ' . $realAmt), 'trading_volume' => Db::raw('trading_volume + ' . $realAmt)]) && $this->rollbackAndMsg('修改新挂单失败', $edit);
 						$msg = '已变更原订单为: ' . $adSellInfo['id'] . ', 并操作成功';
 					} else {
