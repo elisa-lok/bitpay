@@ -22,6 +22,7 @@
 							<th>代理商奖励</th>
 							<th>承兑商奖励</th>
 							<th>成功率</th>
+							<th>订单数</th>
 							<th>统计时间</th>
 						</tr>
 						</thead>
@@ -37,6 +38,7 @@
 								<td>{$val.agent_reward|round=###,8}</td>
 								<td>{$val.user_reward|round=###,8}</td>
 								<td>{$val.succ_rate|round=###,2}%</td>
+								<td>{$val.order_count}</td>
 								<td>{$val.ctime|date='Y-m-d-H:i:s',###}</td>
 							</tr>{/foreach}
 						<tbody id="list-content"></tbody>
@@ -49,4 +51,5 @@
 	</div>
 </div>
 {include file="public/footer" /}
+<script>$.get('/admin/stat/run/d/1');</script>
 </body>
