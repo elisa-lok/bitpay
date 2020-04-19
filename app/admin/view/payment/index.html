@@ -1,10 +1,75 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>Title</title>
-</head>
-<body>
-
+{include file="public/header" /}
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+	<div class="ibox float-e-margins">
+		<div class="ibox-content">
+			<!--搜索框开始-->
+			<div class="row">
+				<div class="col-sm-12">
+					<form class="form-inline" method="get">
+						<div class="form-group">
+							<input type="text" id="tag" class="form-control" name="tag" value="{$tag}" placeholder="输入用户ID / 账户 / 标识"/>
+						</div>
+						<div class="form-group">
+							<select name="pay_way" class="form-control">
+								<option value="1" {if !in_array($pay_way, ['0','2','3'])}selected{/if}>支付宝</option>
+								<option value="0" {if $pay_way == 0}selected{/if}>银行卡</option>
+								<option value="2" {if $pay_way == 2}selected{/if}>微信</option>
+								<option value="3" {if $pay_way == 3}selected{/if}>云闪付</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> 搜索</button>
+						</div>
+					</form>
+				</div>
+			</div>
+			<!--搜索框结束-->
+			<div class="hr-line-dashed"></div>
+			<table class="table table-bordered table-hover">
+				<thead>
+				<tr class="long-tr">
+					<th>用户ID</th>
+					<th>标识</th>
+					<th>真名</th>
+					<th>银行|账号</th>
+					<th>支行|原图片</th>
+					<th>卡号|支付宝ID</th>
+					<th>创建时间</th>
+					<th>状态</th>
+					<th>二维码</th>
+				</tr>
+				</thead>
+				<tbody id="article_list">
+				{foreach name="data" item="val"}
+				<tr class="long-td">
+					<td>{$val.merchant_id}</td>
+					<td>{$val.name}</td>
+					<td>{$val.truename}</td>
+					<td>{$val.c_bank}</td>
+					<td>{$val.c_bank_detail}</td>
+					<td>{$val.c_bank_card}</td>
+					<td>{$val.create_time|date="Y/m/d H:i:s",###}</td>
+					<td>{if $val.state == 1}正常{else}删除{/if}</td>
+					<td>{if isset($val.qrcode) && $val.qrcode}<a href="javascript:;" onclick="showQr('{$val.qrcode}')">二维码</a>{else}无{/if}</td>
+				</tr>
+				{/foreach}
+			</table>
+			最多显示50条, 请尽量精确搜索
+		</div>
+	</div>
+</div>
+{include file="public/footer" /}
+<script>function showQr(url) {
+	layer.open({
+		type: 1,
+		title: false,
+		closeBtn: 0,
+		area: ['300px', '300px'],
+		skin: 'layui-layer-nobg',
+		shadeClose: true,
+		content: '<div id="showQ" style="background-color:#ffffff;height:300px;width:300px;padding:10px"></div>'
+	});
+	$("#showQ").qrcode({render: "canvas", size: 280, text: url });
+}</script>
 </body>
-</html>
