@@ -157,6 +157,9 @@ function sign($dataArr, $key) {
 					window.open(res.data)
 				} else {
 					$("#msg").html("错误 : " + res.err)
+					setTimeout(function () {
+						$("#msg").html('')
+					}, 2000)
 				}
 			}, error: function (err) {
 				console.log(err);

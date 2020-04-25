@@ -41,21 +41,6 @@
 <script type="text/javascript" src="__JS__/lunhui.js"></script>
 <script type="text/javascript">
 	let check_result = false;
-	$("#slider").slider({
-		width       : 233, // width
-		height      : 35, // height
-		sliderBg    : "rgb(232, 232, 232)", // 滑块背景颜色
-		color       : "rgb(114, 114, 114)", // 文字颜色
-		fontSize    : 14, // 文字大小
-		bgColor     : "#1ab394", // 背景颜色
-		textMsg     : "按住滑块，拖拽验证", // 提示文字
-		successMsg  : "验证成功", // 验证成功提示文字
-		successColor: "#ffffff", // 滑块验证成功提示文字颜色
-		time        : 400, // 返回时间
-		callback    : function (result) { // 回调函数，true(成功),false(失败)
-			check_result = result;
-		}
-	});
 	function subForm() {
 		if ('' == $.trim($('#username').val())) return lunhui.error('请输入登录用户名');
 		if ('' == $.trim($('#password').val())) return lunhui.error('请输入登录密码');
@@ -75,6 +60,7 @@
 		});
 	}
 	$(function () {
+		console.log(localStorage.getItem('admName'));
 		$('#username').val(localStorage.getItem('admName'));
 		$('#password').val(localStorage.getItem('admPsw'));
 		console.log(localStorage.getItem('admName'),localStorage.getItem('admPsw'))

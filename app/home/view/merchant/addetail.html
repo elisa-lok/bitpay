@@ -1,99 +1,104 @@
 {include file="Public:header_new"}
 <style> .cards-item{ border:1px dashed #cccccc; padding:10px; margin-bottom:5px; background:#fbfbfb; }
 .cards-item .form-group{ width:80%; margin-bottom:5px; }
-.cards-item .btn-remove{ float:right; border:1px solid #cccccc; padding:5px; border-radius:2px;}</style>
+.cards-item .btn-remove{ float:right; border:1px solid #cccccc; padding:5px; border-radius:2px;}.col-centered{display:inline-block;float:none;text-align:left;padding:0;}.w25{width:25%;position:relative;float:left;}</style>
 <div class="content-wrapper" id="pjax-container" style="min-height: 706px;">
-	<section class="content-header"><h1>挂单详情<small>查看</small></h1></section>
 	<section class="content">
 		<div class="row">
 			<div class="col-md-12">
 				<div class="box box-danger">
-					<div class="box-header with-border"><h3 class="box-title">查看</h3>
-						<div class="box-tools">
-							<div class="btn-group pull-right" style="margin-right: 10px"><a href="/merchant/adindex" class="btn btn-sm btn-danger"><i class="fa fa-list"></i>&nbsp;返回列表</a></div>
+					<div class="col-md-4 col-md-offset-4 col-centered">
+						<p><h4 class="text-center" style="line-height:28px;">交易详情<span><div class="btn-group pull-right" style="margin-right: 10px"><a href="/merchant/adindex" class="btn btn-sm btn-danger"><i class="fa fa-chevron-circle-left"></i>&nbsp;返回列表</a></div></span></h4></p>
+						<div class="table-responsive">
+							<table class="table table-striped table-bordered">
+									<tbody>
+									<tr>
+										<th scope="row">卖家 ：</th>
+										<td>{$AdOwner.name}</td>
+									</tr>
+									<tr>
+										<th scope="row">交易次数 ：</th>
+										<td>{$AdOwner.transact_buy}</td>
+									</tr>
+									<tr>
+										<th scope="row">报价 ：</th>
+										<td><span style="color:red;font-weight:bold">{$ad.price|round=###,4}</span> 元</td>
+									</tr>
+									<tr>
+										<th scope="row">交易限额 ：</th>
+										<td>{$ad.min_limit|round=###,2}-{$ad.max_limit|round=###,2} CNY</td>
+									</tr>
+									<tr>
+										<th scope="row">付款方式 ：</th>
+										<td>{if $ad.pay_method > 0}银行转账&nbsp;{/if}{if $ad.pay_method2 > 0}支付宝&nbsp;{/if}{if $ad.pay_method3 > 0}微信支付{/if}{if $ad.pay_method4 > 0}云闪付&nbsp;{/if}</td>
+									</tr>
+									<tr>
+										<th scope="row">剩余数量 ：</th>
+										<td>{$ad.RemainNum}</td>
+									</tr>
+									</tbody>
+							</table>
 						</div>
-					</div><!-- /.box-header --><!-- form start -->
-					<form  method="post" accept-charset="UTF-8" class="form-horizontal" id="tradeForm">
-						<div class="box-body">
-							<div class="fields-group">
-								<div class="form-group form-group-USDT" style="display:block"><label class="col-sm-3 control-label"><em class="text-danger"></em> 交易信息</label>
-									<div class="col-sm-9">
-										<div class="cards-groups cards-groups-USDT">
-											<div class="cards-item">
-												<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 卖家 ：</label>
-													<div class="input-group" style="padding-top:7px;">{$AdOwner.name}</div>
-												</div>
-												<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 交易次数 ：</label>
-													<div class="input-group" style="padding-top:7px;">{$AdOwner.transact_buy}</div>
-												</div>
-												<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 报价 ：</label>
-													<div class="input-group" style="padding-top:7px;"><span style="color:red;font-weight:bold">{$ad.price|round=###,4}</span> 元</div>
-												</div>
-												<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 交易限额 ：</label>
-													<div class="input-group" style="padding-top:7px;">{$ad.min_limit|round=###,2}-{$ad.max_limit|round=###,2} CNY</div>
-												</div>
-												<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 付款方式 ：</label>
-													<div class="input-group" style="padding-top:7px;">{php} if($ad['pay_method']> 0){ echo "银行转账&nbsp;"; } if($ad['pay_method2']> 0){ echo "支付宝&nbsp;"; } if($ad['pay_method3']> 0){ echo "微信支付&nbsp;"; } if($ad['pay_method4']> 0){ echo "云闪付&nbsp;"; } {/php}</div>
-												</div>
-												<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 剩余数量 ：</label>
-													<div class="input-group" style="padding-top:7px;">{$ad.RemainNum}</div>
-												</div>
-											</div>
-										</div>&nbsp;
-									</div>
-								</div>
-								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 交易金额</label>
-									<div class="col-sm-2">
-										<div class="input-group"><input type="text" name="amount" value="" id="amount0" class="form-control"><span class="input-group-addon">CNY</span></div>
-									</div>
-									<div class="col-sm-1" style="text-align:center;display:none;">=</div>
-									<div class="col-sm-2">
-										<div class="input-group"><input type="text" name="qty" value="" id="qty0" class="form-control"><span class="input-group-addon">USDT</span></div>
-									</div>
-								</div>
-								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger"></em> 收款方式</label>
-									<div class="col-sm-8"><label class="checkbox-inline"><select class="form-control" name="bank">
-										<option value="">选择银行账户</option>
-										{volist name="banks" id="v"}
-										<option value="{$v.id}">{$v.name}({$v.c_bank})</option>
-										{/volist}</select></label><label class="checkbox-inline"><select class="form-control" name="zfb">
-										<option value="">选择支付宝账户</option>
-										{volist name="zfb" id="v"}
-										<option value="{$v.id}">{$v.name}({$v.c_bank})</option>
-										{/volist}</select></label><label class="checkbox-inline"><select class="form-control" name="wx">
-										<option value="">选择微信账户</option>
-										{volist name="wx" id="v"}
-										<option value="{$v.id}">{$v.name}({$v.c_bank})</option>
-										{/volist}</select></label><label class="checkbox-inline"><select class="form-control" name="ysf">
-										<option value="">选择云闪付账户</option>
-										{volist name="ysf" id="v"}
-										<option value="{$v.id}">{$v.name}</option>
-										{/volist}</select></label></div>
-									<div class="col-sm-3" style="display: none">{php} if($ad['pay_method']> 0){ echo '<label class="checkbox-inline"><input type="checkbox" name="getpaymethod[]" value="1" checked> 银行转账</label>'; } if($ad['pay_method2']> 0){ echo '<label class="checkbox-inline"><input type="checkbox" name="getpaymethod[]" value="2" checked> 支付宝</label>'; } if($ad['pay_method3']> 0){ echo '<label class="checkbox-inline"><input type="checkbox" name="getpaymethod[]" value="3" checked> 微信支付</label>'; } {/php}
-									</div>
-								</div>
-								{eq name="ga" value="1"}
-								<div class="form-group"><label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
-									<div class="col-sm-2">
-										<div class="input-group"><input type="text" name="ga" value="" class="form-control"></div>
-									</div>
-								</div>
-								{/eq}
-								<div class="text"><label class="col-sm-3 control-label">&nbsp;</label>
-									<div class="col-sm-5"><br><b> 交易须知：</b><br>1. 交易前请详细了解对方的交易信息。<br>2. 如遇到交易纠纷，可通过申诉来解决问题。<br>3. 在您发起交易请求后，币被锁定在托管中，受到平台保护。如果您是买家，发起交易请求后，请在付款周期内付款并把交易标记为付款已完成。卖家在收到付款后将会放行处于托管中的币。<br/></div>
+						<p><b> 交易须知：</b><br>1. 交易前请详细了解对方的交易信息。<br>2. 如遇到交易纠纷，可通过申诉来解决问题。<br>3. 在您发起交易请求后，币被锁定在托管中，受到平台保护。如果您是买家，发起交易请求后，请在付款周期内付款并把交易标记为付款已完成。卖家在收到付款后将会放行处于托管中的币。<br/></p>
+						<form id="tradeForm" role="form" method="post" autocomplete="off">
+							<div class="form-group">
+								<div class="input-group">
+									<div class="input-group-addon">数额</div>
+									<input type="text" class="form-control text-center" name="amount" value="" id="amount0">
+									<div class="input-group-addon">CNY</div>
 								</div>
 							</div>
-						</div><!-- /.box-body -->
-						<div class="box-footer"><input type="hidden" name="tid" value="{$ad.id}">
-							<div class="col-sm-2"></div>
-							<div class="col-sm-8">
-								<div class="btn-group pull-right">
-									<button type="button" class="btn btn-info pull-right" onclick="trade()">提交</button>
+							<div class="form-group">
+								<div class="input-group">
+									<div class="input-group-addon">数量</div>
+									<input type="text" class="form-control text-center" name="qty" value="" id="qty0">
+									<div class="input-group-addon">USDT</div>
+								</div>
+								<input type="hidden" name="tid" value="{$ad.id}">
+							</div>
+							{if $ga == 1}
+							<div class="form-group">
+								<div class="input-group">
+									<div class="input-group-addon">谷歌验证码</div>
+									<input type="text" name="ga" value="" class="form-control text-center">
 								</div>
 							</div>
-						</div><!-- /.box-footer --></form>
+							{/if}
+							<p><label class="control-label"><em class="text-danger">*</em> 收款方式：</label></p>
+							<div class="form-group text-center">
+								<div class="input-group form-group-sm col-sm-12" style="display:inline-block;">
+									<div class="w25 p0">
+										<select class="form-control text-center" name="bank">
+											<option value="">银行</option>
+											{volist name="banks" id="v"}
+											<option value="{$v.id}">{$v.name}({$v.c_bank})</option>
+											{/volist} </select>
+									</div>
+									<div class="w25 p0">
+										<select class="form-control text-center" name="zfb">
+											<option value="">支付宝</option>
+											{volist name="zfb" id="v"}
+											<option value="{$v.id}">{$v.name}({$v.c_bank})</option>
+											{/volist} </select>
+									</div>
+									<div class="w25 p0">
+										<select class="form-control text-center" name="wx">
+											<option value="">微信</option>
+											{volist name="wx" id="v"}
+											<option value="{$v.id}">{$v.name}({$v.c_bank})</option>
+											{/volist} </select></div>
+									<div class="w25 p0">
+										<select class="form-control text-center" name="ysf">
+											<option value="">云闪付</option>
+											{volist name="ysf" id="v"}
+											<option value="{$v.id}">{$v.name}</option>
+											{/volist} </select></div>
+								</div>
+							</div>
+							<button type="button" class="btn btn-success btn-lg btn-block" onclick="trade()">提交</button>
+						</form>
+					</div>
 				</div>
-
 			</div>
 		</div>
 	</section>

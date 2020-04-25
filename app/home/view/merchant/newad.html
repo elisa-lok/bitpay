@@ -120,10 +120,10 @@
 								<tbody>{volist name="list" id="vo"}
 								<tr>
 									<td>{$vo.ad_no}</td>
-									<td>¥ {$vo.price}</td>
-									<td>¥ {$vo.amount}</td>
-									<td>{$vo.trading_volume}</td>
-									<td>{$vo.remain_amount}</td>
+									<td>¥ {$vo.price|round=###,8}</td>
+									<td>¥ {$vo.amount|round=###,8}</td>
+									<td>{$vo.trading_volume|round=###,8}</td>
+									<td>{$vo.remain_amount|round=###,8}</td>
 									<td>{$vo['add_time']|date="m-d H:i:s",###}</td>
 									<td>{eq name="vo.state" value="1"}进行中{/eq} {eq name="vo.state" value="2"}暂停{/eq} {eq name="vo.state" value="3"}完成{/eq} {eq name="vo.state" value="4"}冻结{/eq}</td>
 									<td>{eq name="vo.state" value="1"}<a href="javascript:;" class="btn btn-sm btn-danger" onclick="changeStatus({$vo.id}, 2)">暂停</a>{/eq} {eq name="vo.state" value="2"}<a href="javascript:;" class="btn btn-sm btn-success" onclick="changeStatus({$vo.id}, 1)">开始</a>{/eq} {if $vo.state == 1 || $vo.state == 2 }<a href="javascript:;" class="btn btn-sm btn-info cancel" onclick="changeStatus({$vo.id}, 3)">撤单</a>{/if}

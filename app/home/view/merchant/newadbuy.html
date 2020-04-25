@@ -123,8 +123,8 @@
 								<tr>
 									<td>{$vo.ad_no}</td>
 									<td>¥ {$vo.price|round=###,6}</td>
-									<td>{$vo.deal}</td>
-									<td>{$vo.remain}</td>
+									<td>{$vo.deal|round=###,8}</td>
+									<td>{$vo.remain|round=###,8}</td>
 									<td>{$vo['add_time']|date="m-d H:i:s",###}</td>
 									<td>{eq name="vo.state" value="1"}进行中{/eq} {eq name="vo.state" value="2"}完成{/eq} {eq name="vo.state" value="4"}冻结{/eq}</td>
 									<td>{eq name="vo.state" value="1"}<a id="{$vo.id}" class="btn btn-sm btn-info down">撤单</a>{/eq}

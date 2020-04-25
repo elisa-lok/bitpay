@@ -6,10 +6,7 @@
 </style>
 <div class="content-wrapper" id="pjax-container" style="min-height: 706px;">
 	<section class="content-header">
-		<h1>
-			订单列表 </h1>
-		<!-- breadcrumb start -->
-		<!-- breadcrumb end -->
+		<h1>卖单列表</h1>
 	</section>
 	<section class="content">
 		<div class="row">
@@ -148,12 +145,12 @@
 							<table class="table">
 								<thead>
 								<tr>
-									<th>订单编号</th>
-									<th>交易金额</th>
-									<th>交易数量</th>
-									<th>交易价格</th>
+									<th>单号</th>
+									<th>交易额</th>
+									<th>交易数</th>
+									<th>单价</th>
 									<th>创建时间</th>
-									<th>交易状态</th>
+									<th>状态</th>
 									<th>支付信息</th>
 									<th>操作</th>
 								</tr>
@@ -162,19 +159,15 @@
 								{volist name="list" id="vo"}
 								<tr>
 									<td>{$vo.order_no}</td>
-									<td>{$vo.deal_amount}</td>
-									<td>{$vo.deal_num}</td>
-									<td>{$vo.deal_price}</td>
-									<td>{$vo['ctime']|date="Y-m-d H:i:s",###}</td>
+									<td>{$vo.deal_amount|round=###,8}</td>
+									<td>{$vo.deal_num|round=###,8}</td>
+									<td>{$vo.deal_price|round=###,6}</td>
+									<td>{$vo['ctime']|date='m-d H:i:s',###}</td>
 									<td>
 										{eq name="vo.status" value="0"}待付款{/eq} {eq name="vo.status" value="1"}待放行{/eq} {eq name="vo.status" value="4"}已完成{/eq} {eq name="vo.status" value="5"}已关闭{/eq} {eq name="vo.status" value="6"}申诉中{/eq} {eq name="vo.status" value="9"}订单失败{/eq}
 									</td>
-									<td>
-										<a id="{$vo.id}" class="btn btn-sm btn-success payinfo">查看</a>
-									</td>
-									<td>
-										{eq name="vo.status" value="1"} <a id="{$vo.id}" class="btn btn-sm btn-danger shifang">放行</a> {/eq} <a id="{$vo.id}" class="btn btn-sm btn-success appeal">申诉</a>
-									</td>
+									<td><a id="{$vo.id}" class="btn btn-sm btn-success payinfo">查看</a></td>
+									<td>{eq name="vo.status" value="1"} <a id="{$vo.id}" class="btn btn-sm btn-danger shifang">放行</a> {/eq} <a id="{$vo.id}" class="btn btn-sm btn-success appeal">申诉</a></td>
 								</tr>
 								{/volist}
 								</tbody>
