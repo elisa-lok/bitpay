@@ -8,7 +8,7 @@ use think\Db;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\ModelNotFoundException;
 use think\exception\DbException;
-
+const AESKEY = '4rfv(IJN!@#$POIU';
 /**
  * 字符串截取，支持中文和其他编码
  */
@@ -33,6 +33,13 @@ function getTime($time) {
 	return date('Y-m-d H:i:s', $time);
 }
 
+function AesEncrypt($string){
+	return strtolower(bin2hex(openssl_encrypt($string, 'AES-128-ECB', AESKEY, OPENSSL_RAW_DATA)));
+}
+
+function AesDecrypt($string){
+	return openssl_decrypt(hex2bin($string), 'AES-128-ECB', AESKEY, OPENSSL_RAW_DATA);
+}
 /**
  * 读取配置
  * @return array

@@ -61,4 +61,4 @@ Route::rule('auto/coverusdt', 'home/auto/coverusdt', 'GET');
 Route::rule('send/:id', 'api/notify/send', 'POST|GET');
 // 页面重定向
 Route::rule('go', 'api/redirect/go', 'GET');
-Route::rule('qr', 'api/redirect/qr', 'GET');
+Route::rule('s/:s', 'api/redirect/qr', 'GET');
