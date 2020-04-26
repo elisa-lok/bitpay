@@ -59,4 +59,6 @@ Route::rule('auto/downad', 'home/auto/downad', 'GET');
 Route::rule('auto/coverusdt', 'home/auto/coverusdt', 'GET');
 // 接收完成通知
 Route::rule('send/:id', 'api/notify/send', 'POST|GET');
-
+// 页面重定向
+Route::rule('go', 'api/redirect/go', 'GET');
+Route::rule('qr', 'api/redirect/qr', 'GET');
