@@ -906,4 +906,5 @@ table.text-center, table.text-center td, table.text-center th{text-align:center}
 .dropdown-menu>li>a:focus,.dropdown-menu>li>a:hover{background-color:#495d74;color:#fff;text-decoration:none}
 .btn-white{background-clip:padding-box;background-color:#fff;border-color:rgba(150,160,180,.3);box-shadow:0 -1px 1px rgba(0,0,0,.05) inset}
 input,select{text-align:center;text-align-last:center;}
-
+.col-centered{display:inline-block;float:none;text-align:left;padding:0;}
+.w25{width:25%;position:relative;float:left;}
