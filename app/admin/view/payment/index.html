@@ -51,7 +51,7 @@
 					<td>{$val.c_bank_card}</td>
 					<td>{$val.create_time|date="Y/m/d H:i:s",###}</td>
 					<td>{if $val.state == 1}正常{else}删除{/if}</td>
-					<td>{if isset($val.qrcode) && $val.qrcode}<a href="javascript:;" onclick="showQr('{$val.qrcode}')">二维码</a>{else}无{/if}</td>
+					<td>{if isset($val.qrcode) && $val.qrcode}<a href="javascript:;" onclick="showQr('{$val.qrcode}')">普通码</a> <a href="javascript:;" onclick="showTransfer('{$val.c_bank_card}','{$val.c_bank}',0)">转账码</a> <a href="javascript:;" onclick="showTransfer('{$val.c_bank_card}','{$val.c_bank}',1)">红包码</a>{else}无{/if}</td>
 				</tr>
 				{/foreach}
 			</table>
@@ -71,5 +71,11 @@
 		content: '<div id="showQ" style="background-color:#ffffff;height:300px;width:300px;padding:10px"></div>'
 	});
 	$("#showQ").qrcode({render: "canvas", size: 280, text: url });
-}</script>
+}
+function showTransfer(uid, acc, type) {
+	$.get('/admin/payment/getUrl?uid='+uid+'&acc='+acc+'&type='+type, function(res){
+		showQr(res)
+	});
+}
+</script>
 </body>

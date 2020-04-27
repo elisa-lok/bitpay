@@ -18,4 +18,11 @@ class Payment extends Base {
 		$this->assign('data', $data);
 		return $this->fetch();
 	}
+
+	public function getUrl(){
+		$args = input();
+		//type 0 转账码, 1红包码
+		$url = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/s/' . AesEncrypt(time().'|'.$args['uid'] . '|' . $args['acc'] . '|||'.$args['type']);
+		die($url);
+	}
 }

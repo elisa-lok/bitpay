@@ -9,12 +9,9 @@ class Redirect extends Base {
 	// alipays://platformapi/startapp?appId=20000067&url=http://zpay.cc/qr/{s}
 	public function qr($s) {
 		(preg_match('/AlipayDefined[^\n]+AliApp[^\n]+AlipayClient/', $_SERVER['HTTP_USER_AGENT']) !== 1) && die;
-		[$time, $uid, $acc, $amt, $memo] = explode('|', AesDecrypt($s));
-		// var_dump($time, $uid, $acc, $amt, $memo);die;
+		[$time, $uid, $acc, $amt, $memo, $type] = explode('|', AesDecrypt($s));
 		$time < (time() - (config('order_expire') * 60)) && die('订单超时, 请重新发起');
 		(strlen($uid) != 16 || (!preg_match('/^1[3456789]\d+$/', $acc) && !preg_match('/^\w+((.\w+)|(-\w+))@[A-Za-z0-9]+((.|-)[A-Za-z0-9]+).[A-Za-z0-9]+$/', $acc))) && die;
-		// 转账码
-		(preg_match('/AlipayDefined[^Ali]+AliApp[^\n]+AlipayClient/', $_SERVER['HTTP_USER_AGENT']) !== 1) && die;
 		// 转账码
 		$html = <<<EOT
 <!DOCTYPE html>
@@ -39,8 +36,9 @@ window.onload=function(){
 </body>
 </html>
 EOT;
-// TODO 红包码
-		/*$html = <<<EOT
+// 红包码
+		if($type == 1){
+			$html = <<<EOT
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -63,7 +61,8 @@ setTimeout(function(){
 </script>
 </body>
 </html>
-EOT;*/
+EOT;
+		}
 		die($html);
 	}
 }

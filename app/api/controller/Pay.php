@@ -32,7 +32,7 @@ class Pay extends Base {
 		shuffle($domain);
 		$domain = $domain[0]['scheme'].'://'.$domain[0]['domain'];
 		if ($type == 'alipay' && preg_match('/^20\d{14}$/', $payDetail['c_bank_card']) && (preg_match('/^1[3456789]\d{9}$/', $payDetail['c_bank']) || preg_match('/^\w+((.\w+)|(-\w+))@[A-Za-z0-9]+((.|-)[A-Za-z0-9]+).[A-Za-z0-9]+$/', $payDetail['c_bank']))) {
-			$payDetail['qrcode'] = $domain . '/s/' . AesEncrypt(time().'|'.$payDetail['c_bank_card'] . '|' . $payDetail['c_bank'] . '||');
+			$payDetail['qrcode'] = $domain . '/s/' . AesEncrypt(time().'|'.$payDetail['c_bank_card'] . '|' . $payDetail['c_bank'] . '|||0');
 		}
 		$this->assign('payDetail', $payDetail);
 		Db::name('tx_ip')->insert(['ip' => getIp()]);
