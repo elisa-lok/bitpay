@@ -21,7 +21,7 @@
 									<label class="col-sm-3 control-label">姓名</label>
 									<div class="col-sm-10">
 										<div class="input-group">
-											<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span><input type="text" name="truename" value="" class="form-control" placeholder="您的真实姓名">
+											<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span><input type="text" name="truename" value="" class="form-control" onkeyup="keepChinese(this)" placeholder="您的真实姓名">
 										</div>
 									</div>
 								</div>
@@ -71,7 +71,7 @@
 									<label class="col-sm-3 control-label">银行卡号</label>
 									<div class="col-sm-10">
 										<div class="input-group">
-											<span class="input-group-addon"><i class="fa fa-credit-card fa-fw"></i></span> <input type="text" name="bank_card" value="" class="form-control" placeholder="银行卡号">
+											<span class="input-group-addon"><i class="fa fa-credit-card fa-fw"></i></span> <input type="text" name="bank_card" value="" class="form-control" onkeyup="keepDigital(this)" placeholder="银行卡号">
 										</div>
 									</div>
 								</div>
@@ -79,7 +79,7 @@
 									<label class="col-sm-3 control-label">确认卡号</label>
 									<div class="col-sm-10">
 										<div class="input-group">
-											<span class="input-group-addon"><i class="fa fa-repeat fa-fw"></i></span> <input type="text" name="bank_card_repeat" value="" class="form-control" placeholder="确认卡号">
+											<span class="input-group-addon"><i class="fa fa-repeat fa-fw"></i></span> <input type="text" name="bank_card_repeat" value="" class="form-control" onkeyup="keepDigital(this)" placeholder="确认卡号">
 										</div>
 									</div>
 								</div>
@@ -88,7 +88,7 @@
 									<label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
 									<div class="col-sm-3">
 										<div class="input-group">
-											<span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span><input type="text" name="ga" value="" class="form-control">
+											<span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span><input type="text" name="ga" value="" onkeyup="keepDigital(this)" class="form-control">
 										</div>
 									</div>
 								</div>
@@ -142,7 +142,7 @@
 									<label class="col-sm-3 control-label">姓名</label>
 									<div class="col-sm-10">
 										<div class="input-group">
-											<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span> <input type="text" name="truename" class="form-control" placeholder="您的真实姓名">
+											<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span> <input type="text" name="truename" class="form-control" onkeyup="keepChinese(this)" placeholder="您的真实姓名">
 										</div>
 									</div>
 								</div>
@@ -166,7 +166,7 @@
 									<label class="col-sm-3 control-label">支付宝ID</label>
 									<div class="col-sm-10">
 										<div class="input-group">
-											<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span> <input type="text" name="alipay_id" class="form-control" placeholder="输入支付宝ID">
+											<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span> <input type="text" name="alipay_id" onkeyup="keepDigital(this)" class="form-control" placeholder="输入支付宝ID" value="">
 										</div>
 										<a href="javascript:;" class="text-info" id="showAlipayId" style="float:left">如何获取支付宝ID?</a>
 									</div>
@@ -188,7 +188,7 @@
 									<label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
 									<div class="col-sm-3">
 										<div class="input-group">
-											<span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span><input type="text" name="ga" value="" class="form-control">
+											<span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span><input type="text" name="ga" onkeyup="keepDigital(this)" value="" class="form-control">
 										</div>
 									</div>
 								</div>
@@ -242,7 +242,7 @@
 									<label class="col-sm-3 control-label">姓名</label>
 									<div class="col-sm-10">
 										<div class="input-group">
-											<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span> <input type="text" name="truename" class="form-control" placeholder="您的真实姓名">
+											<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span> <input type="text" name="truename" class="form-control" onkeyup="keepChinese(this)" placeholder="您的真实姓名">
 										</div>
 									</div>
 								</div>
@@ -258,7 +258,7 @@
 									<label class="col-sm-3 control-label">绑定手机号</label>
 									<div class="col-sm-10">
 										<div class="input-group">
-											<span class="input-group-addon"><i class="fa fa-mobile fa-fw"></i></span> <input type="text" name="account" value="" class="form-control" placeholder="微信绑定手机号">
+											<span class="input-group-addon"><i class="fa fa-mobile fa-fw"></i></span> <input type="text" name="account" value="" class="form-control" onkeyup="keepDigital(this)" placeholder="微信绑定手机号">
 										</div>
 									</div>
 								</div>
@@ -279,7 +279,7 @@
 									<label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
 									<div class="col-sm-3">
 										<div class="input-group">
-											<span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span><input type="text" name="ga" value="" class="form-control">
+											<span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span><input type="text" name="ga" value="" onkeyup="keepDigital(this)" class="form-control">
 										</div>
 									</div>
 								</div>
@@ -333,7 +333,7 @@
 									<label class="col-sm-3 control-label">姓名</label>
 									<div class="col-sm-10">
 										<div class="input-group">
-											<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span> <input type="text" name="truename" class="form-control" placeholder="您的真实姓名">
+											<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span> <input type="text" name="truename" class="form-control" onkeyup="keepChinese(this)" placeholder="您的真实姓名">
 										</div>
 									</div>
 								</div>
@@ -349,7 +349,7 @@
 									<label class="col-sm-3 control-label">手机号</label>
 									<div class="col-sm-10">
 										<div class="input-group">
-											<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span> <input type="text" name="account" class="form-control" placeholder="注册云闪付手机号">
+											<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span> <input type="text" name="account" class="form-control" onkeyup="keepDigital(this)" placeholder="注册云闪付手机号">
 										</div>
 									</div>
 								</div>
@@ -370,7 +370,7 @@
 									<label class="col-sm-3 control-label"><em class="text-danger">*</em> 谷歌验证码</label>
 									<div class="col-sm-3">
 										<div class="input-group">
-											<span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span><input type="text" name="ga" value="" class="form-control">
+											<span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span><input type="text" name="ga" value="" onkeyup="keepDigital()" class="form-control">
 										</div>
 									</div>
 								</div>
@@ -403,7 +403,7 @@
 									<td>{$vo.truename}</td>
 									<td>{$vo.name}</td>
 									<td>{$vo.c_bank}</td>
-									<td><a onclick="showQr('{$vo.qrcode}')"><img src="__IMG__/q.jpg" style="width: 30px;"></a></td>
+									<td><a onclick="showQr('{$vo.qrcode}')"><img src="__IMG__/q.jpg" style="width:30px;"></a></td>
 									<td>{:date('Y-m-d H:i', $vo['create_time'])}</td>
 									<td><a class="btn btn-sm btn-danger" onclick="delPayment('union',this, '{$vo.id}')">删除</a></td>
 								</tr>
@@ -424,20 +424,8 @@
 <script type="text/javascript" src="__JS__/jquery.qrcode.min.js"></script>
 <script type="text/javascript" src="__JS__/llqrcode.js"></script>
 <script>
-	function showQr(url) {
-		layer.open({
-			type: 1,
-			title: false,
-			closeBtn: 0,
-			area: ['300px', '300px'],
-			skin: 'layui-layer-nobg',
-			shadeClose: true,
-			content: '<div id="showQ" style="background-color:#ffffff;height:300px;width:300px;padding:10px"></div>'
-		});
-		$("#showQ").qrcode({render: "canvas", size: 280, text: url });
-	}
-
-	/*删除id*/
+function showQr(url){layer.open({type:1,title:false,closeBtn:0,area:['300px','300px'],skin:'layui-layer-nobg',shadeClose:true,content:'<div id="showQ" style="background-color:#ffffff;height:300px;width:300px;padding:10px"></div>'});$("#showQ").qrcode({render:"canvas",size:280,text:url});}
+/*删除id*/
 function delPayment(type, t, id){layer.confirm('确认删除此条记录吗?', {icon: 3, title: '提示'}, function (index) {$.getJSON("/payment/del/"+ type + '/' + id, {}, function (res) {if (res.code === 1) {layer.msg(res.msg, {icon: 1, time: 1500, shade: 0.1});$(t).parent().parent().remove();} else {layer.msg(res.msg, {icon: 0, time: 1500, shade: 0.1});}});layer.close(index);})}
 /*读取alipayId生成二维码*/
 let alipayIdUrl = 'https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id=2016110502555511&redirect_uri=https%3A%2F%2Fwww.dedemao.com%2Falipay%2Fauthorize.php%3Fscope%3Dauth_base&scope=auth_base&state=STATE';
@@ -454,4 +442,8 @@ function getObjectURL(file) {file = file ? file : null;if (file == null) return 
 function showPhoto(url) {layer.open({type: 1, title: false, closeBtn: 0, area: ['300px', '467px'], skin: 'layui-layer-nobg', shadeClose: true, content: '<img style="width:300px;height:467px" src="/uploads/face/' + url + '">'});}
 /*记住当前tab*/
 $(function() {let getTabIndex = localStorage.getItem('tabIndex');$(".nav-tabs li").eq(getTabIndex).addClass('active').siblings().removeClass('active');$(".tab-pane").eq(getTabIndex).show().siblings(".tab-pane").hide();$(".nav-tabs li").on('click', function () {let i = $(this).index();$(this).addClass('active').siblings().removeClass('active');$(".tab-pane").eq(i).show().siblings(".tab-pane").hide();localStorage.setItem('tabIndex', i);});});
+/*删除非数字*/
+function keepDigital(t) {$(t).val($(t).val().replace(/[^\d]/ig,''));}
+/*删除非中文*/
+function keepChinese(t) {$(t).val($(t).val().replace(/[^\u4E00-\u9FA5]/g,''));}
 </script>{include file="Public:footer_new"/}
