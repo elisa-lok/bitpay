@@ -30,7 +30,7 @@ window.onload=function(){
 	window.location.href="alipays://platformapi/startapp?appId=20000186&actionType=addfriend&source=by_f_v&alert=false&userId=$uid&loginId=$acc";
 	setTimeout(function(){
 		window.location.href="alipays://platformapi/startapp?appId=09999988&actionType=toAccount&goBack=NO&memo=$memo&amount=$amt&userId=$uid"
-	},888);
+	},588);
 }
 </script>
 </body>
