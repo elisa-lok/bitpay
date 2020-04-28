@@ -66,15 +66,15 @@
 						<div class="form-group">
 							<label class="col-sm-3 control-label">角色：</label>
 							<div class="radio i-checks">
-								<input type="radio" name='reg_type' value="1" {if condition="$merchant['reg_type'] eq 1 " }checked{/if}/>商户 <input type="radio" name='reg_type' value="2" {if condition="$merchant['reg_type'] eq 2 " }checked{/if}/>承兑商
-								<input type="radio" name='reg_type' value="3" {if condition="$merchant['reg_type'] eq 3 " }checked{/if}/>代理
+								<input type="radio" name='reg_type' value="1" {if $merchant.reg_type==1}checked{/if}/>商户 <input type="radio" name='reg_type' value="2" {if $merchant.reg_type==2}checked{/if}/>承兑商
+								<input type="radio" name='reg_type' value="3" {if $merchant.reg_type==3}checked{/if}/>代理
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">状态：</label>
 							<div class="input-group">
 								<div class="radio i-checks">
-									<input type="radio" name='status' value="1" {if condition="$merchant['status'] eq 1 " }checked{/if}/>开启&nbsp;&nbsp; <input type="radio" name='status' value="0" {if condition="$merchant['status'] eq 0 " }checked{/if}/>禁用&nbsp;&nbsp;
+									<input type="radio" name='status' value="1" {if $merchant.status==1}checked{/if}/>开启&nbsp;&nbsp; <input type="radio" name='status' value="0" {if $merchant.status== 0 }checked{/if}/>禁用&nbsp;&nbsp;
 								</div>
 							</div>
 						</div>
@@ -87,7 +87,7 @@
 						<div class="form-group">
 							<label class="col-sm-3 control-label">提币手续费：</label>
 							<div class="input-group">
-								<input id="merchant_tibi_fee" type="text" class="form-control" name="merchant_tibi_fee" value="{$merchant.merchant_tibi_fee}" placeholder="请输入提币手续费"><span class="input-group-addon">个</span>
+								<input id="merchant_tibi_fee" type="text" class="form-control" name="merchant_tibi_fee" value="{$merchant.merchant_tibi_fee|round=###,4}" placeholder="请输入提币手续费"><span class="input-group-addon">个</span>
 							</div>
 						</div>
 						<!-- 
@@ -100,20 +100,20 @@
 						<div class="form-group">
 							<label class="col-sm-3 control-label">用户充值手续费：</label>
 							<div class="input-group">
-								<input id="user_recharge_fee" type="text" class="form-control" name="user_recharge_fee" value="{$merchant.user_recharge_fee}" placeholder="请输入用户充值手续费"><span class="input-group-addon">%</span>
+								<input id="user_recharge_fee" type="text" class="form-control" name="user_recharge_fee" value="{$merchant.user_recharge_fee|round=###,4}" placeholder="请输入用户充值手续费"><span class="input-group-addon">%</span>
 							</div>
 						</div>
 						<!--承兑商-->						{eq name="merchant['trader_check']" value="1"}
 						<div class="form-group">
 							<label class="col-sm-3 control-label">承兑商充值手续费：</label>
 							<div class="input-group">
-								<input id="trader_recharge_fee" type="text" class="form-control" name="trader_recharge_fee" value="{$merchant.trader_recharge_fee}" placeholder="请输入承兑商充值手续费"><span class="input-group-addon">%</span>
+								<input id="trader_recharge_fee" type="text" class="form-control" name="trader_recharge_fee" value="{$merchant.trader_recharge_fee|round=###,4}" placeholder="请输入承兑商充值手续费"><span class="input-group-addon">%</span>
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">承兑商卖单奖励：</label>
 							<div class="input-group">
-								<input id="trader_trader_get" type="text" class="form-control" name="trader_trader_get" value="{$merchant.trader_trader_get}" placeholder="请输入承兑商卖单奖励"><span class="input-group-addon">%</span>
+								<input id="trader_trader_get" type="text" class="form-control" name="trader_trader_get" value="{$merchant.trader_trader_get|round=###,4}" placeholder="请输入承兑商卖单奖励"><span class="input-group-addon">%</span>
 							</div>
 						</div>
 						{/eq}
@@ -121,13 +121,13 @@
 						<div class="form-group">
 							<label class="col-sm-3 control-label">商户盘口费率：</label>
 							<div class="input-group">
-								<input id="merchant_pk_fee" type="text" class="form-control" name="merchant_pk_fee" value="{$merchant.merchant_pk_fee}" placeholder="请输入商户盘口费率"><span class="input-group-addon">%</span>
+								<input id="merchant_pk_fee" type="text" class="form-control" name="merchant_pk_fee" value="{$merchant.merchant_pk_fee|round=###,4}" placeholder="请输入商户盘口费率"><span class="input-group-addon">%</span>
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">商户盘口提币手续费：</label>
 							<div class="input-group">
-								<input id="user_withdraw_fee" type="text" class="form-control" name="user_withdraw_fee" value="{$merchant.user_withdraw_fee}" placeholder="请输入盘口提币手续费"> <span class="input-group-addon">%</span>
+								<input id="user_withdraw_fee" type="text" class="form-control" name="user_withdraw_fee" value="{$merchant.user_withdraw_fee|round=###,4}" placeholder="请输入盘口提币手续费"> <span class="input-group-addon">%</span>
 							</div>
 						</div>
 						{/eq}
@@ -135,26 +135,26 @@
 						<div class="form-group">
 							<label class="col-sm-3 control-label">下级承兑卖单佣金比例：</label>
 							<div class="input-group">
-								<input id="trader_parent_get" type="text" class="form-control" name="trader_parent_get" value="{$merchant.trader_parent_get}" placeholder="下级承兑卖单佣金比例"><span class="input-group-addon">%</span>
+								<input id="trader_parent_get" type="text" class="form-control" name="trader_parent_get" value="{$merchant.trader_parent_get|round=###,4}" placeholder="下级承兑卖单佣金比例"><span class="input-group-addon">%</span>
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">下级承兑卖单利润比例：</label>
 							<div class="input-group">
-								<input id="tariff" type="text" class="form-control" name="tariff" value="{$merchant.tariff}" placeholder="下级承兑商卖单利润"><span class="input-group-addon">%</span>
+								<input id="tariff" type="text" class="form-control" name="tariff" value="{$merchant.tariff|round=###,4}" placeholder="下级承兑商卖单利润"><span class="input-group-addon">%</span>
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">下级商户买订单利润比例：</label>
 							<div class="input-group">
-								<input id="trader_merchant_parent_get" type="text" class="form-control" name="trader_merchant_parent_get" value="{$merchant.trader_merchant_parent_get}" placeholder=""><span class="input-group-addon">%</span>
+								<input id="trader_merchant_parent_get" type="text" class="form-control" name="trader_merchant_parent_get" value="{$merchant.trader_merchant_parent_get|round=###,4}" placeholder=""><span class="input-group-addon">%</span>
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">是否开启商户代理购买订单利润：</label>
 							<div class="input-group">
 								<div class="radio i-checks">
-									<input type="radio" name='enable_new_get' value="1" {if condition="$merchant['enable_new_get'] eq 1 " }checked{/if}/>开启&nbsp;&nbsp; <input type="radio" name='enable_new_get' value="0" {if condition="$merchant['enable_new_get'] eq 0 " }checked{/if}/>关闭&nbsp;&nbsp;
+									<input type="radio" name='enable_new_get' value="1" {if $merchant.enable_new_get==1}checked{/if}/>开启&nbsp;&nbsp; <input type="radio" name='enable_new_get' value="0" {if $merchant.enable_new_get==0 }checked{/if}/>关闭&nbsp;&nbsp;
 								</div>
 							</div>
 						</div>
@@ -162,7 +162,7 @@
 						<div class="form-group">
 							<label class="col-sm-3 control-label">商户代理利润：</label>
 							<div class="input-group">
-								<input id="trader_merchant_parent_get_new" type="text" class="form-control" name="trader_merchant_parent_get_new" value="{$merchant.trader_merchant_parent_get_new}" placeholder="商户代理购买订单利润"><span class="input-group-addon">%</span>
+								<input id="trader_merchant_parent_get_new" type="text" class="form-control" name="trader_merchant_parent_get_new" value="{$merchant.trader_merchant_parent_get_new|round=###,4}" placeholder="商户代理购买订单利润"><span class="input-group-addon">%</span>
 							</div>
 						</div>
 						{/eq}

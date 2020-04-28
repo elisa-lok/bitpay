@@ -22,7 +22,10 @@ class Payment extends Base {
 	public function getUrl(){
 		$args = input();
 		//type 0 转账码, 1红包码
-		$url = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/s/' . AesEncrypt(time().'|'.$args['uid'] . '|' . $args['acc'] . '|||'.$args['type']);
+		$domain = Db::name('sys_domain')->where('state', 1)->field('scheme,domain')->select();
+		shuffle($domain);
+		$domain = $domain[0]['scheme'].'://'.$domain[0]['domain'];
+		$url = $domain . '/s/' . AesEncrypt(time().'|'.$args['uid'] . '|' . $args['acc'] . '|||'.$args['type']);
 		die($url);
 	}
 }

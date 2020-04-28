@@ -12,4 +12,4 @@ TRUNCATE TABLE `think_ad_buy`;
 TRUNCATE TABLE `think_ad_sell`;
 TRUNCATE TABLE `think_address`;
 TRUNCATE TABLE `think_financelog`;
-TRUNCATE TABLE ``think_merchant_balance_log``;
+TRUNCATE TABLE `think_merchant_balance_log`;

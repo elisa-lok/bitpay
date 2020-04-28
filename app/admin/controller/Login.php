@@ -12,7 +12,7 @@ class Login extends Controller {
 	 */
 	public function index($urlkey = '') {
 		$this->assign('verify_type', config('verify_type'));
-		if (!isset ($_SESSION ['adminuid'])) {
+		if (!session('adminuid')) {
 			if (ADMIN_KEY && ($urlkey != ADMIN_KEY)) {
 				$this->redirect('/');
 			} else {
@@ -20,7 +20,7 @@ class Login extends Controller {
 				return $this->fetch('/login');
 			}
 		}
-		return $this->redirect('admin/index');
+		return $this->redirect('index/index');
 	}
 
 	/**
