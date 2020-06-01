@@ -26,10 +26,10 @@
 			<input type="hidden" name="_token" value="bNzO8aGnLnPI5Tgo7i9YVw8qTQEoybhZxxZNraQX">
 			<div class="form-group has-feedback"><input type="input" class="form-control" placeholder="用户名" name="username" value="" id="username" onblur="usernames()"> <span class="glyphicon glyphicon-envelope form-control-feedback"></span></div>
 			<div class="form-group has-feedback"><input type="password" class="form-control" placeholder="密码" name="password" id="password"> <span class="glyphicon glyphicon-lock form-control-feedback"></span></div>
-			<div class="form-group has-feedback"><input type="text" class="form-control" placeholder="图片验证码" name="verify" id="verify" style="padding-right:104px;">
+			<div class="form-group has-feedback"><input type="text" class="form-control" placeholder="图片验证码" name="verify" id="verify" style="padding-right:104px;" onkeypress="usernames()" autocomplete="off">
 				<img style="width:104px;height:32px;position:absolute;top:1px;right:1px;border-radius:4px;" src="{:url('home/login/verify')}" id="verify_img" alt="captcha" onclick="refreshVerify()"/>
 			</div>
-			<div class="form-group has-feedback" id="ga" style="display:none;"><input type="text" class="form-control" placeholder="谷歌验证码，未绑定不用填" name="goole" id="goole"> <span class="glyphicon glyphicon-lock form-control-feedback"></span></div>
+			<div class="form-group has-feedback" id="ga" style="display:none;"><input type="text" class="form-control" placeholder="谷歌验证码" name="goole" id="goole"> <span class="glyphicon glyphicon-lock form-control-feedback"></span></div>
 			<p class="text-center" style="color:#ffffff;">
 				<button type="button" class="btn btn-success btn-lg btn-block" onclick="login()">登录</button>
 			</p>
