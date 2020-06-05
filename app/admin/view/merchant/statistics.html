@@ -9,7 +9,16 @@
         <div class="ibox-content">
             <!--搜索框开始-->
             <div class="row">
-                <div class="col-sm-12">
+                <div class="form-group pull-right">
+                    <div class="form-inline">
+                        <form id="cleanUp">
+                            <label>清理平台利润数据：</label>
+                            <input type="text" name="sdate" onclick="laydate()" id="sdate" class="form-control layer-date" placeholder="开始日期"/>
+                            <input type="text" name="edate" onclick="laydate()" id="edate" class="form-control layer-date" placeholder="结束日期"/>
+                            <button type="button" class="btn btn-primary" onclick="clearDate()">清理</button>
+                        </form>
+                    </div>
+                    可不选开始日期,则清理结束日期之前所有数据
                 </div>
             </div>
             <!--搜索框结束-->
@@ -66,7 +75,6 @@
 {include file="public/footer" /}
 
 <script type="text/javascript">
-
     //laypage分页
     Ajaxpage();
     function Ajaxpage(curr){
@@ -96,6 +104,32 @@
                     }
                 });
             }
+        });
+    }
+
+    function clearDate() {
+        let sdate = $('#sdate').val(), edate = $('#edate').val();
+        if(edate == ''){
+            layer.msg('结束日期不能为空', {icon: 5, time: 1500, shade: 0.1});
+            return false
+        }
+        layer.confirm('确定清理'+sdate +' - '+ edate+'日的利润数据?', {btn: ['确定', '取消'], title: "提示"}, function () {
+            $.ajax({
+                type    : 'POST',
+                url     : "{:url('stat_platform_clean')}",
+                data    : $('#cleanUp').serialize(),
+                dataType: 'json',
+                success : function (data) {
+                    if (data.code == 1) {
+                        layer.msg(data.msg, {icon: 1, time: 1500, shade: 0.1}, function (index) {
+                            location.reload()
+                        });
+                    } else {
+                        layer.msg(data.msg, {icon: 5, time: 1500, shade: 0.1});
+                        return false;
+                    }
+                }
+            });
         });
     }
 </script>
