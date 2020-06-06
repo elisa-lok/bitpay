@@ -1186,7 +1186,7 @@ class Merchant extends Base {
     $args = input('post.');
     (!$args || !$args['edate']) && showMsg('日期错误');
     $stime = (int)strtotime($args['sdate']);
-    $etime = (int)strtotime($args['edate']);
+    $etime = (int)strtotime($args['edate']) + 86399;
     Db::startTrans();
     $sql = ['status' => 1, 'addtime' => ['between', [$stime, $etime]]];
     Db::name('merchant_user_recharge')->where($sql)->update(['fee' => 0]);
@@ -1196,7 +1196,7 @@ class Merchant extends Base {
     Db::name('order_buy')->where($sql)->update(['platform_fee' => 0]);
     Db::name('order_sell')->where($sql)->update(['fee' => 0, 'buyer_fee' => 0]);
     // 删除所有统计信息,
-    Db::name('statistics')->where(['id' => ['gt', 0], 'create_time' => ['between', [$stime, $etime + 21600]]])->update(['platform_profit' => 0, 'new_platform_profit' => 0]);
+    Db::name('statistics')->where(['id' => ['gt', 0]])->update(['platform_profit' => 0, 'new_platform_profit' => 0]);
     Db::commit();
     writelog($this->uid, $this->username, '用户【' . $this->username . '】删除平台' . $args['sdate'] . '-' . $args['edate'] . '统计日志', 1);
     showMsg('删除数据成功', 1);

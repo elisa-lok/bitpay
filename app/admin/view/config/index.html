@@ -97,8 +97,8 @@
 											<label class="col-sm-2 control-label">站点状态：</label>
 											<div class="input-group col-sm-4">
 												<div class="radio i-checks">
-													<input type="radio" name='config[web_site_close]' value="1" {if condition="$config['web_site_close'] eq 1 " }checked{/if}/>开启&nbsp;&nbsp;
-													<input type="radio" name='config[web_site_close]' value="0" {if condition="$config['web_site_close'] eq 0 " }checked{/if}/>关闭
+													<input type="radio" name='config[web_site_close]' value="1" {if $config.web_site_close == 1 }checked{/if}/>开启&nbsp;&nbsp;
+													<input type="radio" name='config[web_site_close]' value="0" {if $config.web_site_close == 0 }checked{/if}/>关闭
 												</div>
 												<span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 站点关闭后除管理员外所有人访问不了后台</span>
 											</div>
@@ -107,7 +107,7 @@
 											<label class="col-sm-2 control-label">支付开关：</label>
 											<div class="input-group col-sm-4">
 												<div class="radio i-checks">
-													<input type="radio" name='config[web_site_api]' value="1" {if condition="$config['web_site_api'] eq 1 " }checked{/if}/>开启 <input type="radio" name='config[web_site_api]' value="0" {if condition="$config['web_site_api'] eq 0 " }checked{/if}/>关闭
+													<input type="radio" name='config[web_site_api]' value="1" {if $config.web_site_api == 1 }checked{/if}/>开启 <input type="radio" name='config[web_site_api]' value="0" {if $config.web_site_api == 0 }checked{/if}/>关闭
 												</div>
 												<span class="help-block m-b-none"><i class="fa fa-info-circle"></i> API关闭后, 商家无法收款</span>
 											</div>
@@ -216,7 +216,7 @@
 											<label class="col-sm-2 control-label">注册邀请人：</label>
 											<div class="input-group col-sm-4">
 												<div class="radio i-checks">
-													<input type="radio" name='config[reg_invite_on]' value="1" {if condition="$config['reg_invite_on'] eq 1 " }checked{/if}/>必填&nbsp;&nbsp; <input type="radio" name='config[reg_invite_on]' value="0" {if condition="$config['reg_invite_on'] eq 0 " }checked{/if}/>非必填
+													<input type="radio" name='config[reg_invite_on]' value="1" {if $config.reg_invite_on == 1 }checked{/if}/>必填&nbsp;&nbsp; <input type="radio" name='config[reg_invite_on]' value="0" {if $config.reg_invite_on == 0 }checked{/if}/>非必填
 												</div>
 												<span class="help-block m-b-none"><i class="fa fa-info-circle"></i></span>
 											</div>
@@ -249,7 +249,7 @@
 										<div class="form-group">
 											<label class="col-sm-2 control-label">USDT币价:</label>
 											<div class="input-group col-sm-4">
-												<input class="form-control" type="text" name="config[usdt_price]" value="{$config['usdt_price']}" placeholder="请输入币价,如:7.0 ( 0为动态读取火币币价 )">
+												<input class="form-control" type="text" name="config[usdt_price]" value="{$config.usdt_price}" placeholder="请输入币价,如:7.0 ( 0为动态读取火币币价 )">
 											</div>
 										</div>
 										<div class="hr-line-dashed"></div>
@@ -257,9 +257,9 @@
 											<label class="col-sm-2 control-label">钱包类型:</label>
 											<div class="input-group col-sm-4">
 												<select class="form-control" name="config[wallettype]">
-													<option value="omni" {if condition="$config['wallettype'] eq 'omni' " }selected="" {/if}> BTC链OMNI协议</option>
-													<option value="erc" {if condition="$config['wallettype'] eq 'erc' " }selected="" {/if}> ETH链ERC20协议</option>
-													<!--  <option value="all" {if condition="$config['wallettype'] eq 'all' "}selected=""{/if}>两者兼容</option> -->
+													<option value="omni" {if $config.wallettype == 'omni' }selected=""{/if}> BTC链OMNI协议</option>
+													<option value="erc" {if $config.wallettype == 'erc' }selected=""{/if}> ETH链ERC20协议</option>
+													<!--  <option value="all" {if $config.wallettype == 'all'}selected=""{/if}>两者兼容</option> -->
 												</select>
 											</div>
 										</div>
@@ -578,7 +578,7 @@
 <script type="text/javascript">
 	let config = {
 		'.chosen-select': {},
-	}
+	};
 	for (var selector in config) {
 		$(selector).chosen(config[selector]);
 	}

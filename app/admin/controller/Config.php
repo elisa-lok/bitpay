@@ -13,6 +13,7 @@ class Config extends Base {
 		foreach ($list as $k => $v) {
 			$config[trim($v['name'])] = $v['value'];
 		}
+		!isset($config['web_site_api']) && ($config['web_site_api'] = 1);
 		$this->assign('config', $config);
 		return $this->fetch();
 	}
