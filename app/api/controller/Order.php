@@ -26,6 +26,7 @@ class Order extends Base {
 	 * notify_url:异步回调页面
 	 */
 	public function tradeCrypto() {
+    !config('web_site_api') && $this->err('通道维护中, 约30分钟恢复');
 		$data = input('post.');
 		(empty($data['amount']) || $data['amount'] <= 0) && $this->err('请输入正确的充值数量');
 		empty($data['address']) && $this->err('充值地址不正确');
@@ -162,7 +163,7 @@ class Order extends Base {
 	 * notify_url:异步回调页面
 	 */
 	public function tradeFiat() {
-		//!config('web_api_close') && $this->err('通道维护中, 约30分钟恢复');
+	  !config('web_site_api') && $this->err('通道维护中, 约30分钟恢复');
 		$data = input('post.');
 		(empty($data['amount']) || $data['amount'] <= 0) && $this->err('请输入正确的充值金额');
 		$data['amount'] < 100 && $this->err('你的充值金额不能小于100');

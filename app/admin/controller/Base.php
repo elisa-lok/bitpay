@@ -12,7 +12,7 @@ class Base extends Controller {
 
 	public function _initialize() {
 		if (!session('adminuid') || !session('username')) {
-			$this->redirect('login/index');
+			$this->redirect('login/loginOut');
 		}
 		$this->uid      = session('adminuid');
 		$this->username = session('username');
